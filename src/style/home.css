@@ -2,14 +2,3 @@
 	width: 100%;
 	display: block;
 }
-
-.home .new-product {
-	background-color: #607D8B;
-	padding: 10px 20px;
-	color: white;
-	font-weight: bold;
-	cursor: pointer;
-	display: block;
-	width: fit-content;
-	margin-left: 85.8%;
-}

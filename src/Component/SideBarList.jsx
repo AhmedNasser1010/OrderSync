@@ -5,8 +5,13 @@ const SideBarList = () => {
     return (
 
         <ul>
-            <li className="all-products link"><Link to="/">All Products</Link></li>
-			<li className="categories link"><Link to="categories">Categories</Link></li>
+            <li className="link"><Link to="/user">User Profile</Link></li>
+            <li className="link"><Link to="/">Overview</Link></li>
+            <li className="link"><Link to="/performance">Performance</Link></li>
+            <li className="link"><Link to="/restaurants">Restaurants</Link></li>
+            <li className="link"><Link to="/login">Logout</Link></li>
+
+
         </ul>
 
     )

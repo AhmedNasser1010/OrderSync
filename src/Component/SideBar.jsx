@@ -9,7 +9,7 @@ function SideBar() {
 	return (
 
 		<div className="side-bar">
-			<Link to="/" className="logo">Logo</Link>
+			<Link to="/" className="logo">POS System Admin</Link>
 			<SideBarList />
 		</div>
 

@@ -3,14 +3,14 @@ import React from "react";
 // Components
 import BtnGroup from "./BtnGroup.jsx";
 
-const TableRow = ({ rowItems }) => {
+const TableRow = ({ rowItems, editBtn, readBtn, deleteBtn}) => {
 	return (
 
 		<tr className={`row-${rowItems.id}`}>
             {
                 Object.values(rowItems).map(value => <th key={`${rowItems.id}+${value}`}>{ value }</th>)
             }
-            <BtnGroup id={rowItems.id} />
+            { editBtn && readBtn && deleteBtn && <BtnGroup id={rowItems.id} editBtn={editBtn} readBtn={readBtn} deleteBtn={deleteBtn} /> }
 		</tr>
 
 	);

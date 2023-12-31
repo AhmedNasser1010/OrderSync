@@ -6,7 +6,7 @@ import TableRow from './TableRow.jsx';
 // API
 import getItems from "../api/getItems.js"
 
-function Table({ skipItems, endPoint, colTitles, theme }) {
+function Table({ skipItems, endPoint, colTitles, theme, editBtn = true, readBtn = true, deleteBtn = true }) {
     const [rowItems, setRowItems] = useState([]);
 
 	useEffect(() => {
@@ -35,7 +35,7 @@ function Table({ skipItems, endPoint, colTitles, theme }) {
 				</tr>
 			</thead>
 			<tbody>
-				{rowItems.map(item => (<TableRow key={item.id} rowItems={item} skipItems={skipItems} />))}
+				{rowItems.map(item => (<TableRow key={item.id} rowItems={item} skipItems={skipItems} editBtn={editBtn} readBtn={readBtn} deleteBtn={deleteBtn} />))}
 			</tbody>
 		</table>
 
