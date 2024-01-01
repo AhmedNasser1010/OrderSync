@@ -5,11 +5,14 @@ import React from "react";
 import "./style/home.css";
 import "./style/sideBar.css";
 
+// Components
+import PageTitle from "./Component/PageTitle";
+
 function Overview() {
 	return (
 
 		<div className="overview">
-            Overview
+			<PageTitle title="Overview" />
 		</div>
 
 	);

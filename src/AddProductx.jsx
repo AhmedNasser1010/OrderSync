@@ -1,7 +1,7 @@
 import React from 'react';
-import Form from './Component/Form.jsx';
 
 // Components
+import Form from './Component/Form.jsx';
 import PageTitle from "./Component/PageTitle.jsx";
 
 function AddProduct() {

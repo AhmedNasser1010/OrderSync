@@ -1,54 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Scripts
-import { getDate, getTime } from "../script.js";
-
 // Components
 import FormLabel from './FormLabel.jsx';
 
-// API
-import postItem from '../api/postItem.js';
-import putItem from "../api/putItem.js";
-import getItems from "../api/getItems.js"
+// Firebase
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { initializeApp } from "firebase/app";
 
-const Form = ({ settings: { theme, fields, endpoint, afterSubmitNavigatePath, apiAction, itemId } }) => {
+const Form = ({ settings: { theme, fields, endpoint, afterSubmitNavigatePath, apiAction, itemId, btnText, submitFunction, job } }) => {
 	const [values, setValues] = useState();
+	const [formErrorMessage, setFormErrorMessage] = useState("");
+	const [inProgress, setInProgress] = useState(false);
 	const navigate = useNavigate();
 
-    // Setup values useState
-    useEffect(() => {
-        let setupResult = {date: getDate(), time: getTime()};
+	// keyyyyyy
 
-		if (apiAction === "POST") {
-			fields.map(field => {
-				setupResult[field.name] = field.defaultData;
-			})
+	const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+	// Set the default state values
+	useEffect(() => {
+		let defaultStateResult = {}
+		fields.map(field => defaultStateResult[field.name] = field.defaultData)
+		setValues(defaultStateResult)
+	}, [])
 	
-			setValues(setupResult);
-		} else if (apiAction === "PUT") {
-			getItems(endpoint, itemId).then(res => setValues(res));
-		}
-    }, [])
-
-    // On Submit Action
-	const handleSubmit = (e) => {
-		e.preventDefault();
-
-		if (values.title === "" || values.category === "" || values.description === "") {
-			return false;
-		} else {
-
-			if (apiAction === "POST") {
-				postItem(endpoint, values);
-			} else if (apiAction === "PUT") {
-				putItem(endpoint, itemId, values);
-			}
-
-            // After Submit Action
-            navigate(afterSubmitNavigatePath)
-		}
+    // On submit action
+	const handleSubmit = (event) => {
+		event.preventDefault();
 		
+		// Create or sign up user process
+		if (!(values.password.length < 6)) {
+			if (job === "register") {
+				setInProgress(true);
+				createUserWithEmailAndPassword(auth, values.email, values.password)
+					.then(() => {navigate(afterSubmitNavigatePath)})
+					.catch((error) => {
+						const errorCode = error.code;
+						const errorMessage = error.message;
+
+						setInProgress(false);
+						setFormErrorMessage(errorMessage);
+					});
+			} else if (job === "login") {
+				setInProgress(true);
+				signInWithEmailAndPassword(auth, values.email, values.password)
+					.then(() => {navigate(afterSubmitNavigatePath)})
+					.catch((error) => {
+						const errorCode = error.code;
+						const errorMessage = error.message;
+
+						setInProgress(false);
+						setFormErrorMessage(errorMessage);
+					});
+			}
+		} else {setFormErrorMessage("Password should be at least 6 characters")}
 	}
 
 	const handleOnChange = (e) => {
@@ -64,7 +71,8 @@ const Form = ({ settings: { theme, fields, endpoint, afterSubmitNavigatePath, ap
             {
                 fields.map((field, index) => <FormLabel key={index} labelData={field} value={values ? values[field.name] : ""} onChangeEvent={handleOnChange} />)
             }
-			<input type="submit" value="Submit" className="submit-btn" />
+			{ inProgress ? <span style={{color: "green"}}>In progress...</span> : <input type="submit" value={btnText} className="submit-btn" /> }
+			<span className='error-message' style={{color: "red", display: "block", fontSize: "20px"}}>{ formErrorMessage }</span>
 		</form>
 
 	);

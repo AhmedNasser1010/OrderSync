@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 
 // Styles
 import "./style/table.css";
+import "./style/formTheme.css";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

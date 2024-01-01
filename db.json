@@ -70,5 +70,21 @@
       "id": 2,
       "name": "jewelery"
     }
+  ],
+  "users": [
+    {
+      "date": "2024/1/1",
+      "time": "4:37 PM",
+      "email": "ahmed.mix.games@gmail.com",
+      "password": "523465",
+      "id": 1
+    },
+    {
+      "date": "2024/1/1",
+      "time": "5:08 PM",
+      "email": "ahmed.mix.games@gmail.com",
+      "password": "000000000000000",
+      "id": 2
+    }
   ]
 }

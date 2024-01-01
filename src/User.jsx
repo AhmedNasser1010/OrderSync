@@ -1,9 +1,12 @@
 import React from "react";
 
+// Components
+import PageTitle from "./Component/PageTitle";
+
 const User = () => {
     return (
         <div className="user">
-            User
+            <PageTitle title="User Profile" />
         </div>
     )
 }

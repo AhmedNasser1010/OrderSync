@@ -1,9 +1,12 @@
 import React from "react";
 
+// Components
+import PageTitle from "./Component/PageTitle";
+
 const Performance = () => {
     return (
         <div className="performance">
-            Performance
+            <PageTitle title="Performance" />
         </div>
     )
 }

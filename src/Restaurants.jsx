@@ -5,6 +5,7 @@ import Tab from "./Component/Tab";
 import RestaurantsManagement from "./RestaurantsManagement.jsx";
 import RestaurantsOrdersList from "./RestaurantsOrdersList.jsx";
 import RestaurantsPendingOrders from "./RestaurantsPendingOrders.jsx";
+import PageTitle from "./Component/PageTitle";
 
 // fx
 import fromKebabToTitle from "./function/fromKebabToTitle.js";
@@ -19,7 +20,7 @@ const Restaurants = () => {
 
     return (
         <div className="Restaurants">
-            Restaurants - { fromKebabToTitle(currentTab) }
+            <PageTitle title={`Restaurants - ${fromKebabToTitle(currentTab)}`} />
 
             <Tab
                 setCurrentTabState={setCurrentTabState}
