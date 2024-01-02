@@ -1,45 +1,26 @@
 import { Link, useNavigate } from "react-router-dom";
 
-// Firebase
-import { getAuth, signOut} from "firebase/auth";
-import { initializeApp } from "firebase/app";
+// Functions
+import authSignOut from "../function/authSignOut.js";
 
+// Firebase
+import { auth } from "../firebase.js";
 
 const SideBarList = () => {
     const navigate = useNavigate();
     
-    const firebaseConfig = {
-        apiKey: "AIzaSyBeH_AMxj4EC4tgDG39z8MTHh6SlmgAljc",
-        authDomain: "pos-system-0.firebaseapp.com",
-        projectId: "pos-system-0",
-        storageBucket: "pos-system-0.appspot.com",
-        messagingSenderId: "966111235551",
-        appId: "1:966111235551:web:1c422bde0a7404682fc86a",
-        measurementId: "G-SGG6QFT1H7"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    
     const signOutMethod = () => {
-        signOut(auth)
-            .then(() => {navigate("/login")})
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-
-                console.error(errorCode);
-                console.error(errorMessage);
-            });
+        authSignOut();
+        navigate("/login");
     }
 
     return (
 
         <ul>
-            <li className="link"><Link to="/user">User Profile</Link></li>
-            <li className="link"><Link to="/">Overview</Link></li>
-            <li className="link"><Link to="/performance">Performance</Link></li>
-            <li className="link"><Link to="/restaurants">Restaurants</Link></li>
+            <li className="link"><Link to={auth.currentUser ? "/user" : "/login"}>User Profile</Link></li>
+            <li className="link"><Link to={auth.currentUser ? "/" : "/login"}>Overview</Link></li>
+            <li className="link"><Link to={auth.currentUser ? "/performance" : "/login"}>Performance</Link></li>
+            <li className="link"><Link to={auth.currentUser ? "/restaurants" : "/login"}>Restaurants</Link></li>
             <li className="link" onClick={signOutMethod}><Link to="/login">Logout</Link></li>
         </ul>
 

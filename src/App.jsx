@@ -6,17 +6,14 @@ import { Routes, Route } from "react-router-dom";
 import SideBar from "./Component/SideBar.jsx";
 
 // Pages
-import Overview from "./Overview.jsx";
+import PrivateRoute from "./PrivateRoute.jsx";
+import Home from "./Home.jsx";
 import User from './User.jsx';
 import Performance from './Performance.jsx';
 import Restaurants from './Restaurants.jsx';
 import Login from './Login.jsx';
-import Register from './Register.jsx';
+import Signup from './Signup.jsx';
 import AddNewRestaurant from './AddNewRestaurant.jsx';
-
-// import AddProduct from "./AddProduct.jsx";
-// import ViewItem from "./ViewItem.jsx";
-// import EditProduct from "./EditProduct.jsx";
 
 
 function App() {
@@ -27,17 +24,13 @@ function App() {
       <div className="content">
         
         <Routes>
-          <Route path="/" element={<Overview />} />
-          <Route path="/user" element={<User />} />
-          <Route path="/performance" element={<Performance />} />
-          <Route path="/restaurants" element={<Restaurants />} />
+          <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/restaurants/new" element={<AddNewRestaurant />} />
-
-          {/* <Route path="new" element={<AddProduct />} /> */}
-          {/* <Route path="item/:productId" element={<ViewItem />} /> */}
-          {/* <Route path="products/edit/:productId" element={<EditProduct />} /> */}
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/user" element={<PrivateRoute><User /></PrivateRoute>} />
+          <Route path="/performance" element={<PrivateRoute><Performance /></PrivateRoute>} />
+          <Route path="/restaurants" element={<PrivateRoute><Restaurants /></PrivateRoute>} />
+          <Route path="/restaurants/new" element={<PrivateRoute><AddNewRestaurant /></PrivateRoute>} />
         </Routes>
 
       </div>

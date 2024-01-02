@@ -8,14 +8,14 @@ import "./style/sideBar.css";
 // Components
 import PageTitle from "./Component/PageTitle";
 
-function Overview() {
+function Home() {
 	return (
 
-		<div className="overview">
-			<PageTitle title="Overview" />
+		<div className="home">
+			<PageTitle title="Home - Overview" />
 		</div>
 
 	);
 }
 
-export default Overview;
+export default Home;

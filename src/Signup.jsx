@@ -1,15 +1,11 @@
-import React, { useEffect } from "react";
-
-
-
 // Components
 import PageTitle from "./Component/PageTitle";
 import Form from "./Component/Form";
 
-const Register = () => {
+const Signup = () => {
     const formSettings = {
 		theme: "theme1",
-		afterSubmitNavigatePath: "/",
+		afterSubmitNavigatePath: "/login",
         btnText: "Register",
         job: "register",
 		fields:[
@@ -19,11 +15,11 @@ const Register = () => {
 	};
 
     return (
-        <div className="register">
+        <div className="signup">
             <PageTitle title="Register a New Account" />
             <Form settings={formSettings} />
         </div>
     )
 }
 
-export default Register;
+export default Signup;

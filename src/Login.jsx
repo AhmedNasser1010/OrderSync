@@ -5,12 +5,10 @@ import { Link } from "react-router-dom";
 import PageTitle from "./Component/PageTitle.jsx";
 import Form from './Component/Form.jsx';
 
-
 const Login = () => {
-
     const formSettings = {
 		theme: "theme1",
-		afterSubmitNavigatePath: "/login",
+		afterSubmitNavigatePath: "/",
         btnText: "Login",
         job: "login",
 		fields:[
@@ -25,7 +23,7 @@ const Login = () => {
             <Form settings={formSettings} />
             <span style={{display: "block"}}>Or <Link to="/register" style={{color: "blue"}}>register</Link> a new account</span>
         </div>
-    )
+    );
 }
 
 export default Login;

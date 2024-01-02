@@ -5,27 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import FormLabel from './FormLabel.jsx';
 
 // Firebase
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { initializeApp } from "firebase/app";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase.js";
+import authSignOut from "../function/authSignOut.js";
 
 const Form = ({ settings: { theme, fields, afterSubmitNavigatePath, btnText, job } }) => {
 	const [values, setValues] = useState();
 	const [formErrorMessage, setFormErrorMessage] = useState("");
 	const [inProgress, setInProgress] = useState(false);
 	const navigate = useNavigate();
-
-	const firebaseConfig = {
-		apiKey: "AIzaSyBeH_AMxj4EC4tgDG39z8MTHh6SlmgAljc",
-		authDomain: "pos-system-0.firebaseapp.com",
-		projectId: "pos-system-0",
-		storageBucket: "pos-system-0.appspot.com",
-		messagingSenderId: "966111235551",
-		appId: "1:966111235551:web:1c422bde0a7404682fc86a",
-		measurementId: "G-SGG6QFT1H7"
-	};
-
-	const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
 
 	// Set the default state values
 	useEffect(() => {
@@ -43,7 +31,11 @@ const Form = ({ settings: { theme, fields, afterSubmitNavigatePath, btnText, job
 			if (job === "register") {
 				setInProgress(true);
 				createUserWithEmailAndPassword(auth, values.email, values.password)
-					.then(() => {navigate(afterSubmitNavigatePath)})
+					.then(() => {
+						navigate(afterSubmitNavigatePath);
+						console.log("Registration successful!");
+						authSignOut();
+					})
 					.catch((error) => {
 						const errorCode = error.code;
 						const errorMessage = error.message;
@@ -56,18 +48,25 @@ const Form = ({ settings: { theme, fields, afterSubmitNavigatePath, btnText, job
 					});
 			} else if (job === "login") {
 				setInProgress(true);
-				signInWithEmailAndPassword(auth, values.email, values.password)
-					.then(() => {navigate(afterSubmitNavigatePath)})
-					.catch((error) => {
-						const errorCode = error.code;
-						const errorMessage = error.message;
+				if (auth.currentUser) {
+					console.warn("Auth: You are already logged in");
+				} else {
+					signInWithEmailAndPassword(auth, values.email, values.password)
+						.then(() => {
+							navigate(afterSubmitNavigatePath);
+							console.log("Login successful");
+						})
+						.catch((error) => {
+							const errorCode = error.code;
+							const errorMessage = error.message;
 
-						console.error(errorCode);
-						console.error(errorMessage);
+							console.error(errorCode);
+							console.error(errorMessage);
 
-						setInProgress(false);
-						setFormErrorMessage(errorMessage);
+							setInProgress(false);
+							setFormErrorMessage(errorMessage);
 					});
+				}
 			}
 		} else {setFormErrorMessage("Password should be at least 6 characters")}
 	}
