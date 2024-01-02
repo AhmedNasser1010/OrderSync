@@ -1,5 +1,3 @@
-import React from 'react';
-
 import "./style/Normaliz.css";
 import "./style/all.css";
 import { Routes, Route } from "react-router-dom";

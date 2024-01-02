@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Components
@@ -8,13 +8,21 @@ import FormLabel from './FormLabel.jsx';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 
-const Form = ({ settings: { theme, fields, endpoint, afterSubmitNavigatePath, apiAction, itemId, btnText, submitFunction, job } }) => {
+const Form = ({ settings: { theme, fields, afterSubmitNavigatePath, btnText, job } }) => {
 	const [values, setValues] = useState();
 	const [formErrorMessage, setFormErrorMessage] = useState("");
 	const [inProgress, setInProgress] = useState(false);
 	const navigate = useNavigate();
 
-	// keyyyyyy
+	const firebaseConfig = {
+		apiKey: "AIzaSyBeH_AMxj4EC4tgDG39z8MTHh6SlmgAljc",
+		authDomain: "pos-system-0.firebaseapp.com",
+		projectId: "pos-system-0",
+		storageBucket: "pos-system-0.appspot.com",
+		messagingSenderId: "966111235551",
+		appId: "1:966111235551:web:1c422bde0a7404682fc86a",
+		measurementId: "G-SGG6QFT1H7"
+	};
 
 	const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -40,6 +48,9 @@ const Form = ({ settings: { theme, fields, endpoint, afterSubmitNavigatePath, ap
 						const errorCode = error.code;
 						const errorMessage = error.message;
 
+						console.error(errorCode);
+						console.error(errorMessage);
+
 						setInProgress(false);
 						setFormErrorMessage(errorMessage);
 					});
@@ -50,6 +61,9 @@ const Form = ({ settings: { theme, fields, endpoint, afterSubmitNavigatePath, ap
 					.catch((error) => {
 						const errorCode = error.code;
 						const errorMessage = error.message;
+
+						console.error(errorCode);
+						console.error(errorMessage);
 
 						setInProgress(false);
 						setFormErrorMessage(errorMessage);

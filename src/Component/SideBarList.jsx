@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 // Firebase
@@ -7,24 +6,30 @@ import { initializeApp } from "firebase/app";
 
 
 const SideBarList = () => {
-	const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const navigate = useNavigate();
-
-    // keyyyyy
-
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyBeH_AMxj4EC4tgDG39z8MTHh6SlmgAljc",
+        authDomain: "pos-system-0.firebaseapp.com",
+        projectId: "pos-system-0",
+        storageBucket: "pos-system-0.appspot.com",
+        messagingSenderId: "966111235551",
+        appId: "1:966111235551:web:1c422bde0a7404682fc86a",
+        measurementId: "G-SGG6QFT1H7"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    
     const signOutMethod = () => {
-        // setInProgress(true);
         signOut(auth)
             .then(() => {navigate("/login")})
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
+
                 console.error(errorCode);
                 console.error(errorMessage);
-
-                // setInProgress(false);
-                // setFormErrorMessage(errorMessage);
             });
     }
 
@@ -35,7 +40,7 @@ const SideBarList = () => {
             <li className="link"><Link to="/">Overview</Link></li>
             <li className="link"><Link to="/performance">Performance</Link></li>
             <li className="link"><Link to="/restaurants">Restaurants</Link></li>
-            <li className="link"><Link to="/login">Logout</Link></li>
+            <li className="link" onClick={signOutMethod}><Link to="/login">Logout</Link></li>
         </ul>
 
     )
