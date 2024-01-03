@@ -3,9 +3,9 @@ import React from "react";
 // Components
 import Table from "./Component/Table.jsx";
 
-const RestaurantsPendingOrders = () => {
+const BusinessesPendingOrders = () => {
     return (
-        <section className="">
+        <section className="businesses-pending-orders">
             <Table
                 endPoint={"categories"}
 				colTitles={["ID", "Title"]}
@@ -19,4 +19,4 @@ const RestaurantsPendingOrders = () => {
     )
 }
 
-export default RestaurantsPendingOrders;
+export default BusinessesPendingOrders;

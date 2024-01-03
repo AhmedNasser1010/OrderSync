@@ -40,7 +40,8 @@ Revolutionize your business management with our innovative web application, draw
 	- Done
 - Brainstorming 🌪️
 	- To Do
-		- [ ] Create a basic documentation for the project
+		- [ ] Create a basic documentation for the project.
+		- [ ] Add method to make backup from the database.
 	- In Progress
 	- Done
  

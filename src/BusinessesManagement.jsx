@@ -4,12 +4,12 @@ import { Link } from "react-router-dom";
 // Components
 import Table from "./Component/Table.jsx";
 
-const RestaurantsManagement = () => {
+const BusinessesManagement = () => {
 
     return (
 
-        <section className="RestaurantsManagement">
-            <Link to="/restaurants/new" style={{color: "white", backgroundColor: "blue"}}>Add New Restaurant</Link>
+        <section className="businesses-management">
+            <Link to="/Businesses/new" style={{color: "white", backgroundColor: "blue"}}>Add New Business</Link>
             <Table
                 endPoint={"products"}
 				colTitles={["ID", "Title", "Price", "Description", "Category", "Date", "Time", "Action"]}
@@ -21,4 +21,4 @@ const RestaurantsManagement = () => {
     )
 }
 
-export default RestaurantsManagement;
+export default BusinessesManagement;

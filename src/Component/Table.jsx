@@ -3,28 +3,25 @@ import React, { useState, useEffect } from 'react';
 // Components
 import TableRow from './TableRow.jsx';
 
-// API
-import getItems from "../api/getItems.js"
-
 function Table({ skipItems, endPoint, colTitles, theme, editBtn = true, readBtn = true, deleteBtn = true }) {
     const [rowItems, setRowItems] = useState([]);
 
-	useEffect(() => {
-		getItems(endPoint)
-		.then(data => {
+	// useEffect(() => {
+	// 	getItems(endPoint)
+	// 	.then(data => {
 			
-			if (skipItems) {
-				data.map(item => {
-					skipItems.map(skipItem => {
-						delete item[skipItem]
-					})
-				})
-			}
+	// 		if (skipItems) {
+	// 			data.map(item => {
+	// 				skipItems.map(skipItem => {
+	// 					delete item[skipItem]
+	// 				})
+	// 			})
+	// 		}
 
-			setRowItems(data)
-		})
+	// 		setRowItems(data)
+	// 	})
 
-	}, [])
+	// }, [])
 
 	return (
 

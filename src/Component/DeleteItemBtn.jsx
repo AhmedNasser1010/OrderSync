@@ -1,8 +1,5 @@
 import React from "react";
 
-// API
-import deleteItem from "../api/deleteItem.js";
-
 const DeleteItemBtn = ({ id }) => {
 
     const handleDelete = (id) => {

@@ -2,9 +2,9 @@ import React, { useState } from "react";
 
 // Components
 import Tab from "./Component/Tab";
-import RestaurantsManagement from "./RestaurantsManagement.jsx";
-import RestaurantsOrdersList from "./RestaurantsOrdersList.jsx";
-import RestaurantsPendingOrders from "./RestaurantsPendingOrders.jsx";
+import BusinessesManagement from "./BusinessesManagement.jsx";
+import BusinessesOrdersList from "./BusinessesOrdersList.jsx";
+import BusinessesPendingOrders from "./BusinessesPendingOrders.jsx";
 import PageTitle from "./Component/PageTitle";
 
 // fx
@@ -19,8 +19,8 @@ const Restaurants = () => {
     }
 
     return (
-        <div className="Restaurants">
-            <PageTitle title={`Restaurants - ${fromKebabToTitle(currentTab)}`} />
+        <div className="businesses">
+            <PageTitle title={`Businesses - ${fromKebabToTitle(currentTab)}`} />
 
             <Tab
                 setCurrentTabState={setCurrentTabState}
@@ -32,9 +32,9 @@ const Restaurants = () => {
 
             <hr />
 
-            { currentTab === "management" && <RestaurantsManagement /> }
-            { currentTab === "orders-list" && <RestaurantsOrdersList /> }
-            { currentTab === "pending-orders" && <RestaurantsPendingOrders /> }
+            { currentTab === "management" && <BusinessesManagement /> }
+            { currentTab === "orders-list" && <BusinessesOrdersList /> }
+            { currentTab === "pending-orders" && <BusinessesPendingOrders /> }
         </div>
     )
 }
