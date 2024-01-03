@@ -1,9 +1,11 @@
 
+
 # POS System Admin 🧑‍💼🚀
 
 ## 🔶 Table of Contents
 - [Description](#description)
 - [To Do List](#to-do-list)
+- [Diagrams](#diagrams)
 - [Technologies](#technologies)
 - [Features](#features)
 - [Installation](#installation)
@@ -42,6 +44,10 @@ Revolutionize your business management with our innovative web application, draw
 	- In Progress
 	- Done
  
+## Diagrams
+![onion-diagram](https://i.imgur.com/tOzaiai.png)
+![permission-levels](https://i.imgur.com/bYowxmL.png)
+
 
 ## 🔶 Technologies
 
