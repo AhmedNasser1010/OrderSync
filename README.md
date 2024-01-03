@@ -22,12 +22,13 @@ Revolutionize your business management with our innovative web application, draw
 - Tasks 🎯
 	- To Do
 	- In Progress
-		- [ ] Active Firestore with the project
 	- Done
 		- [x] Clone CRUD project from my repo and make a copy to start this project.
 		- [x] Break down the components.
 		- [x] Integrate Firebase with [Authenticate, Firestore].
 		- [x] Active Authenticate system.
+  		- [x] Initialize Firestore.
+    	- [x] Add, form for add new business.
 - Feature Development 🚀
 	- To Do
 	- In Progress
@@ -41,7 +42,8 @@ Revolutionize your business management with our innovative web application, draw
 - Brainstorming 🌪️
 	- To Do
 		- [ ] Create a basic documentation for the project.
-		- [ ] Add method to make backup from the database.
+		- [ ] Add method to make backup for all database (system owner).
+  		- [ ] Add method for admin to extract business data to Exel or google sheet file.
 	- In Progress
 	- Done
  
