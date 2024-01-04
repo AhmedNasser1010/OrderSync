@@ -1,16 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
 
-// Components
-import BtnGroup from "./BtnGroup.jsx";
+// Functions
+import fromKebabToTitle from "../function/fromKebabToTitle.js";
+import sortByKey from "../function/sortByKey";
 
-const TableRow = ({ rowItems, editBtn, readBtn, deleteBtn}) => {
+const TableRow = ({ rowItems, index }) => {
+	const navigate = useNavigate();
+	const rowItemsSorted = sortByKey(rowItems);
+
+	const handleOnClick = (path) => {
+		navigate(`/businesses/${path}`);
+	}
+
 	return (
 
-		<tr className={`row-${rowItems.id}`}>
-            {
-                Object.values(rowItems).map(value => <th key={`${rowItems.id}+${value}`}>{ value }</th>)
-            }
-            { editBtn && readBtn && deleteBtn && <BtnGroup id={rowItems.id} editBtn={editBtn} readBtn={readBtn} deleteBtn={deleteBtn} /> }
+		<tr className='row' style={{cursor: "pointer"}} onClick={() => handleOnClick(rowItems.businessName)}>
+			<th>{ index + 1 }</th>
+      {
+        Object.values(rowItemsSorted).map(value => <th key={uuidv4()}>{ fromKebabToTitle(value) }</th>)
+      }
 		</tr>
 
 	);

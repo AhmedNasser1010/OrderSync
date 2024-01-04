@@ -21,14 +21,29 @@ Revolutionize your business management with our innovative web application, draw
 ### Project
 - Tasks 🎯
 	- To Do
+		- [ ] Store and get bussinesses one time in state
+		- [ ] Optimize React Redux for use.
+		- [ ] Create, User profile page.
+		- [ ] Create, Home page (Overview).
+		- [ ] Create, Performance page.
+		- [ ] Create, businesses sales widget.
+		- [ ] Create, Manage business tab.
+		- [ ] Create, Orders list tab.
+		- [ ] Create, Pending orders.
+		- [ ] Change the registration forms to "Formik" forms
 	- In Progress
+		- [ ] Add, Remove current business function.
+		- [ ] Create, Business settings page.
 	- Done
-		- [x] Clone CRUD project from my repo and make a copy to start this project.
+		- [x] Get current businesses in table.
 		- [x] Break down the components.
 		- [x] Integrate Firebase with [Authenticate, Firestore].
 		- [x] Active Authenticate system.
   		- [x] Initialize Firestore.
     	- [x] Add, form for add new business.
+    	- [x] Create, Businesses page.
+    	- [x] Create, Add new business page.
+		- [x] Clone CRUD project from my repo and make a copy to start this project.
 - Feature Development 🚀
 	- To Do
 	- In Progress

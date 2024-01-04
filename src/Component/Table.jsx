@@ -1,38 +1,38 @@
 import React, { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 // Components
 import TableRow from './TableRow.jsx';
 
-function Table({ skipItems, endPoint, colTitles, theme, editBtn = true, readBtn = true, deleteBtn = true }) {
-    const [rowItems, setRowItems] = useState([]);
+function Table({ skipItems, colTitles, theme, data }) {
+   const [rowItems, setRowItems] = useState([]);
 
-	// useEffect(() => {
-	// 	getItems(endPoint)
-	// 	.then(data => {
-			
-	// 		if (skipItems) {
-	// 			data.map(item => {
-	// 				skipItems.map(skipItem => {
-	// 					delete item[skipItem]
-	// 				})
-	// 			})
-	// 		}
+	useEffect(() => {
 
-	// 		setRowItems(data)
-	// 	})
+		if (skipItems) {
+			data.map(item => {
+				skipItems.map(skipItem => {
+					delete item[skipItem]
+				})
+			})
+		}
 
-	// }, [])
+		setRowItems(data)
+
+	}, [data])
+
+	useEffect(() => {}, [])
 
 	return (
 
 		<table className={`${theme}`}>
 			<thead>
 				<tr>
-                    {colTitles.map(head => (<th key={head}>{ head }</th>))}
+          { colTitles.map(head => (<th key={head}>{ head }</th>)) }
 				</tr>
 			</thead>
 			<tbody>
-				{rowItems.map(item => (<TableRow key={item.id} rowItems={item} skipItems={skipItems} editBtn={editBtn} readBtn={readBtn} deleteBtn={deleteBtn} />))}
+				{ rowItems.map((item, index) => (<TableRow key={uuidv4()} rowItems={item} index={index} />)) }
 			</tbody>
 		</table>
 

@@ -1,24 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 // Components
 import Table from "./Component/Table.jsx";
 
+// Functions
+import _getDoc from "./function/_getDoc.js";
+
 const BusinessesManagement = () => {
+	const [data, setData] = useState([])
 
-    return (
+	useEffect(() => {
 
-        <section className="businesses-management">
-            <Link to="/Businesses/new" style={{color: "white", backgroundColor: "blue"}}>Add New Business</Link>
-            <Table
-                endPoint={"products"}
-				colTitles={["ID", "Title", "Price", "Description", "Category", "Date", "Time", "Action"]}
+		const fetchData = async () => {
+
+			const result = await _getDoc("businesses");
+			setData(result);
+
+		}
+
+		fetchData();
+
+	}, [])
+
+	return (
+
+		<section className="businesses-management">
+			<Link to="/Businesses/new" style={{color: "white", backgroundColor: "blue"}}>Add New Business</Link>
+			<Table
+				colTitles={["Index", "Business Name", "Industry Type"]}
 				theme="styled-table"
-				skipItems={["image"]}
-            />
-        </section>
+				data={data}
+				skipItems={["createdOn", "uid", "businessOwnerEmail"]}
+			/>
+		</section>
 
-    )
+	)
 }
 
 export default BusinessesManagement;

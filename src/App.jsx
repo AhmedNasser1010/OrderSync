@@ -14,6 +14,7 @@ import Businesses from './Businesses.jsx';
 import Login from './Login.jsx';
 import Signup from './Signup.jsx';
 import AddNewBusinesse from './AddNewBusinesse.jsx';
+import BusinessSettings from "./BusinessSettings.jsx";
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
           <Route path="/performance" element={<PrivateRoute><Performance /></PrivateRoute>} />
           <Route path="/businesses" element={<PrivateRoute><Businesses /></PrivateRoute>} />
           <Route path="/businesses/new" element={<PrivateRoute><AddNewBusinesse /></PrivateRoute>} />
+          <Route path="/businesses/:businessName" element={<PrivateRoute><BusinessSettings /></PrivateRoute>} />
         </Routes>
 
       </div>
