@@ -1,4 +1,4 @@
-const getCurrentTime = () => {
+const getCurrentTime12H = () => {
 
 	const currentDate = new Date();
 	let hours = currentDate.getHours();
@@ -16,4 +16,4 @@ const getCurrentTime = () => {
 
 }
 
-export default getCurrentTime;
+export default getCurrentTime12H;

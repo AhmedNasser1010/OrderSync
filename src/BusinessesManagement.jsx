@@ -1,26 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBusinesses } from "./rtk/slices/businessesSlice.js";
 
 // Components
 import Table from "./Component/Table.jsx";
 
-// Functions
-import _getDoc from "./function/_getDoc.js";
-
 const BusinessesManagement = () => {
-	const [data, setData] = useState([])
+	const [data, setData] = useState([]);
+	const dispatch = useDispatch();
+  	const businesses = useSelector((state) => state.businesses);
 
 	useEffect(() => {
-
-		const fetchData = async () => {
-
-			const result = await _getDoc("businesses");
-			setData(result);
-
-		}
-
-		fetchData();
-
+		dispatch(fetchBusinesses());
 	}, [])
 
 	return (
@@ -30,8 +22,8 @@ const BusinessesManagement = () => {
 			<Table
 				colTitles={["Index", "Business Name", "Industry Type"]}
 				theme="styled-table"
-				data={data}
-				skipItems={["createdOn", "uid", "businessOwnerEmail"]}
+				data={businesses.data}
+				allowedKeys={["businessName", "industry"]}
 			/>
 		</section>
 

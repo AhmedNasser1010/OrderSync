@@ -21,8 +21,7 @@ Revolutionize your business management with our innovative web application, draw
 ### Project
 - Tasks 🎯
 	- To Do
-		- [ ] Store and get bussinesses one time in state
-		- [ ] Optimize React Redux for use.
+		- [ ] Caching data.
 		- [ ] Create, User profile page.
 		- [ ] Create, Home page (Overview).
 		- [ ] Create, Performance page.
@@ -30,11 +29,13 @@ Revolutionize your business management with our innovative web application, draw
 		- [ ] Create, Manage business tab.
 		- [ ] Create, Orders list tab.
 		- [ ] Create, Pending orders.
-		- [ ] Change the registration forms to "Formik" forms
+		- [ ] Change the registration forms to "Formik" forms.
 	- In Progress
 		- [ ] Add, Remove current business function.
 		- [ ] Create, Business settings page.
 	- Done
+		- [x] Store and get bussinesses one time in state (Redux).
+		- [x] Optimize React Redux for use.
 		- [x] Get current businesses in table.
 		- [x] Break down the components.
 		- [x] Integrate Firebase with [Authenticate, Firestore].

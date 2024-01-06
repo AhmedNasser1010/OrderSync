@@ -32,7 +32,7 @@ function App() {
           <Route path="/performance" element={<PrivateRoute><Performance /></PrivateRoute>} />
           <Route path="/businesses" element={<PrivateRoute><Businesses /></PrivateRoute>} />
           <Route path="/businesses/new" element={<PrivateRoute><AddNewBusinesse /></PrivateRoute>} />
-          <Route path="/businesses/:businessName" element={<PrivateRoute><BusinessSettings /></PrivateRoute>} />
+          <Route path="/businesses/:accessToken" element={<PrivateRoute><BusinessSettings /></PrivateRoute>} />
         </Routes>
 
       </div>

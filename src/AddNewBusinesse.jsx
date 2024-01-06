@@ -1,20 +1,23 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { object, string, date } from 'yup';
 import { useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
 
 // Firebase
 import { auth } from "./firebase.js";
 
 // Functions
 import _addDoc from "./function/_addDoc.js";
+import getCurrentDate from "./function/getCurrentDate.js";
+import getCurrentTime24H from "./function/getCurrentTime24H.js";
 
 // Validation Schema
 let businessSchema = object({
   businessName: string().required().min(3, "Too Short").max(20, "Too Long"),
   industry: string().required().min(3, "Too Short").max(20, "Too Long"),
-  createdOn: date().default(() => new Date()),
-  uid: string().required(),
+  createdOn: object().required(),
+  accessToken: string().required(),
   businessOwnerEmail: string().email().required(),
 });
 
@@ -23,16 +26,17 @@ import PageTitle from "./Component/PageTitle.jsx";
 
 const AddNewBusinesse = () => {
 	const navigate = useNavigate();
+	const [accessToken, setAccessToken] = useState(`${uuidv4()}_${auth.currentUser.uid}`);
 
 	return (
 
 		<section className="add-new-businesse theme1">
 			<PageTitle title="Add New Businesse +" />
 			<Formik
-				initialValues={{ businessName: '', businessOwnerEmail: '', industry: '', createdOn: new Date(), uid: auth.currentUser.uid }}
+				initialValues={{ businessName: '', businessOwnerEmail: '', industry: '', createdOn: {date: getCurrentDate(), time: getCurrentTime24H()}, accessToken: accessToken }}
 				validationSchema={businessSchema}
 				onSubmit={values => {
-					_addDoc("businesses", values);
+					_addDoc("businesses", values, accessToken);
 					navigate("/businesses?tab=management");
 				}}
 			>

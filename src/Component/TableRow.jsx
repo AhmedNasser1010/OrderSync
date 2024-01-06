@@ -6,20 +6,39 @@ import { v4 as uuidv4 } from 'uuid';
 import fromKebabToTitle from "../function/fromKebabToTitle.js";
 import sortByKey from "../function/sortByKey";
 
-const TableRow = ({ rowItems, index }) => {
+const TableRow = ({ rowItems, index, allowedKeys }) => {
 	const navigate = useNavigate();
-	const rowItemsSorted = sortByKey(rowItems);
+	const [filtered, setFiltered] = useState({})
 
 	const handleOnClick = (path) => {
 		navigate(`/businesses/${path}`);
 	}
 
+	useEffect(() => {
+		let result = {};
+
+		Object.entries(rowItems).map(([key, value]) => {
+
+      allowedKeys.map(allowedKey => {
+
+        if (allowedKey === key) {
+        	result[key] = value;
+        }
+
+      })
+
+    })
+
+    setFiltered(sortByKey(result))
+
+	}, [])
+
 	return (
 
-		<tr className='row' style={{cursor: "pointer"}} onClick={() => handleOnClick(rowItems.businessName)}>
+		<tr className='row' style={{cursor: "pointer"}} onClick={() => handleOnClick(rowItems.accessToken)}>
 			<th>{ index + 1 }</th>
       {
-        Object.values(rowItemsSorted).map(value => <th key={uuidv4()}>{ fromKebabToTitle(value) }</th>)
+      	Object.values(filtered).map(value => <th key={uuidv4()}>{ fromKebabToTitle(value) }</th>)
       }
 		</tr>
 

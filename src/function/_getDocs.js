@@ -1,7 +1,7 @@
 import { doc, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase.js";
 
-const _getDoc = async (collectionName) => {
+const _getDocs = async (collectionName) => {
 
 	try {
 
@@ -9,6 +9,7 @@ const _getDoc = async (collectionName) => {
 		let result = [];
 		querySnapshot.forEach((doc) => {
 
+			console.log("Firebase: Get data from the store successfuly");
 			result.push(doc.data().data);
 
 		});
@@ -21,4 +22,4 @@ const _getDoc = async (collectionName) => {
 	}
 }
 
-export default _getDoc;
+export default _getDocs;

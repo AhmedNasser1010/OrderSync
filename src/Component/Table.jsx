@@ -4,24 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 // Components
 import TableRow from './TableRow.jsx';
 
-function Table({ skipItems, colTitles, theme, data }) {
+function Table({ allowedKeys, colTitles, theme, data }) {
    const [rowItems, setRowItems] = useState([]);
 
 	useEffect(() => {
-
-		if (skipItems) {
-			data.map(item => {
-				skipItems.map(skipItem => {
-					delete item[skipItem]
-				})
-			})
-		}
-
 		setRowItems(data)
-
 	}, [data])
-
-	useEffect(() => {}, [])
 
 	return (
 
@@ -32,7 +20,7 @@ function Table({ skipItems, colTitles, theme, data }) {
 				</tr>
 			</thead>
 			<tbody>
-				{ rowItems.map((item, index) => (<TableRow key={uuidv4()} rowItems={item} index={index} />)) }
+				{ rowItems.map((item, index) => (<TableRow key={uuidv4()} rowItems={item} index={index} allowedKeys={allowedKeys} />)) }
 			</tbody>
 		</table>
 
