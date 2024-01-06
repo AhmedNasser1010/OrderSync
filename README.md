@@ -2,6 +2,8 @@
 
 # POS System Admin 🧑‍💼🚀
 
+**THE PROJECT ARE NOT COMPLETED (UNDER DEVELOPMENT)**
+
 ## 🔶 Table of Contents
 - [Description](#description)
 - [To Do List](#to-do-list)
