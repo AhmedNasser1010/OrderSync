@@ -4,7 +4,7 @@ import { db } from "../firebase.js";
 const _addDoc = async (collectionName, data, accessToken) => {
   try {
 
-    await setDoc(doc(db, collectionName, accessToken), {data});
+    await setDoc(doc(db, collectionName, accessToken), {...data});
 
   } catch (error) {
 

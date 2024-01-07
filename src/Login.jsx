@@ -21,7 +21,7 @@ const Login = () => {
         <div className="login">
             <PageTitle title="Welcome Back! - Login" />
             <Form settings={formSettings} />
-            <span style={{display: "block"}}>Or <Link to="/register" style={{color: "blue"}}>register</Link> a new account</span>
+            <span style={{display: "block"}}>Or <Link to="/signup" style={{color: "blue"}}>register</Link> a new account</span>
         </div>
     );
 }

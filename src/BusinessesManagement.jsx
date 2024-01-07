@@ -22,7 +22,7 @@ const BusinessesManagement = () => {
 			<Table
 				colTitles={["Index", "Business Name", "Industry Type"]}
 				theme="styled-table"
-				data={businesses.data}
+				data={businesses}
 				allowedKeys={["businessName", "industry"]}
 			/>
 		</section>

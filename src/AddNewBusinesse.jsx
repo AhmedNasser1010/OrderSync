@@ -3,6 +3,8 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { object, string, date } from 'yup';
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
+import { addBusiness } from "./rtk/slices/businessesSlice.js"
+import { useDispatch } from "react-redux";
 
 // Firebase
 import { auth } from "./firebase.js";
@@ -11,6 +13,9 @@ import { auth } from "./firebase.js";
 import _addDoc from "./function/_addDoc.js";
 import getCurrentDate from "./function/getCurrentDate.js";
 import getCurrentTime24H from "./function/getCurrentTime24H.js";
+
+// Components
+import PageTitle from "./Component/PageTitle.jsx";
 
 // Validation Schema
 let businessSchema = object({
@@ -21,22 +26,29 @@ let businessSchema = object({
   businessOwnerEmail: string().email().required(),
 });
 
-// Components
-import PageTitle from "./Component/PageTitle.jsx";
-
 const AddNewBusinesse = () => {
 	const navigate = useNavigate();
 	const [accessToken, setAccessToken] = useState(`${uuidv4()}_${auth.currentUser.uid}`);
+	const dispatch = useDispatch();
 
 	return (
 
 		<section className="add-new-businesse theme1">
 			<PageTitle title="Add New Businesse +" />
 			<Formik
-				initialValues={{ businessName: '', businessOwnerEmail: '', industry: '', createdOn: {date: getCurrentDate(), time: getCurrentTime24H()}, accessToken: accessToken }}
+				initialValues={{
+					businessName: '',
+					businessOwnerEmail: '',
+					industry: '',
+					createdOn: {
+						date: getCurrentDate(),
+						time: getCurrentTime24H()
+					},
+					accessToken: accessToken,
+				}}
 				validationSchema={businessSchema}
 				onSubmit={values => {
-					_addDoc("businesses", values, accessToken);
+					dispatch(addBusiness(values))
 					navigate("/businesses?tab=management");
 				}}
 			>
@@ -61,7 +73,7 @@ const AddNewBusinesse = () => {
 								<option value="gym-programs">Gym Programs</option>
 							</Field>
 		  			</label>
-		  			<button type="submit" disabled={isSubmitting}>Add +</button>
+		  			<button className="btnTheme" type="submit" disabled={isSubmitting}>Add +</button>
 					</Form>
 				)}
 			</Formik>

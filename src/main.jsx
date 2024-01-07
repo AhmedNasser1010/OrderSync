@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 // Styles
 import "./style/table.css";
 import "./style/formTheme.css";
+import "./style/btnTheme.css";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

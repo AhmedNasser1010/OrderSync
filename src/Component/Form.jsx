@@ -84,7 +84,7 @@ const Form = ({ settings: { theme, fields, afterSubmitNavigatePath, btnText, job
             {
                 fields.map((field, index) => <FormLabel key={index} labelData={field} value={values ? values[field.name] : ""} onChangeEvent={handleOnChange} />)
             }
-			{ inProgress ? <span style={{color: "green"}}>In progress...</span> : <input type="submit" value={btnText} className="submit-btn" /> }
+			{ inProgress ? <span style={{color: "green"}}>In progress...</span> : <input type="submit" value={btnText} className="btnTheme" /> }
 			<span className='error-message' style={{color: "red", display: "block", fontSize: "20px"}}>{ formErrorMessage }</span>
 		</form>
 

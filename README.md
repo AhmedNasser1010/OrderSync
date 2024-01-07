@@ -23,7 +23,8 @@ Revolutionize your business management with our innovative web application, draw
 ### Project
 - Tasks 🎯
 	- To Do
-		- [ ] Caching data.
+		- [ ] Table sorting vertical.
+		- [ ] Caching data instead of API request.
 		- [ ] Create, User profile page.
 		- [ ] Create, Home page (Overview).
 		- [ ] Create, Performance page.
@@ -33,9 +34,13 @@ Revolutionize your business management with our innovative web application, draw
 		- [ ] Create, Pending orders.
 		- [ ] Change the registration forms to "Formik" forms.
 	- In Progress
-		- [ ] Add, Remove current business function.
-		- [ ] Create, Business settings page.
+		- [ ] Add more options to both settings & add new business pages.
 	- Done
+		- [x] Create, Business settings page.
+		- [x] Add, Remove current business function.
+		- [x] Add, Update current business function.
+		- [x] Add, New business through redux actions.
+		- [x] Table sorting horizontal.
 		- [x] Store and get bussinesses one time in state (Redux).
 		- [x] Optimize React Redux for use.
 		- [x] Get current businesses in table.
@@ -53,8 +58,10 @@ Revolutionize your business management with our innovative web application, draw
 	- Done
 - Bug Fixes 🐞
  	- To Do
+ 		- [ ] Warning A uncontrolled input in update business page
 	 	- [ ] Hide the side menu when the user are not logged in.
-	 	- [ ] Add auto navigate the user to the home if he is already logged in
+	 	- [ ] Add auto navigate the user to the home if he is already logged in.
+	 	- [ ] _getDocs.js requests built on how many subcollection i have and react duble it more.
 	- In Progress
 	- Done
 - Brainstorming 🌪️
