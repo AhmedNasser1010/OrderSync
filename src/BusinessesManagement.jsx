@@ -20,10 +20,10 @@ const BusinessesManagement = () => {
 		<section className="businesses-management">
 			<Link to="/Businesses/new" style={{color: "white", backgroundColor: "blue"}}>Add New Business</Link>
 			<Table
-				colTitles={["Index", "Business Name", "Industry Type"]}
+				colTitles={["Index", "Industry Type", "Business Name"]}
 				theme="styled-table"
 				data={businesses}
-				allowedKeys={["businessName", "industry"]}
+				allowedKeys={["name", "industry"]}
 			/>
 		</section>
 

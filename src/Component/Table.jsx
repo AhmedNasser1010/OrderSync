@@ -16,7 +16,7 @@ function Table({ allowedKeys, colTitles, theme, data }) {
 		<table className={`${theme}`}>
 			<thead>
 				<tr>
-          { colTitles.map(head => (<th key={head}>{ head }</th>)) }
+          		{ colTitles.map(head => (<th key={head}>{ head }</th>)) }
 				</tr>
 			</thead>
 			<tbody>

@@ -17,7 +17,7 @@ const TableRow = ({ rowItems, index, allowedKeys }) => {
 	useEffect(() => {
 		let result = {};
 
-		Object.entries(rowItems).map(([key, value]) => {
+		Object.entries(rowItems.business).map(([key, value]) => {
 
       allowedKeys.map(allowedKey => {
 

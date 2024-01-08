@@ -23,6 +23,8 @@ Revolutionize your business management with our innovative web application, draw
 ### Project
 - Tasks 🎯
 	- To Do
+		- [ ] Start using MatrialUI.
+		- [ ] Add, history object to containe any changes like "createdOn", "lastUpdate".
 		- [ ] Table sorting vertical.
 		- [ ] Caching data instead of API request.
 		- [ ] Create, User profile page.
@@ -34,8 +36,10 @@ Revolutionize your business management with our innovative web application, draw
 		- [ ] Create, Pending orders.
 		- [ ] Change the registration forms to "Formik" forms.
 	- In Progress
-		- [ ] Add more options to both settings & add new business pages.
+		- [ ] Initial Cloud Firestore rules.
+		- [ ] Get businesses only what the admin have.
 	- Done
+		- [x] Add more options to both settings & add new business pages.
 		- [x] Create, Business settings page.
 		- [x] Add, Remove current business function.
 		- [x] Add, Update current business function.
@@ -65,16 +69,16 @@ Revolutionize your business management with our innovative web application, draw
 	- In Progress
 	- Done
 - Brainstorming 🌪️
-	- To Do
-		- [ ] Create a basic documentation for the project.
-		- [ ] Add method to make backup for all database (system owner).
-  		- [ ] Add method for admin to extract business data to Exel or google sheet file.
-	- In Progress
-	- Done
+		- [ ] Admin businesses limit avoid spamming.
+		- [ ] Add, Custom google maps zone select for delivery zones.
+		- [ ] Create, A basic documentation for the project.
+		- [ ] Add, method to make backup for all database (system owner).
+  		- [ ] Add, method for admin to extract business data to Exel or google sheet file.
  
 ## Diagrams
 ![onion-diagram](https://i.imgur.com/tOzaiai.png)
 ![permission-levels](https://i.imgur.com/bYowxmL.png)
+![ips](https://i.imgur.com/LdMrTRP.png)
 
 
 ## 🔶 Technologies
