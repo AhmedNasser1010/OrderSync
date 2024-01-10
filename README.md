@@ -1,6 +1,4 @@
-
-
-# POS System Admin 🧑‍💼🚀
+# Ordering System (Admin) 🧑‍💼🚀
 
 **THE PROJECT ARE NOT COMPLETED (UNDER DEVELOPMENT)**
 
@@ -36,9 +34,11 @@ Revolutionize your business management with our innovative web application, draw
 		- [ ] Create, Pending orders.
 		- [ ] Change the registration forms to "Formik" forms.
 	- In Progress
-		- [ ] Initial Cloud Firestore rules.
-		- [ ] Get businesses only what the admin have.
 	- Done
+		- [x] Add. user subcollection to redux state on login.
+		- [x] Collect admin signup data to firestore collection.
+		- [x] Get businesses only what admins they have.
+		- [x] Initial Cloud Firestore rules.
 		- [x] Add more options to both settings & add new business pages.
 		- [x] Create, Business settings page.
 		- [x] Add, Remove current business function.
@@ -69,11 +69,11 @@ Revolutionize your business management with our innovative web application, draw
 	- In Progress
 	- Done
 - Brainstorming 🌪️
-		- [ ] Admin businesses limit avoid spamming.
-		- [ ] Add, Custom google maps zone select for delivery zones.
-		- [ ] Create, A basic documentation for the project.
-		- [ ] Add, method to make backup for all database (system owner).
-  		- [ ] Add, method for admin to extract business data to Exel or google sheet file.
+	- [ ] Admin businesses limit avoid spamming.
+	- [ ] Add, Custom google maps zone select for delivery zones.
+	- [ ] Create, A basic documentation for the project.
+	- [ ] Add, method to make backup for all database (system owner).
+  	- [ ] Add, method for admin to extract business data to Exel or google sheet file.
  
 ## Diagrams
 ![onion-diagram](https://i.imgur.com/tOzaiai.png)

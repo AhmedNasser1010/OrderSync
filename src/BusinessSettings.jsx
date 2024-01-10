@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { deleteBusiness, updateBusiness } from "./rtk/slices/businessesSlice.js";
 import { useDispatch, useSelector } from 'react-redux';
+import { deleteBusiness, updateBusiness } from "./rtk/slices/businessesSlice.js";
+import { deleteAccessTokenFromTheUser } from "./rtk/slices/userSlice.js";
 
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { object, string, date, array, boolean } from 'yup';
@@ -67,6 +68,7 @@ const BusinessSettings = () => {
 
 	const handleDelete = () => {
 		navigate("/businesses?tab=management");
+		dispatch(deleteAccessTokenFromTheUser(accessToken));
 		dispatch(deleteBusiness(accessToken));
 	}
 	

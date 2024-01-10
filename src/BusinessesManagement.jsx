@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBusinesses } from "./rtk/slices/businessesSlice.js";
+import _testGet from "./function/_testGet.js";
 
 // Components
 import Table from "./Component/Table.jsx";
@@ -13,6 +14,10 @@ const BusinessesManagement = () => {
 
 	useEffect(() => {
 		dispatch(fetchBusinesses());
+	}, [])
+
+	useEffect(() => {
+		// _testGet("businesses", "8458a6fd-02e3-4100-9cbd-0d2a2dca0824_N3dokfBrsRbEJ8oF6pBmeQVUbwh");
 	}, [])
 
 	return (

@@ -3,7 +3,8 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { object, string, date, array, boolean } from 'yup';
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
-import { addBusiness } from "./rtk/slices/businessesSlice.js"
+import { addBusiness } from "./rtk/slices/businessesSlice.js";
+import { pushAccesTokenToTheUser } from "./rtk/slices/userSlice.js";
 import { useDispatch } from "react-redux";
 
 // Firebase
@@ -107,6 +108,7 @@ const AddNewBusinesse = () => {
 				validationSchema={businessSchema}
 				onSubmit={values => {
 					dispatch(addBusiness(values));
+					dispatch(pushAccesTokenToTheUser(values.accessToken));
 					navigate("/businesses?tab=management");
 				}}
 			>

@@ -5,17 +5,18 @@ import _addDoc from "../../function/_addDoc.js";
 import _getDocs from "../../function/_getDocs.js";
 import _deleteDoc from "../../function/_deleteDoc.js";
 import _updateDoc from "../../function/_updateDoc.js";
+import _getSubcollections from "../../function/_getSubcollections.js";
 
 
 export const fetchBusinesses = createAsyncThunk("businesses/fetchBusinesses", (userId, thunkAPI) => {
 
-  const currentState = thunkAPI.getState().businesses;
+  const currentState = thunkAPI.getState();
 
-  if (currentState.length === 0) {
-    return _getDocs("businesses");
+  if (currentState.businesses.length === 0) {
+    return _getSubcollections("businesses", currentState.user.data.businesses);
   }
 
-  return currentState;
+  return currentState.businesses;
 });
 
 
