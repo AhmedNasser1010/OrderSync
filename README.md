@@ -15,7 +15,7 @@
 - [License](#license)
 
 ## 🔶 Description
-Revolutionize your business management with our innovative web application, drawing inspiration from POS (Point of Sale) systems. Experience seamless administration.
+Revolutionize your business management with our innovative web application, ordering systems. Experience seamless administration.
 
 ## 🔶 To Do List
 ### Project
@@ -114,7 +114,7 @@ npm i
 The app will be accessible at http://localhost:5173.
 
 ## 🔶 Usage
-Welcome to our developer-friendly web application, a powerhouse inspired by POS systems. Here's your guide to leveraging the potential of our platform:
+Welcome to our developer-friendly web application, a powerhouse ordering systems. Here's your guide to leveraging the potential of our platform:
 
 1.  **Admin Sign-up:**
     
