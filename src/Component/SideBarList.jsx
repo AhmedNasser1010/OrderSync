@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import { clearUser } from "../rtk/slices/userSlice.js";
+import { clearBusinesses } from "../rtk/slices/businessesSlice.js";
 
 // Functions
 import authSignOut from "../function/authSignOut.js";
@@ -16,6 +17,7 @@ const SideBarList = () => {
     const signoutFunc = () => {
         authSignOut();
         dispatch(clearUser());
+        dispatch(clearBusinesses());
         navigate("/login");
     }
 

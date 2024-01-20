@@ -13,9 +13,11 @@ export const fetchBusinesses = createAsyncThunk("businesses/fetchBusinesses", (u
   const currentState = thunkAPI.getState();
 
   if (currentState.businesses.length === 0) {
+    console.log("LOG:", currentState.user.data.businesses);
     return _getSubcollections("businesses", currentState.user.data.businesses);
   }
 
+  console.log("LOG:", currentState.businesses);
   return currentState.businesses;
 });
 
@@ -42,6 +44,9 @@ export const businessesSlice = createSlice({
       _addDoc("businesses", payload, payload.accessToken);
       return [...state, payload];
     },
+    clearBusinesses: () => {
+      return [];
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchBusinesses.fulfilled, (state, { payload }) => {
@@ -51,5 +56,5 @@ export const businessesSlice = createSlice({
 })
 
 
-export const { deleteBusiness, updateBusiness, addBusiness } = businessesSlice.actions;
+export const { deleteBusiness, updateBusiness, addBusiness, clearBusinesses } = businessesSlice.actions;
 export default businessesSlice.reducer;
