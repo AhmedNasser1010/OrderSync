@@ -21,7 +21,7 @@ Revolutionize your business management with our innovative web application, draw
 ### Project
 - Tasks 🎯
 	- To Do
-		- [ ] Start using MatrialUI.
+		- [ ] Change, the previous Table component to MatrialUI table.
 		- [ ] Add, history object to containe any changes like "createdOn", "lastUpdate".
 		- [ ] Table sorting vertical.
 		- [ ] Caching data instead of API request.
@@ -30,10 +30,12 @@ Revolutionize your business management with our innovative web application, draw
 		- [ ] Create, Performance page.
 		- [ ] Create, businesses sales widget.
 		- [ ] Create, Manage business tab.
-		- [ ] Create, Orders list tab.
-		- [ ] Create, Pending orders.
 		- [ ] Change the registration forms to "Formik" forms.
 	- In Progress
+		- [x] Create, orders, customers collections Firestore.
+		- [ ] Start using MatrialUI.
+		- [ ] Create, Orders list tab.
+		- [ ] Create, Pending orders tab.
 	- Done
 		- [x] Add. user subcollection to redux state on login.
 		- [x] Collect admin signup data to firestore collection.

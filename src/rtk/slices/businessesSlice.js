@@ -13,11 +13,9 @@ export const fetchBusinesses = createAsyncThunk("businesses/fetchBusinesses", (u
   const currentState = thunkAPI.getState();
 
   if (currentState.businesses.length === 0) {
-    console.log("LOG:", currentState.user.data.businesses);
     return _getSubcollections("businesses", currentState.user.data.businesses);
   }
 
-  console.log("LOG:", currentState.businesses);
   return currentState.businesses;
 });
 

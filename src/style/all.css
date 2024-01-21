@@ -13,9 +13,9 @@ ul, li, a {
 
 .side-bar-container {
 	width: 200px;
-	margin-right: 15px;
 }
 
 .content {
 	width: calc(100% - 200px);
+	margin: 0 15px;
 }

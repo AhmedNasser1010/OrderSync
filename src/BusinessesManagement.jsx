@@ -7,6 +7,9 @@ import _testGet from "./function/_testGet.js";
 // Components
 import Table from "./Component/Table.jsx";
 
+// MUI
+import Box from '@mui/material/Box';
+
 const BusinessesManagement = () => {
 	const [data, setData] = useState([]);
 	const dispatch = useDispatch();
@@ -22,7 +25,7 @@ const BusinessesManagement = () => {
 
 	return (
 
-		<section className="businesses-management">
+		<Box>
 			<Link to="/Businesses/new" style={{color: "white", backgroundColor: "blue"}}>Add New Business</Link>
 			<Table
 				colTitles={["Index", "Industry Type", "Business Name"]}
@@ -30,7 +33,7 @@ const BusinessesManagement = () => {
 				data={businesses}
 				allowedKeys={["name", "industry"]}
 			/>
-		</section>
+		</Box>
 
 	)
 }
