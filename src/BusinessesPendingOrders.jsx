@@ -46,16 +46,14 @@ const BusinessesPendingOrders = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order, index) => (
-              <TableRow
-                key={order.id}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell align="right">{index+1}</TableCell>
-                <TableCell align="right">{order.cart.map(item => item.name + ", ")}</TableCell>
-                <TableCell align="right">{order.paymentInfo.totalOrderAmount}</TableCell>
-              </TableRow>
-            ))}
+            {orders.map((order, index) => {
+              if (order.status === "RECEIVED") {
+                return <TableRow key={order.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                    <TableCell align="right">{index+1}</TableCell>
+                    <TableCell align="right">{order.cart.map(item => item.name + ", ")}</TableCell>
+                    <TableCell align="right">{order.paymentInfo.totalOrderAmount}</TableCell>
+                </TableRow>
+            }})}
           </TableBody>
         </Table>
       </TableContainer>

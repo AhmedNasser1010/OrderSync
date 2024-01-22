@@ -32,11 +32,11 @@ Revolutionize your business management with our innovative web application, draw
 		- [ ] Create, Manage business tab.
 		- [ ] Change the registration forms to "Formik" forms.
 	- In Progress
-		- [x] Create, orders, customers collections Firestore.
-		- [ ] Start using MatrialUI.
-		- [ ] Create, Orders list tab.
-		- [ ] Create, Pending orders tab.
 	- Done
+		- [x] Create, Pending orders tab.
+		- [x] Create, Orders list tab.
+		- [x] Start using MatrialUI.
+		- [x] Create, orders, customers collections Firestore.
 		- [x] Add. user subcollection to redux state on login.
 		- [x] Collect admin signup data to firestore collection.
 		- [x] Get businesses only what admins they have.
