@@ -38,7 +38,6 @@ const Form = ({ settings: { theme, fields, afterSubmitNavigatePath, btnText, job
 				setInProgress(true);
 				_signupUser(values, (isPassed, error) => {
 					if (isPassed) {
-						console.log("Registration successful!");
 						navigate(afterSubmitNavigatePath);
 					} else {
 						console.error(error);
@@ -51,7 +50,6 @@ const Form = ({ settings: { theme, fields, afterSubmitNavigatePath, btnText, job
 				setInProgress(true);
 				_loginUser(values, (isPassed, error, result) => {
 					if (isPassed) {
-						console.log("Login successful");
 						dispatch(addUser(result));
 						navigate(afterSubmitNavigatePath);
 					} else {

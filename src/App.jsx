@@ -17,7 +17,20 @@ import AddNewBusinesse from './AddNewBusinesse.jsx';
 import BusinessSettings from "./BusinessSettings.jsx";
 
 
+import { useEffect } from "react";
+import $get_items from "../userAPI/$get_items.js";
+import $PLACE_ORDER from "../userAPI/$PLACE_ORDER.js";
+import getIpAddress from "./function/getIpAddress.js";
+
 function App() {
+
+  useEffect(() => {
+
+    // $get_items();
+    $PLACE_ORDER();
+
+  }, [])
+
   return (
 
     <>
