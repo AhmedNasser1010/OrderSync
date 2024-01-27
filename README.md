@@ -1,21 +1,22 @@
-# Ordering System (Admin) 🧑‍💼🚀
+# OrderSync 📦️🔗
+![permission-levels](public/favicon.svg)
 
-**THE PROJECT ARE NOT COMPLETED (UNDER DEVELOPMENT)**
+**THE PROJECT ARE NOT COMPLETED (UNDER DEVELOPMENT) (LOGICAL PHASE)**
 
 ## 🔶 Table of Contents
-- [Description](#description)
-- [To Do List](#to-do-list)
-- [Diagrams](#diagrams)
-- [Technologies](#technologies)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [Project Versions](#project-versions)
-- [License](#license)
+- [Description](#🔶-description)
+- [To Do List](#🔶-to-do-list)
+- [Diagrams](#🔶-diagrams)
+- [Technologies](#🔶-technologies)
+- [Features](#🔶-features)
+- [Installation](#🔶-installation)
+- [Usage](#🔶-usage)
+- [Contributing](#🔶-contributing)
+- [Project Versions](#🔶-project-versions)
+- [License](#🔶-license)
 
 ## 🔶 Description
-Revolutionize your business management with our innovative web application, ordering systems. Experience seamless administration.
+OrderSync us a cutting-edge ordering system meticulously crafted for developers and business owner. Seamlessly integrating into applications, it boasts a robust backend powered by Google Firebase ensuring secure authentication. With a blend of Google MatrialUI and JavaScript, coupled with the dynamic capailities of ReactJS, OrderSync delivers a streamlined and efficient online ordering experience. Simplify your development journey with OrderSync, where technology meets intuitive order management.
 
 ## 🔶 To Do List
 ### Project
@@ -29,35 +30,17 @@ Revolutionize your business management with our innovative web application, orde
 		- [ ] Create, Home page (Overview).
 		- [ ] Create, Performance page.
 		- [ ] Create, businesses sales widget.
-		- [ ] Create, Manage business tab.
-		- [ ] Change the registration forms to "Formik" forms.
+		- [ ] Change the registration forms to "Formik" forms with MatrialUI.
 	- In Progress
 	- Done
+		- [x] Create, Manage business tab.
 		- [x] Create, Pending orders tab.
 		- [x] Create, Orders list tab.
 		- [x] Start using MatrialUI.
 		- [x] Create, orders, customers collections Firestore.
 		- [x] Add. user subcollection to redux state on login.
 		- [x] Collect admin signup data to firestore collection.
-		- [x] Get businesses only what admins they have.
-		- [x] Initial Cloud Firestore rules.
-		- [x] Add more options to both settings & add new business pages.
-		- [x] Create, Business settings page.
-		- [x] Add, Remove current business function.
-		- [x] Add, Update current business function.
-		- [x] Add, New business through redux actions.
-		- [x] Table sorting horizontal.
-		- [x] Store and get bussinesses one time in state (Redux).
-		- [x] Optimize React Redux for use.
-		- [x] Get current businesses in table.
-		- [x] Break down the components.
-		- [x] Integrate Firebase with [Authenticate, Firestore].
-		- [x] Active Authenticate system.
-  		- [x] Initialize Firestore.
-    	- [x] Add, form for add new business.
-    	- [x] Create, Businesses page.
-    	- [x] Create, Add new business page.
-		- [x] Clone CRUD project from my repo and make a copy to start this project.
+		[...](reverences/old-todos.md)
 - Feature Development 🚀
 	- To Do
 	- In Progress
@@ -78,14 +61,13 @@ Revolutionize your business management with our innovative web application, orde
   	- [ ] Add, method for admin to extract business data to Exel or google sheet file.
  
 ## Diagrams
-![onion-diagram](https://i.imgur.com/tOzaiai.png)
-![permission-levels](https://i.imgur.com/bYowxmL.png)
-![ips](https://i.imgur.com/LdMrTRP.png)
+**Permission Levels and InterProcess Communication (IPS)**
+![permission-levels](images/permission-levels.png)
+![ips](images/ips/png)
 
 
 ## 🔶 Technologies
 
-* HTML
 * CSS
 * JavaScript
 * React
@@ -150,4 +132,4 @@ Please adhere to the coding conventions and standards followed in the project.
 
 ## 🔶 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [Apache-2.0 license](LICENSE).
