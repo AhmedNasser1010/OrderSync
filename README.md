@@ -45,7 +45,7 @@ OrderSync us a cutting-edge ordering system meticulously crafted for developers 
 		- [x] Create, orders, customers collections Firestore.
 		- [x] Add. user subcollection to redux state on login.
 		- [x] Collect admin signup data to firestore collection.
-		<br>[...](reverences/old-todos.md)
+		<br>[...](references/old-todos.md)
 - Feature Development 🚀
 	- To Do
 	- In Progress
