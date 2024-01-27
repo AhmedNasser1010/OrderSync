@@ -1,12 +1,12 @@
 # OrderSync 📦️🔗
-![permission-levels](public/favicon.svg)
+<img src="public/favicon.svg" alt="icon" width="150" />
 
 **THE PROJECT ARE NOT COMPLETED (UNDER DEVELOPMENT) (LOGICAL PHASE)**
 
 ## 🔶 Table of Contents
+- [Diagrams](#🔶-diagrams)
 - [Description](#🔶-description)
 - [To Do List](#🔶-to-do-list)
-- [Diagrams](#🔶-diagrams)
 - [Technologies](#🔶-technologies)
 - [Features](#🔶-features)
 - [Installation](#🔶-installation)
@@ -14,6 +14,11 @@
 - [Contributing](#🔶-contributing)
 - [Project Versions](#🔶-project-versions)
 - [License](#🔶-license)
+
+## 🔶 Diagrams
+**Permission Levels and InterProcess Communication (IPS)**
+![permission-levels](images/permission-levels.png)
+![ips](images/ips.png)
 
 ## 🔶 Description
 OrderSync us a cutting-edge ordering system meticulously crafted for developers and business owner. Seamlessly integrating into applications, it boasts a robust backend powered by Google Firebase ensuring secure authentication. With a blend of Google MatrialUI and JavaScript, coupled with the dynamic capailities of ReactJS, OrderSync delivers a streamlined and efficient online ordering experience. Simplify your development journey with OrderSync, where technology meets intuitive order management.
@@ -40,7 +45,7 @@ OrderSync us a cutting-edge ordering system meticulously crafted for developers 
 		- [x] Create, orders, customers collections Firestore.
 		- [x] Add. user subcollection to redux state on login.
 		- [x] Collect admin signup data to firestore collection.
-		[...](reverences/old-todos.md)
+		<br>[...](reverences/old-todos.md)
 - Feature Development 🚀
 	- To Do
 	- In Progress
@@ -59,20 +64,14 @@ OrderSync us a cutting-edge ordering system meticulously crafted for developers 
 	- [ ] Create, A basic documentation for the project.
 	- [ ] Add, method to make backup for all database (system owner).
   	- [ ] Add, method for admin to extract business data to Exel or google sheet file.
- 
-## Diagrams
-**Permission Levels and InterProcess Communication (IPS)**
-![permission-levels](images/permission-levels.png)
-![ips](images/ips/png)
-
 
 ## 🔶 Technologies
 
 * CSS
 * JavaScript
-* React
-* React Router DOM
-* Firebase [Authenticate, Firestore]
+* ReactJS
+* MatrialUI
+* Firebase
 
 ## 🔶 Features
 - 
