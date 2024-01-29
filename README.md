@@ -27,16 +27,16 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 ### Project
 - Tasks 🎯
 	- To Do
-		- [ ] Change, the previous Table component to MatrialUI table.
-		- [ ] Add, history object to containe any changes like "createdOn", "lastUpdate".
 		- [ ] Table sorting vertical.
 		- [ ] Caching data instead of API request.
 		- [ ] Create, User profile page.
 		- [ ] Create, Home page (Overview).
 		- [ ] Create, Performance page.
 		- [ ] Create, businesses sales widget.
-		- [ ] Change the registration forms to "Formik" forms with MatrialUI.
 	- In Progress
+		- [ ] Change, add business form to "Formik" forms with "MatrialUI" and "yup" validation schema.
+		- [x] Change, businesses management Table component to MatrialUI table.
+		- [x] Change, the login/signup forms to "Formik" forms with "MatrialUI" and "yup" validation schema.
 	- Done
 		- [x] Create, Manage business tab.
 		- [x] Create, Pending orders tab.
@@ -57,6 +57,7 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 	 	- [ ] Add auto navigate the user to the home if he is already logged in.
 	 	- [ ] _getDocs.js requests built on how many subcollection i have and react duble it more.
 	- In Progress
+		- [ ] The app are'nt loading correctly when the user open the app again after login
 	- Done
 - Brainstorming 🌪️
 	- [ ] Admin businesses limit avoid spamming.

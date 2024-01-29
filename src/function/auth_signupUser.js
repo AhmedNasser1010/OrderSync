@@ -7,17 +7,16 @@ import authSignOut from "./authSignOut.js";
 import userRegRecordData from "./userRegRecordData.js";
 
 
-const _signupUser = async (values, onSubmit) => {
+const auth_signupUser = async (values, onSubmit) => {
 
   try {
     
     let userData = {
-      jwt: "",
       userInfo: {
         uid: "",
         email: values.email,
         password: values.password,
-        role: values.role,
+        role: "admin",
       },
       registrationHistory: [],
       data: {
@@ -33,9 +32,6 @@ const _signupUser = async (values, onSubmit) => {
     // record user signup
     const record = await userRegRecordData("SIGNUP");
     userData.registrationHistory[0] = record;
-
-    // get jwt
-    userData.jwt = await userCredential.user.getIdToken();
 
     // set user id
     userData.userInfo.uid = userID;
@@ -60,4 +56,4 @@ const _signupUser = async (values, onSubmit) => {
   }
 }
 
-export default _signupUser;
+export default auth_signupUser;

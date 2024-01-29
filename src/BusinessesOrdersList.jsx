@@ -18,6 +18,7 @@ const BusinessesOrdersList = () => {
   const dispatch = useDispatch();
   const orders = useSelector(status => status.orders);
   const businesses = useSelector(status => status.businesses);
+  const [orderLoading, setOrderLoading] = useState(true);
 
   useEffect(() => {
     let ids = [];
@@ -36,28 +37,37 @@ const BusinessesOrdersList = () => {
 
   }, [businesses]);
 
+  useEffect(() => {
+    console.log(orders);
+    if (orders.length === 0) {
+      setOrderLoading(true);
+    } else {
+      setOrderLoading(false);
+    }
+  }, [orders])
+
   return (
     <Box>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell align="right">ID</TableCell>
-              <TableCell align="right">Cart</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Total (USD)</TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell>Cart</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Total (USD)</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order, index) => (
+            {orderLoading ? <TableRow><TableCell>Loading...</TableCell></TableRow> : orders[0].list.map((order, index) => (
               <TableRow
-                key={order.id}
+                key={index}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
-                <TableCell align="right">{index+1}</TableCell>
-                <TableCell align="right">{order.cart.map(item => item.name + ", ")}</TableCell>
-                <TableCell align="right">{order.status}</TableCell>
-                <TableCell align="right">{order.paymentInfo.totalOrderAmount}</TableCell>
+                <TableCell>{index+1}</TableCell>
+                <TableCell>{order.cart.map(item => item.name + ", ")}</TableCell>
+                <TableCell>{order.status}</TableCell>
+                <TableCell>{order.payment.totalAmount}</TableCell>
               </TableRow>
             ))}
           </TableBody>

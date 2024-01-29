@@ -8,7 +8,7 @@ import _getSubcollection from "./_getSubcollection.js";
 import _updateAnArray from "./_updateAnArray.js";
 import userRegRecordData from "./userRegRecordData.js";
 
-const _loginUser = async (values, onSubmit) => {
+const auth_loginUser = async (values, onSubmit) => {
 
   try {
     
@@ -45,4 +45,4 @@ const _loginUser = async (values, onSubmit) => {
   }
 }
 
-export default _loginUser;
+export default auth_loginUser;
