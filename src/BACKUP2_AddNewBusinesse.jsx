@@ -15,15 +15,13 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import MuiTextField from "./Component/MuiTextField.jsx";
 import MenuItem from '@mui/material/MenuItem';
 
 // Components
 import PageTitle from "./Component/PageTitle.jsx";
 import Widget from "./Component/Widget.jsx";
-import MuiTextField from "./Component/MuiTextField.jsx";
 import FormikCheckBox from "./Component/FormikCheckBox.jsx";
-
-import BusinessOwnerInfoFieldsWidget from "./Component/BusinessOwnerInfoFieldsWidget.jsx";
 
 // Functions
 import _addDoc from "./function/_addDoc.js";
@@ -32,6 +30,7 @@ import getCurrentTime24H from "./function/getCurrentTime24H.js";
 
 
 // RegEx
+const phoneNumberRegex = /^\+(\d{12})$/;
 const locationCodeRegex = /^(\d{1,2})°(\d{1,2})'(\d{1,2}\.\d{1})"([NS])\s+(\d{1,3})°(\d{1,2})'(\d{1,2}\.\d{1})"([EW])$/;
 // 26°50'49.1"N 29°44'20.4"E
 const timeRegex = /^\d{2}:\d{2}$/;
@@ -39,6 +38,12 @@ const timeRegex = /^\d{2}:\d{2}$/;
 // Validation Schema
 let businessSchema = object({
   accessToken: string().required(),
+  owner: object({
+  	fName: string().required().min(3, "First name are too Short").max(20, "First name are too Long"),
+  	lName: string().required().min(3, "Last name are too Short").max(20, "Last name are too Long"),
+  	email: string().email().required(),
+  	phone: string().matches(phoneNumberRegex, 'Phone number is not valid'),
+  }),
   business: object({
   	name: string().required().min(3, "Business name are too Short").max(20, "Business name are too Long"),
   	industry: string().required(),
@@ -141,7 +146,32 @@ const AddNewBusinesse = () => {
 				{({ isSubmitting, errors }) => (
 					<Form>
 						{ logText(errors) }
-						<BusinessOwnerInfoFieldsWidget />
+						<Widget>
+				      <Typography variant="h6" gutterBottom>Business Owner Info</Typography>
+				      <Stack>
+				        <Field
+				          error={handleError(errors.owner?.name)}
+				          helperText={errors.owner?.name}
+				          component={MuiTextField}
+				          name="owner.name"
+				          label="Name"
+				         />
+				        <Field
+				          error={handleError(errors.owner?.email)}
+				          helperText={errors.owner?.email}
+				          component={MuiTextField}
+				          name="owner.email"
+				          label="Email"
+				         />
+				        <Field
+				          error={handleError(errors.owner?.phone)}
+				          helperText={errors.owner?.phone}
+				          component={MuiTextField}
+				          name="owner.phone"
+				          label="Phone"
+				         />
+				      </Stack>
+				    </Widget>
 		  			<Widget>
 							<Typography variant="h6" gutterBottom>Business Info</Typography>
 							<Field

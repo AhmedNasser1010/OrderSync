@@ -2,13 +2,11 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 
-const FormikCheckBox = ({ name, label, props }) => {
+const FormikCheckBox = ({ label, handleChange, props }) => {
 	return (
-
 		<FormGroup>
-			<FormControlLabel control={<Checkbox name={name} { ...props } />} label={label} />
+			<FormControlLabel control={<Checkbox { ...props } />} label={label} onChange={handleChange} />
 		</FormGroup>
-
 	)
 }
 
