@@ -27,6 +27,7 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 ### Project
 - Tasks 🎯
 	- To Do
+		- [ ] Add, loading screen.
 		- [ ] Table sorting vertical.
 		- [ ] Caching data instead of API request.
 		- [ ] Create, User profile page.

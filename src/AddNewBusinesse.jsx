@@ -73,6 +73,11 @@ const AddNewBusinesse = () => {
 	const [accessToken, setAccessToken] = useState(`${uuidv4()}_${auth.currentUser.uid}`);
 	const dispatch = useDispatch();
 	const [paymentValues, setPaymentValues] = useState({cash: false, vodafoneCash: false, etisalatCash: false});
+  const [businessValues, setBusinessValues] = useState({});
+
+  const handleBusinessValuesChanges = (values, name) => {
+  	setBusinessValues({...businessValues, [name]: {...values}});
+  }
 
 	const handleError = (err) => {
     return err && true
@@ -83,17 +88,13 @@ const AddNewBusinesse = () => {
   }
 
   const handleCheckboxChange = (value, key) => {
+
   	const checked = value.target.checked;
-  	setPaymentValues({...paymentValues, [key]: checked});
-  }
+  		setPaymentValues({...paymentValues, [key]: checked});
+  	}
 
 	let businessInitialValues = {
 		accessToken: accessToken,
-		owner: {
-			name: '',
-			email: '',
-			phone: '',
-		},
 		business: {
 			name: '',
 			industry: '',
@@ -122,11 +123,17 @@ const AddNewBusinesse = () => {
 		},
 	}
 
+	useEffect(() => {
+		console.log("Business values from the parent: ", businessValues);
+	}, [businessValues])
 
 	return (
 
 		<section className="add-new-businesse theme1">
 			<PageTitle title="Add New Businesse +" />
+
+			<BusinessOwnerInfoFieldsWidget businessOwnerInfoValues={handleBusinessValuesChanges} />
+
 			<Formik
 				initialValues={businessInitialValues}
 				validationSchema={businessSchema}
@@ -140,9 +147,7 @@ const AddNewBusinesse = () => {
 			>
 				{({ isSubmitting, errors }) => (
 					<Form>
-						{ logText(errors) }
-						<BusinessOwnerInfoFieldsWidget />
-		  			<Widget>
+		  			{/*<Widget>
 							<Typography variant="h6" gutterBottom>Business Info</Typography>
 							<Field
                 error={handleError(errors.business?.name)}
@@ -317,7 +322,7 @@ const AddNewBusinesse = () => {
     						handleChange={(value) => handleCheckboxChange(value, "etisalatCash")}
     						label="Etisalat Cash"
 							/>
-		  			</Widget>
+		  			</Widget>*/}
 		  			<Button
               id="submit-btn"
               variant="contained"
