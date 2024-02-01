@@ -21,18 +21,15 @@ import auth_loginUser from "./function/auth_loginUser.js";
 // Login validation schema
 let loginValidationSchema = object({
     email: string().email().required("Email must be a valid email"),
-    password: string().required("Password is required").min(6, "Your password is too short").max(25, "Your password is too long"),
+    password: string().required("Password is required").min(6, "Your password is too short"),
 });
 
 const Login = () => {
     const [authError, setAuthError] = useState({});
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [readyToSubmit, setReadyToSubmit] = useState(false);
 
-
-    const handleError = (err) => {
-        return err && true
-    }
 
     const handleAuthError = () => {
         switch (authError.error) {
@@ -58,30 +55,32 @@ const Login = () => {
                 }}
                 validationSchema={loginValidationSchema}
                 onSubmit={values => {
+                    setReadyToSubmit(true);
                     auth_loginUser(values, (isPassed, error, result) => {
                         if (isPassed) {
                             dispatch(addUser(result));
                             navigate("/");
                         } else {
+                            setReadyToSubmit(false);
                             setAuthError({...authError, error});
                         }
                     });
                 }}
             >
-                {({ isSubmitting, errors }) => (
-                    <Form>
+                {({ isSubmitting, errors, touched }) => (
+                    <Form onChange={() => setReadyToSubmit(false)}>
                         <Stack spacing={2} sx={{width: "50%"}}>
                             <Field
-                                error={handleError(errors.email) || handleError(authError.error)}
-                                helperText={errors.email}
+                                error={errors.email && touched.email && true}
+                                helperText={errors.email && touched.email && errors.email}
                                 component={MuiTextField}
                                 name="email"
                                 label="Email"
                             />
                             <Field
                                 component={MuiTextField}
-                                error={handleError(errors.password) || handleError(authError.error)}
-                                helperText={errors.password}
+                                error={errors.password && touched.password && true}
+                                helperText={errors.password && touched.password && errors.password}
                                 name="password"
                                 label="Password"
                                 type="password"
@@ -94,6 +93,7 @@ const Login = () => {
                             <Button
                                 variant="contained"
                                 type="submit"
+                                disabled={readyToSubmit && isSubmitting}
                             >
                                 Login
                             </Button>

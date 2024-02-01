@@ -28,17 +28,18 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 - Tasks 🎯
 	- To Do
 		- [ ] Add, loading screen.
-		- [ ] Table sorting vertical.
+		- [ ] Tables sorting.
 		- [ ] Caching data instead of API request.
 		- [ ] Create, User profile page.
 		- [ ] Create, Home page (Overview).
 		- [ ] Create, Performance page.
 		- [ ] Create, businesses sales widget.
 	- In Progress
-		- [ ] Change, add business form to "Formik" forms with "MatrialUI" and "yup" validation schema.
+	- Done
+		- [x] Enhance, signupUser/loginUser/logout/openApp functions to record user signup/login/logout/openapp process
+		- [x] Change, add business form to "Formik" forms with "MatrialUI" and "yup" validation schema.
 		- [x] Change, businesses management Table component to MatrialUI table.
 		- [x] Change, the login/signup forms to "Formik" forms with "MatrialUI" and "yup" validation schema.
-	- Done
 		- [x] Create, Manage business tab.
 		- [x] Create, Pending orders tab.
 		- [x] Create, Orders list tab.
@@ -53,13 +54,13 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 	- Done
 - Bug Fixes 🐞
  	- To Do
- 		- [ ] Warning A uncontrolled input in update business page
-	 	- [ ] Hide the side menu when the user are not logged in.
-	 	- [ ] Add auto navigate the user to the home if he is already logged in.
-	 	- [ ] _getDocs.js requests built on how many subcollection i have and react duble it more.
+ 		- [ ] Fix, Warning: validateDOMNesting(...): < table > cannot appear as a descendant of < p >, in business management page.
+ 		- [ ] Fix, Warning A uncontrolled input in update business page
+	 	- [ ] Fix, getDocs.js requests built on how many subcollection i have and react duble it more.
 	- In Progress
-		- [ ] The app are'nt loading correctly when the user open the app again after login
 	- Done
+		- [x] Fix, login/signup forms trigger all errors in same time if the user enter a wrong one field.
+		- [x] Fix, The app are not loading correctly when the user open the app again after login
 - Brainstorming 🌪️
 	- [ ] Admin businesses limit avoid spamming.
 	- [ ] Add, Custom google maps zone select for delivery zones.

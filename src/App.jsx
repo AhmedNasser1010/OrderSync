@@ -1,6 +1,12 @@
+import { useEffect } from "react";
 import "./style/Normaliz.css";
 import "./style/all.css";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { addUser } from "./rtk/slices/userSlice.js";
+
+// Functions
+import startApp from "./function/startApp.js";
 
 // Components
 import SideBar from "./Component/SideBar.jsx";
@@ -13,10 +19,26 @@ import Performance from './Performance.jsx';
 import Businesses from './Businesses.jsx';
 import Login from './Login.jsx';
 import Signup from './Signup.jsx';
-import AddNewBusinesse from './AddNewBusinesse.jsx';
+import AddNewBusiness from './AddNewBusiness.jsx';
 import BusinessSettings from "./BusinessSettings.jsx";
 
 function App() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+
+    startApp()
+      .then(userData => {
+        dispatch(addUser(userData));
+        navigate("/");
+      }).catch(error => {
+        console.log(error);
+        navigate("/login");
+      })
+
+  }, [])
+
   return (
 
     <>
@@ -30,7 +52,7 @@ function App() {
           <Route path="/user" element={<PrivateRoute><User /></PrivateRoute>} />
           <Route path="/performance" element={<PrivateRoute><Performance /></PrivateRoute>} />
           <Route path="/businesses" element={<PrivateRoute><Businesses /></PrivateRoute>} />
-          <Route path="/businesses/new" element={<PrivateRoute><AddNewBusinesse /></PrivateRoute>} />
+          <Route path="/businesses/new" element={<PrivateRoute><AddNewBusiness /></PrivateRoute>} />
           <Route path="/businesses/:accessToken" element={<PrivateRoute><BusinessSettings /></PrivateRoute>} />
         </Routes>
 

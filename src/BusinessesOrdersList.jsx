@@ -25,7 +25,7 @@ const BusinessesOrdersList = () => {
 
     businesses.map(business => {
 
-      business.ordersIDs.map(orderID => {
+      business.ordersIDs?.map(orderID => {
 
         ids.push(orderID);
 
@@ -38,7 +38,6 @@ const BusinessesOrdersList = () => {
   }, [businesses]);
 
   useEffect(() => {
-    console.log(orders);
     if (orders.length === 0) {
       setOrderLoading(true);
     } else {

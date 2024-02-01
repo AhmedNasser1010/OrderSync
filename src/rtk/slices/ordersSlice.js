@@ -9,7 +9,6 @@ export const fetchOrders = createAsyncThunk("orders/fetchOrders", (ordersIDs, th
   const currentState = thunkAPI.getState();
 
   if (currentState.orders.length === 0) {
-    console.log('get data start')
     return _getSubcollections("orders", ordersIDs);
   }
 

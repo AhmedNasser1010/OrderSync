@@ -21,18 +21,14 @@ import auth_signupUser from "./function/auth_signupUser.js";
 // Login validation schema
 let signupValidationSchema = object({
     email: string().email().required("Email must be a valid email"),
-    password: string().required("Password is required"),
+    password: string().required("Password is required").min(6, "Password is too short"),
 });
 
 const Signup = () => {
     const [authError, setAuthError] = useState({});
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-
-    const handleError = (err) => {
-        return err && true
-    }
+    const [readyToSubmit, setReadyToSubmit] = useState(false);
 
     const handleAuthError = () => {
         switch (authError.error) {
@@ -43,6 +39,14 @@ const Signup = () => {
                 return "We're having issues in registration process, please try again later."
                 break;
         }
+    }
+
+    const handleEmailErrorBoolean = (errors, touched) => {
+        if (errors.email) {
+            return touched.email && true
+        }
+        return authError.error === "auth/email-already-in-use" && true
+
     }
     
     return (
@@ -55,29 +59,31 @@ const Signup = () => {
                 }}
                 validationSchema={signupValidationSchema}
                 onSubmit={values => {
+                    setReadyToSubmit(true);
                      auth_signupUser(values, (isPassed, error) => {
                         if (isPassed) {
                             navigate("/login");
                         } else {
+                            setReadyToSubmit(false);
                             setAuthError({...authError, error});
                         }
                      })
                 }}
             >
-                {({ isSubmitting, errors }) => (
-                    <Form>
+                {({ isSubmitting, errors, touched }) => (
+                    <Form onChange={() => setReadyToSubmit(false)}>
                         <Stack spacing={2} sx={{width: "50%"}}>
                             <Field
-                                error={handleError(errors.email) || handleError(authError.error)}
-                                helperText={errors.email || authError.error === "auth/email-already-in-use" && "Email already in use"}
+                                error={handleEmailErrorBoolean(errors, touched)}
+                                helperText={`${authError.error === "auth/email-already-in-use" ? "Email already in use" : ""} ${errors.email && touched.email ? errors.email : ""}`}
                                 component={MuiTextField}
                                 name="email"
                                 label="Email"
                             />
                             <Field
                                 component={MuiTextField}
-                                error={handleError(errors.password)}
-                                helperText={errors.password}
+                                error={errors.password && touched.password && true}
+                                helperText={errors.password && touched.password && errors.password}
                                 name="password"
                                 label="Password"
                                 type="password"
@@ -91,6 +97,7 @@ const Signup = () => {
                                 id="submit-btn"
                                 variant="contained"
                                 type="submit"
+                                disabled={readyToSubmit && isSubmitting}
                             >
                                 Signup
                             </Button>

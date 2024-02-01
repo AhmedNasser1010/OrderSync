@@ -23,7 +23,7 @@ const BusinessesPendingOrders = () => {
 
     businesses.map(business => {
 
-      business.ordersIDs.map(orderID => {
+      business.ordersIDs?.map(orderID => {
 
         ids.push(orderID);
 
