@@ -27,6 +27,9 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 ### Project
 - Tasks 🎯
 	- To Do
+		- [ ] Split up create new user for business manager.
+		- [ ] Seprate update business form in different pages for better user experience.
+		- [ ] Seprate add new business form in different pages for better user experience.
 		- [ ] Add, loading screen.
 		- [ ] Tables sorting.
 		- [ ] Caching data instead of API request.
@@ -36,6 +39,7 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 		- [ ] Create, businesses sales widget.
 	- In Progress
 	- Done
+		- [x] Optimize, 'addNewBusiness' form to use it in 'businessSetting' page.
 		- [x] Enhance, signupUser/loginUser/logout/openApp functions to record user signup/login/logout/openapp process
 		- [x] Change, add business form to "Formik" forms with "MatrialUI" and "yup" validation schema.
 		- [x] Change, businesses management Table component to MatrialUI table.
@@ -54,11 +58,14 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 	- Done
 - Bug Fixes 🐞
  	- To Do
+ 		- [ ] Fix, MatrialUI fields didint take any effect when i reinitilize the field value.
+ 		- [ ] Fix, reinitilize values is not visible with selectbox and checkbox fields in update business page.
  		- [ ] Fix, Warning: validateDOMNesting(...): < table > cannot appear as a descendant of < p >, in business management page.
  		- [ ] Fix, Warning A uncontrolled input in update business page
 	 	- [ ] Fix, getDocs.js requests built on how many subcollection i have and react duble it more.
 	- In Progress
 	- Done
+		- [x] Fix, 'businessSettings' navigation
 		- [x] Fix, login/signup forms trigger all errors in same time if the user enter a wrong one field.
 		- [x] Fix, The app are not loading correctly when the user open the app again after login
 - Brainstorming 🌪️

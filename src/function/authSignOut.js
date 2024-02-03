@@ -4,12 +4,14 @@ import { signOut } from "firebase/auth";
 import userRegRecordData from "./userRegRecordData.js";
 import _updateAnArray from "./_updateAnArray.js";
 
-const authSignOut = async () => {
+const authSignOut = async (recordProcess = true) => {
   if (auth.currentUser) {
 
-  // record user logout
-  const record = await userRegRecordData("LOGOUT");
-  _updateAnArray("users", auth.currentUser.uid, "registrationHistory", record);
+  if (recordProcess) {
+    // record user logout
+    const record = await userRegRecordData("LOGOUT");
+    _updateAnArray("users", auth.currentUser.uid, "registrationHistory", record);
+  }
 
   // signout process
   signOut(auth)

@@ -2,7 +2,6 @@ import getIpAddress from "./getIpAddress.js";
 
 const userAgentData = navigator.userAgentData;
 
-// processType: SIGNUP, LOGIN, LOGOUT
 const userRegRecordData = (processType) => {
 	return getIpAddress().then(res => {
     return {

@@ -15,7 +15,6 @@ const _getSubcollection = async (collectionName, subCollectionID) => {
     } else {
 
       console.error("Firestore: Document does not exist");
-      return false;
 
     }
 

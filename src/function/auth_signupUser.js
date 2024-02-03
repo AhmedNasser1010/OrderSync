@@ -7,16 +7,17 @@ import authSignOut from "./authSignOut.js";
 import userRegRecordData from "./userRegRecordData.js";
 
 
-const auth_signupUser = async (values, onSubmit) => {
+const auth_signupUser = async (values, role = 'BUSINESSES_CREATOR', onSubmit) => {
 
   try {
     
     let userData = {
+      accessToken: values.accessToken,
       userInfo: {
         uid: "",
         email: values.email,
         password: values.password,
-        role: "admin",
+        role: role,
       },
       registrationHistory: [],
       data: {

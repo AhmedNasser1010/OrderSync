@@ -3,12 +3,14 @@ import { db } from "../firebase.js";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase.js";
 
-import authSignOut from "./authSignOut.js";
 import _getSubcollection from "./_getSubcollection.js";
 import _updateAnArray from "./_updateAnArray.js";
 import userRegRecordData from "./userRegRecordData.js";
 
-const auth_loginUser = async (values, onSubmit) => {
+// Functions
+import AUTH_signout from "./AUTH_signout.js";
+
+const AUTH_loginUser = async (values, onSubmit) => {
 
   try {
     
@@ -31,8 +33,8 @@ const auth_loginUser = async (values, onSubmit) => {
     const data = await _getSubcollection("users", userID);
 
     // check if the login user are business owner
-    if (data.userInfo.role !== "BUSINESSES_CREATOR") {
-      authSignOut(false);
+    if (data.userInfo.role !== "BUSINESS_MANAGER") {
+      AUTH_signout(false);
       onSubmit(false, "auth/invalid-credential");
       return;
     }
@@ -52,4 +54,4 @@ const auth_loginUser = async (values, onSubmit) => {
   }
 }
 
-export default auth_loginUser;
+export default AUTH_loginUser;

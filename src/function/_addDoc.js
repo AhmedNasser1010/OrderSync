@@ -5,6 +5,7 @@ const _addDoc = async (collectionName, data, accessToken) => {
   try {
 
     await setDoc(doc(db, collectionName, accessToken), {...data});
+    return true;
 
   } catch (error) {
 

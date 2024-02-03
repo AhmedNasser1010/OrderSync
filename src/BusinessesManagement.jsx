@@ -1,42 +1,4 @@
-// import React, { useEffect, useState } from "react";
-// import { Link } from "react-router-dom";
-// import { useDispatch, useSelector } from 'react-redux';
-// import { fetchBusinesses } from "./rtk/slices/businessesSlice.js";
-// import _testGet from "./function/_testGet.js";
-
-// // Components
-// import Table from "./Component/Table.jsx";
-
-// // MUI
-// import Box from '@mui/material/Box';
-
-// const BusinessesManagement = () => {
-// 	const [data, setData] = useState([]);
-// 	const dispatch = useDispatch();
-//   	const businesses = useSelector((state) => state.businesses);
-
-// 	useEffect(() => {
-// 		dispatch(fetchBusinesses());
-// 	}, [])
-
-// 	return (
-
-// 		<Box>
-// 			<Link to="/Businesses/new" style={{color: "white", backgroundColor: "blue"}}>Add New Business</Link>
-// 			<Table
-// 				colTitles={["Index", "Industry Type", "Business Name"]}
-// 				theme="styled-table"
-// 				data={businesses}
-// 				allowedKeys={["name", "industry"]}
-// 			/>
-// 		</Box>
-
-// 	)
-// }
-
-// export default BusinessesManagement;
-
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBusinesses } from "./rtk/slices/businessesSlice.js";
@@ -51,9 +13,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
+import TuneIcon from '@mui/icons-material/Tune';
 
 const BusinessesManagement = () => {
-	const [data, setData] = useState([]);
 	const dispatch = useDispatch();
   const businesses = useSelector((state) => state.businesses);
 
@@ -74,6 +36,7 @@ const BusinessesManagement = () => {
 	      			<TableCell>Index</TableCell>
 	      			<TableCell>Industry Type</TableCell>
 	      			<TableCell>Business Name</TableCell>
+	      			<TableCell>Settings</TableCell>
 	      		</TableRow>
 	      	</TableHead>
 	      	<TableBody>
@@ -86,6 +49,7 @@ const BusinessesManagement = () => {
 	      					<TableCell>{ index + 1 }</TableCell>
 	      					<TableCell>{ business.business.industry }</TableCell>
 	      					<TableCell>{ business.business.name }</TableCell>
+	      					<TableCell><Link to={`/businesses/${business.accessToken}`}><TuneIcon sx={{ cursor: 'pointer' }} /></Link></TableCell>
 	      				</TableRow>
 	      			))
 	      		}

@@ -117,7 +117,7 @@ const AddNewBusiness = () => {
 			password: '',
 		},
 		services: {
-			openingHourse: {
+			openingHours: {
 				sunday: {start: '', end: ''},
 				monday: {start: '', end: ''},
 				tuesday: {start: '', end: ''},
@@ -164,7 +164,7 @@ const AddNewBusiness = () => {
   			
   			dispatch(addBusiness(businessValues));
 				dispatch(pushAccesTokenToTheUser(businessValues.accessToken));
-				navigate("/businesses?tab=management");
+				navigate("/login");
   		})
   		.catch(error => {
   			setSubmitErrorVisibility(true);
@@ -209,13 +209,13 @@ const AddNewBusiness = () => {
 			<Stack>
 
 				<Stack direction="row" spacing={3}>
-					<BusinessOwnerInfoFieldsWidget businessOwnerInfoValues={handleBusinessValuesChanges} />
-					<BusinessInfoFieldsWidget businessInfoValues={handleBusinessValuesChanges} />
+					<BusinessOwnerInfoFieldsWidget businessOwnerInfoValues={handleBusinessValuesChanges} values={businessValues.owner} />
+					<BusinessInfoFieldsWidget businessInfoValues={handleBusinessValuesChanges} values={businessValues.business} />
 				</Stack>
 
 				<Stack direction="row" spacing={3}>
-					<BusinessOpeningHoursFieldsWidget businessOpeningHoursValues={handleBusinessValuesChanges} />
-					<BusinessPaymentMethodsFieldsWidget businessPaymentMethodsValues={handleBusinessValuesChanges} />
+					<BusinessOpeningHoursFieldsWidget businessOpeningHoursValues={handleBusinessValuesChanges} values={businessValues.services.openingHours} />
+					<BusinessPaymentMethodsFieldsWidget businessPaymentMethodsValues={handleBusinessValuesChanges} values={businessValues.services.paymentMethods} />
 				</Stack>
 
 				<Button

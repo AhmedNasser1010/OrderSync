@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Formik, Form, Field } from 'formik';
 
@@ -15,16 +15,13 @@ import FormikCheckBox from "./FormikCheckBox.jsx";
 // Validation schema
 import { businessPaymentMethodsValidationSchema } from "../AddNewBusiness.jsx";
 
-// Initial values
-const initialValues = {
-	cash: false,
-	vodafoneCash: false,
-	etisalatCash: false,
-};
-
-const BusinessPaymentMethodsFieldsWidget = ({ businessPaymentMethodsValues }) => {
+const BusinessPaymentMethodsFieldsWidget = ({ businessPaymentMethodsValues, values }) => {
 	const [readyToSubmit, setReadyToSubmit] = useState(false);
-	const [paymentValues, setPaymentValues] = useState({cash: false, vodafoneCash: false, etisalatCash: false});
+	const [paymentValues, setPaymentValues] = useState({ cash: false, vodafoneCash: false, etisalatCash: false });
+
+	useEffect(() => {
+		setPaymentValues(values)
+	}, [values])
 
 	const handleCheckboxChange = (value, key) => {
 
@@ -36,12 +33,12 @@ const BusinessPaymentMethodsFieldsWidget = ({ businessPaymentMethodsValues }) =>
 	return (
 
 		<Formik
-			initialValues={initialValues}
+			enableReinitialize
+			initialValues={values}
 			validationSchema={businessPaymentMethodsValidationSchema}
-			onSubmit={values => {
-				values = {...paymentValues};
+			onSubmit={() => {
 				setReadyToSubmit(true);
-				businessPaymentMethodsValues(values, "services.paymentMethods");
+				businessPaymentMethodsValues(paymentValues, "services.paymentMethods");
 			}}
 		>
 			{({ isSubmitting, errors, touched }) => (

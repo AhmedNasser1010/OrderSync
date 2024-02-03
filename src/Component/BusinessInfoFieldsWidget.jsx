@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Formik, Form, Field } from 'formik';
 
@@ -15,20 +15,14 @@ import MuiTextField from "./MuiTextField.jsx";
 // Validation schema
 import { businessInfoValidationSchema } from "../AddNewBusiness.jsx";
 
-// Initial values
-const initialValues = {
-	name: '',
-	industry: '',
-	address: '',
-	location: ''
-};
-
-const BusinessInfoFieldsWidget = ({ businessInfoValues }) => {
+const BusinessInfoFieldsWidget = ({ businessInfoValues, values }) => {
 	const [readyToSubmit, setReadyToSubmit] = useState(false);
+
 	return (
 
 	<Formik
-		initialValues={initialValues}
+		enableReinitialize
+		initialValues={values}
 		validationSchema={businessInfoValidationSchema}
 		onSubmit={values => {
 			setReadyToSubmit(true);

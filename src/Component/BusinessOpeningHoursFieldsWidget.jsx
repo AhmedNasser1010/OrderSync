@@ -15,27 +15,17 @@ import MuiTextField from "./MuiTextField.jsx";
 // Validation Schema
 import { businessOpeningHoursValidationSchema } from "../AddNewBusiness.jsx";
 
-// Initial values
-const initialValues = {
-	sunday: {start: '', end: ''},
-	monday: {start: '', end: ''},
-  tuesday: {start: '', end: ''},
-  wednesday: {start: '', end: ''},
-  thursday: {start: '', end: ''},
-  friday: {start: '', end: ''},
-  saturday: {start: '', end: ''},
-}
-
-const BusinessOpeningHoursFieldsWidget = ({ businessOpeningHoursValues }) => {
+const BusinessOpeningHoursFieldsWidget = ({ businessOpeningHoursValues, values }) => {
 	const [readyToSubmit, setReadyToSubmit] = useState(false);
 	return (
 
 		<Formik
-			initialValues={initialValues}
+			enableReinitialize
+			initialValues={values}
 			validationSchema={businessOpeningHoursValidationSchema}
 			onSubmit={values => {
 				setReadyToSubmit(true);
-				businessOpeningHoursValues({...values}, 'services.openingHourse');
+				businessOpeningHoursValues({...values}, 'services.openingHours');
 			}}
 		>
 			{({ isSubmitting, errors, touched }) => (

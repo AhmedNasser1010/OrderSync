@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import { Formik, Form, Field } from 'formik';
 
 // MUI
@@ -15,30 +14,23 @@ import MuiTextField from "./MuiTextField.jsx";
 // Validation Schema
 import { businessOwnerInfoValidationSchema } from "../AddNewBusiness.jsx";
 
-// Initial Values
-let initialValues = {
-	basic: {
-		fName: '',
-		lName: '',
-		age: '',
-		gender: '',
-	},
-	contact: {
-		email: '',
-		phone: '',
-		address: '',
-	},
-	password: ""
-}
-
-const BusinessOwnerInfoFieldsWidget = ({ businessOwnerInfoValues }) => {
+const BusinessOwnerInfoFieldsWidget = ({ businessOwnerInfoValues, values }) => {
 	const [readyToSubmit, setReadyToSubmit] = useState(false);
 	return (
 
 		<Formik
-			initialValues={initialValues}
+			enableReinitialize
+			initialValues={values}
 			validationSchema={businessOwnerInfoValidationSchema}
 			onSubmit={values => {
+				// !!!!! Here should we have a function to check if the user email is used before !!!!!
+				// if (values.contact.email !== ####) {
+				// 	setReadyToSubmit(true);
+				// 	businessOwnerInfoValues({...values}, "owner");	
+				// } else {
+				// 	setReadyToSubmit(false);
+				// 	setAuthError("email is used before")
+				// }
 				setReadyToSubmit(true);
 				businessOwnerInfoValues({...values}, "owner");
 			}}
