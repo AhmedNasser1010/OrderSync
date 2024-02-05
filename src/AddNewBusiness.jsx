@@ -108,6 +108,7 @@ const AddNewBusiness = () => {
 				fName: '',
 				lName: '',
 				age: '',
+				gender: '',
 			},
 			contact: {
 				email: '',
@@ -209,13 +210,13 @@ const AddNewBusiness = () => {
 			<Stack>
 
 				<Stack direction="row" spacing={3}>
-					<BusinessOwnerInfoFieldsWidget businessOwnerInfoValues={handleBusinessValuesChanges} values={businessValues.owner} />
-					<BusinessInfoFieldsWidget businessInfoValues={handleBusinessValuesChanges} values={businessValues.business} />
+					<BusinessOwnerInfoFieldsWidget businessOwnerInfoValues={handleBusinessValuesChanges} initialValues={businessValues.owner} />
+					<BusinessInfoFieldsWidget businessInfoValues={handleBusinessValuesChanges} initialValues={businessValues.business} />
 				</Stack>
 
 				<Stack direction="row" spacing={3}>
-					<BusinessOpeningHoursFieldsWidget businessOpeningHoursValues={handleBusinessValuesChanges} values={businessValues.services.openingHours} />
-					<BusinessPaymentMethodsFieldsWidget businessPaymentMethodsValues={handleBusinessValuesChanges} values={businessValues.services.paymentMethods} />
+					<BusinessOpeningHoursFieldsWidget businessOpeningHoursValues={handleBusinessValuesChanges} initialValues={businessValues.services.openingHours} />
+					<BusinessPaymentMethodsFieldsWidget businessPaymentMethodsValues={handleBusinessValuesChanges} initialValues={businessValues.services.paymentMethods} />
 				</Stack>
 
 				<Button

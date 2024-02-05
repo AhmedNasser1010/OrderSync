@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchOrders } from "./rtk/slices/ordersSlice.js";
+import { useSelector } from "react-redux";
 
 // MUI
 import Table from '@mui/material/Table';
@@ -15,27 +14,8 @@ import Box from '@mui/material/Box';
 import _getSubcollections from "./function/_getSubcollections.js"
 
 const BusinessesOrdersList = () => {
-  const dispatch = useDispatch();
   const orders = useSelector(status => status.orders);
-  const businesses = useSelector(status => status.businesses);
   const [orderLoading, setOrderLoading] = useState(true);
-
-  useEffect(() => {
-    let ids = [];
-
-    businesses.map(business => {
-
-      business.ordersIDs?.map(orderID => {
-
-        ids.push(orderID);
-
-      })
-
-    });
-
-  dispatch(fetchOrders(ids));
-
-  }, [businesses]);
 
   useEffect(() => {
     if (orders.length === 0) {
@@ -58,7 +38,7 @@ const BusinessesOrdersList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orderLoading ? <TableRow><TableCell>Loading...</TableCell></TableRow> : orders[0].list.map((order, index) => (
+            {orders[0]?.list.map((order, index) => (
               <TableRow
                 key={index}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}

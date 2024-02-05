@@ -15,13 +15,13 @@ import FormikCheckBox from "./FormikCheckBox.jsx";
 // Validation schema
 import { businessPaymentMethodsValidationSchema } from "../AddNewBusiness.jsx";
 
-const BusinessPaymentMethodsFieldsWidget = ({ businessPaymentMethodsValues, values }) => {
+const BusinessPaymentMethodsFieldsWidget = ({ businessPaymentMethodsValues, initialValues }) => {
 	const [readyToSubmit, setReadyToSubmit] = useState(false);
 	const [paymentValues, setPaymentValues] = useState({ cash: false, vodafoneCash: false, etisalatCash: false });
 
 	useEffect(() => {
-		setPaymentValues(values)
-	}, [values])
+		setPaymentValues(initialValues)
+	}, [initialValues])
 
 	const handleCheckboxChange = (value, key) => {
 
@@ -34,7 +34,7 @@ const BusinessPaymentMethodsFieldsWidget = ({ businessPaymentMethodsValues, valu
 
 		<Formik
 			enableReinitialize
-			initialValues={values}
+			initialValues={initialValues}
 			validationSchema={businessPaymentMethodsValidationSchema}
 			onSubmit={() => {
 				setReadyToSubmit(true);

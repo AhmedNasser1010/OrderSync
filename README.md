@@ -58,13 +58,13 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 	- Done
 - Bug Fixes 🐞
  	- To Do
- 		- [ ] Fix, MatrialUI fields didint take any effect when i reinitilize the field value.
  		- [ ] Fix, reinitilize values is not visible with selectbox and checkbox fields in update business page.
  		- [ ] Fix, Warning: validateDOMNesting(...): < table > cannot appear as a descendant of < p >, in business management page.
  		- [ ] Fix, Warning A uncontrolled input in update business page
 	 	- [ ] Fix, getDocs.js requests built on how many subcollection i have and react duble it more.
 	- In Progress
 	- Done
+ 		- [x] Fix, MatrialUI fields label dose not shrink when change the value logically.
 		- [x] Fix, 'businessSettings' navigation
 		- [x] Fix, login/signup forms trigger all errors in same time if the user enter a wrong one field.
 		- [x] Fix, The app are not loading correctly when the user open the app again after login

@@ -42,6 +42,9 @@ const LoginForm = () => {
       case "invalid-argument":
         return "We're having issues in registration process, please try again later."
         break;
+      case "auth/network-request-failed":
+        return "Network error, check your internet connection and try again."
+        break;
     }
   }
 

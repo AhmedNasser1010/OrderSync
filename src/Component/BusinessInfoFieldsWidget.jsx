@@ -15,64 +15,48 @@ import MuiTextField from "./MuiTextField.jsx";
 // Validation schema
 import { businessInfoValidationSchema } from "../AddNewBusiness.jsx";
 
-const BusinessInfoFieldsWidget = ({ businessInfoValues, values }) => {
+const BusinessInfoFieldsWidget = ({ businessInfoValues, initialValues, filledValues = false }) => {
 	const [readyToSubmit, setReadyToSubmit] = useState(false);
+
+	const muiTextFieldProps = (errors, touched, values, name, label) => {
+		return {
+			InputLabelProps: filledValues && values && values[name] !== '' && { shrink: true },
+			error: errors && touched && errors[name] && touched[name] && true,
+			helperText: errors && touched && errors[name] && touched[name] && errors[name],
+			component: MuiTextField,
+			name: name,
+			label: label
+		};
+	};
 
 	return (
 
 	<Formik
 		enableReinitialize
-		initialValues={values}
+		initialValues={initialValues}
 		validationSchema={businessInfoValidationSchema}
 		onSubmit={values => {
 			setReadyToSubmit(true);
-			console.log(values)
 			businessInfoValues({...values}, "business");
 		}}
 	>
-		{({ isSubmitting, errors, touched }) => (
+		{({ isSubmitting, errors, touched, values }) => (
 
 			<Form onChange={() => setReadyToSubmit(false)} style={{ width: '100%' }}>
 				<Widget>
 					<Typography variant="h6" gutterBottom>Business Info</Typography>
 					<Stack spacing={1}>
-						<Field
-			  	  	error={errors.name && touched.name && true}
-			  	  	helperText={errors.name && touched.name && errors.name}
-			  	  	component={MuiTextField}
-			  	  	name="name"
-			  	  	label="Name"
-			  		/>
-			    	<Field
-			      	error={errors.industry && touched.industry && true}
-			      	helperTexthelperText={errors.industry && touched.industry && errors.industry}
-			      	component={MuiTextField}
-			      	name="industry"
-			      	label="Indystry Type"
-			      	select
-			    	>
+						<Field { ...muiTextFieldProps(errors, touched, values, 'name', 'Name') } />
+			    	<Field { ...muiTextFieldProps(errors, touched, values, 'industry', 'Indystry Type') } select>
 			    		<MenuItem value="coffe-shop">Coffee Shop</MenuItem>
 			    		<MenuItem value="restaurant">Restaurant</MenuItem>
 			    		<MenuItem value="online-shopping">Online Shopping</MenuItem>
 			    		<MenuItem value="gym-programs">Gym Programs</MenuItem>
+			    		<MenuItem value="it">IT</MenuItem>
 			    	</Field>
 			    	<Stack direction='row' spacing={1}>
-			    		<Field
-			      		error={errors.address && touched.address && true}
-			      		helperText={errors.address && touched.address && errors.address}
-			      		component={MuiTextField}
-			      		name="address"
-			      		label="Address"
-			      		fullWidth
-			    		/>
-			    		<Field
-			      		error={errors.location && touched.location && true}
-			      		helperText={errors.location && touched.location && errors.location}
-			      		component={MuiTextField}
-			      		name="location"
-			      		label="Location"
-			      		fullWidth
-			    		/>
+			    		<Field { ...muiTextFieldProps(errors, touched, values, 'address', 'Address') } fullWidth />
+			    		<Field { ...muiTextFieldProps(errors, touched, values, 'location', 'Location') } fullWidth />
 			    	</Stack>
 			    	<Button
 							variant="outlined"

@@ -1,6 +1,5 @@
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchOrders } from "./rtk/slices/ordersSlice.js";
+import { useSelector } from "react-redux";
 
 // MUI
 import Table from '@mui/material/Table';
@@ -14,27 +13,7 @@ import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 
 const BusinessesPendingOrders = () => {
-  const dispatch = useDispatch();
   const orders = useSelector(status => status.orders);
-  const businesses = useSelector(status => status.businesses);
-
-  useEffect(() => {
-    let ids = [];
-
-    businesses.map(business => {
-
-      business.ordersIDs?.map(orderID => {
-
-        ids.push(orderID);
-
-      })
-
-    });
-
-  dispatch(fetchOrders(ids));
-
-  }, [businesses]);
-
 
   return (
     <Box>
@@ -48,7 +27,7 @@ const BusinessesPendingOrders = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders[0].list.map((order, index) => {
+            {orders[0]?.list.map((order, index) => {
               if (order.status === "RECEIVED") {
                 return <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                           <TableCell>{index + 1}</TableCell>

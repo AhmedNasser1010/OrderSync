@@ -1,49 +1,7 @@
-// import React, { useState } from "react";
-
-// // Components
-// import Tab from "./Component/Tab";
-// import BusinessesManagement from "./BusinessesManagement.jsx";
-// import BusinessesOrdersList from "./BusinessesOrdersList.jsx";
-// import BusinessesPendingOrders from "./BusinessesPendingOrders.jsx";
-// import PageTitle from "./Component/PageTitle";
-
-// // fx
-// import fromKebabToTitle from "./function/fromKebabToTitle.js";
-
-
-// const Restaurants = () => {
-//     const [currentTab, setCurrentTab] = useState("");
-
-//     const setCurrentTabState = (value) => {
-//         setCurrentTab(value);
-//     }
-
-//     return (
-//         <div className="businesses">
-//             <PageTitle title={`Businesses - ${fromKebabToTitle(currentTab)}`} />
-
-//             <Tab
-//                 setCurrentTabState={setCurrentTabState}
-//                 tabs={[
-//                     {path: "management", title: "Management"},
-//                     {path: "orders-list", title: "Orders list"},
-//                     {path: "pending-orders", title: "Pending orders"}
-//             ]} />
-
-//             <hr />
-
-//             { currentTab === "management" && <BusinessesManagement /> }
-//             { currentTab === "orders-list" && <BusinessesOrdersList /> }
-//             { currentTab === "pending-orders" && <BusinessesPendingOrders /> }
-
-//         </div>
-//     )
-// }
-
-// export default Restaurants;
-
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBusinesses } from "./rtk/slices/businessesSlice.js";
+import { fetchOrders } from "./rtk/slices/ordersSlice.js";
 
 // Components
 import BusinessesManagement from "./BusinessesManagement.jsx";
@@ -71,7 +29,30 @@ function a11yProps(index) {
 }
 
 const Restaurants = () => {
+    const dispatch = useDispatch();
     const [value, setValue] = useState(0);
+    const businesses = useSelector(status => status.businesses);
+
+
+    // start get the needed data
+    useEffect(() => {
+        // #1 businesses
+        dispatch(fetchBusinesses());
+
+        // #2 businesses orders ID's
+        let ordersIDs = [];
+
+        businesses.map(business => {
+            business.ordersIDs?.map(orderID => {
+
+                ordersIDs.push(orderID);
+
+            })
+        });
+
+        ordersIDs.length && dispatch(fetchOrders(ordersIDs));
+
+    }, [])
 
     const handleChange = (event, newValue) => {
         setValue(newValue);

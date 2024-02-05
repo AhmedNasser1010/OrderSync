@@ -11,16 +11,46 @@ import Button from '@mui/material/Button';
 import Widget from "./Widget.jsx";
 import MuiTextField from "./MuiTextField.jsx";
 
+// Functions
+import getNestedValue from '../function/getNestedValue.js';
+
 // Validation Schema
 import { businessOwnerInfoValidationSchema } from "../AddNewBusiness.jsx";
 
-const BusinessOwnerInfoFieldsWidget = ({ businessOwnerInfoValues, values }) => {
+const BusinessOwnerInfoFieldsWidget = ({ businessOwnerInfoValues, initialValues, filledValues = false }) => {
 	const [readyToSubmit, setReadyToSubmit] = useState(false);
+
+	const muiTextFieldProps = (errors, touched, values, name, label) => {
+		const value = getNestedValue(values, name);
+		const error = getNestedValue(errors, name);
+		const touch = getNestedValue(touched, name);
+
+		return {
+			InputLabelProps: filledValues && value !== '' && { shrink: true },
+			error: errors && touched && error && touch && true,
+			helperText: errors && touched && error && touch && error,
+			component: MuiTextField,
+			name: name,
+			label: label,
+			fullWidth: true
+		};
+	};
+
+	const stackProps = () => {
+		return {
+			direction: 'row',
+			spacing: 1,
+			sx: {
+				marginBottom: "0.5rem"
+			}
+		};
+	}
+
 	return (
 
 		<Formik
 			enableReinitialize
-			initialValues={values}
+			initialValues={initialValues}
 			validationSchema={businessOwnerInfoValidationSchema}
 			onSubmit={values => {
 				// !!!!! Here should we have a function to check if the user email is used before !!!!!
@@ -35,87 +65,41 @@ const BusinessOwnerInfoFieldsWidget = ({ businessOwnerInfoValues, values }) => {
 				businessOwnerInfoValues({...values}, "owner");
 			}}
 		>
-			{({ isSubmitting, errors, touched }) => (
+			{({ isSubmitting, errors, touched, values}) => (
 
 				<Form onChange={() => setReadyToSubmit(false)} style={{ width: '100%' }}>
 					<Widget>
 						<Typography variant="h6" gutterBottom>Business Owner Info</Typography>
 						<Stack>
-							<Stack direction='row' spacing={1} sx={{ minWidth: "100%", marginBottom: "0.5rem" }}>
-								<Field
-								  error={errors.basic?.fName && touched.basic?.fName && true}
-								  helperText={errors.basic?.fName && touched.basic?.fName && errors.basic?.fName}
-								  as={MuiTextField}
-								  name="basic.fName"
-								  label="First Name"
-								  fullWidth
-								/>
-								<Field
-								  error={errors.basic?.lName && touched.basic?.lName && true}
-								  helperText={errors.basic?.lName && touched.basic?.lName && errors.basic?.lName}
-								  as={MuiTextField}
-								  name="basic.lName"
-								  label="Last Name"
-								  fullWidth
-								/>
+							<Stack { ...stackProps() }>
+								<Field { ...muiTextFieldProps(errors, touched, values, 'basic.fName', 'First Name') } />
+								<Field { ...muiTextFieldProps(errors, touched, values, 'basic.lName', 'Last Name') } />
 							</Stack>
-							<Stack direction='row' spacing={1} sx={{ marginBottom: "0.5rem" }}>
+							<Stack { ...stackProps() }>
 								<Field
-	                error={errors.basic?.gender && touched.basic?.gender && true}
-	                helperText={errors.basic?.gender && touched.basic?.gender && errors.basic?.gender}
-	                component={MuiTextField}
-	                name="basic.gender"
-	                label="Gender"
+	                { ...muiTextFieldProps(errors, touched, values, 'basic.gender', 'Gender') }
 	                select
-	                fullWidth
 	              >
 	              	<MenuItem value="male">Male</MenuItem>
 	              	<MenuItem value="female">Female</MenuItem>
 	              	<MenuItem value="no-answer">No Answer</MenuItem>
 	              </Field>
 	              <Field
-								  error={errors.basic?.age && touched.basic?.age && true}
-								  helperText={errors.basic?.age && touched.basic?.age && errors.basic?.age}
-								  component={MuiTextField}
-								  name="basic.age"
-								  label="Age"
+								  { ...muiTextFieldProps(errors, touched, values, 'basic.age', 'Age') }
 								  type="date"
-								  fullWidth
 								/>
 							</Stack>
-							<Stack direction='row' spacing={1} sx={{ marginBottom: "0.5rem" }}>
-								<Field
-								  error={errors.contact?.email && touched.contact?.email && true}
-								  helperText={errors.contact?.email && touched.contact?.email && errors.contact?.email}
-								  component={MuiTextField}
-								  name="contact.email"
-								  label="Email"
-								  fullWidth
-								/>
-								<Field
-								  error={errors.contact?.phone && touched.contact?.phone && true}
-								  helperText={errors.contact?.phone && touched.contact?.phone && errors.contact?.phone}
-								  component={MuiTextField}
-								  name="contact.phone"
-								  label="Phone Number"
-								  fullWidth
-								 />
+							<Stack { ...stackProps() }>
+								<Field { ...muiTextFieldProps(errors, touched, values, 'contact.email', 'Email') }  />
+								<Field { ...muiTextFieldProps(errors, touched, values, 'contact.phone', 'Phone Number') } />
 							</Stack>
 							<Field
-								error={errors.contact?.address && touched.contact?.address && true}
-								helperText={errors.contact?.address && touched.contact?.address && errors.contact?.address}
-								component={MuiTextField}
-								name="contact.address"
-								label="Address"
+								{ ...muiTextFieldProps(errors, touched, values, 'contact.address', 'Address') }
 								sx={{ marginBottom: "0.5rem" }}
 							/>
 							<Field
-								error={errors.password && touched.password && true}
-								helperText={errors.password && touched.password && errors.password}
-								component={MuiTextField}
-								name="password"
+								{ ...muiTextFieldProps(errors, touched, values, 'password', 'Password') }
 								type="password"
-								label="Password"
 								sx={{ marginBottom: "0.5rem" }}
 							/>
 						</Stack>
