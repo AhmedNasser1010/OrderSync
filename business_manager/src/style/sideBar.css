@@ -1,0 +1,27 @@
+.side-bar {
+	background-color: #eee;
+	position: fixed;
+	width: calc(200px - 40px);
+	height: 100vh;
+	padding: 20px 0px 20px 40px;
+}
+
+.side-bar .logo {
+	display: block;
+	font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 25px;
+}
+
+.side-bar ul {}
+
+.side-bar ul li {
+	display: block;
+	color: #607D8B;
+	margin-bottom: 5px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.side-bar ul li a {}

@@ -5,6 +5,9 @@ import { BrowserRouter } from "react-router-dom";
 import { store } from './rtk/store';
 import { Provider } from 'react-redux';
 
+// styles
+import './style/sideBar.css'
+
 // Fonts
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
