@@ -1,5 +1,5 @@
 # OrderSync 📦️🔗
-<img src="public/favicon.svg" alt="icon" width="150" />
+<img src="images/favicon.svg" alt="icon" width="150" />
 
 **THE PROJECT ARE NOT COMPLETED (UNDER DEVELOPMENT) (LOGICAL PHASE)**
 
