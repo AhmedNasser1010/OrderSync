@@ -1,3 +1,7 @@
+html {
+	background-color: #f5f3ef;
+}
+
 #root {
 	display: flex;
 	font-family: monospace;

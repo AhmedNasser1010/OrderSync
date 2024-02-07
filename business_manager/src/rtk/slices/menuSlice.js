@@ -2,14 +2,14 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   items: [
-    { name: 'Espresso', discription: 'foo', categoty: 'hot-drinks', price: 2.50 },
-    { name: 'Cappuccino', discription: 'foo', categoty: 'hot-drinks', price: 3.50 },
-    { name: 'Iced Latte', discription: 'foo', categoty: 'cold-drinks', price: 4 },
-    { name: 'Cold Brew', discription: 'foo', categoty: 'cold-drinks', price: 3.75 },
+    { title: 'Espresso', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 2.50, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'] },
+    { title: 'Cappuccino', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 3.50, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'] },
+    { title: 'Iced Latte', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 4, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'] },
+    { title: 'Cold Brew', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 3.75, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'] },
   ],
   categories: [
-    { name: 'hot-drinks', discription: 'foo' },
-    { name: 'cold-drinks', discription: 'foo' },
+    { title: 'hot-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', background: '' },
+    { title: 'cold-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', background: '' },
   ],
 };
 
