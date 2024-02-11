@@ -6,11 +6,11 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import fromKebabToTitle from '../functions/fromKebabToTitle.js';
 import Collapse from '@mui/material/Collapse';
 
-const CategoryInfoBox = ({ title, background, hovered }) => {
+const MenuNestedCardInfoBox = ({ title, background, description, hovered }) => {
 
 	const paperStyles = {
-		width: '70px',
-		height: '70px',
+		width: '55px',
+		height: '55px',
 		borderRadius: '4px',
 		backgroundColor: '#eee',
 		overflow: 'hidden',
@@ -31,11 +31,11 @@ const CategoryInfoBox = ({ title, background, hovered }) => {
 
 		<Stack
 			direction='row'
-			spacing={2}
+			spacing={1}
 			alignItems="center"
 			sx={{
 				transition: '0.3s',
-				transform: hovered ? 'translateX(0)' : 'translateX(-1.5em)',
+				transform: hovered ? 'translateX(-5px)' : 'translateX(-20px)',
 			}}
 		>
 
@@ -45,7 +45,8 @@ const CategoryInfoBox = ({ title, background, hovered }) => {
 			</Paper>
 
 			<Stack sx={{color: '#454545'}}>
-				<Typography variant="h2" gutterBottom sx={{ fontSize: '24px', fontWeight: 'bold' }}>{ fromKebabToTitle(title) }</Typography>
+				<Typography variant="h3" gutterBottom sx={{ fontSize: '16px', fontWeight: 'bold' }}>{ fromKebabToTitle(title) }</Typography>
+				<Typography variant="body2" gutterBottom sx={{ maxWidth: '90%', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', color: '#4a4a4a', fontSize: '12px' }}>{ description }</Typography>
 			</Stack>
 
 		</Stack>
@@ -53,4 +54,4 @@ const CategoryInfoBox = ({ title, background, hovered }) => {
 	);
 }
 
-export default CategoryInfoBox;
+export default MenuNestedCardInfoBox;

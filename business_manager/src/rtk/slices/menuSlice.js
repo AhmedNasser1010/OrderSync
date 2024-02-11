@@ -4,12 +4,14 @@ const initialState = {
   items: [
     { title: 'Espresso', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 2.50, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'] },
     { title: 'Cappuccino', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 3.50, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'] },
-    { title: 'Iced Latte', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 4, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'] },
+    { title: 'Chai', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 1.00, backgrounds: [] },
+    { title: 'Iced Latte', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 4.00, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'] },
     { title: 'Cold Brew', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 3.75, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'] },
   ],
   categories: [
     { title: 'hot-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', background: '' },
     { title: 'cold-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', background: '' },
+    { title: 'other', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', background: '' },
   ],
 };
 
@@ -52,7 +54,7 @@ export const menuSlice = createSlice({
         ...state,
         items: [
           ...state.items,
-          ...payload,
+          payload,
         ],
       };
     },
@@ -61,7 +63,7 @@ export const menuSlice = createSlice({
         ...state,
         categories: [
           ...state.categories,
-          ...payload,
+          payload,
         ],
       };
     },

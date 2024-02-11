@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import {
 	DndContext,
   KeyboardSensor,
@@ -15,17 +16,20 @@ import {
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import SortableItem from './Component/SortableItem.jsx';
-import Category from './Component/Category.jsx';
+import MenuCard from './Component/MenuCard.jsx';
 import reOrderArray from './functions/reOrderArray.js';
-import { useSelector } from 'react-redux';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import { useSelector, useDispatch } from 'react-redux';
+import { addCategory } from './rtk/slices/menuSlice.js';
 
 const Menu = () => {
 	const categories = useSelector(state => state.menu.categories);
 	const [indexes, setIndexes] = useState([]);
+	const dispatch = useDispatch();
 
 	// setup indexed from categories
 	useEffect(() => {
-		!indexes.length && setIndexes(prevIndexes => categories.map((item, i) => i + 1));
+		setIndexes(prevIndexes => categories.map((item, i) => i + 1));
 	}, [categories])
 
 	const sensors = useSensors(
@@ -48,6 +52,28 @@ const Menu = () => {
     }
   }
 
+  const handleAddNewCategory = () => {
+  	const newCategory = {
+  		title: 'new',
+  		description: '',
+  		background: ''
+  	}
+  	dispatch(addCategory(newCategory));
+  }
+
+  const btnStyle = {
+		backgroundColor: '#eee',
+  	borderColor: '#bdbdbd',
+  	color: '#454545',
+		borderStyle: 'dotted',
+		borderWidth: '2px',
+		'&:hover': {
+  		borderColor: '#454545',
+			borderStyle: 'dotted',
+			borderWidth: '2px'
+		}
+	}
+
 	return (
 
 		<Box style={{ marginTop: '100px' }}>
@@ -58,14 +84,24 @@ const Menu = () => {
 			>
 
 				<SortableContext items={indexes} strategy={verticalListSortingStrategy}>
-					{indexes.map(index =>
+					{indexes.map((index, i) =>
 						<SortableItem key={index} id={index} >
-							<Category category={categories[index - 1]} />
+							<MenuCard item={categories[index - 1]} />
 						</SortableItem>
 					)}
 				</SortableContext>
 
 			</DndContext>
+
+			<Button
+				variant="outlined"
+				sx={btnStyle}
+				startIcon={<PlaylistAddIcon />}
+				onClick={handleAddNewCategory}
+			>
+				Add New Category
+			</Button>
+
 		</Box>
 
 	);
