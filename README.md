@@ -1,5 +1,5 @@
-# OrderSync 📦️🔗
-<img src="images/favicon.svg" alt="icon" width="150" />
+# OrderSync 🛵🔗
+<img src="images/cover.png" alt="cover" />
 
 **THE PROJECT ARE NOT COMPLETED (UNDER DEVELOPMENT) (LOGICAL PHASE)**
 
@@ -9,6 +9,7 @@
 - [To Do List](#🔶-to-do-list)
 - [Technologies](#🔶-technologies)
 - [Features](#🔶-features)
+- [Products](#🔶-products)
 - [Installation](#🔶-installation)
 - [Usage](#🔶-usage)
 - [Contributing](#🔶-contributing)
@@ -77,14 +78,28 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 
 ## 🔶 Technologies
 
-* CSS
 * JavaScript
 * ReactJS
 * MatrialUI
 * Firebase
+* Formik
+* Yup
+* DnD-Kit
+* ...
 
 ## 🔶 Features
 - 
+
+## 🔶 Products
+
+- System Owner (for the system owner who will own it) **Still BackStage**
+- [Business Creator (for developers like font-end developer).](businesses_creator/)
+- [Business Manager (for businesses owners).](businesses_manager/)
+- Customer Store (for the customer who will buy a products). **Still BackStage**
+
+**API We Provide:**
+- Business Manager API. **Still BackStage**
+- Customer Store API. **Still BackStage**
 
 ## 🔶 Installation
 
@@ -137,7 +152,8 @@ Please adhere to the coding conventions and standards followed in the project.
 **Finally, Thank you for your valuable contribution to making our web application even better.**
 
 ## 🔶 Project Versions
--
+
+- **0.1.0 Demo version is coming soon! stay tuned**
 
 ## 🔶 License
 
