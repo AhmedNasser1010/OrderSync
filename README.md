@@ -1,7 +1,8 @@
-# OrderSync 🛵🔗
 <img src="images/cover.png" alt="cover" />
 
-**THE PROJECT ARE NOT COMPLETED (UNDER DEVELOPMENT) (LOGICAL PHASE)**
+# OrderSync 🛵🔗
+
+**THE PROJECT WILL COMPLETED SOON!**
 
 ## 🔶 Table of Contents
 - [Diagrams](#🔶-diagrams)
