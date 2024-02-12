@@ -68,6 +68,7 @@ const CategoryBody = ({ name }) => {
   		category: name,
   		price: 0,
   		backgrounds: [],
+  		visibility: false,
   	}
   	dispatch(addItem(newItem))
   }

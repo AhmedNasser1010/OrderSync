@@ -56,7 +56,8 @@ const Menu = () => {
   	const newCategory = {
   		title: 'new',
   		description: '',
-  		background: ''
+  		background: '',
+  		visibility: false,
   	}
   	dispatch(addCategory(newCategory));
   }

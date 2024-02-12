@@ -25,7 +25,7 @@ const MenuCard = ({ item }) => {
 
 	return (
 
-		<Box sx={{ maxWidth: '600px' }}>
+		<Box sx={{ maxWidth: '600px', opacity: item?.visibility ? '100%' : '60%' }}>
 			<Paper
 				onMouseEnter={() => setHovered(true)}
 				onMouseLeave={() => setHovered(false)}
@@ -37,17 +37,17 @@ const MenuCard = ({ item }) => {
 
 					<Stack direction='row' spacing={1} alignItems="center" justifyContent="space-between">
 						<DragIndicatorIcon sx={{ color: '#454545', opacity: hovered ? '100%' : '0', transition: '0.3s' }} />
-						<CategoryInfoBox title={item.title} description={item.description} background={item.background} hovered={hovered} />
+						<CategoryInfoBox title={item?.title} description={item?.description} background={item?.background} hovered={hovered} />
 					</Stack>
 
-					<CategoryButtonBox hovered={hovered} handleExpanded={handleExpanded} expanded={expanded} />
+					<CategoryButtonBox hovered={hovered} handleExpanded={handleExpanded} expanded={expanded} item={item} />
 
 				</Stack>
 
 
 			</Paper>
 			<Collapse in={expanded}>
-				<CategoryBody name={item.title} />
+				<CategoryBody name={item?.title} />
 			</Collapse>
 		</Box>
 
