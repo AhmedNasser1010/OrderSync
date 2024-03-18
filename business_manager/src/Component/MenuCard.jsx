@@ -37,7 +37,7 @@ const MenuCard = ({ item }) => {
 
 					<Stack direction='row' spacing={1} alignItems="center" justifyContent="space-between">
 						<DragIndicatorIcon sx={{ color: '#454545', opacity: hovered ? '100%' : '0', transition: '0.3s' }} />
-						<CategoryInfoBox title={item?.title} description={item?.description} background={item?.background} hovered={hovered} />
+						<CategoryInfoBox item={item} description={item?.description} background={item?.background} hovered={hovered} />
 					</Stack>
 
 					<CategoryButtonBox hovered={hovered} handleExpanded={handleExpanded} expanded={expanded} item={item} />

@@ -9,9 +9,9 @@ const initialState = {
     { title: 'Cold Brew', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 3.75, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
   ],
   categories: [
-    { title: 'hot-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', background: '', visibility: true },
-    { title: 'cold-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', background: '', visibility: true },
-    { title: 'other', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', background: '', visibility: false },
+    { title: 'hot-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['asd', 'ss', '', '', ''], visibility: true },
+    { title: 'cold-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['', '', '', '', ''], visibility: true },
+    { title: 'other', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['', '', '', '', ''], visibility: false },
   ],
 };
 
@@ -117,6 +117,24 @@ export const menuSlice = createSlice({
         ],
       };
     },
+    addNewCategoryBackgrounds: (state, { payload }) => {
+      return {
+        ...state,
+        categories: [
+          ...state.categories.map(category => {
+            if (category.title === payload.title) {
+              return {
+                ...category,
+                backgrounds: payload.data
+              };
+            } else {
+              return category;
+            }
+          }),
+
+        ]
+      }
+    }
   },
 })
 
@@ -134,6 +152,7 @@ export const {
   removeItem,
   categoryVisibility,
   itemVisibility,
+  addNewCategoryBackgrounds
 } = menuSlice.actions;
 
 export default menuSlice.reducer;

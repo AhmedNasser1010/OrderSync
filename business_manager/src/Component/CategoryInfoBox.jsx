@@ -1,12 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import fromKebabToTitle from '../functions/fromKebabToTitle.js';
 import Collapse from '@mui/material/Collapse';
+import AddImageForm from './AddImageForm.jsx';
+import Dialog from '@mui/material/Dialog';
+import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice';
+import { useDispatch } from 'react-redux';
 
-const CategoryInfoBox = ({ title, background, hovered }) => {
+const CategoryInfoBox = ({ item, background, hovered }) => {
+	const dispatch = useDispatch();
+	const [addImageExpanded, setAddImageExpanded] = useState(false);
 
 	const paperStyles = {
 		width: '70px',
@@ -14,7 +20,7 @@ const CategoryInfoBox = ({ title, background, hovered }) => {
 		borderRadius: '4px',
 		backgroundColor: '#eee',
 		overflow: 'hidden',
-		border: !background && '2px dotted #bdbdbd',
+		border: !item?.backgrounds[0] && '2px dotted #bdbdbd',
 		cursor: 'pointer',
 		position: 'relative',
 	};
@@ -26,6 +32,16 @@ const CategoryInfoBox = ({ title, background, hovered }) => {
 		transform: 'translate(-50%, -50%)',
 		color: '#bdbdbd'
 	};
+
+	const handleDialogOpen = () => {
+		setAddImageExpanded(true);
+		dispatch(setDisableMenuDnD(true));
+	}
+
+	const handleDialogClose = () => {
+		setAddImageExpanded(false);
+		dispatch(setDisableMenuDnD(false));
+	}
 
 	return (
 
@@ -39,13 +55,19 @@ const CategoryInfoBox = ({ title, background, hovered }) => {
 			}}
 		>
 
-			<Paper sx={paperStyles}>
-			<AddPhotoAlternateIcon sx={photoIconStyles} />
-			{ background && <img src={background} alt="category background" style={{ width: '100%', position: 'absolute' }} /> }
+			<Paper sx={paperStyles} onMouseDown={handleDialogOpen}>
+				
+				<AddPhotoAlternateIcon sx={photoIconStyles} />
+				{ item?.backgrounds[0] && <img src={item.backgrounds[0]} alt="category background" style={{ width: '100%', position: 'absolute' }} /> }
+				
+				<Dialog open={addImageExpanded}>
+					<AddImageForm item={item} handleDialogClose={handleDialogClose} />
+				</Dialog>
+			
 			</Paper>
 
 			<Stack sx={{color: '#454545'}}>
-				<Typography variant="h2" gutterBottom sx={{ fontSize: '24px', fontWeight: 'bold' }}>{ fromKebabToTitle(title) }</Typography>
+				<Typography variant="h2" gutterBottom sx={{ fontSize: '24px', fontWeight: 'bold' }}>{ fromKebabToTitle(item?.title) }</Typography>
 			</Stack>
 
 		</Stack>

@@ -24,6 +24,7 @@ import { addCategory } from './rtk/slices/menuSlice.js';
 
 const Menu = () => {
 	const categories = useSelector(state => state.menu.categories);
+	const disableMenuDnD = useSelector(state => state.conditionalValues.disableMenuDnD);
 	const [indexes, setIndexes] = useState([]);
 	const dispatch = useDispatch();
 
@@ -84,7 +85,7 @@ const Menu = () => {
 				onDragEnd={handleDragEnd}
 			>
 
-				<SortableContext items={indexes} strategy={verticalListSortingStrategy}>
+				<SortableContext items={indexes} strategy={verticalListSortingStrategy} disabled={disableMenuDnD}>
 					{indexes.map((index, i) =>
 						<SortableItem key={index} id={index} >
 							<MenuCard item={categories[index - 1]} />
