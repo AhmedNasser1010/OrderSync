@@ -3,7 +3,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Switch from '@mui/material/Switch';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { removeCategory, categoryVisibility, removeItem, itemVisibility } from '../rtk/slices/menuSlice.js';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -18,7 +18,7 @@ const MenuCardManageMiniMenu = ({ item, buttonStyles, hovered = true, categoryOr
 
 	const handleOpenExpandMore = (event) => {
     setExpandMoreAnchorEl(event.currentTarget);
-  };
+  }
 
 	const handleCloseExpandMore = () => {
 		setExpandMoreAnchorEl(null);

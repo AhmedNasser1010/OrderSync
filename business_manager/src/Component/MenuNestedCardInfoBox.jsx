@@ -5,8 +5,30 @@ import Stack from '@mui/material/Stack';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import fromKebabToTitle from '../functions/fromKebabToTitle.js';
 import Collapse from '@mui/material/Collapse';
+import AddImageForm from './AddImageForm.jsx';
+import Dialog from '@mui/material/Dialog';
+import { useDispatch } from 'react-redux';
+import { addNewItemBackgrounds } from '../rtk/slices/menuSlice';
+import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice';
 
-const MenuNestedCardInfoBox = ({ title, background, description, hovered }) => {
+const MenuNestedCardInfoBox = ({ item, hovered }) => {
+	const dispatch = useDispatch();
+	const [dialogVisibility, setDialogVisibility] = useState(false);
+
+	const handleDialogOpen = () => {
+		setDialogVisibility(true);
+		dispatch(setDisableMenuDnD(true));
+	}
+
+	const handleDialogClose = () => {
+		setDialogVisibility(false);
+		dispatch(setDisableMenuDnD(false));
+	}
+
+	const submitFunc = (values) => {
+		dispatch(addNewItemBackgrounds({title: item.title, data: values}))
+		return true;
+	}
 
 	const paperStyles = {
 		width: '55px',
@@ -14,7 +36,7 @@ const MenuNestedCardInfoBox = ({ title, background, description, hovered }) => {
 		borderRadius: '4px',
 		backgroundColor: '#eee',
 		overflow: 'hidden',
-		border: !background && '2px dotted #bdbdbd',
+		border: !item?.backgrounds[0] && '2px dotted #bdbdbd',
 		cursor: 'pointer',
 		position: 'relative',
 	};
@@ -39,14 +61,17 @@ const MenuNestedCardInfoBox = ({ title, background, description, hovered }) => {
 			}}
 		>
 
-			<Paper sx={paperStyles}>
-			<AddPhotoAlternateIcon sx={photoIconStyles} />
-			{ background && <img src={background} alt="category background" style={{ width: '100%', position: 'absolute' }} /> }
+			<Paper sx={paperStyles} onMouseDown={handleDialogOpen}>
+				<AddPhotoAlternateIcon sx={photoIconStyles} />
+				{ item?.backgrounds[0] && <img src={item.backgrounds[0]} alt="category background" style={{ width: '100%', position: 'absolute' }} /> }
+
+				<AddImageForm item={item} handleDialogClose={handleDialogClose} submitFunc={submitFunc} dialogVisibility={dialogVisibility} />
+
 			</Paper>
 
 			<Stack sx={{color: '#454545'}}>
-				<Typography variant="h3" gutterBottom sx={{ fontSize: '16px', fontWeight: 'bold' }}>{ fromKebabToTitle(title) }</Typography>
-				<Typography variant="body2" gutterBottom sx={{ maxWidth: '90%', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', color: '#4a4a4a', fontSize: '12px' }}>{ description }</Typography>
+				<Typography variant="h3" gutterBottom sx={{ fontSize: '16px', fontWeight: 'bold' }}>{ fromKebabToTitle(item?.title) }</Typography>
+				<Typography variant="body2" gutterBottom sx={{ maxWidth: '90%', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', color: '#4a4a4a', fontSize: '12px' }}>{ item?.description }</Typography>
 			</Stack>
 
 		</Stack>

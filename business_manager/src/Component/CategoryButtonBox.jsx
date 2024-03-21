@@ -6,6 +6,10 @@ import MenuCardManageMiniMenu from './MenuCardManageMiniMenu.jsx';
 
 const CategoryButtonBox = ({ hovered, handleExpanded, expanded, item }) => {
 
+	const handleEdit = () => {
+		console.log('handleEdit: CategoryButtonBox.jsx 10:5');
+	}
+
 	const buttonStyles = {
 		cursor: 'pointer',
 		color: '#454545',
@@ -26,7 +30,7 @@ const CategoryButtonBox = ({ hovered, handleExpanded, expanded, item }) => {
 				hovered={hovered}
 				categoryOrItem='category'
 			/>
-			<ModeIcon sx={{...buttonStyles, transform: hovered ? 'translateY(0)' : 'translateY(5px)',}} />
+			<ModeIcon sx={{...buttonStyles, transform: hovered ? 'translateY(0)' : 'translateY(5px)'}} onMouseUp={handleEdit} />
 			<ExpandMoreIcon sx={{...buttonStyles, opacity: '100%', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)'}} onMouseUp={handleExpanded} />
 
 		</Stack>

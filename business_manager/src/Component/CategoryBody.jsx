@@ -22,12 +22,17 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import fromKebabToTitle from '../functions/fromKebabToTitle.js';
 import Button from '@mui/material/Button';
 import { addItem } from '../rtk/slices/menuSlice.js';
+import AddNewItemDialog from './AddNewItemDialog';
+import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice';
 
 const CategoryBody = ({ name }) => {
+	const dispatch = useDispatch();
+	const disableMenuDnD = useSelector(state => state.conditionalValues.disableMenuDnD);
 	const items = useSelector(state => state.menu.items);
 	const [filteredItems, setFilteredItems] = useState([]);
 	const [indexes, setIndexes] = useState([]);
-	const dispatch = useDispatch();
+	const [dialogVisibility, setDialogVisibility] = useState(false);
+	const convertedTitle = fromKebabToTitle(name);
 
 	// setup filtered items by filter all items with spicific category
 	useEffect(() => {
@@ -61,16 +66,14 @@ const CategoryBody = ({ name }) => {
     }
   }
 
-  const handleAddNewItem = () => {
-  	const newItem = {
-  		title: '',
-  		description: '',
-  		category: name,
-  		price: 0,
-  		backgrounds: [],
-  		visibility: false,
-  	}
-  	dispatch(addItem(newItem))
+  const handleDialogOpen = () => {
+  	setDialogVisibility(true);
+  	dispatch(setDisableMenuDnD(true));
+  }
+
+  const handleDialogClose = () => {
+  	setDialogVisibility(false);
+  	dispatch(setDisableMenuDnD(false));
   }
 
   const btnStyle = {
@@ -97,7 +100,7 @@ const CategoryBody = ({ name }) => {
 				collisionDetection={closestCenter}
 				onDragEnd={handleDragEnd}
 			>
-				<SortableContext items={indexes} strategy={verticalListSortingStrategy}>
+				<SortableContext items={indexes} strategy={verticalListSortingStrategy} disabled={disableMenuDnD}>
 					{indexes?.map((index, i) =>
 						<SortableItem key={i} id={index} >
 							<MenuNestedCard item={filteredItems[index - 1]} />
@@ -105,13 +108,16 @@ const CategoryBody = ({ name }) => {
 					)}
 				</SortableContext>
 			</DndContext>
+
+			<AddNewItemDialog itemName={convertedTitle} dialogVisibility={dialogVisibility} handleDialogClose={handleDialogClose} />
+
 			<Button
 				variant="outlined"
 				sx={btnStyle}
 				startIcon={<PlaylistAddIcon />}
-				onMouseUp={handleAddNewItem}
+				onMouseUp={handleDialogOpen}
 			>
-				Add New Item To { fromKebabToTitle(name) }
+				Add New Item To { convertedTitle }
 			</Button>
 		</Box>
 

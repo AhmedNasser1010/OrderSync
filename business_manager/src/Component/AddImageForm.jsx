@@ -6,7 +6,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import { Formik, Form, Field } from 'formik';
 import { object, string, array } from 'yup';
-import { useDispatch } from 'react-redux';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import MuiTextField from "./MuiTextField.jsx";
@@ -15,16 +14,18 @@ import DoneAllIcon from '@mui/icons-material/DoneAll';
 import CancelIcon from '@mui/icons-material/Cancel';
 import Typography from '@mui/material/Typography';
 import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice.js';
-import { addNewCategoryBackgrounds } from '../rtk/slices/menuSlice.js'
+import fromKebabToTitle from '../functions/fromKebabToTitle.js';
+import IconedTitle from './IconedTitle';
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 // Validation schema
 const linksValidationSchema = array().of(string().required("link are required"));
 
 
-const AddImageForm = ({ item, handleDialogClose }) => {
-	const dispatch = useDispatch();
+const AddImageForm = ({ item, handleDialogClose, submitFunc, dialogVisibility }) => {
 	const [lastInput, setLastInput] = useState(0);
 	const [morelinkDisable, setMorelinkDisable] = useState(false);
+	const itemName = fromKebabToTitle(item?.title);
 
 	useEffect(() => {
 		item?.backgrounds.map((background, index) => {
@@ -43,50 +44,78 @@ const AddImageForm = ({ item, handleDialogClose }) => {
 		setLastInput(lastInput+1);
 	}
 
+	const btnStyle = {
+		borderStyle: 'dotted',
+		borderWidth: '2px',
+		fontSize: '12px',
+		'&:hover': {
+			borderStyle: 'dotted',
+			borderWidth: '2px'
+		}
+	}
+
 	return (
 
-		<Box>
+		<Dialog open={dialogVisibility}>
 
-			<Typography variant='h3' sx={{ fontSize: '24px' }}>{ item?.title }</Typography>
+			<DialogTitle>
+				<IconedTitle
+					icon={<AddPhotoAlternateIcon sx={{ fontSize: '26px', marginRight: '8px' }} />}
+					title={`Add Images To ${itemName}`}
+					variant='h3'
+					fontSize='24px'
+				/>
+			</DialogTitle>
 
-			<Formik
-				enableReinitialize
-				initialValues={item.backgrounds}
-				// validationSchema={linksValidationSchema}
-				onSubmit={values => {
-					dispatch(addNewCategoryBackgrounds({title: item.title, data: values}))
-				}}
-			>
-				{({ isSubmitting, errors, touched, values }) => (
+			<DialogContent>
+				<Formik
+					enableReinitialize
+					initialValues={item.backgrounds}
+					// validationSchema={linksValidationSchema}
+					onSubmit={values => {
+						submitFunc(values);
+					}}
+				>
+					{({ isSubmitting, errors, touched, values }) => (
 
-					<Form>
-						<Stack sx={{ padding: '20px' }}>
+						<Form>
+							<Stack>
+								{values.map((value, index) => (
+									<Field
+										key={index}
+										className={`link-input i-${index}`}
+										style={{ marginBottom: '10px', display: value === '' && index !== 0 && 'none' }}
+										error={errors[index] && touched[index] && true}
+										helperText={errors[index] && touched[index] && errors[index]}
+										component={MuiTextField}
+										name={`[${index}]`}
+										label={`#${index+1}'s Link`}
+										fullWidth
+									/>
+								))}
+							</Stack>
 
-							{values.map((value, index) => (
-								<Field
-									key={index}
-									className={`link-input i-${index}`}
-									style={{ marginBottom: '10px', display: value === '' && index !== 0 && 'none' }}
-									error={errors[index] && touched[index] && true}
-									helperText={errors[index] && touched[index] && errors[index]}
-									component={MuiTextField}
-									name={`[${index}]`}
-									label={`#${index+1}'s Link`}
-									fullWidth
-								/>
-							))}
+							<Button
+								disabled={morelinkDisable}
+								onMouseUp={handleMoreLink}
+								startIcon={<AddCircleOutlineIcon />}
+								sx={btnStyle}
+								variant="outlined"
+							>
+								More Link
+							</Button>
 							
+							<DialogActions>
+								<Button onMouseUp={handleDialogClose} color="error" startIcon={<CancelIcon />}>Cancel</Button>
+								<Button onMouseUp={handleDialogClose} type="submit" startIcon={<DoneAllIcon />}>Add</Button>
+							</DialogActions>
+						</Form>
 
-							<Button disabled={morelinkDisable} onMouseUp={handleMoreLink} startIcon={<AddCircleOutlineIcon />}>More Link</Button>
-							<Button onMouseUp={handleDialogClose} type="submit" startIcon={<DoneAllIcon />}>Add</Button>
-							<Button onMouseUp={handleDialogClose} color="error" startIcon={<CancelIcon />}>Cancel</Button>
+					)}
+				</Formik>
+			</DialogContent>
 
-						</Stack>
-					</Form>
-
-				)}
-			</Formik>
-		</Box>
+		</Dialog>
 
 	);
 }

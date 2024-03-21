@@ -8,11 +8,12 @@ import Collapse from '@mui/material/Collapse';
 import AddImageForm from './AddImageForm.jsx';
 import Dialog from '@mui/material/Dialog';
 import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice';
+import { addNewCategoryBackgrounds } from '../rtk/slices/menuSlice.js'
 import { useDispatch } from 'react-redux';
 
 const CategoryInfoBox = ({ item, background, hovered }) => {
 	const dispatch = useDispatch();
-	const [addImageExpanded, setAddImageExpanded] = useState(false);
+	const [dialogVisibility, setDialogVisibility] = useState(false);
 
 	const paperStyles = {
 		width: '70px',
@@ -34,13 +35,18 @@ const CategoryInfoBox = ({ item, background, hovered }) => {
 	};
 
 	const handleDialogOpen = () => {
-		setAddImageExpanded(true);
+		setDialogVisibility(true);
 		dispatch(setDisableMenuDnD(true));
 	}
 
 	const handleDialogClose = () => {
-		setAddImageExpanded(false);
+		setDialogVisibility(false);
 		dispatch(setDisableMenuDnD(false));
+	}
+
+	const submitFunc = (values) => {
+		dispatch(addNewCategoryBackgrounds({title: item.title, data: values}))
+		return true;
 	}
 
 	return (
@@ -59,10 +65,8 @@ const CategoryInfoBox = ({ item, background, hovered }) => {
 				
 				<AddPhotoAlternateIcon sx={photoIconStyles} />
 				{ item?.backgrounds[0] && <img src={item.backgrounds[0]} alt="category background" style={{ width: '100%', position: 'absolute' }} /> }
-				
-				<Dialog open={addImageExpanded}>
-					<AddImageForm item={item} handleDialogClose={handleDialogClose} />
-				</Dialog>
+
+				<AddImageForm item={item} handleDialogClose={handleDialogClose} submitFunc={submitFunc} dialogVisibility={dialogVisibility} />
 			
 			</Paper>
 

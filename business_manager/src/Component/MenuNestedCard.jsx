@@ -39,7 +39,7 @@ const MenuNestedCard = ({ item }) => {
 
 				<Stack direction='row' spacing={1} alignItems="center" justifyContent="space-between">
 					<DragIndicatorIcon sx={{ color: '#454545', opacity: hovered ? '100%' : '0', transition: '0.3s', fontSize: '16px' }} />
-					<MenuNestedCardInfoBox title={item?.title} description={item?.description} background={item?.background} hovered={hovered} />
+					<MenuNestedCardInfoBox item={item} hovered={hovered} />
 				</Stack>
 
 				<Stack
@@ -54,7 +54,7 @@ const MenuNestedCard = ({ item }) => {
 					/>
 					<ModeIcon sx={{...buttonStyles, transform: hovered ? 'translateY(0)' : 'translateY(5px)', fontSize: '16px'}} />
 					{/* bro don't forget to get the currency from the business data instead of the static value */}
-					<span style={{ color: '#4a4a4a', fontSize: '12px' }}>{ item?.price.toFixed(2) } USD</span>
+					<span style={{ color: '#4a4a4a', fontSize: '12px' }}>{ Number(item?.price).toFixed(2) } USD</span>
 
 				</Stack>
 

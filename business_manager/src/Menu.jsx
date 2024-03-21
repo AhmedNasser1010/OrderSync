@@ -21,11 +21,13 @@ import reOrderArray from './functions/reOrderArray.js';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import { useSelector, useDispatch } from 'react-redux';
 import { addCategory } from './rtk/slices/menuSlice.js';
+import AddNewCategoryDialog from './Component/AddNewCategoryDialog';
 
 const Menu = () => {
+	const [indexes, setIndexes] = useState([]);
+	const [dialogVisibility, setDialogVisibility] = useState(false);
 	const categories = useSelector(state => state.menu.categories);
 	const disableMenuDnD = useSelector(state => state.conditionalValues.disableMenuDnD);
-	const [indexes, setIndexes] = useState([]);
 	const dispatch = useDispatch();
 
 	// setup indexed from categories
@@ -53,14 +55,12 @@ const Menu = () => {
     }
   }
 
-  const handleAddNewCategory = () => {
-  	const newCategory = {
-  		title: 'new',
-  		description: '',
-  		background: '',
-  		visibility: false,
-  	}
-  	dispatch(addCategory(newCategory));
+  const handleDialogOpen = () => {
+  	setDialogVisibility(true);
+  }
+
+  const handleDialogClose = () => {
+  	setDialogVisibility(false);
   }
 
   const btnStyle = {
@@ -95,11 +95,13 @@ const Menu = () => {
 
 			</DndContext>
 
+			<AddNewCategoryDialog dialogVisibility={dialogVisibility} handleDialogClose={handleDialogClose} />
+
 			<Button
 				variant="outlined"
 				sx={btnStyle}
 				startIcon={<PlaylistAddIcon />}
-				onClick={handleAddNewCategory}
+				onClick={handleDialogOpen}
 			>
 				Add New Category
 			</Button>
