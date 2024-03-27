@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Collapse from '@mui/material/Collapse';
@@ -6,10 +8,13 @@ import MenuCardManageMiniMenu from './MenuCardManageMiniMenu.jsx';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import MenuNestedCardInfoBox from './MenuNestedCardInfoBox.jsx';
 import ModeIcon from '@mui/icons-material/Mode';
+import AddNewItemDialog from './AddNewItemDialog';
 
 const MenuNestedCard = ({ item }) => {
+	const dispatch = useDispatch();
 	const [mouseState, setMouseState] = useState('grab');
 	const [hovered, setHovered] = useState(false);
+	const [dialogVisibility, setDialogVisibility] = useState(false);
 
 	const paperStyles = {
 		cursor: mouseState,
@@ -24,6 +29,16 @@ const MenuNestedCard = ({ item }) => {
 		transition: '0.3s',
 		padding: '5px',
 	};
+
+	const handleDialogOpen = () => {
+		setDialogVisibility(true);
+		dispatch(setDisableMenuDnD(true));
+	}
+
+	const handleDialogClose = () => {
+		setDialogVisibility(false);
+		dispatch(setDisableMenuDnD(false));
+	}
 
 	return (
 
@@ -52,7 +67,10 @@ const MenuNestedCard = ({ item }) => {
 						hovered={hovered}
 						categoryOrItem='item'
 					/>
-					<ModeIcon sx={{...buttonStyles, transform: hovered ? 'translateY(0)' : 'translateY(5px)', fontSize: '16px'}} />
+
+					<ModeIcon sx={{...buttonStyles, transform: hovered ? 'translateY(0)' : 'translateY(5px)', fontSize: '16px'}} onMouseUp={handleDialogOpen} />
+					<AddNewItemDialog itemName={item.name} dialogVisibility={dialogVisibility} handleDialogClose={handleDialogClose} initialValues={item} />
+
 					{/* bro don't forget to get the currency from the business data instead of the static value */}
 					<span style={{ color: '#4a4a4a', fontSize: '12px' }}>{ Number(item?.price).toFixed(2) } USD</span>
 

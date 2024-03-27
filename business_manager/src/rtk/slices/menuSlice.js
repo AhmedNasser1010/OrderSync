@@ -58,6 +58,20 @@ export const menuSlice = createSlice({
         ],
       };
     },
+    updateItem: (state, { payload }) => {
+      return {
+        ...state,
+        items: [
+          ...state.items.map(item => {
+            if (item.title !== payload.initialValues.title) {
+              return item;
+            } else {
+              return payload.values;
+            }
+          }),
+        ],
+      }
+    },
     addCategory: (state, { payload }) => {
       return {
         ...state,
@@ -66,6 +80,20 @@ export const menuSlice = createSlice({
           payload,
         ],
       };
+    },
+    updateCategory: (state, { payload }) => {
+      return {
+        ...state,
+        categories: [
+          ...state.categories.map(category => {
+            if (category.title !== payload.initialValues.title) {
+              return category;
+            } else {
+              return payload.values;
+            }
+          }),
+        ],
+      }
     },
     removeCategory: (state, { payload }) => {
       return {
@@ -153,7 +181,9 @@ export const menuSlice = createSlice({
         ]
       }
     },
-
+    saveToCloud: (state, { payload }) => {
+      
+    },
   },
 })
 
@@ -166,7 +196,9 @@ export const {
   addNewCategories,
   clearAllCategories,
   addItem,
+  updateItem,
   addCategory,
+  updateCategory,
   removeCategory,
   removeItem,
   categoryVisibility,

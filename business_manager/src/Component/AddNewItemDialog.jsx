@@ -1,8 +1,9 @@
+import { useEffect } from 'react';
 import { object, string, array, boolean } from 'yup';
 import { Formik, Form, Field } from 'formik';
 import fromKebabToTitle from '../functions/fromKebabToTitle';
 import { useDispatch, useSelector } from 'react-redux';
-import { addItem } from '../rtk/slices/menuSlice';
+import { addItem, updateItem } from '../rtk/slices/menuSlice';
 import MuiTextField from "./MuiTextField.jsx";
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
@@ -17,15 +18,6 @@ import Typography from '@mui/material/Typography';
 import IconedTitle from './IconedTitle';
 import MenuItem from '@mui/material/MenuItem';
 
-const initialValues = {
-  title: '',
-  description: '',
-  category: '',
-  price: '',
-  backgrounds: ['', '', '', '', ''],
-  visibility: false,
-}
-
 const validationSchema = object({
 	title: string().required('Title is required'),
 	description: string(),
@@ -35,9 +27,18 @@ const validationSchema = object({
 	visibility: boolean(),
 })
 
-const AddNewItemDialog = ({ itemName, dialogVisibility, handleDialogClose }) => {
+const AddNewItemDialog = ({ itemName, dialogVisibility, handleDialogClose, initialValues }) => {
 	const dispatch = useDispatch();
 	const categories = useSelector(state => state.menu.categories);
+
+	const newInitialValues = {
+		title: '',
+		description: '',
+		category: itemName,
+		price: '',
+		backgrounds: ['', '', '', '', ''],
+		visibility: false
+	}
 
 	return (
 		<Dialog open={dialogVisibility}>
@@ -45,18 +46,17 @@ const AddNewItemDialog = ({ itemName, dialogVisibility, handleDialogClose }) => 
 			<DialogTitle>
 				<IconedTitle
 					icon={<PlaylistAddCircleIcon sx={{ fontSize: '26px', marginRight: '8px' }} />}
-					title={`Add New Item To ${itemName}`}
+					title={`Add New Item To ${fromKebabToTitle(itemName)}`}
 					variant='h3'
 					fontSize='24px'
 				/>
 			</DialogTitle>
 			
 				<Formik
-					initialValues={initialValues}
-					// validationSchema={validationSchema}
+					initialValues={initialValues || newInitialValues}
+					validationSchema={validationSchema}
 					onSubmit={values => {
-						console.log(values)
-						dispatch(addItem(values))
+						initialValues.title === '' ? dispatch(addItem(values)) : dispatch(updateItem({ initialValues, values }))
 						handleDialogClose();
 					}}
 				>

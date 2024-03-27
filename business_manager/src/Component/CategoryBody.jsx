@@ -56,7 +56,7 @@ const CategoryBody = ({ name }) => {
 	const handleDragEnd = (event) => {
     const {active, over} = event;
     
-    if (active.id !== over.id) {
+    if (over?.id && active.id !== over.id) {
       setIndexes((indexes) => {
         const oldIndex = indexes.indexOf(active.id);
         const newIndex = indexes.indexOf(over.id);
@@ -109,7 +109,7 @@ const CategoryBody = ({ name }) => {
 				</SortableContext>
 			</DndContext>
 
-			<AddNewItemDialog itemName={convertedTitle} dialogVisibility={dialogVisibility} handleDialogClose={handleDialogClose} />
+			<AddNewItemDialog itemName={name} dialogVisibility={dialogVisibility} handleDialogClose={handleDialogClose} />
 
 			<Button
 				variant="outlined"

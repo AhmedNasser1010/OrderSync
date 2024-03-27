@@ -1,7 +1,7 @@
 import { object, string, array } from 'yup';
 import { Formik, Form, Field } from 'formik';
 import { useDispatch } from 'react-redux';
-import { addCategory } from '../rtk/slices/menuSlice';
+import { addCategory, updateCategory } from '../rtk/slices/menuSlice';
 import MuiTextField from "./MuiTextField.jsx";
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
@@ -15,19 +15,12 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import IconedTitle from './IconedTitle';
 
-const initialValues = {
-	title: '',
-  description: '',
-  backgrounds: ['', '', '', '', ''],
-  visibility: false,
-}
-
 const validationSchema = object({
 	title: string().required('Title is required'),
 	description: string(),
 })
 
-const AddNewCategoryDialog = ({ dialogVisibility, handleDialogClose }) => {
+const AddNewCategoryDialog = ({ dialogVisibility, handleDialogClose, initialValues = { title: '', description: '', backgrounds: ['', '', '', '', ''], visibility: false } }) => {
 	const dispatch = useDispatch();
 
 	return (
@@ -46,7 +39,7 @@ const AddNewCategoryDialog = ({ dialogVisibility, handleDialogClose }) => {
 					initialValues={initialValues}
 					validationSchema={validationSchema}
 					onSubmit={values => {
-						dispatch(addCategory(values))
+						initialValues.title === '' ? dispatch(addCategory(values)) : dispatch(updateCategory({ initialValues, values }));
 						handleDialogClose();
 					}}
 				>

@@ -1,13 +1,24 @@
 import { useState, useEffect } from 'react';
+import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice';
+import { useDispatch } from 'react-redux';
 import ModeIcon from '@mui/icons-material/Mode';
 import Stack from '@mui/material/Stack';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MenuCardManageMiniMenu from './MenuCardManageMiniMenu.jsx';
+import AddNewCategoryDialog from './AddNewCategoryDialog';
 
 const CategoryButtonBox = ({ hovered, handleExpanded, expanded, item }) => {
+	const dispatch = useDispatch();
+	const [dialogVisibility, setDialogVisibility] = useState(false);
 
-	const handleEdit = () => {
-		console.log('handleEdit: CategoryButtonBox.jsx 10:5');
+	const handleDialogOpen = () => {
+		setDialogVisibility(true);
+		dispatch(setDisableMenuDnD(true));
+	}
+
+	const handleDialogClose = () => {
+		setDialogVisibility(false);
+		dispatch(setDisableMenuDnD(false));
 	}
 
 	const buttonStyles = {
@@ -30,8 +41,10 @@ const CategoryButtonBox = ({ hovered, handleExpanded, expanded, item }) => {
 				hovered={hovered}
 				categoryOrItem='category'
 			/>
-			<ModeIcon sx={{...buttonStyles, transform: hovered ? 'translateY(0)' : 'translateY(5px)'}} onMouseUp={handleEdit} />
+			<ModeIcon sx={{...buttonStyles, transform: hovered ? 'translateY(0)' : 'translateY(5px)'}} onMouseUp={handleDialogOpen} />
 			<ExpandMoreIcon sx={{...buttonStyles, opacity: '100%', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)'}} onMouseUp={handleExpanded} />
+
+			<AddNewCategoryDialog dialogVisibility={dialogVisibility} handleDialogClose={handleDialogClose} initialValues={item} />
 
 		</Stack>
 
