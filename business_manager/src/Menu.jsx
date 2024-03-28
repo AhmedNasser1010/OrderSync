@@ -20,15 +20,22 @@ import MenuCard from './Component/MenuCard.jsx';
 import reOrderArray from './functions/reOrderArray.js';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import { useSelector, useDispatch } from 'react-redux';
-import { addCategory } from './rtk/slices/menuSlice.js';
+import { addCategory, saveToCloud } from './rtk/slices/menuSlice.js';
 import AddNewCategoryDialog from './Component/AddNewCategoryDialog';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import SaveIcon from '@mui/icons-material/Save';
+import Typography from '@mui/material/Typography';
+import ChecklistRtlIcon from '@mui/icons-material/ChecklistRtl';
+import { setSaveToCloudBtnStatus } from './rtk/slices/conditionalValuesSlice';
 
 const Menu = () => {
-	const [indexes, setIndexes] = useState([]);
 	const [dialogVisibility, setDialogVisibility] = useState(false);
 	const categories = useSelector(state => state.menu.categories);
 	const disableMenuDnD = useSelector(state => state.conditionalValues.disableMenuDnD);
+	const saveToCloudBtnStatus = useSelector(state => state.conditionalValues.saveToCloudBtnStatus);
 	const dispatch = useDispatch();
+	const [indexes, setIndexes] = useState([]);
+	const [saveBtnStyles, setSaveBtnStyles] = useState({});
 
 	// setup indexed from categories
 	useEffect(() => {
@@ -76,9 +83,52 @@ const Menu = () => {
 		}
 	}
 
+	const handleToCloudeBtnStart = () => {
+		switch (saveToCloudBtnStatus) {
+			case 'ON_SAVED':
+				console.log('Start ON_SAVED');
+				setSaveBtnStyles({
+					label: 'saved',
+					variant: 'contained',
+					startIcon: <ChecklistRtlIcon />,
+					disabled: true
+				});
+				break;
+			case 'ON_CHANGES':
+				console.log('Start ON_CHANGES');
+				setSaveBtnStyles({
+					label: 'save to the cloud',
+					variant: 'contained',
+					startIcon: <CloudUploadIcon />,
+					disabled: false
+				});
+				break;
+		}
+	}
+
+	const handleToCloudeBtnSave = () => {
+		if (saveToCloudBtnStatus === 'ON_CHANGES') {
+			dispatch(setSaveToCloudBtnStatus('ON_SAVED'));
+			dispatch(saveToCloud());
+		}
+	}
+
+	useEffect(() => {
+		handleToCloudeBtnStart();
+	}, [saveToCloudBtnStatus])
+
 	return (
 
-		<Box style={{ marginTop: '100px' }}>
+		<Box style={{ marginTop: '100px', marginBottom: '20px' }}>
+
+			<Button
+				sx={{ marginBottom: '10px', fontSize: '11px' }}
+				onMouseUp={handleToCloudeBtnSave}
+				{...saveBtnStyles}
+			>
+				{ saveBtnStyles?.label }
+			</Button>
+
 			<DndContext
 				sensors={sensors}
 				collisionDetection={closestCenter}

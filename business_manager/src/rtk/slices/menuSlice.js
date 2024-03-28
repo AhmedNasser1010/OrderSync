@@ -182,7 +182,7 @@ export const menuSlice = createSlice({
       }
     },
     saveToCloud: (state, { payload }) => {
-      
+      console.log('saveToCloud reducer menuSlice.js 185:7 from Menu.jsx 111:7');
     },
   },
 })
@@ -204,7 +204,8 @@ export const {
   categoryVisibility,
   itemVisibility,
   addNewCategoryBackgrounds,
-  addNewItemBackgrounds
+  addNewItemBackgrounds,
+  saveToCloud
 } = menuSlice.actions;
 
 export default menuSlice.reducer;

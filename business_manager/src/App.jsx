@@ -27,7 +27,7 @@ function App() {
     startApp()
       .then(userData => {
         dispatch(addUser(userData));
-        navigate("/");
+        navigate("/menu");
       }).catch(error => {
         console.log(error);
         navigate("/login");

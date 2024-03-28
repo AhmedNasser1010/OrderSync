@@ -14,6 +14,7 @@ import PlaylistAddCircleIcon from '@mui/icons-material/PlaylistAddCircle';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import IconedTitle from './IconedTitle';
+import { setSaveToCloudBtnStatus } from '../rtk/slices/conditionalValuesSlice';
 
 const validationSchema = object({
 	title: string().required('Title is required'),
@@ -40,6 +41,7 @@ const AddNewCategoryDialog = ({ dialogVisibility, handleDialogClose, initialValu
 					validationSchema={validationSchema}
 					onSubmit={values => {
 						initialValues.title === '' ? dispatch(addCategory(values)) : dispatch(updateCategory({ initialValues, values }));
+						dispatch(setSaveToCloudBtnStatus('ON_CHANGES'));
 						handleDialogClose();
 					}}
 				>

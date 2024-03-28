@@ -109,7 +109,11 @@ const CategoryBody = ({ name }) => {
 				</SortableContext>
 			</DndContext>
 
-			<AddNewItemDialog itemName={name} dialogVisibility={dialogVisibility} handleDialogClose={handleDialogClose} />
+			<AddNewItemDialog
+				dialogVisibility={dialogVisibility}
+				handleDialogClose={handleDialogClose}
+				initialValues={{ title: '', description: '', category: name, price: '', backgrounds: ['', '', '', '', ''], visibility: false }}
+			/>
 
 			<Button
 				variant="outlined"

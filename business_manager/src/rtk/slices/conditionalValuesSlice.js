@@ -3,18 +3,23 @@ import { createSlice } from '@reduxjs/toolkit';
 export const conditionalValuesSlice = createSlice({
   name: 'user',
   initialState: {
-    disableMenuDnD: false
+    disableMenuDnD: false,
+    saveToCloudBtnStatus: 'ON_CHANGES',
   },
   reducers: {
     setDisableMenuDnD: (state, { payload }) => {
-      return {...state, disableMenuDnD: payload};
+      return { ...state, disableMenuDnD: payload };
+    },
+    setSaveToCloudBtnStatus: (state, { payload }) => {
+      return { ...state, saveToCloudBtnStatus: payload }
     }
   },
 })
 
 
 export const {
-  setDisableMenuDnD
+  setDisableMenuDnD,
+  setSaveToCloudBtnStatus
 } = conditionalValuesSlice.actions;
 
 export default conditionalValuesSlice.reducer;

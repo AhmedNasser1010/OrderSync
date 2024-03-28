@@ -69,7 +69,11 @@ const MenuNestedCard = ({ item }) => {
 					/>
 
 					<ModeIcon sx={{...buttonStyles, transform: hovered ? 'translateY(0)' : 'translateY(5px)', fontSize: '16px'}} onMouseUp={handleDialogOpen} />
-					<AddNewItemDialog itemName={item.name} dialogVisibility={dialogVisibility} handleDialogClose={handleDialogClose} initialValues={item} />
+					<AddNewItemDialog
+						dialogVisibility={dialogVisibility}
+						handleDialogClose={handleDialogClose}
+						initialValues={item}
+					/>
 
 					{/* bro don't forget to get the currency from the business data instead of the static value */}
 					<span style={{ color: '#4a4a4a', fontSize: '12px' }}>{ Number(item?.price).toFixed(2) } USD</span>

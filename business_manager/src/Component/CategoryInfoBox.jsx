@@ -10,6 +10,7 @@ import Dialog from '@mui/material/Dialog';
 import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice';
 import { addNewCategoryBackgrounds } from '../rtk/slices/menuSlice.js'
 import { useDispatch } from 'react-redux';
+import { setSaveToCloudBtnStatus } from '../rtk/slices/conditionalValuesSlice';
 
 const CategoryInfoBox = ({ item, background, hovered }) => {
 	const dispatch = useDispatch();
@@ -46,6 +47,7 @@ const CategoryInfoBox = ({ item, background, hovered }) => {
 
 	const submitFunc = (values) => {
 		dispatch(addNewCategoryBackgrounds({title: item.title, data: values}))
+		dispatch(setSaveToCloudBtnStatus('ON_CHANGES'));
 		return true;
 	}
 

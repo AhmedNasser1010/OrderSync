@@ -10,6 +10,7 @@ import Dialog from '@mui/material/Dialog';
 import { useDispatch } from 'react-redux';
 import { addNewItemBackgrounds } from '../rtk/slices/menuSlice';
 import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice';
+import { setSaveToCloudBtnStatus } from '../rtk/slices/conditionalValuesSlice';
 
 const MenuNestedCardInfoBox = ({ item, hovered }) => {
 	const dispatch = useDispatch();
@@ -27,6 +28,7 @@ const MenuNestedCardInfoBox = ({ item, hovered }) => {
 
 	const submitFunc = (values) => {
 		dispatch(addNewItemBackgrounds({title: item.title, data: values}))
+		dispatch(setSaveToCloudBtnStatus('ON_CHANGES'));
 		return true;
 	}
 

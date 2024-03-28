@@ -4,6 +4,7 @@ import { Formik, Form, Field } from 'formik';
 import fromKebabToTitle from '../functions/fromKebabToTitle';
 import { useDispatch, useSelector } from 'react-redux';
 import { addItem, updateItem } from '../rtk/slices/menuSlice';
+import { setSaveToCloudBtnStatus } from '../rtk/slices/conditionalValuesSlice';
 import MuiTextField from "./MuiTextField.jsx";
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
@@ -27,18 +28,9 @@ const validationSchema = object({
 	visibility: boolean(),
 })
 
-const AddNewItemDialog = ({ itemName, dialogVisibility, handleDialogClose, initialValues }) => {
+const AddNewItemDialog = ({ dialogVisibility, handleDialogClose, initialValues }) => {
 	const dispatch = useDispatch();
 	const categories = useSelector(state => state.menu.categories);
-
-	const newInitialValues = {
-		title: '',
-		description: '',
-		category: itemName,
-		price: '',
-		backgrounds: ['', '', '', '', ''],
-		visibility: false
-	}
 
 	return (
 		<Dialog open={dialogVisibility}>
@@ -46,17 +38,18 @@ const AddNewItemDialog = ({ itemName, dialogVisibility, handleDialogClose, initi
 			<DialogTitle>
 				<IconedTitle
 					icon={<PlaylistAddCircleIcon sx={{ fontSize: '26px', marginRight: '8px' }} />}
-					title={`Add New Item To ${fromKebabToTitle(itemName)}`}
+					title={`Add New Item To ${fromKebabToTitle(initialValues?.category)}`}
 					variant='h3'
 					fontSize='24px'
 				/>
 			</DialogTitle>
 			
 				<Formik
-					initialValues={initialValues || newInitialValues}
+					initialValues={initialValues}
 					validationSchema={validationSchema}
 					onSubmit={values => {
 						initialValues.title === '' ? dispatch(addItem(values)) : dispatch(updateItem({ initialValues, values }))
+						dispatch(setSaveToCloudBtnStatus('ON_CHANGES'));
 						handleDialogClose();
 					}}
 				>

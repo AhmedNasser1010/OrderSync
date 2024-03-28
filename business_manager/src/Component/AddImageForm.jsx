@@ -70,7 +70,7 @@ const AddImageForm = ({ item, handleDialogClose, submitFunc, dialogVisibility })
 			<DialogContent>
 				<Formik
 					enableReinitialize
-					initialValues={item.backgrounds}
+					initialValues={item?.backgrounds}
 					// validationSchema={linksValidationSchema}
 					onSubmit={values => {
 						submitFunc(values);

@@ -9,6 +9,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import { setSaveToCloudBtnStatus } from '../rtk/slices/conditionalValuesSlice';
 
 const MenuCardManageMiniMenu = ({ item, buttonStyles, hovered = true, categoryOrItem }) => {
 	const dispatch = useDispatch();
@@ -30,12 +31,14 @@ const MenuCardManageMiniMenu = ({ item, buttonStyles, hovered = true, categoryOr
 		setVisibility(visibilityValue);
 		categoryOrItem === 'category' && dispatch(categoryVisibility({ item, visibilityValue }));
 		categoryOrItem === 'item' && dispatch(itemVisibility({ item, visibilityValue }));
+		dispatch(setSaveToCloudBtnStatus('ON_CHANGES'));
 	}
 
 	const handleDelete = () => {
 		handleCloseExpandMore();
 		categoryOrItem === 'category' && dispatch(removeCategory(item));
 		categoryOrItem === 'item' && dispatch(removeItem(item));
+		dispatch(setSaveToCloudBtnStatus('ON_CHANGES'));
 	}
 
 	return (
