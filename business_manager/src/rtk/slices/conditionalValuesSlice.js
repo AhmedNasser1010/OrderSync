@@ -4,7 +4,7 @@ export const conditionalValuesSlice = createSlice({
   name: 'user',
   initialState: {
     disableMenuDnD: false,
-    saveToCloudBtnStatus: 'ON_CHANGES',
+    saveToCloudBtnStatus: 'ON_SAVED',
   },
   reducers: {
     setDisableMenuDnD: (state, { payload }) => {

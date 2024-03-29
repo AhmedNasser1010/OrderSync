@@ -73,7 +73,7 @@ const MenuCardManageMiniMenu = ({ item, buttonStyles, hovered = true, categoryOr
 				</MenuItem>
 
 				<MenuItem onMouseUp={handleCategoryVisibility}>
-					<Switch defaultChecked size="small" checked={visibility} sx={{ transform: 'translateX(-10px)' }} />
+					<Switch size="small" checked={visibility} sx={{ transform: 'translateX(-10px)' }} />
 					<Typography sx={{ transform: 'translateX(-5px)' }}>Visibility</Typography>
 				</MenuItem>
 

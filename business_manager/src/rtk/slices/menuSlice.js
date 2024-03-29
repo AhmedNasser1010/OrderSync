@@ -1,19 +1,24 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  items: [
-    { title: 'Espresso', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 2.50, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
-    { title: 'Cappuccino', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 3.50, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
-    { title: 'Chai', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 1.00, backgrounds: ['', '', '', '', ''], visibility: true },
-    { title: 'Iced Latte', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 4.00, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
-    { title: 'Cold Brew', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 3.75, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
-  ],
-  categories: [
-    { title: 'hot-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['http://via.placeholder.com/50x50', '', '', '', ''], visibility: true },
-    { title: 'cold-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['', '', '', '', ''], visibility: true },
-    { title: 'other', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['', '', '', '', ''], visibility: false },
-  ],
+  items: [],
+  categories: [],
 };
+
+// const initialState = {
+//   items: [
+//     { title: 'Espresso', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 2.50, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
+//     { title: 'Cappuccino', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 3.50, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
+//     { title: 'Chai', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 1.00, backgrounds: ['', '', '', '', ''], visibility: true },
+//     { title: 'Iced Latte', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 4.00, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
+//     { title: 'Cold Brew', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 3.75, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
+//   ],
+//   categories: [
+//     { title: 'hot-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['http://via.placeholder.com/50x50', '', '', '', ''], visibility: true },
+//     { title: 'cold-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['', '', '', '', ''], visibility: true },
+//     { title: 'other', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['', '', '', '', ''], visibility: false },
+//   ],
+// };
 
 export const menuSlice = createSlice({
   name: 'menu',
@@ -23,7 +28,10 @@ export const menuSlice = createSlice({
       return {...payload};
     },
     clearMenu: (state) => {
-      return {};
+      return {
+        items: [],
+        categories: [],
+      };
     },
     addNewItems: (state, { payload }) => {
       return {
@@ -48,6 +56,14 @@ export const menuSlice = createSlice({
         ...state,
         categories: [],
       };
+    },
+    categoryIndexesMove: (state, { payload }) => {
+      return {
+        ...state,
+        categories: [
+          ...payload.map(index => state.categories[index-1])
+        ],
+      }
     },
     addItem: (state, { payload }) => {
       return {
@@ -100,6 +116,9 @@ export const menuSlice = createSlice({
         ...state,
         categories: [
           ...state.categories.filter(category => category.title !== payload.title)
+        ],
+        items: [
+          ...state.items.filter(item => item.category !== payload.title)
         ],
       };
     },
@@ -180,10 +199,7 @@ export const menuSlice = createSlice({
 
         ]
       }
-    },
-    saveToCloud: (state, { payload }) => {
-      console.log('saveToCloud reducer menuSlice.js 185:7 from Menu.jsx 111:7');
-    },
+    }
   },
 })
 
@@ -195,6 +211,7 @@ export const {
   clearAllItems,
   addNewCategories,
   clearAllCategories,
+  categoryIndexesMove,
   addItem,
   updateItem,
   addCategory,
@@ -204,8 +221,7 @@ export const {
   categoryVisibility,
   itemVisibility,
   addNewCategoryBackgrounds,
-  addNewItemBackgrounds,
-  saveToCloud
+  addNewItemBackgrounds
 } = menuSlice.actions;
 
 export default menuSlice.reducer;

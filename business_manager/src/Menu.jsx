@@ -20,22 +20,30 @@ import MenuCard from './Component/MenuCard.jsx';
 import reOrderArray from './functions/reOrderArray.js';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import { useSelector, useDispatch } from 'react-redux';
-import { addCategory, saveToCloud } from './rtk/slices/menuSlice.js';
+import { addCategory, addMenu, categoryIndexesMove } from './rtk/slices/menuSlice.js';
 import AddNewCategoryDialog from './Component/AddNewCategoryDialog';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import SaveIcon from '@mui/icons-material/Save';
 import Typography from '@mui/material/Typography';
 import ChecklistRtlIcon from '@mui/icons-material/ChecklistRtl';
 import { setSaveToCloudBtnStatus } from './rtk/slices/conditionalValuesSlice';
+import _addDoc from './functions/_addDoc';
+import AutorenewSharpIcon from '@mui/icons-material/AutorenewSharp';
+import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
+import _getSubcollection from './functions/_getSubcollection';
 
 const Menu = () => {
 	const [dialogVisibility, setDialogVisibility] = useState(false);
 	const categories = useSelector(state => state.menu.categories);
+	const menuValues = useSelector(state => state.menu);
 	const disableMenuDnD = useSelector(state => state.conditionalValues.disableMenuDnD);
 	const saveToCloudBtnStatus = useSelector(state => state.conditionalValues.saveToCloudBtnStatus);
+	const user = useSelector(state => state.user);
 	const dispatch = useDispatch();
 	const [indexes, setIndexes] = useState([]);
 	const [saveBtnStyles, setSaveBtnStyles] = useState({});
+	const [menuValuesSnapshot, setMenuValuesSnapshot] = useState({});
+	const [onceRun, setOnceRun] = useState(false);
 
 	// setup indexed from categories
 	useEffect(() => {
@@ -56,10 +64,13 @@ const Menu = () => {
 			setIndexes((indexes) => {
 				const oldIndex = indexes.indexOf(active.id);
 				const newIndex = indexes.indexOf(over.id);
-					
-				 return arrayMove(indexes, oldIndex, newIndex);
+				
+				return arrayMove(indexes, oldIndex, newIndex);
 			});
-		 }
+
+			setOnceRun(true);
+
+		}
 	}
 
 	const handleDialogOpen = () => {
@@ -86,7 +97,6 @@ const Menu = () => {
 	const handleToCloudeBtnStart = () => {
 		switch (saveToCloudBtnStatus) {
 			case 'ON_SAVED':
-				console.log('Start ON_SAVED');
 				setSaveBtnStyles({
 					label: 'saved',
 					variant: 'contained',
@@ -95,7 +105,6 @@ const Menu = () => {
 				});
 				break;
 			case 'ON_CHANGES':
-				console.log('Start ON_CHANGES');
 				setSaveBtnStyles({
 					label: 'save to the cloud',
 					variant: 'contained',
@@ -103,26 +112,76 @@ const Menu = () => {
 					disabled: false
 				});
 				break;
+			case 'ON_LOADING':
+				setSaveBtnStyles({
+					label: 'save to the cloud',
+					variant: 'outlined',
+					startIcon: <AutorenewSharpIcon sx={{ animation: 'spin 1s ease-in-out infinite' }} />,
+					disabled: true,
+				});
+				break;
+			case 'ON_ERROR':
+				setSaveBtnStyles({
+					label: 'error, try again',
+					variant: 'contained',
+					startIcon: <ErrorOutlineSharpIcon />,
+					disabled: false,
+					color: "error"
+				});
+				break;
 		}
 	}
 
 	const handleToCloudeBtnSave = () => {
-		if (saveToCloudBtnStatus === 'ON_CHANGES') {
-			dispatch(setSaveToCloudBtnStatus('ON_SAVED'));
-			dispatch(saveToCloud());
+		if (saveToCloudBtnStatus === 'ON_CHANGES' || 'ON_ERROR') {
+
+			dispatch(setSaveToCloudBtnStatus('ON_LOADING'));
+
+			_addDoc('menus', menuValues, user.accessToken).then(res => {
+				res === true && dispatch(setSaveToCloudBtnStatus('ON_SAVED'));
+				res === undefined && dispatch(setSaveToCloudBtnStatus('ON_ERROR'));
+			});
+
+			// setTimeout(() => {
+			// 	console.log(saveToCloudBtnStatus);
+			// 	saveToCloudBtnStatus !== 'ON_SAVED' && dispatch(setSaveToCloudBtnStatus('ON_ERROR'));
+			// 	return false;
+			// }, 10000);
+
 		}
 	}
 
+	// change the button status when there is any change in the value status
 	useEffect(() => {
 		handleToCloudeBtnStart();
 	}, [saveToCloudBtnStatus])
+
+	// get the menu data from the server once
+	useEffect(() => {
+		_getSubcollection('menus', user.accessToken).then(res => {
+			dispatch(addMenu(res))
+			setMenuValuesSnapshot(res);
+		});
+	}, []);
+
+	// check if the current menu compaier the last saved menu
+	useEffect(() => {
+		JSON.stringify(menuValues) === JSON.stringify(menuValuesSnapshot) && dispatch(setSaveToCloudBtnStatus('ON_SAVED'));
+	}, [menuValues, menuValuesSnapshot])
+
+	// handle when category indexes change
+	// useEffect(() => {
+	// 	console.log('move');
+	// 	onceRun && dispatch(categoryIndexesMove(indexes));
+	// 	setOnceRun(false);
+	// }, [indexes, onceRun])
 
 	return (
 
 		<Box style={{ marginTop: '100px', marginBottom: '20px' }}>
 
 			<Button
-				sx={{ marginBottom: '10px', fontSize: '11px' }}
+				sx={{ marginBottom: '10px', fontSize: '11px', transition: '0.3s' }}
 				onMouseUp={handleToCloudeBtnSave}
 				{...saveBtnStyles}
 			>

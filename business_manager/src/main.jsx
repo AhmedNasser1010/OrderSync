@@ -6,7 +6,8 @@ import { store } from './rtk/store';
 import { Provider } from 'react-redux';
 
 // styles
-import './style/sideBar.css'
+import './style/sideBar.css';
+import './style/keyframs.css';
 
 // Fonts
 import '@fontsource/roboto/300.css';
