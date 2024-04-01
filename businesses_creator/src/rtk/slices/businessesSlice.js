@@ -42,6 +42,9 @@ export const businessesSlice = createSlice({
     addBusiness: (state, { payload }) => {
       _addDoc("businesses", payload, payload.accessToken)
         .then(passed => {
+          // add menu to this business
+          _addDoc("menus", {items: [], categories: []}, payload.accessToken);
+          
           // if passed => signup the business owner in the db
           auth_signupUser(
             {email: payload.owner.contact.email, password: payload.owner.password, accessToken: payload.accessToken},

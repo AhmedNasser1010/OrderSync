@@ -13,10 +13,11 @@ import SideBar from "./Component/SideBar.jsx";
 
 // Pages
 import PrivateRoute from "./PrivateRoute.jsx";
-import Home from "./Home.jsx";
-import User from "./User.jsx";
-import Menu from "./Menu.jsx";
-import Login from "./Login.jsx";
+import Home from "./Home";
+import User from "./User";
+import Orders from './Orders'
+import Menu from "./Menu";
+import Login from "./Login";
 
 function App() {
 	const dispatch = useDispatch();
@@ -28,7 +29,7 @@ function App() {
 		startApp()
 			.then(userData => {
 				dispatch(addUser(userData));
-				navigate("/menu");
+				navigate("/orders");
 			}).catch(error => {
 				console.log(error);
 				navigate("/login");
@@ -60,6 +61,7 @@ function App() {
 				<Routes>
 					<Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
 					<Route path="/user" element={<PrivateRoute><User /></PrivateRoute>} />
+					<Route path="/Orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
 					<Route path="/menu" element={<PrivateRoute><Menu /></PrivateRoute>} />
 					<Route path="/login" element={<Login />} />
 				</Routes>

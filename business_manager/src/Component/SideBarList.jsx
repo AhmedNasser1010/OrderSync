@@ -1,8 +1,10 @@
+// React Router
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 
-import { clearUser } from "../rtk/slices/userSlice.js";
-// import { clearBusinesses } from "../rtk/slices/businessesSlice.js";
+// Redux
+import { useDispatch } from "react-redux";
+import { clearUser } from '../rtk/slices/userSlice'
+import { clearMenu } from '../rtk/slices/menuSlice'
 
 // Functions
 import AUTH_signout from "../functions/AUTH_signout.js";
@@ -11,25 +13,26 @@ import AUTH_signout from "../functions/AUTH_signout.js";
 import { auth } from "../firebase.js";
 
 const SideBarList = () => {
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    
-    const handleSignout = () => {
-        // dispatch(clearBusinesses());
-        dispatch(clearUser());
-        AUTH_signout();
-        navigate("/login");
-    }
+	const navigate = useNavigate();
+	const dispatch = useDispatch();
+	
+	const handleSignout = () => {
+		dispatch(clearUser());
+		dispatch(clearMenu());
+		AUTH_signout();
+		navigate("/login");
+	}
 
-    return (
+	return (
 
-        <ul>
-            <li className="link"><Link to={auth.currentUser ? "/user" : "/login"}>User Profile</Link></li>
-            <li className="link"><Link to={auth.currentUser ? "/menu" : "/menu"}>Menu Setup</Link></li>
-            <li className="link" onClick={handleSignout}><Link to="/login">Logout</Link></li>
-        </ul>
+		<ul>
+			<li className="link"><Link to={auth.currentUser ? "/user" : "/login"}>User Profile</Link></li>
+			<li className="link"><Link to={auth.currentUser ? "/orders" : "/login"}>Orders</Link></li>
+			<li className="link"><Link to={auth.currentUser ? "/menu" : "/menu"}>Menu Setup</Link></li>
+			<li className="link" onClick={handleSignout}><Link to="/login">Logout</Link></li>
+		</ul>
 
-    )
+	)
 }
 
 export default SideBarList;
