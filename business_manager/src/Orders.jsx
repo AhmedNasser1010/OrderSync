@@ -8,7 +8,7 @@ import Tab from '@mui/material/Tab';
 
 import RecievedOrders from './Component/RecievedOrders';
 import OnGoingOrders from './Component/OnGoingOrders';
-import OnDeliveryOrders from './Component/OnDeliveryOrders';
+import InDeliveryOrders from './Component/InDeliveryOrders';
 import CompletedOrders from './Component/CompletedOrders';
 
 
@@ -42,8 +42,8 @@ const Orders = () => {
 						variant='scrollable'
 					>
 						<Tab label="Recieved" {...a11yProps(0)} />
-						<Tab label="Cook" {...a11yProps(1)} />
-						<Tab label="On Delivery" {...a11yProps(2)} />
+						<Tab label="On Going" {...a11yProps(1)} />
+						<Tab label="In Delivery" {...a11yProps(2)} />
 						<Tab label="Completed" {...a11yProps(3)} />
 					</Tabs>
 				</Box>
@@ -56,7 +56,7 @@ const Orders = () => {
 						<OnGoingOrders />
 					</CustomTabPanel>
 					<CustomTabPanel tabValue={tabValue} index={2}>
-						<OnDeliveryOrders />
+						<InDeliveryOrders />
 					</CustomTabPanel>
 					<CustomTabPanel tabValue={tabValue} index={3}>
 						<CompletedOrders />

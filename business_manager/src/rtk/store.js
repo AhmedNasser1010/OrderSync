@@ -4,11 +4,13 @@ import { configureStore } from '@reduxjs/toolkit';
 import userSlice from "./slices/userSlice.js";
 import menuSlice from "./slices/menuSlice.js";
 import conditionalValuesSlice from "./slices/conditionalValuesSlice.js";
+import ordersSlice from './slices/ordersSlice.js';
 
 export const store = configureStore({
   reducer: {
     user: userSlice,
     menu: menuSlice,
-    conditionalValues: conditionalValuesSlice
+    conditionalValues: conditionalValuesSlice,
+    orders: ordersSlice,
   }
 });

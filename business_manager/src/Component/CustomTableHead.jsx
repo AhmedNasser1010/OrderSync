@@ -15,20 +15,20 @@ const headCells = [
 	},
 	{
 		id: 'order',
-		numeric: false,
-		disablePadding: true,
+		numeric: true,
+		disablePadding: false,
 		label: 'Order',
 	},
 	{
 		id: 'totla',
 		numeric: true,
-		disablePadding: true,
+		disablePadding: false,
 		label: 'Total USD',
 	},
 ];
 
 
-const TableHeadd = ({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }) => {
+const CustomTableHead = ({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }) => {
 
 	const createSortHandler = (property) => (event) => {
 		onRequestSort(event, property);
@@ -74,4 +74,4 @@ const TableHeadd = ({ onSelectAllClick, order, orderBy, numSelected, rowCount, o
 	);
 }
 
-export default TableHeadd;
+export default CustomTableHead;

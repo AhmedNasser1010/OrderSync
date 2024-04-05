@@ -5,7 +5,12 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
-const TableToolbar = ({ numSelected }) => {
+const TableToolbar = ({ numSelected, selected }) => {
+
+  const handleDelete = () => {
+    console.log(selected)
+  }
+
   return (
     <Toolbar>
       {numSelected > 0 ? (
@@ -24,14 +29,14 @@ const TableToolbar = ({ numSelected }) => {
           id="tableTitle"
           component="div"
         >
-          Nutrition
+          Recived Orders
         </Typography>
       )}
 
       {numSelected > 0 ? (
         <Tooltip title="Delete">
           <IconButton>
-            <DeleteIcon />
+            <DeleteIcon onMouseUp={handleDelete} />
           </IconButton>
         </Tooltip>
       ) : (

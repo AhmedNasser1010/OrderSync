@@ -1,6 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import TableToolbar from './TableToolbar';
-import TableHeadd from './TableHead';
+import CustomTableHead from './CustomTableHead';
+import CustomTableRow from './CustomTableRow';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -44,22 +46,18 @@ const stableSort = (array, comparator) => {
 	return stabilizedThis.map((el) => el[0]);
 }
 
-const OrdersTable = ({  }) => {
+const OrdersTable = () => {
 	const [order, setOrder] = useState('asc');
 	const [orderBy, setOrderBy] = useState('nasser');
 	const [selected, setSelected] = useState([]);
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(5);
 	const [dense, setDense] = useState(false);
+	const rows = useSelector(state => state.orders);
 
-	const createData = (name, order, total) => {
-		return { name, order, total };
+	const handleSetSelected = (value) => {
+		setSelected(value)
 	}
-
-	const rows = [
-		createData('ahmed', ['pizza', 'clhs', 'akn'], '90'),
-		createData('nasser', ['beef', 'cidugkv'], '120'),
-	];
 
 	const handleSelectAllClick = (event) => {
 		if (event.target.checked) {
@@ -80,28 +78,7 @@ const OrdersTable = ({  }) => {
 		stableSort(rows, getComparator(order, orderBy)).slice(
 			page * rowsPerPage,
 			page * rowsPerPage + rowsPerPage,
-		), [order, orderBy, page, rowsPerPage]);
-
-	const isSelected = (id) => selected.indexOf(id) !== -1;
-
-	const handleClick = (event, id) => {
-		const selectedIndex = selected.indexOf(id);
-		let newSelected = [];
-
-		if (selectedIndex === -1) {
-			newSelected = newSelected.concat(selected, id);
-		} else if (selectedIndex === 0) {
-			newSelected = newSelected.concat(selected.slice(1));
-		} else if (selectedIndex === selected.length - 1) {
-			newSelected = newSelected.concat(selected.slice(0, -1));
-		} else if (selectedIndex > 0) {
-			newSelected = newSelected.concat(
-				selected.slice(0, selectedIndex),
-				selected.slice(selectedIndex + 1),
-			);
-		}
-		setSelected(newSelected);
-	};
+		), [order, orderBy, page, rowsPerPage, rows]);
 
 	// Avoid a layout jump when reaching the last page with empty rows.
 	const emptyRows =
@@ -123,12 +100,16 @@ const OrdersTable = ({  }) => {
 	return (
 
 		<Box>
-			<TableToolbar numSelected={selected.length} />
+			<TableToolbar numSelected={selected.length} selected={selected} />
 			<TableContainer component={Paper}>
 
-			<Table sx={{ minWidth: 650 }} aria-label="simple table">
+			<Table
+				sx={{ minWidth: 650 }}
+				aria-label="simple table"
+				size={dense ? 'small' : 'medium'}
+			>
 
-				<TableHeadd
+				<CustomTableHead
 					numSelected={selected.length}
 					order={order}
 					orderBy={orderBy}
@@ -139,40 +120,14 @@ const OrdersTable = ({  }) => {
 
 				<TableBody>
 					{visibleRows.map((row, index) => {
-						const isItemSelected = isSelected(row.id);
-						const labelId = `enhanced-table-checkbox-${index}`;
-
 						return (
-							<TableRow
-								key={index}
-								hover
-								onClick={(event) => handleClick(event, row.id)}
-								role="checkbox"
-								aria-checked={isItemSelected}
-								tabIndex={-1}
-								selected={isItemSelected}
-								sx={{ cursor: 'pointer' }}
-							>
-								<TableCell padding="checkbox">
-									<Checkbox
-										color="primary"
-										checked={isItemSelected}
-										inputProps={{
-											'aria-labelledby': labelId,
-										}}
-									/>
-								</TableCell>
-								<TableCell
-									component="th"
-									id={labelId}
-									scope="row"
-									padding="none"
-								>
-									{row.name}
-								</TableCell>
-								<TableCell align="right">{row.order[0]}</TableCell>
-								<TableCell align="right">{row.total}</TableCell>
-							</TableRow>
+							<CustomTableRow
+								key={index, row.id}
+								row={row}
+								selected={selected}
+								index={index}
+								handleSetSelected={handleSetSelected}
+							/>
 						);
 					})}
 					{emptyRows > 0 && (
