@@ -8,8 +8,8 @@ import IconButton from '@mui/material/IconButton';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-const CustomTableRow = ({ row, selected, index, handleSetSelected }) => {
-	const [isOpen, setIsOpen] = useState(true);
+const CustomTableRow = ({ row = [], selected, index, handleSetSelected }) => {
+	const [isOpen, setIsOpen] = useState(false);
 
 	const isSelected = (id) => selected.indexOf(id) !== -1;
 
@@ -65,16 +65,8 @@ const CustomTableRow = ({ row, selected, index, handleSetSelected }) => {
 						</IconButton>
 					</Stack>
 				</TableCell>
-				<TableCell
-					component="th"
-					id={labelId}
-					scope="row"
-					padding="none"
-				>
-					{row.name}
-				</TableCell>
-				<TableCell align="right">{row.order[0]}</TableCell>
-				<TableCell align="right">{row.total}</TableCell>
+				<TableCell>{ index+1 }</TableCell>
+				{ Object.values(row).map((value, i) => (<TableCell key={i}>{ value }</TableCell>)) }
 			</TableRow>
 			<TableRow>
 				<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
@@ -87,3 +79,14 @@ const CustomTableRow = ({ row, selected, index, handleSetSelected }) => {
 }
 
 export default CustomTableRow;
+
+
+
+//<TableCell
+//					component="th"
+//					id={labelId}
+//					scope="row"
+//					padding="none"
+//				>
+//					{row.name}
+//				</TableCell>

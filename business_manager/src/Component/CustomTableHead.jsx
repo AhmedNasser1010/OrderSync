@@ -6,29 +6,7 @@ import Checkbox from '@mui/material/Checkbox';
 import Box from '@mui/material/Box';
 import { visuallyHidden } from '@mui/utils';
 
-const headCells = [
-	{
-		id: 'name',
-		numeric: false,
-		disablePadding: true,
-		label: 'Name',
-	},
-	{
-		id: 'order',
-		numeric: true,
-		disablePadding: false,
-		label: 'Order',
-	},
-	{
-		id: 'totla',
-		numeric: true,
-		disablePadding: false,
-		label: 'Total USD',
-	},
-];
-
-
-const CustomTableHead = ({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort }) => {
+const CustomTableHead = ({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, headCells }) => {
 
 	const createSortHandler = (property) => (event) => {
 		onRequestSort(event, property);

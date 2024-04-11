@@ -35,25 +35,31 @@ const getComparator = (order, orderBy) => {
 
 // for non-modern browsers [exampleArray.slice().sort(exampleComparator)]
 const stableSort = (array, comparator) => {
-	const stabilizedThis = array.map((el, index) => [el, index]);
-	stabilizedThis.sort((a, b) => {
-		const order = comparator(a[0], b[0]);
-		if (order !== 0) {
-			return order;
-		}
-		return a[1] - b[1];
-	});
-	return stabilizedThis.map((el) => el[0]);
+	if (array) {
+		const stabilizedThis = array.map((el, index) => [el, index]);
+		stabilizedThis.sort((a, b) => {
+			const order = comparator(a[0], b[0]);
+			if (order !== 0) {
+				return order;
+			}
+			return a[1] - b[1];
+		});
+		return stabilizedThis.map((el) => el[0]);
+	}
 }
 
-const OrdersTable = () => {
+const OrdersTable = ({ dataRows, headCells }) => {
 	const [order, setOrder] = useState('asc');
 	const [orderBy, setOrderBy] = useState('nasser');
 	const [selected, setSelected] = useState([]);
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(5);
 	const [dense, setDense] = useState(false);
-	const rows = useSelector(state => state.orders);
+	const [rows, setRows] = useState([]);
+
+	useEffect(() => {
+		setRows(dataRows);
+	}, [dataRows])
 
 	const handleSetSelected = (value) => {
 		setSelected(value)
@@ -75,7 +81,7 @@ const OrdersTable = () => {
 	};
 
 	const visibleRows = useMemo(() =>
-		stableSort(rows, getComparator(order, orderBy)).slice(
+		stableSort(rows, getComparator(order, orderBy))?.slice(
 			page * rowsPerPage,
 			page * rowsPerPage + rowsPerPage,
 		), [order, orderBy, page, rowsPerPage, rows]);
@@ -115,11 +121,12 @@ const OrdersTable = () => {
 					orderBy={orderBy}
 					onSelectAllClick={handleSelectAllClick}
 					onRequestSort={handleRequestSort}
-					rowCount={rows.length}
+					rowCount={rows?.length}
+					headCells={headCells}
 				/>
 
 				<TableBody>
-					{visibleRows.map((row, index) => {
+					{visibleRows?.map((row, index) => {
 						return (
 							<CustomTableRow
 								key={index, row.id}
@@ -147,7 +154,7 @@ const OrdersTable = () => {
 			<TablePagination
 				rowsPerPageOptions={[5, 10, 25]}
 				component="div"
-				count={rows.length}
+				count={rows?.length}
 				rowsPerPage={rowsPerPage}
 				page={page}
 				onPageChange={handleChangePage}
