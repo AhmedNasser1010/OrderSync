@@ -38,6 +38,7 @@ const CustomTableHead = ({ onSelectAllClick, order, orderBy, numSelected, rowCou
 							direction={orderBy === headCell.id ? order : 'asc'}
 							onClick={createSortHandler(headCell.id)}
 						>
+							{ headCell.startIcon && headCell.startIcon }
 							{headCell.label}
 							{orderBy === headCell.id ? (
 								<Box component="span" sx={visuallyHidden}>

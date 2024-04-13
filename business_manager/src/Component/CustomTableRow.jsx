@@ -66,11 +66,15 @@ const CustomTableRow = ({ row = [], selected, index, handleSetSelected }) => {
 					</Stack>
 				</TableCell>
 				<TableCell>{ index+1 }</TableCell>
-				{ Object.values(row).map((value, i) => (<TableCell key={i}>{ value }</TableCell>)) }
+				{ Object.values(row).map((value, i) => (
+					<TableCell key={i}>
+						{ value }
+					</TableCell>
+				)) }
 			</TableRow>
 			<TableRow>
-				<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
-					<CustomCollapsedTableRow isOpen={isOpen} />
+				<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+					<CustomCollapsedTableRow isOpen={isOpen} row={row} />
 				</TableCell>
 			</TableRow>
 		</>
