@@ -45,29 +45,29 @@ const collapsHeadCells = [
 ];
 
 const CustomCollapsedTableRow = ({ isOpen, row }) => {
-	const orders = useSelector(state => state.orders.ordersArray);
+	const orders = useSelector(state => state.orders.open);
 	const [cart, setCart] = useState([]);
 
 	// get full row data process
 	useEffect(() => {
-		const rowID = row.shortedID.slice(1, 5);
+		// const rowID = row.shortedID.slice(1, 5);
 		const rowCustomerName = row.name.props.children[1];
 		// console.log(row)
 		// console.log(orders)
 
 		// filtering
 		orders.map(order => {
-			const orderID = order.id.split('-')[0];
-			const orderCustomerName = order.customer.name;
-			// console.log(orderID, '=>', rowID);
-			// console.log(orderCustomerName, '=>', rowCustomerName);
-			
-			orderID === rowID && orderCustomerName === rowCustomerName && setCart(order.cart);
+			// const orderID = order.id.split('-')[0];
+			const orderCustomerName = order?.customer?.name;
+
+			// console.log('order', order.id)
+			// console.log('row', row.id)
+
+			// orderID === rowID && orderCustomerName === rowCustomerName && setCart(order.cart);
+			order?.id === row.id && orderCustomerName === rowCustomerName && setCart(order.cart);
 
 		});
 	}, [])
-
-	useEffect(() => {console.log(cart)}, [cart])
 
 	return (
 

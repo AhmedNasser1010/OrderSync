@@ -19,7 +19,7 @@ export const newOrder = async (req, res, next) => {
     const orderRef = doc(db, 'orders', secretKey);
 
     await updateDoc(orderRef, {
-      ordersArray: arrayUnion(data)
+      open: arrayUnion(data)
     });
 
     res.status(200).send('order created successfully');

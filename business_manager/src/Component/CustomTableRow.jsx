@@ -68,7 +68,7 @@ const CustomTableRow = ({ row = [], selected, index, handleSetSelected }) => {
 				<TableCell>{ index+1 }</TableCell>
 				{ Object.values(row).map((value, i) => (
 					<TableCell key={i}>
-						{ value }
+						{ i === 0 ? `#${value.split('-')[0]}` : value }
 					</TableCell>
 				)) }
 			</TableRow>
@@ -83,14 +83,3 @@ const CustomTableRow = ({ row = [], selected, index, handleSetSelected }) => {
 }
 
 export default CustomTableRow;
-
-
-
-//<TableCell
-//					component="th"
-//					id={labelId}
-//					scope="row"
-//					padding="none"
-//				>
-//					{row.name}
-//				</TableCell>

@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { setOrders } from '../rtk/slices/ordersSlice';
-import _getSubcollection from '../functions/_getSubcollection';
 import currencyToSymbol from '../functions/currencyToSymbol';
 import OrdersTable from './OrdersTable';
 import Box from '@mui/material/Box';
@@ -14,7 +12,7 @@ const headCells = [
 		id: 'index',
 		numeric: false,
 		disablePadding: true,
-		label: '',
+		label: '#',
 	},
 	{
 		id: 'id',
@@ -54,23 +52,11 @@ const headCells = [
 	},
 ];
 
-const RecievedOrders = () => {
+const RecievedOrders = ({ tableData, tableStatus }) => {
 	const dispatch = useDispatch();
-	const dataRows = useSelector(state => state.orders);
-	const orders = useSelector(state => state.orders);
-	const businessID = useSelector(state => state.user.accessToken);
 	const [processRows, setProcessRows] = useState([]);
 
-	// set orders state
-	useEffect(() => {
-		_getSubcollection('orders', businessID)
-			.then(res => orders.length === 0 && dispatch(setOrders(res)));
-	}, [])
-
 	const createData = (id, customer, cart, timestemp) => {
-
-		// id process
-		const shortedID = `#${id.split('-')[0]}`;
 
 		// name process
 		let name = `${customer.name}`;
@@ -135,18 +121,18 @@ const RecievedOrders = () => {
 			ago += `${remainingMinutes}m`;
 		}
 
-		return { shortedID, name, order, ago, total };
+		return { id, name, order, ago, total };
 	}
 
 	// process incoming data to data rows
 	useEffect(() => {
-		setProcessRows(dataRows.ordersArray?.map(order => createData(order.id, order.customer, order.cart, order.timestemp)));
-	}, [dataRows])
+		setProcessRows(tableData.map(order => createData(order.id, order.customer, order.cart, order.timestemp)));
+	}, [tableData])
 
 	return (
 
 		<Box>
-			<OrdersTable dataRows={processRows} headCells={headCells} />
+			<OrdersTable tableData={processRows} headCells={headCells} tableStatus={tableStatus} />
 		</Box>
 
 	);

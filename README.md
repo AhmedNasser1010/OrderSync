@@ -1,18 +1,16 @@
+
 <img src="images/cover.png" alt="cover" />
 
 # OrderSync 🛵🔗
 
-**THE PROJECT WILL COMPLETED SOON!**
+**THE PROJECT WILL COMPLETED SOON! STAY TUNED**
 
 ## 🔶 Table of Contents
 - [Diagrams](#🔶-diagrams)
 - [Description](#🔶-description)
 - [To Do List](#🔶-to-do-list)
 - [Technologies](#🔶-technologies)
-- [Features](#🔶-features)
-- [Products](#🔶-products)
-- [Installation](#🔶-installation)
-- [Usage](#🔶-usage)
+- [Products Apps](#🔶-products-apps)
 - [Contributing](#🔶-contributing)
 - [Project Versions](#🔶-project-versions)
 - [License](#🔶-license)
@@ -29,31 +27,8 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 ### Project
 - Tasks 🎯
 	- To Do
-		- [ ] Split up create new user for business manager.
-		- [ ] Seprate update business form in different pages for better user experience.
-		- [ ] Seprate add new business form in different pages for better user experience.
-		- [ ] Add, loading screen.
-		- [ ] Tables sorting.
-		- [ ] Caching data instead of API request.
-		- [ ] Create, User profile page.
-		- [ ] Create, Home page (Overview).
-		- [ ] Create, Performance page.
-		- [ ] Create, businesses sales widget.
 	- In Progress
 	- Done
-		- [x] Optimize, 'addNewBusiness' form to use it in 'businessSetting' page.
-		- [x] Enhance, signupUser/loginUser/logout/openApp functions to record user signup/login/logout/openapp process
-		- [x] Change, add business form to "Formik" forms with "MatrialUI" and "yup" validation schema.
-		- [x] Change, businesses management Table component to MatrialUI table.
-		- [x] Change, the login/signup forms to "Formik" forms with "MatrialUI" and "yup" validation schema.
-		- [x] Create, Manage business tab.
-		- [x] Create, Pending orders tab.
-		- [x] Create, Orders list tab.
-		- [x] Start using MatrialUI.
-		- [x] Create, orders, customers collections Firestore.
-		- [x] Add. user subcollection to redux state on login.
-		- [x] Collect admin signup data to firestore collection.
-		<br>[...](references/old-todos.md)
 - Feature Development 🚀
 	- To Do
 	- In Progress
@@ -65,17 +40,12 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
  		- [ ] Fix, Warning A uncontrolled input in update business page
 	 	- [ ] Fix, getDocs.js requests built on how many subcollection i have and react duble it more.
 	- In Progress
-	- Done
- 		- [x] Fix, MatrialUI fields label dose not shrink when change the value logically.
-		- [x] Fix, 'businessSettings' navigation
-		- [x] Fix, login/signup forms trigger all errors in same time if the user enter a wrong one field.
-		- [x] Fix, The app are not loading correctly when the user open the app again after login
 - Brainstorming 🌪️
-	- [ ] Admin businesses limit avoid spamming.
+	- [ ] Add tow new branches "Order Captain", "Delivery Captain".
 	- [ ] Add, Custom google maps zone select for delivery zones.
-	- [ ] Create, A basic documentation for the project.
-	- [ ] Add, method to make backup for all database (system owner).
-  	- [ ] Add, method for admin to extract business data to Exel or google sheet file.
+	- [ ] Create, A basic documentation for the project apps.
+	- [ ] Create, A basic documentation for user_gateway API.
+  	- [ ] Add, method for admin to extract business data to Excel and google sheet.
 
 ## 🔶 Technologies
 
@@ -83,61 +53,18 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 * ReactJS
 * MatrialUI
 * Firebase
-* Formik
-* Yup
-* DnD-Kit
-* ...
 
-## 🔶 Features
-- 
+## 🔶 Products Apps
 
-## 🔶 Products
-
-- System Owner (for the system owner who will own it) **Still BackStage**
 - [Business Creator (for developers like font-end developer).](businesses_creator/)
-- [Business Manager (for businesses owners).](businesses_manager/)
+- [Business Manager (for businesses owners and cashers).](businesses_manager/)
+- Order Captain (falls under Business Manager app ). **Still BackStage**
+- Delivery Captain (falls under Business Manager app ). **Still BackStage**
 - Customer Store (for the customer who will buy a products). **Still BackStage**
 
-**API We Provide:**
+**Provided APIs:**
 - Business Manager API. **Still BackStage**
 - Customer Store API. **Still BackStage**
-
-## 🔶 Installation
-
-1. Install npm and.
-```bash
-npm install -g npm
-```
-
-2. Clone this repository.
-`https://github.com/AhmedNasser1010/pos-system-admin.git`
-
-3. Run `npm i` in the project directory.
-```
-cd pos-system-admin
-npm i
-```
-
-4. Run `npm run dev` to start the app.
-
-The app will be accessible at http://localhost:5173.
-
-## 🔶 Usage
-Welcome to our developer-friendly web application, a powerhouse ordering systems. Here's your guide to leveraging the potential of our platform:
-
-1.  **Admin Sign-up:**
-    
-    -   Kickstart your development journey by signing up as an admin to gain access to a robust set of tools.
-2.  **Business Management:**
-    
-    -   Easily integrate and manage multiple businesses, spanning retail, coffee shops, restaurants, and online ordering, all with developer-centric controls.
-3.  **API Extraction:**
-    
-    -   Extract business-specific APIs, including the Menu API for fetching product details, the Orders API for efficient order management, and the Payment API for secure transactions.
-4.  **Integration Possibilities:**
-    -   Seamlessly integrate extracted APIs into your own e-commerce website or custom orders manager, empowering you to tailor solutions for your clients.
-
-Unlock the potential of our platform to streamline and enhance your development workflow. Elevate your projects with versatile APIs designed for efficiency, flexibility, and seamless integration
 
 ## 🔶 Contributing
 Thank you for considering contributing to our project! We welcome contributions from the developer community to enhance the functionality and features of our web application.

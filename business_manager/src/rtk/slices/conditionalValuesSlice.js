@@ -5,6 +5,7 @@ export const conditionalValuesSlice = createSlice({
   initialState: {
     disableMenuDnD: false,
     saveToCloudBtnStatus: 'ON_SAVED',
+    savingOrdersTimer: 5
   },
   reducers: {
     setDisableMenuDnD: (state, { payload }) => {
@@ -12,6 +13,15 @@ export const conditionalValuesSlice = createSlice({
     },
     setSaveToCloudBtnStatus: (state, { payload }) => {
       return { ...state, saveToCloudBtnStatus: payload }
+    },
+    decreaseSavingOrdersTimer: (state, { payload }) => {
+      return { ...state, savingOrdersTimer: state.savingOrdersTimer-1 }
+    },
+    resetSavingOrdersTimer: (state, { payload }) => {
+      return { ...state, savingOrdersTimer: 5 }
+    },
+    savingOrdersTimerIsLoading: (state, { payload }) => {
+      return { ...state, savingOrdersTimer: 'Saving' }
     }
   },
 })
@@ -19,7 +29,10 @@ export const conditionalValuesSlice = createSlice({
 
 export const {
   setDisableMenuDnD,
-  setSaveToCloudBtnStatus
+  setSaveToCloudBtnStatus,
+  decreaseSavingOrdersTimer,
+  resetSavingOrdersTimer,
+  savingOrdersTimerIsLoading
 } = conditionalValuesSlice.actions;
 
 export default conditionalValuesSlice.reducer;

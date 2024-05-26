@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSelector } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
 import TableToolbar from './TableToolbar';
 import CustomTableHead from './CustomTableHead';
 import CustomTableRow from './CustomTableRow';
@@ -48,9 +49,9 @@ const stableSort = (array, comparator) => {
 	}
 }
 
-const OrdersTable = ({ dataRows, headCells }) => {
+const OrdersTable = ({ tableData, headCells, tableStatus }) => {
 	const [order, setOrder] = useState('asc');
-	const [orderBy, setOrderBy] = useState('nasser');
+	const [orderBy, setOrderBy] = useState('');
 	const [selected, setSelected] = useState([]);
 	const [page, setPage] = useState(0);
 	const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -58,8 +59,8 @@ const OrdersTable = ({ dataRows, headCells }) => {
 	const [rows, setRows] = useState([]);
 
 	useEffect(() => {
-		setRows(dataRows);
-	}, [dataRows])
+		setRows(tableData);
+	}, [tableData])
 
 	const handleSetSelected = (value) => {
 		setSelected(value)
@@ -106,7 +107,11 @@ const OrdersTable = ({ dataRows, headCells }) => {
 	return (
 
 		<Box>
-			<TableToolbar numSelected={selected.length} selected={selected} />
+			<TableToolbar
+				selected={selected}
+				handleSetSelected={handleSetSelected}
+				tableStatus={tableStatus}
+			/>
 			<TableContainer component={Paper}>
 
 			<Table
@@ -129,7 +134,7 @@ const OrdersTable = ({ dataRows, headCells }) => {
 					{visibleRows?.map((row, index) => {
 						return (
 							<CustomTableRow
-								key={index, row.id}
+								key={uuidv4()}
 								row={row}
 								selected={selected}
 								index={index}
