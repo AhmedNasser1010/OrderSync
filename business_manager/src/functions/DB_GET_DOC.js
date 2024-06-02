@@ -1,7 +1,7 @@
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase.js";
 
-const _getSubcollection = async (collectionName, subCollectionID) => {
+const DB_GET_DOC = async (collectionName, subCollectionID) => {
   try {
   	
     const docRef = doc(db, collectionName, subCollectionID);
@@ -23,4 +23,4 @@ const _getSubcollection = async (collectionName, subCollectionID) => {
   }
 }
 
-export default _getSubcollection;
+export default DB_GET_DOC;

@@ -30,7 +30,7 @@ import { setSaveToCloudBtnStatus } from './rtk/slices/conditionalValuesSlice';
 import _addDoc from './functions/_addDoc';
 import AutorenewSharpIcon from '@mui/icons-material/AutorenewSharp';
 import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
-import _getSubcollection from './functions/_getSubcollection';
+import DB_GET_DOC from './functions/DB_GET_DOC';
 
 const Menu = () => {
 	const [dialogVisibility, setDialogVisibility] = useState(false);
@@ -158,7 +158,7 @@ const Menu = () => {
 
 	// get the menu data from the server once
 	useEffect(() => {
-		_getSubcollection('menus', user.accessToken).then(res => {
+		DB_GET_DOC('menus', user.accessToken).then(res => {
 			dispatch(addMenu(res))
 			setMenuValuesSnapshot(res);
 		});

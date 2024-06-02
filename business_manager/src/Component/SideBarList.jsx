@@ -27,8 +27,7 @@ const SideBarList = () => {
 
 		<ul>
 			<li className="link"><Link to={auth.currentUser ? "/user" : "/login"}>User Profile</Link></li>
-			<li className="link"><Link to={auth.currentUser ? "/orders" : "/login"}>Orders</Link></li>
-			<li className="link"><Link to={auth.currentUser ? "/menu" : "/menu"}>Menu Setup</Link></li>
+			<li className="link"><Link to={auth.currentUser ? "/orders" : "/login"}>Orders</Link></li>			<li className="link"><Link to={auth.currentUser ? "/menu" : "/menu"}>Menu Setup</Link></li>
 			<li className="link" onClick={handleSignout}><Link to="/login">Logout</Link></li>
 		</ul>
 

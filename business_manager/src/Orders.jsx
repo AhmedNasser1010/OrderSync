@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { setOpenedOrders, newTestOrder } from './rtk/slices/ordersSlice';
 import { resetSavingOrdersTimer, decreaseSavingOrdersTimer, savingOrdersTimerIsLoading } from './rtk/slices/conditionalValuesSlice';
-import _getSubcollection from './functions/_getSubcollection';
+import DB_GET_DOC from './functions/DB_GET_DOC';
 import _updateAnArray from './functions/_updateAnArray';
 import returnTestOrder from './functions/returnTestOrder';
 import PageTitle from './Component/PageTitle';
@@ -12,11 +12,13 @@ import Stack from '@mui/material/Stack';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Button from '@mui/material/Button';
+import Divider from '@mui/material/Divider';
 
 import RecievedOrders from './Component/RecievedOrders';
 import OnGoingOrders from './Component/OnGoingOrders';
 import InDeliveryOrders from './Component/InDeliveryOrders';
 import CompletedOrders from './Component/CompletedOrders';
+import ClosedOrders from './Component/ClosedOrders';
 
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "./firebase.js";
@@ -44,7 +46,7 @@ const Orders = () => {
 
 	// Set orders data to redux state
 	useEffect(() => {
-		// _getSubcollection('orders', accessToken)
+		// DB_GET_DOC('orders', accessToken)
 		// 	.then(res => !currentOrdersLength && dispatch(setOrders(res)));
 		const docRef = doc(db, 'orders', accessToken);
 
@@ -116,6 +118,7 @@ const Orders = () => {
 						<Tab label="On Going" {...a11yProps(1)} />
 						<Tab label="In Delivery" {...a11yProps(2)} />
 						<Tab label="Completed" {...a11yProps(3)} />
+						<Tab label="Closed" {...a11yProps(4)} sx={{ borderTop: '1px solid #0000001f' }} />
 					</Tabs>
 				</Box>
 
@@ -136,6 +139,9 @@ const Orders = () => {
 					</CustomTabPanel>
 					<CustomTabPanel tabValue={tabValue} index={3}>
 						<CompletedOrders tableData={orderFilter('COMPLETED')} tableStatus='COMPLETED' />
+					</CustomTabPanel>
+					<CustomTabPanel tabValue={tabValue} index={4}>
+						<ClosedOrders />
 					</CustomTabPanel>
 
 				</Box>

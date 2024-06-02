@@ -67,6 +67,12 @@ export const ordersSlice = createSlice({
           }
         ]
       }
+    },
+    setClosedOrders: (state, { payload }) => {
+      return {
+        ...state,
+        closed: payload
+      }
     }
   },
 })
@@ -79,7 +85,8 @@ export const {
   deleteOrder,
   newTestOrder,
   setOpenedOrders,
-  storeOrder
+  storeOrder,
+  setClosedOrders
 } = ordersSlice.actions;
 
 export default ordersSlice.reducer;

@@ -1,7 +1,7 @@
 import { auth } from "../firebase.js";
 import userRegRecordData from "./userRegRecordData.js";
 import _updateAnArray from "./_updateAnArray.js";
-import _getSubcollection from "./_getSubcollection.js";
+import DB_GET_DOC from "./DB_GET_DOC.js";
 
 const startApp = async () => {
 
@@ -20,7 +20,7 @@ const startApp = async () => {
   await _updateAnArray("users", uid, "registrationHistory", record);
 
 	// get user data
-  const data = await _getSubcollection("users", uid);
+  const data = await DB_GET_DOC("users", uid);
   
   return data;
 }

@@ -15,7 +15,7 @@ import SideBar from "./Component/SideBar.jsx";
 import PrivateRoute from "./PrivateRoute.jsx";
 import Home from "./Home";
 import User from "./User";
-import Orders from './Orders'
+import Orders from './Orders';
 import Menu from "./Menu";
 import Login from "./Login";
 
@@ -61,7 +61,7 @@ function App() {
 				<Routes>
 					<Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
 					<Route path="/user" element={<PrivateRoute><User /></PrivateRoute>} />
-					<Route path="/Orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
+					<Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
 					<Route path="/menu" element={<PrivateRoute><Menu /></PrivateRoute>} />
 					<Route path="/login" element={<Login />} />
 				</Routes>

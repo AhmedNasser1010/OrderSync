@@ -3,7 +3,7 @@ import { db } from "../firebase.js";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase.js";
 
-import _getSubcollection from "./_getSubcollection.js";
+import DB_GET_DOC from "./DB_GET_DOC.js";
 import _updateAnArray from "./_updateAnArray.js";
 import userRegRecordData from "./userRegRecordData.js";
 
@@ -30,7 +30,7 @@ const AUTH_loginUser = async (values, onSubmit) => {
     _updateAnArray("users", userID, "registrationHistory", record);
 
     // get user data
-    const data = await _getSubcollection("users", userID);
+    const data = await DB_GET_DOC("users", userID);
 
     // check if the login user are business owner
     if (data.userInfo.role !== "BUSINESS_MANAGER") {
