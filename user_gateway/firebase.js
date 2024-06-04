@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import config from './config.js';
+import { getFirestore } from 'firebase/firestore';
 
-const firebase = initializeApp(config.firebaseConfig);
-
-export default firebase;
+export const firebase = initializeApp(config.firebaseConfig);
+export const db = getFirestore(firebase);

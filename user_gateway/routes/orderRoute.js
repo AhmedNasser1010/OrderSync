@@ -1,9 +1,7 @@
 import express from 'express';
 
-import {
-  newOrder,
-  getMenu
-} from '../controllers/orderController.js';
+import getMenu from '../controllers/getMenuController.js'
+import newOrder from '../controllers/newOrderController.js'
 
 const router = express.Router();
 

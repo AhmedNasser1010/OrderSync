@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 export const conditionalValuesSlice = createSlice({
-  name: 'user',
+  name: 'conditionalValues',
   initialState: {
     disableMenuDnD: false,
     saveToCloudBtnStatus: 'ON_SAVED',
