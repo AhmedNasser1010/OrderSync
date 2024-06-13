@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import currencyToSymbol from '../functions/currencyToSymbol';
+import priceAfterDiscount from '../functions/priceAfterDiscount';
 import Paper from '@mui/material/Paper';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
@@ -23,9 +23,14 @@ const collapsHeadCells = [
 		label: 'ID',
 	},
 	{
-		id: 'customer',
+		id: 'name',
 		numeric: false,
-		label: 'Customer',
+		label: 'name',
+	},
+	{
+		id: 'phone',
+		numeric: false,
+		label: 'Phone',
 	},
 	{
 		id: 'order',
@@ -41,22 +46,62 @@ const collapsHeadCells = [
 
 function ClosedOrdersCollapsedTable({ timestamp, isOpen }) {
 	const closedOrders = useSelector(state => state.orders.closed)
+	const menuItems = useSelector(state => state.menu.items)
 	const [rows, setRows] = useState([])
+
+	// useEffect(() => {
+	// 	let finallRows = []
+	// 	closedOrders.map(closedOrder => {
+	// 		if (closedOrder.timestamp === timestamp) {
+	// 			closedOrder.orders.map(order => {
+	// 				let cartNameArr = []
+	// 				order.cart.map(cart => cartNameArr.push(cart.name))
+
+	// 				finallRows.push({ id: order.id, name: order.customer.name, orders: cartNameArr.join(', '), total: order.payment.total, currency: order.payment.currency })
+	// 			})
+	// 		}
+	// 	})
+
+	// 	setRows(finallRows)
+	// }, [])
+
 
 	useEffect(() => {
 		let finallRows = []
-		closedOrders.map(closedOrder => {
-			if (closedOrder.timestamp === timestamp) {
-				closedOrder.orders.map(order => {
-					let cartNameArr = []
-					order.cart.map(cart => cartNameArr.push(cart.name))
 
-					finallRows.push({ id: order.id, name: order.customer.name, orders: cartNameArr.join(', '), total: order.payment.total, currency: order.payment.currency })
-				})
-			}
+		let closedOrder
+		closedOrders.map(closed => {if (closed.timestamp === timestamp) closedOrder = closed; return})
+
+		closedOrder.orders.map(order => {
+			let orderItems = []
+			order.cart.map(cart => menuItems.map(item => cart.id === item.id && orderItems.push({...item, quantity: cart.quantity})))
+
+			let orderItemsName = []
+			orderItems.map(item => orderItemsName.push(item.title))
+
+			let total = 0
+			orderItems.map(item => item.discount ? total += priceAfterDiscount(item.price, item.discount.code) * item.quantity : total += item.price * item.quantity)
+
+			console.log(order)
+			finallRows.push({ id: order.id, name: order.user.name, phone: order.user.phone, orders: orderItemsName.join(', '), total })
 		})
 
 		setRows(finallRows)
+
+		// let finallRows = []
+
+		// closedOrders.map(closedOrder => {
+		// 	if (closedOrder.timestamp === timestamp) {
+		// 		closedOrder.orders.map(order => {
+		// 			let cartNameArr = []
+		// 			order.cart.map(cart => cartNameArr.push(cart.name))
+
+		// 			finallRows.push({ id: order.id, name: order.customer.name, orders: cartNameArr.join(', '), total: order.payment.total, currency: order.payment.currency })
+		// 		})
+		// 	}
+		// })
+
+		// setRows(finallRows)
 	}, [])
 
 	return (
@@ -93,8 +138,9 @@ function ClosedOrdersCollapsedTable({ timestamp, isOpen }) {
       						<TableCell padding='none'>{ i+1 }</TableCell>
       						<TableCell padding='none'>{ row.id }</TableCell>
       						<TableCell padding='none'>{ row.name }</TableCell>
+      						<TableCell padding='none'>{ row.phone }</TableCell>
       						<TableCell padding='none'>{ row.orders }</TableCell>
-      						<TableCell padding='none'>{ row.total + currencyToSymbol(row.currency) }</TableCell>
+      						<TableCell padding='none'>{ row.total }LE</TableCell>
       					</TableRow>
       				))
       			}

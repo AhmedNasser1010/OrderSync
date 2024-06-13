@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import currencyToSymbol from '../functions/currencyToSymbol';
+import priceAfterDiscount from '../functions/priceAfterDiscount';
 import OrdersTable from './OrdersTable';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -55,64 +55,69 @@ const headCells = [
 const InDeliveryOrders = ({ tableData, tableStatus }) => {
 	const dispatch = useDispatch();
 	const [processRows, setProcessRows] = useState([]);
+	const menuItems = useSelector(state => state.menu?.items)
 
-	const createData = (id, customer, cart, timestemp) => {
+	const createData = (id, user, cart, timestamp) => {
 
 		// name process
-		let name = `${customer.name}`;
-		if (customer.verified) {
+		let name = user.name
+		// the user should be check if verified or not
+		// as default its false right now
+		if (false) {
 			name = (
 				<Stack direction='row' alignItems='center'>
 					<CheckCircleIcon sx={{ fontSize: 'small', marginRight: '3px' }} />
-					{ customer.name }
+					{ user.name }
 				</Stack>
 			);
 		} else {
 			name = (
 				<Stack direction='row' alignItems='center'>
 					<CheckCircleOutlineIcon sx={{ fontSize: 'small', marginRight: '3px' }} />
-					{ customer.name }
+					{ user.name }
 				</Stack>
 			);
 		}
 
+		// get cart items
+		let cartItems = []
+		menuItems.map(menuItem => {
+			cart.map(cartItem => {
+				menuItem.id === cartItem.id && cartItems.push({...menuItem, quantity: cartItem.quantity})
+			})
+		})
+
 		// cart process
 		let cartNameArr = [];
-		cart.map(item => cartNameArr.push(item.name));
+		cartItems.map(item => cartNameArr.push(item.title));
 		const order = cartNameArr.join(', ');
 
 		// total process
-		let total = 0;
-		let lastCurrency = null;
-		let sameCurrency = true;
-		cart.map(item => total = item.price + total);
-		cart.map(item => {
-			if (lastCurrency !== null) {
-				if (lastCurrency !== item.currency) {
-					sameCurrency = false;
-				}
-			}
-			lastCurrency = item.currency;
+		let totalPrice = 0;
+		let totalPriceDiscounted = 0;
+		cartItems.map(item => {
+			totalPrice += item.price * item.quantity
+			item.discount ? totalPriceDiscounted += priceAfterDiscount(item.price, item.discount.code) * item.quantity : totalPriceDiscounted += item.price * item.quantity
 		});
-		if (sameCurrency) {
-			total = `${total}${currencyToSymbol(lastCurrency)}`;
+		// total = `${total}LE`
+		let total
+		if (totalPrice === totalPriceDiscounted) {
+			total = `${totalPrice}LE`
 		} else {
-			total = `${total}??`;
+			total = <div>
+				<span style={{ color: 'red' }}>{ totalPrice }</span> <span style={{ color: 'green' }}>{ totalPriceDiscounted }LE</span>
+			</div>
 		}
 
 		// timestemp process
-		// Assuming 'timestamp' is the time in milliseconds
 		const currentTimestamp = Date.now();
-		const timeDifference = currentTimestamp - timestemp;
+		const timeDifference = currentTimestamp - timestamp;
 
-		// Calculate hours and minutes from milliseconds
 		const minutes = Math.floor(timeDifference / (1000 * 60));
 		const hours = Math.floor(minutes / 60);
 
-		// Calculate remaining minutes
 		const remainingMinutes = minutes % 60;
 
-		// Construct the time ago string
 		let ago = '';
 		if (hours > 0) {
 			ago += `${hours}h, `;
@@ -126,8 +131,8 @@ const InDeliveryOrders = ({ tableData, tableStatus }) => {
 
 	// process incoming data to data rows
 	useEffect(() => {
-		setProcessRows(tableData.map(order => createData(order.id, order.customer, order.cart, order.timestemp)));
-	}, [tableData])
+		setProcessRows(tableData?.map(order => createData(order.id, order.user, order.cart, order.timestamp)));
+	}, [tableData, menuItems])
 
 	return (
 

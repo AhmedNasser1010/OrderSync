@@ -31,7 +31,7 @@ function ClosedOrdersRow({ row, index }) {
 				</TableCell>
 				<TableCell>{formatDateFromTimestamp(row.timestamp, '/')}</TableCell>
 				<TableCell>{row.counter}</TableCell>
-				<TableCell>{row.total}{currencyToSymbol(row.currency)}</TableCell>
+				<TableCell>{row.totalDayIncome}</TableCell>
 			</TableRow>
 			<TableRow>
 				<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={5}>

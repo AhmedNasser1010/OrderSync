@@ -4,6 +4,7 @@ import { setClosedOrders } from '../rtk/slices/ordersSlice'
 import { v4 as uuidv4 } from 'uuid'
 import stableSort from '../functions/stableSort'
 import DB_GET_DOC from '../functions/DB_GET_DOC'
+import priceAfterDiscount from '../functions/priceAfterDiscount'
 import ClosedOrdersRow from './ClosedOrdersRow'
 import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
@@ -74,6 +75,7 @@ function ClosedOrders() {
 	const dispatch = useDispatch()
 	const accessToken = useSelector(state => state.user.accessToken)
 	const closedOrders = useSelector(state => state.orders.closed)
+	const menuItems = useSelector(state => state.menu.items)
 	const [order, setOrder] = useState('asc')
 	const [orderBy, setOrderBy] = useState('')
 	const [page, setPage] = useState(0)
@@ -88,21 +90,20 @@ function ClosedOrders() {
 	useEffect(() => {
 		const result = closedOrders.map(closed => {
 			let counter = 0
-			let total = 0
-			let currency = 'none'
+			let totalDayIncome = 0
 
 			counter = closed.orders.length
 			closed.orders.map(order => {
-				total += order.payment.total
+				let orderItems = []
 
-				if (order.payment.currency === currency || currency === 'none')
-					currency = order.payment.currency
-				else
-					currency = ''
+				order.cart.map(cartItem => menuItems.map(menuItem => cartItem.id === menuItem.id && orderItems.push({...menuItem, quantity: cartItem.quantity})))
+
+				orderItems.map(order => {
+					order.discount ? totalDayIncome += priceAfterDiscount(order.price, order.discount.code) * order.quantity : totalDayIncome += order.price * order.quantity
+				})
 			})
 
-
-			return {timestamp: closed.timestamp, counter, total, currency}
+			return {timestamp: closed.timestamp, counter, totalDayIncome}
 		})
 
 

@@ -44,10 +44,8 @@ const Orders = () => {
 		setTabValue(newValue);
 	};
 
-	// Set orders data to redux state
+	// Live subscribe with orders document
 	useEffect(() => {
-		// DB_GET_DOC('orders', accessToken)
-		// 	.then(res => !currentOrdersLength && dispatch(setOrders(res)));
 		const docRef = doc(db, 'orders', accessToken);
 
 		const unsub = onSnapshot(docRef, doc => {
@@ -70,34 +68,6 @@ const Orders = () => {
 		_updateAnArray('orders', accessToken, 'open', dummyOrder);
 		dispatch(newTestOrder(dummyOrder));
 	}
-
-	// useEffect(() => {
-
-	// 	intervalRef.current = setInterval(() => {
-	// 		dispatch(decreaseSavingOrdersTimer());
-	// 	}, 1000)
-
-	// 	return () => {
-	// 		clearInterval(intervalRef.current)
-	// 	}
-	// }, [])
-
-	// useEffect(() => {
-	// 	if (savingOrdersTimer <= -1) {
-	// 		dispatch(savingOrdersTimerIsLoading());
-	// 		clearInterval(intervalRef.current);
-	// 		setIsSaving(true);
-	// 		// dispatch(resetSavingOrdersTimer());
-	// 	}
-	// }, [savingOrdersTimer])
-
-	// useEffect(() => {
-	// 	console.log(isSaving)
-	// }, [isSaving])
-
-	// useEffect(() => {
-	// 	console.log(savingOrdersTimer)
-	// }, [savingOrdersTimer])
 
 	return (
 

@@ -42,7 +42,7 @@ const Menu = () => {
 	const dispatch = useDispatch();
 	const [indexes, setIndexes] = useState([]);
 	const [saveBtnStyles, setSaveBtnStyles] = useState({});
-	const [menuValuesSnapshot, setMenuValuesSnapshot] = useState({});
+	const [menuValuesSnapshot, setMenuValuesSnapshot] = useState(menuValues);
 	const [onceRun, setOnceRun] = useState(false);
 
 	// setup indexed from categories
@@ -155,14 +155,6 @@ const Menu = () => {
 	useEffect(() => {
 		handleToCloudeBtnStart();
 	}, [saveToCloudBtnStatus])
-
-	// get the menu data from the server once
-	useEffect(() => {
-		DB_GET_DOC('menus', user.accessToken).then(res => {
-			dispatch(addMenu(res))
-			setMenuValuesSnapshot(res);
-		});
-	}, []);
 
 	// check if the current menu compaier the last saved menu
 	useEffect(() => {

@@ -4,9 +4,11 @@ import "./style/all.css";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { addUser } from "./rtk/slices/userSlice.js";
+import { addMenu } from './rtk/slices/menuSlice.js';
 
 // Functions
 import startApp from "./functions/startApp.js";
+import DB_GET_DOC from './functions/DB_GET_DOC';
 
 // Components
 import SideBar from "./Component/SideBar.jsx";
@@ -29,6 +31,7 @@ function App() {
 		startApp()
 			.then(userData => {
 				dispatch(addUser(userData));
+				DB_GET_DOC('menus', userData.accessToken).then(res => dispatch(addMenu(res)));
 				navigate("/orders");
 			}).catch(error => {
 				console.log(error);

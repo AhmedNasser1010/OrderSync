@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import currencyToSymbol from '../functions/currencyToSymbol';
+import styled from 'styled-components'
+import priceAfterDiscount from '../functions/priceAfterDiscount';
 import Paper from '@mui/material/Paper';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
@@ -10,6 +11,17 @@ import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
+
+const MoreDetails = styled.div`
+	padding: 5px 0;
+`
+const MoreDetailsFlexBox = styled.div`
+	display: flex;
+	flex-wrap: wrap;
+`
+const MoreDetailsItem = styled.div`
+	width: 50%;
+`
 
 const collapsHeadCells = [
 	{
@@ -23,9 +35,9 @@ const collapsHeadCells = [
 		label: 'ID',
 	},
 	{
-		id: 'orderItem',
+		id: 'name',
 		numeric: false,
-		label: 'Order Item',
+		label: 'Name',
 	},
 	{
 		id: 'amount',
@@ -38,35 +50,35 @@ const collapsHeadCells = [
 		label: 'Price Per',
 	},
 	{
-		id: 'price',
+		id: 'subtotal',
 		numeric: false,
-		label: 'Price',
+		label: 'Subtotal',
 	},
 ];
 
 const CustomCollapsedTableRow = ({ isOpen, row }) => {
 	const orders = useSelector(state => state.orders.open);
+	const menuItems = useSelector(state => state.menu?.items)
 	const [cart, setCart] = useState([]);
+	const [fullOrderDetails, setFullOrderDetails] = useState(null)
 
-	// get full row data process
 	useEffect(() => {
-		// const rowID = row.shortedID.slice(1, 5);
-		const rowCustomerName = row.name.props.children[1];
-		// console.log(row)
-		// console.log(orders)
+		orders.map(order => {if (order.id === row.id) setFullOrderDetails(order)})
+	}, [row])
 
-		// filtering
-		orders.map(order => {
-			// const orderID = order.id.split('-')[0];
-			const orderCustomerName = order?.customer?.name;
+	useEffect(() => {
+		// get cart
+		let cart
+		orders.map(order => {if (order.id === row.id) return cart = order.cart})
 
-			// console.log('order', order.id)
-			// console.log('row', row.id)
-
-			// orderID === rowID && orderCustomerName === rowCustomerName && setCart(order.cart);
-			order?.id === row.id && orderCustomerName === rowCustomerName && setCart(order.cart);
-
-		});
+		// get cart items
+		let items = []
+		menuItems?.map(menuItem => {
+			cart?.map(cartItem => {
+				if (menuItem.id === cartItem.id) items = [...items, {...menuItem, quantity: cartItem.quantity}]
+			})
+		})
+		setCart(items)
 	}, [])
 
 	return (
@@ -79,7 +91,7 @@ const CustomCollapsedTableRow = ({ isOpen, row }) => {
 		>
 			<TableContainer>
 				<Typography variant="h6" gutterBottom component="div">
-        	More Details
+        	Order Details
       	</Typography>
 
       	<Table aria-label="collapsible table">
@@ -102,16 +114,42 @@ const CustomCollapsedTableRow = ({ isOpen, row }) => {
       					<TableRow key={cartItem.id}>
       						<TableCell padding='none'>{ i+1 }</TableCell>
       						<TableCell padding='none'>{ cartItem.id }</TableCell>
-      						<TableCell padding='none'>{ cartItem.name }</TableCell>
+      						<TableCell padding='none'>{ cartItem.title }</TableCell>
       						<TableCell padding='none'>{ cartItem.quantity }</TableCell>
-      						<TableCell padding='none'>{ cartItem.price + currencyToSymbol(cartItem.currency) }</TableCell>
-      						<TableCell padding='none'>{ cartItem.price * cartItem.quantity  + currencyToSymbol(cartItem.currency) }</TableCell>
+      						<TableCell padding='none'>{ cartItem.price }LE</TableCell>
+      						{ !cartItem.discount && <TableCell padding='none'>{ cartItem.price * cartItem.quantity }LE</TableCell> }
+      						{ cartItem.discount && <TableCell padding='none'><span style={{ color: 'red' }}>{ cartItem.price * cartItem.quantity }</span> <span style={{ color: 'green' }}>{ priceAfterDiscount(cartItem.price, cartItem.discount.code) * cartItem.quantity }LE</span></TableCell> }
       					</TableRow>
       				))
       			}
       		</TableBody>
       	</Table>
 			</TableContainer>
+			<MoreDetails>
+				<Typography variant="h6" gutterBottom component="div" sx={{ fontSize: '16px'}}>
+			    More Details
+			  </Typography>
+			  <MoreDetailsFlexBox>
+			  	<MoreDetailsItem>
+			  		<span>Name: </span><span>{fullOrderDetails?.user?.name}</span>
+			  	</MoreDetailsItem>
+			  	<MoreDetailsItem>
+			  		<span>Phone: </span><span>{fullOrderDetails?.user?.phone}</span>
+			  	</MoreDetailsItem>
+			  	<MoreDetailsItem>
+			  		<span>Comment: </span><span>{fullOrderDetails?.user?.comment}</span>
+			  	</MoreDetailsItem>
+			  	<MoreDetailsItem>
+			  		<span>Payment: </span><span>{fullOrderDetails?.payment?.method}</span>
+			  	</MoreDetailsItem>
+			  	<MoreDetailsItem>
+			  		<span>Address: </span><span>{fullOrderDetails?.location?.address}</span>
+			  	</MoreDetailsItem>
+			  	<MoreDetailsItem>
+			  		<span>Location: </span><span><a style={{ color: 'blue', cursor: 'pointer' }} target='_blank' href={`https://www.google.com/maps?q=${fullOrderDetails?.location?.positions[fullOrderDetails?.location?.positions?.selected][0]},${fullOrderDetails?.location?.positions[fullOrderDetails?.location?.positions?.selected][1]}`}>Google Maps</a></span>
+			  	</MoreDetailsItem>
+			  </MoreDetailsFlexBox>
+			</MoreDetails>
 		</Collapse>
 
 	);

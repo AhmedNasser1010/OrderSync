@@ -26,8 +26,14 @@ const getMenu = async (req, res, next) => {
         ]
       }
 
+      apiData = {
+        ...apiData,
+        items: apiData.items.filter(item =>
+          apiData.categories.some(category => item.category === category.title)
+        )
+      }
+
       res.status(200).send(apiData)
-      console.log(apiData)
 
     } else {
       res.status(404).send('product not found')
