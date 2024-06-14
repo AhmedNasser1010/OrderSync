@@ -4,11 +4,9 @@ html {
 
 #root {
 	display: flex;
-	font-family: monospace;
-}
-
-h1, h2, h3, h4, h5, h6 {
-	margin: 0;
+	/* font-family: monospace; */
+	font-family: "Roboto";
+	color: #1a1a1a;
 }
 
 ul, li, a {
@@ -22,4 +20,10 @@ ul, li, a {
 .content {
 	width: calc(100% - 200px);
 	margin: 0 15px;
+}
+
+* {
+	padding: 0;
+	margin: 0;
+	user-select: none;
 }

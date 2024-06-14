@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Switch from '@mui/material/Switch';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useDispatch, useSelector } from 'react-redux';
-import { removeCategory, categoryVisibility, removeItem, itemVisibility } from '../rtk/slices/menuSlice.js';
+import { removeCategory, categoryVisibility, topCategory, removeItem, itemVisibility, topItem } from '../rtk/slices/menuSlice.js';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
@@ -16,6 +16,7 @@ const MenuCardManageMiniMenu = ({ item, buttonStyles, hovered = true, categoryOr
 	const [expandMoreAnchorEl, setExpandMoreAnchorEl] = useState(null);
 	const expandMore = Boolean(expandMoreAnchorEl);
 	const [visibility, setVisibility] = useState(item?.visibility);
+	const [topMenu, setTopMenu] = useState(item?.topMenu);
 
 	const handleOpenExpandMore = (event) => {
     setExpandMoreAnchorEl(event.currentTarget);
@@ -31,6 +32,15 @@ const MenuCardManageMiniMenu = ({ item, buttonStyles, hovered = true, categoryOr
 		setVisibility(visibilityValue);
 		categoryOrItem === 'category' && dispatch(categoryVisibility({ item, visibilityValue }));
 		categoryOrItem === 'item' && dispatch(itemVisibility({ item, visibilityValue }));
+		dispatch(setSaveToCloudBtnStatus('ON_CHANGES'));
+	}
+
+	const handleTopCategory = () => {
+		const topMenuValue = !topMenu;
+		
+		setTopMenu(topMenuValue);
+		categoryOrItem === 'category' && dispatch(topCategory({ item, topMenuValue }));
+		categoryOrItem === 'item' && dispatch(topItem({ item, topMenuValue }));
 		dispatch(setSaveToCloudBtnStatus('ON_CHANGES'));
 	}
 
@@ -75,6 +85,11 @@ const MenuCardManageMiniMenu = ({ item, buttonStyles, hovered = true, categoryOr
 				<MenuItem onMouseUp={handleCategoryVisibility}>
 					<Switch size="small" checked={visibility} sx={{ transform: 'translateX(-10px)' }} />
 					<Typography sx={{ transform: 'translateX(-5px)' }}>Visibility</Typography>
+				</MenuItem>
+
+				<MenuItem onMouseUp={handleTopCategory}>
+					<Switch size="small" checked={topMenu} sx={{ transform: 'translateX(-10px)' }} />
+					<Typography sx={{ transform: 'translateX(-5px)' }}>Top Menu</Typography>
 				</MenuItem>
 
 				<MenuItem onMouseUp={handleCloseExpandMore}>

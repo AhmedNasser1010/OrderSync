@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid'
 import Box from '@mui/material/Box';
 import {
 	DndContext,
@@ -112,7 +113,7 @@ const CategoryBody = ({ name }) => {
 			<AddNewItemDialog
 				dialogVisibility={dialogVisibility}
 				handleDialogClose={handleDialogClose}
-				initialValues={{ title: '', description: '', category: name, price: '', backgrounds: ['', '', '', '', ''], visibility: false }}
+				initialValues={{ id: uuidv4(), timestamp: Date.now(), title: '', description: '', category: name, price: '', backgrounds: ['', '', '', '', ''], visibility: false, topMenu: false }}
 			/>
 
 			<Button

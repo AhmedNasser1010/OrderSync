@@ -19,14 +19,18 @@ const getBusinessInfo = async (req, res, next) => {
       const finalData = {
         services: {
           openingHours: data.services.openingHours,
-          deliveryTax: data.services.deliveryTax,
-          isStrictOnline: data.services.isStrictOnline,
-          tempCloseMsg: data.services.tempCloseMsg
+          deliveryTax: data.services.deliveryTax
         },
         business: {
           latlng: data.business.latlng,
           name: data.business.name,
           address: data.business.address
+        },
+        settings: {
+          siteControl: {
+            isStrictOpen: data.settings.siteControl.isStrictOpen,
+            closeMsg: data.settings.siteControl.closeMsg
+          }
         }
       }
 

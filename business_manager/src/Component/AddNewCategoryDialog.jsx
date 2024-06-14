@@ -2,6 +2,7 @@ import { object, string, array } from 'yup';
 import { Formik, Form, Field } from 'formik';
 import { useDispatch } from 'react-redux';
 import { addCategory, updateCategory } from '../rtk/slices/menuSlice';
+import { v4 as uuidv4 } from 'uuid'
 import MuiTextField from "./MuiTextField.jsx";
 import Dialog from '@mui/material/Dialog';
 import Button from '@mui/material/Button';
@@ -21,7 +22,7 @@ const validationSchema = object({
 	description: string(),
 })
 
-const AddNewCategoryDialog = ({ dialogVisibility, handleDialogClose, initialValues = { title: '', description: '', backgrounds: ['', '', '', '', ''], visibility: false } }) => {
+const AddNewCategoryDialog = ({ dialogVisibility, handleDialogClose, initialValues = { id: uuidv4(), timestamp: Date.now(), title: '', description: '', backgrounds: ['', '', '', '', ''], visibility: false, topMenu: false } }) => {
 	const dispatch = useDispatch();
 
 	return (

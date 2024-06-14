@@ -147,6 +147,23 @@ export const menuSlice = createSlice({
         ],
       };
     },
+    topCategory: (state, { payload }) => {
+      return {
+        ...state,
+        categories: [
+          ...state.categories.map(category => {
+            if (category.title === payload.item.title) {
+              return {
+                ...category,
+                topMenu: payload.topMenuValue
+              }
+            } else {
+              return category;
+            }
+          })
+        ],
+      };
+    },
     itemVisibility: (state, { payload }) => {
       return {
         ...state,
@@ -156,6 +173,24 @@ export const menuSlice = createSlice({
               return {
                 ...item,
                 visibility: payload.visibilityValue
+              }
+            } else {
+              return item;
+            }
+          })
+        ],
+      };
+    },
+    topItem: (state, { payload }) => {
+      return {
+        ...state,
+        items: [
+          ...state.items.map(item => {
+            if (item.title === payload.item.title) {
+              console.log(item.title)
+              return {
+                ...item,
+                topMenu: payload.topMenuValue
               }
             } else {
               return item;
@@ -219,7 +254,9 @@ export const {
   removeCategory,
   removeItem,
   categoryVisibility,
+  topCategory,
   itemVisibility,
+  topItem,
   addNewCategoryBackgrounds,
   addNewItemBackgrounds
 } = menuSlice.actions;
