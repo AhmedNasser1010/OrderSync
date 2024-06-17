@@ -1,11 +1,11 @@
-import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
+import Box from '@mui/material/Box';
 
-const PageTitle = ({ title }) => {
+const PageTitle = ({ style, title }) => {
 	return (
 
-		<Box>
+		<Box sx={style}>
 			<Typography
 				variant="h2"
 				gutterBottom

@@ -1,17 +1,18 @@
-import { doc, setDoc } from "firebase/firestore"; 
-import { db } from "../firebase.js";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../firebase.js"
 
 const _addDoc = async (collectionName, data, accessToken) => {
   try {
 
-    await setDoc(doc(db, collectionName, accessToken), {...data});
-    return true;
+    await setDoc(doc(db, collectionName, accessToken), {...data})
 
+    return true
   } catch (error) {
 
-    console.error("Error adding document: ", error);
+    console.error("Error adding document: ", error)
 
+    return false
   } 
 }
 
-export default _addDoc;
+export default _addDoc

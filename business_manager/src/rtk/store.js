@@ -1,11 +1,12 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit'
 
 // Slices
-import userSlice from "./slices/userSlice.js";
-import menuSlice from "./slices/menuSlice.js";
-import conditionalValuesSlice from "./slices/conditionalValuesSlice.js";
-import ordersSlice from './slices/ordersSlice.js';
-import businessSlice from './slices/businessSlice.js';
+import userSlice from "./slices/userSlice.js"
+import menuSlice from "./slices/menuSlice.js"
+import conditionalValuesSlice from "./slices/conditionalValuesSlice.js"
+import ordersSlice from './slices/ordersSlice.js'
+import businessSlice from './slices/businessSlice.js'
+import workersSlice from './slices/workersSlice.js'
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     menu: menuSlice,
     conditionalValues: conditionalValuesSlice,
     orders: ordersSlice,
-    business: businessSlice
+    business: businessSlice,
+    workers: workersSlice,
   }
 });

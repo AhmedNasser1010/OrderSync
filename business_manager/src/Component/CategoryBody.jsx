@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid'
-import Box from '@mui/material/Box';
 import {
 	DndContext,
   KeyboardSensor,
@@ -25,6 +24,7 @@ import Button from '@mui/material/Button';
 import { addItem } from '../rtk/slices/menuSlice.js';
 import AddNewItemDialog from './AddNewItemDialog';
 import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice';
+import Box from '@mui/material/Box';
 
 const CategoryBody = ({ name }) => {
 	const dispatch = useDispatch();

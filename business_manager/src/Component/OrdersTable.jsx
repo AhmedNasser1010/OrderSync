@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import TableToolbar from './TableToolbar';
 import CustomTableHead from './CustomTableHead';
 import CustomTableRow from './CustomTableRow';
-import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -16,6 +15,7 @@ import TablePagination from '@mui/material/TablePagination';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Checkbox from '@mui/material/Checkbox';
+import Box from '@mui/material/Box';
 
 
 const descendingComparator = (a, b, orderBy) => {

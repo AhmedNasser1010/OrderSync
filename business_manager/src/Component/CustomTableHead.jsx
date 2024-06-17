@@ -3,8 +3,8 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Box from '@mui/material/Box';
 import { visuallyHidden } from '@mui/utils';
+import Box from '@mui/material/Box';
 
 const CustomTableHead = ({ onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, headCells }) => {
 

@@ -6,7 +6,6 @@ import stableSort from '../functions/stableSort'
 import DB_GET_DOC from '../functions/DB_GET_DOC'
 import priceAfterDiscount from '../functions/priceAfterDiscount'
 import ClosedOrdersRow from './ClosedOrdersRow'
-import Box from '@mui/material/Box'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import Toolbar from '@mui/material/Toolbar'
@@ -21,6 +20,7 @@ import Switch from '@mui/material/Switch'
 import Typography from '@mui/material/Typography'
 import Collapse from '@mui/material/Collapse'
 import TableSortLabel from '@mui/material/TableSortLabel';
+import Box from '@mui/material/Box'
 
 const descendingComparator = (a, b, orderBy) => {
 	if (b[orderBy] < a[orderBy]) {

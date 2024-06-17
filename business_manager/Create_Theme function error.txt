@@ -1,6 +1,0 @@
-how to fix Create_Theme function error
-
-1. Go to your project directory
-2. node_modules > vite > dist > client
-3. then select all and move to the truch
-4. Start your project again and keep coding :)

@@ -22,6 +22,7 @@ import Orders from './Orders';
 import Menu from "./Menu";
 import Settings from './Settings'
 import Login from "./Login";
+import Workers from "./Workers"
 
 function App() {
 	const dispatch = useDispatch();
@@ -35,7 +36,7 @@ function App() {
 				dispatch(addUser(userData));
 				DB_GET_DOC('menus', userData.accessToken).then(res => dispatch(addMenu(res)));
 				DB_GET_DOC('businesses', userData.accessToken).then(res => dispatch(initBusiness(res)));
-				navigate("/settings");
+				navigate("/workers");
 			}).catch(error => {
 				console.log(error);
 				navigate("/login");
@@ -70,6 +71,7 @@ function App() {
 					<Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
 					<Route path="/menu" element={<PrivateRoute><Menu /></PrivateRoute>} />
 					<Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+					<Route path="/workers" element={<PrivateRoute><Workers /></PrivateRoute>} />
 					<Route path="/login" element={<Login />} />
 				</Routes>
 

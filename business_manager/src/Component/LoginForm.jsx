@@ -7,8 +7,8 @@ import { addUser } from "../rtk/slices/userSlice.js";
 
 // MUI
 import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 
 // Components
 import MuiTextField from "./MuiTextField.jsx";

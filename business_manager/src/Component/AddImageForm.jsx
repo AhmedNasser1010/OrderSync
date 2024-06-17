@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -17,6 +16,7 @@ import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice.js';
 import fromKebabToTitle from '../functions/fromKebabToTitle.js';
 import IconedTitle from './IconedTitle';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import Box from '@mui/material/Box';
 
 // Validation schema
 const linksValidationSchema = array().of(string().required("link are required"));

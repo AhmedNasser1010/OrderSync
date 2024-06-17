@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import priceAfterDiscount from '../functions/priceAfterDiscount';
 import OrdersTable from './OrdersTable';
-import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import Box from '@mui/material/Box';
 
 const headCells = [
 	{
