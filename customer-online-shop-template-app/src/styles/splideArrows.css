@@ -1,0 +1,20 @@
+/* Custom styles for the arrow container */
+.splide__arrows {
+  position: absolute;
+  right: 10px;
+  top: -20px;
+  width: 100px;
+  opacity: 0.6;
+}
+
+/* Styles for the previous arrow */
+.splide__arrow--prev {}
+
+/* Styles for the next arrow */
+.splide__arrow--next {}
+
+/* Styles for the arrow icons */
+.splide__arrow svg {}
+
+/* Hover effect for arrows */
+.splide__arrow:hover {}
