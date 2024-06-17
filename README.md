@@ -3,49 +3,26 @@
 
 # OrderSync 🛵🔗
 
-**THE PROJECT WILL COMPLETED SOON! STAY TUNED**
+**Demo Version Ready To Use**
 
 ## 🔶 Table of Contents
 - [Diagrams](#🔶-diagrams)
 - [Description](#🔶-description)
-- [To Do List](#🔶-to-do-list)
 - [Technologies](#🔶-technologies)
-- [Products Apps](#🔶-products-apps)
+- [Applications](#🔶-Applications)
 - [Contributing](#🔶-contributing)
 - [Project Versions](#🔶-project-versions)
 - [License](#🔶-license)
 
 ## 🔶 Diagrams
-**Permission Levels and InterProcess Communication (IPS)**
-![permission-levels](images/permission-levels.png)
-![ips](images/ips.png)
+![applications](images/applications.jpg)
+![features](images/features.jpg)
+![app&forwho&usage](images/app&forwho&usage.jpg)
+![workflow](images/workflow.jpg)
+![order-journey](images/order-journey.jpg)
 
 ## 🔶 Description
 OrderSync is a cutting-edge ordering system meticulously crafted for developers and business owner. Seamlessly integrating into applications, it boasts a robust backend powered by Google Firebase ensuring secure authentication. With a blend of Google MatrialUI and JavaScript, coupled with the dynamic capailities of ReactJS, OrderSync delivers a streamlined and efficient online ordering experience. Simplify your development journey with OrderSync, where technology meets intuitive order management.
-
-## 🔶 To Do List
-### Project
-- Tasks 🎯
-	- To Do
-	- In Progress
-	- Done
-- Feature Development 🚀
-	- To Do
-	- In Progress
-	- Done
-- Bug Fixes 🐞
- 	- To Do
- 		- [ ] Fix, reinitilize values is not visible with selectbox and checkbox fields in update business page.
- 		- [ ] Fix, Warning: validateDOMNesting(...): < table > cannot appear as a descendant of < p >, in business management page.
- 		- [ ] Fix, Warning A uncontrolled input in update business page
-	 	- [ ] Fix, getDocs.js requests built on how many subcollection i have and react duble it more.
-	- In Progress
-- Brainstorming 🌪️
-	- [ ] Add tow new branches "Order Captain", "Delivery Captain".
-	- [ ] Add, Custom google maps zone select for delivery zones.
-	- [ ] Create, A basic documentation for the project apps.
-	- [ ] Create, A basic documentation for user_gateway API.
-  	- [ ] Add, method for admin to extract business data to Excel and google sheet.
 
 ## 🔶 Technologies
 
@@ -54,17 +31,17 @@ OrderSync is a cutting-edge ordering system meticulously crafted for developers 
 * MatrialUI
 * Firebase
 
-## 🔶 Products Apps
+## 🔶 Applications
 
-- [Business Creator (for developers like font-end developer).](businesses_creator/)
-- [Business Manager (for businesses owners and cashers).](businesses_manager/)
-- Order Captain (falls under Business Manager app ). **Still BackStage**
-- Delivery Captain (falls under Business Manager app ). **Still BackStage**
-- Customer Store (for the customer who will buy a products). **Still BackStage**
+- [Business Creator](businesses_creator/)
+- [Business Manager](businesses_manager/)
+- [Staff Application](staff_app/)
+- [Customer Online Shop Template App](customer_online_shop_template/)
 
 **Provided APIs:**
 - Business Manager API. **Still BackStage**
-- Customer Store API. **Still BackStage**
+- Staff Application API. **Still BackStage**
+- [Customer Shop Third-Party API](user_gateway/)
 
 ## 🔶 Contributing
 Thank you for considering contributing to our project! We welcome contributions from the developer community to enhance the functionality and features of our web application.
