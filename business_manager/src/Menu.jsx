@@ -33,17 +33,21 @@ import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
 import DB_GET_DOC from './functions/DB_GET_DOC';
 
 const Menu = () => {
+	const dispatch = useDispatch();
 	const [dialogVisibility, setDialogVisibility] = useState(false);
 	const categories = useSelector(state => state.menu.categories);
 	const menuValues = useSelector(state => state.menu);
 	const disableMenuDnD = useSelector(state => state.conditionalValues.disableMenuDnD);
 	const saveToCloudBtnStatus = useSelector(state => state.conditionalValues.saveToCloudBtnStatus);
 	const user = useSelector(state => state.user);
-	const dispatch = useDispatch();
 	const [indexes, setIndexes] = useState([]);
 	const [saveBtnStyles, setSaveBtnStyles] = useState({});
 	const [menuValuesSnapshot, setMenuValuesSnapshot] = useState(menuValues);
 	const [onceRun, setOnceRun] = useState(false);
+
+	useEffect(() => {
+		!categories.length && DB_GET_DOC('menus', user.accessToken).then(res => dispatch(addMenu(res)))
+	}, [])
 
 	// setup indexed from categories
 	useEffect(() => {

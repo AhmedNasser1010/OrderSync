@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 
 import { clearBusiness } from '../rtk/slices/businessSlice'
@@ -10,6 +11,7 @@ import AUTH_signout from '../functions/AUTH_signout'
 
 const useLogout = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const handleLogout = async () => {
     const res = await AUTH_signout()
@@ -20,6 +22,7 @@ const useLogout = () => {
       dispatch(clearUser())
       dispatch(clearStaff())
       dispatch(setUserRegisterStatus('LOGGED_OUT'))
+      navigate('/')
     }
   };
 

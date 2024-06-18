@@ -1,26 +1,22 @@
 // React Router
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 // Redux
 import { useDispatch } from "react-redux";
 import { clearUser } from '../rtk/slices/userSlice'
 import { clearMenu } from '../rtk/slices/menuSlice'
 
-// Functions
-import AUTH_signout from "../functions/AUTH_signout.js";
+import useLogout from '../hooks/useLogout'
 
 // Firebase
 import { auth } from "../firebase.js";
 
 const SideBarList = () => {
-	const navigate = useNavigate();
+	const logout = useLogout()
 	const dispatch = useDispatch();
 	
 	const handleSignout = () => {
-		dispatch(clearUser());
-		dispatch(clearMenu());
-		AUTH_signout();
-		navigate("/login");
+		logout()
 	}
 
 	return (
