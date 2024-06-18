@@ -10,6 +10,7 @@ import { initBusiness } from './rtk/slices/businessSlice.js';
 // Functions
 import startApp from "./functions/startApp.js";
 import DB_GET_DOC from './functions/DB_GET_DOC';
+import AUTH_signout from './functions/AUTH_signout'
 
 // Components
 import SideBar from "./Component/SideBar.jsx";
@@ -33,6 +34,12 @@ function App() {
 
 		startApp()
 			.then(userData => {
+				if (userData.userInfo.role !== 'BUSINESS_MANAGER') {
+          AUTH_signout()
+          navigate("/login")
+          return
+        }
+
 				dispatch(addUser(userData));
 				DB_GET_DOC('menus', userData.accessToken).then(res => dispatch(addMenu(res)));
 				DB_GET_DOC('businesses', userData.accessToken).then(res => dispatch(initBusiness(res)));

@@ -1,6 +1,4 @@
 import { auth } from "../firebase.js";
-import userRegRecordData from "./userRegRecordData.js";
-import _updateAnArray from "./_updateAnArray.js";
 import _getSubcollection from "./_getSubcollection.js";
 
 const startApp = async () => {
@@ -14,10 +12,6 @@ const startApp = async () => {
       unsubscribe();
     });
   });
-
-	// record user open app
-  const record = await userRegRecordData("OPEN_APP");
-  await _updateAnArray("users", uid, "registrationHistory", record);
 
 	// get user data
   const data = await _getSubcollection("users", uid);

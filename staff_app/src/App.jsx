@@ -12,6 +12,7 @@ import { db } from "./firebase.js";
 
 import LOGIN_IN_APP_STAR from './utils/LOGIN_IN_APP_STAR'
 import DB_GET_DOC from './utils/DB_GET_DOC'
+import AUTH_SIGNOUT from './utils/AUTH_SIGNOUT'
 
 import Login from './Login'
 import Signup from './Signup'
@@ -31,6 +32,12 @@ function App() {
     LOGIN_IN_APP_STAR()
     .then(res => {
       if (res) {
+        if (res.userInfo.role !== 'ORDER_CAPTAIN' || res.userInfo.role !== 'DELIVERY_CAPTAIN') {
+          AUTH_SIGNOUT()
+          navigate("/login")
+          return
+        }
+
         dispatch(addUser(res))
         dispatch(setUserRegisterStatus('LOGGED_IN'))
       } else {

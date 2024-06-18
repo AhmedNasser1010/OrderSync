@@ -5,8 +5,6 @@ import { auth } from "../firebase.js";
 
 import authSignOut from "./authSignOut.js";
 import _getSubcollection from "./_getSubcollection.js";
-import _updateAnArray from "./_updateAnArray.js";
-import userRegRecordData from "./userRegRecordData.js";
 
 const auth_loginUser = async (values, onSubmit) => {
 
@@ -22,10 +20,6 @@ const auth_loginUser = async (values, onSubmit) => {
     // auth login
     const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
     const userID = userCredential.user.uid;
-
-    // record user login
-    const record = await userRegRecordData("LOGIN");
-    _updateAnArray("users", userID, "registrationHistory", record);
 
     // get user data
     const data = await _getSubcollection("users", userID);

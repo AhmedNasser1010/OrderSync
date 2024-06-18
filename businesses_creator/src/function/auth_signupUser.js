@@ -4,20 +4,17 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase.js";
 
 import authSignOut from "./authSignOut.js";
-import userRegRecordData from "./userRegRecordData.js";
 
-
-const auth_signupUser = async (values, role = 'BUSINESSES_CREATOR', onSubmit) => {
+const auth_signupUser = async (values, onSubmit) => {
 
   try {
     
     let userData = {
-      accessToken: values.accessToken,
       userInfo: {
         uid: "",
         email: values.email,
         password: values.password,
-        role: role,
+        role: 'BUSINESSES_CREATOR',
       },
       registrationHistory: [],
       data: {
@@ -30,12 +27,10 @@ const auth_signupUser = async (values, role = 'BUSINESSES_CREATOR', onSubmit) =>
     const userCredential = await createUserWithEmailAndPassword(auth, values.email, values.password);
     const userID = userCredential.user.uid;
 
-    // record user signup
-    const record = await userRegRecordData("SIGNUP");
-    userData.registrationHistory[0] = record;
-
     // set user id
     userData.userInfo.uid = userID;
+
+    console.log('userData', userData)
 
     // store user in firestore
     const docRef = doc(db, "users", userID);

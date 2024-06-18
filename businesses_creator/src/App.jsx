@@ -7,6 +7,7 @@ import { addUser } from "./rtk/slices/userSlice.js";
 
 // Functions
 import startApp from "./function/startApp.js";
+import authSignOut from './function/authSignOut'
 
 // Components
 import SideBar from "./Component/SideBar.jsx";
@@ -30,6 +31,12 @@ function App() {
 
     startApp()
       .then(userData => {
+        if (userData.userInfo.role !== 'BUSINESSES_CREATOR') {
+          authSignOut()
+          navigate("/login")
+          return
+        }
+
         dispatch(addUser(userData));
         navigate("/");
       }).catch(error => {
