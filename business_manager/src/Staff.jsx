@@ -3,7 +3,7 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "./firebase.js"
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
-import { initWorkers, newWorkers } from './rtk/slices/workersSlice'
+import { initStaff, newStaff } from './rtk/slices/staffSlice'
 
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import PeopleIcon from '@mui/icons-material/People'
@@ -18,7 +18,7 @@ import Container from './Component/Container'
 import MUITable from './Component/MUITable'
 import PageTitle from './Component/PageTitle'
 import TableTitle from './Component/TableTitle'
-import WorkersTableActions from './Component/WorkersTableActions'
+import StaffTableActions from './Component/StaffTableActions'
 import AddNewWorkerDialog from './Component/AddNewWorkerDialog'
 
 const headCells = [
@@ -52,10 +52,10 @@ const headCells = [
 	},
 ]
 
-function Workers() {
+function Staff() {
 	const dispatch = useDispatch()
 	const accessToken = useSelector(state => state.user.accessToken)
-	const workers = useSelector(state => state.workers)
+	const staff = useSelector(state => state.staff)
 	const [rowCells, setRowCells] = useState([])
 	const [dialogIsOpen, setDialogIsOpen] = useState(false)
 
@@ -80,27 +80,27 @@ function Workers() {
 			}
 		}
 
-		!workers.length && fetchUsers().then(res => dispatch(initWorkers(res)))
+		!staff.length && fetchUsers().then(res => dispatch(initStaff(res)))
 	}, [])
 
 	useEffect(() => {
-		const rowCellsMap = workers.map(user => {
+		const rowCellsMap = staff.map(user => {
 			const id = user.userInfo.uid
 			const name = user.userInfo.name || ''
 			const email = user.userInfo.email
 			const phone = user.userInfo.phone || ''
 			const role = user.userInfo.role
 
-			return { id, name, email, phone, role, action: <WorkersTableActions id={id} /> }
+			return { id, name, email, phone, role, action: <StaffTableActions id={id} /> }
 		})
 
 		setRowCells(rowCellsMap)
-	}, [workers])
+	}, [staff])
 
 	return (
 
 		<Container>
-			<PageTitle title='Workers' style={{ marginBottom: '50px' }} />
+			<PageTitle title='Staff' style={{ marginBottom: '50px' }} />
 
 			<TableTitle
 				title='Worker Action'
@@ -123,4 +123,4 @@ function Workers() {
 	)
 }
 
-export default Workers
+export default Staff

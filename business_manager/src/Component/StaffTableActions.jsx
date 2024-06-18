@@ -6,14 +6,14 @@ import IconButton from '@mui/material/IconButton'
 import Tooltip from '@mui/material/Tooltip'
 
 import DB_DELETE_SUBCOLLECTION from '../functions/DB_DELETE_SUBCOLLECTION'
-import { deleteWorker } from '../rtk/slices/workersSlice'
+import { deleteWorker } from '../rtk/slices/staffSlice'
 
 const Parent = styled.div``
 const Icon = styled.div``
 
-function WorkersTableActions({ id }) {
+function StaffTableActions({ id }) {
 	const dispatch = useDispatch()
-	const workers = useSelector(state => state.workers)
+	const staff = useSelector(state => state.staff)
 
 	const handleDeleteWorker = () => {
 		DB_DELETE_SUBCOLLECTION('users', id)
@@ -35,4 +35,4 @@ function WorkersTableActions({ id }) {
 	)
 }
 
-export default WorkersTableActions
+export default StaffTableActions

@@ -4,7 +4,7 @@ import { clearBusiness } from '../rtk/slices/businessSlice'
 import { clearMenu } from '../rtk/slices/menuSlice'
 import { clearOrders } from '../rtk/slices/ordersSlice'
 import { clearUser } from '../rtk/slices/userSlice'
-import { clearWorkers } from '../rtk/slices/workersSlice'
+import { clearStaff } from '../rtk/slices/staffSlice'
 import { setUserRegisterStatus } from '../rtk/slices/conditionalValuesSlice'
 import AUTH_signout from '../functions/AUTH_signout'
 
@@ -18,7 +18,7 @@ const useLogout = () => {
       dispatch(clearMenu())
       dispatch(clearOrders())
       dispatch(clearUser())
-      dispatch(clearWorkers())
+      dispatch(clearStaff())
       dispatch(setUserRegisterStatus('LOGGED_OUT'))
     }
   };

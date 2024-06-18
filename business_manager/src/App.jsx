@@ -23,7 +23,7 @@ import User from "./User";
 import Orders from './Orders';
 import Menu from "./Menu";
 import Settings from './Settings'
-import Workers from "./Workers"
+import Staff from "./Staff"
 import Login from "./Login";
 import Signup from './Signup';
 import NoBusinessFound from './Component/NoBusinessFound';
@@ -51,7 +51,7 @@ function App() {
 					dispatch(addUser(userData));
 					DB_GET_DOC('menus', userData.accessToken).then(res => dispatch(addMenu(res)));
 					DB_GET_DOC('businesses', userData.accessToken).then(res => dispatch(initBusiness(res)));
-					navigate("/workers");
+					navigate("/staff");
 
 				} else {
 					dispatch(setUserRegisterStatus('LOGGED_IN_NO_BUSINESS'))
@@ -100,7 +100,7 @@ function App() {
 								<Route path="/orders" element={<Orders />} />
 								<Route path="/menu" element={<Menu />} />
 								<Route path="/settings" element={<Settings />} />
-								<Route path="/workers" element={<Workers />} />
+								<Route path="/staff" element={<Staff />} />
 							</Routes>
 						</div>
 					</>

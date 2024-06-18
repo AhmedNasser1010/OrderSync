@@ -1,18 +1,9 @@
 import { auth } from "../firebase.js";
 import { signOut } from "firebase/auth";
 
-import userRegRecordData from "./userRegRecordData.js";
-import _updateAnArray from "./_updateAnArray.js";
-
-const AUTH_signout = async (recordProcess = true) => {
+const AUTH_signout = async () => {
 	try {
 		if (auth.currentUser) {
-
-			if (recordProcess) {
-				// record user logout
-				const record = await userRegRecordData("LOGOUT");
-				_updateAnArray("users", auth.currentUser.uid, "registrationHistory", record);
-			}
 
 			// signout process
 			signOut(auth)

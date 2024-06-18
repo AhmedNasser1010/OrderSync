@@ -12,7 +12,7 @@ import MenuItem from '@mui/material/MenuItem'
 
 import MuiTextField from "./MuiTextField.jsx"
 
-import { newWorkers } from '../rtk/slices/workersSlice'
+import { newStaff } from '../rtk/slices/staffSlice'
 import _addDoc from '../functions/_addDoc'
 import workerSchema from '../schemas/workerSchema'
 
@@ -61,7 +61,7 @@ const NewWorkerForm = ({ handleDialogOpenClose }) => {
 				_addDoc('users', data, values.uid)
 				.then(res => {
 					if (res) {
-						dispatch(newWorkers(data))
+						dispatch(newStaff(data))
 						handleDialogOpenClose()
 					}
 				})

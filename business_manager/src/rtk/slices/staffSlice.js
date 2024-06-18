@@ -1,16 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-export const workersSlice = createSlice({
-  name: 'workers',
+export const staffSlice = createSlice({
+  name: 'staff',
   initialState: [],
   reducers: {
-    initWorkers: (state, { payload }) => {
+    initStaff: (state, { payload }) => {
       return payload
     },
-    clearWorkers: () => {
+    clearStaff: () => {
       return []
     },
-    newWorkers: (state, { payload }) => {
+    newStaff: (state, { payload }) => {
       return [
         ...state,
         payload
@@ -24,10 +24,10 @@ export const workersSlice = createSlice({
 
 
 export const {
-	initWorkers,
-	clearWorkers,
-  newWorkers,
+	initStaff,
+	clearStaff,
+  newStaff,
   deleteWorker
-} = workersSlice.actions
+} = staffSlice.actions
 
-export default workersSlice.reducer
+export default staffSlice.reducer
