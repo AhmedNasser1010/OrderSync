@@ -3,7 +3,7 @@
 
 # OrderSync 🛵🔗
 
-**Demo Version Ready To Use**
+[**Demo Version Ready To Use**](demo-test.md)
 
 ## 🔶 Table of Contents
 - [Diagrams](#🔶-diagrams)
