@@ -26,7 +26,7 @@ import AddNewItemDialog from './AddNewItemDialog';
 import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice';
 import Box from '@mui/material/Box';
 
-const CategoryBody = ({ name }) => {
+const CategoryBody = ({ name, categoryID }) => {
 	const dispatch = useDispatch();
 	const disableMenuDnD = useSelector(state => state.conditionalValues.disableMenuDnD);
 	const items = useSelector(state => state.menu.items);
@@ -38,7 +38,7 @@ const CategoryBody = ({ name }) => {
 	// setup filtered items by filter all items with spicific category
 	useEffect(() => {
 		let result = [];
-		items.map(item => item.category === name && result.push(item));
+		items.map(item => item.category === categoryID && result.push(item));
 		setFilteredItems(result);
 	}, [items])
 
@@ -113,7 +113,7 @@ const CategoryBody = ({ name }) => {
 			<AddNewItemDialog
 				dialogVisibility={dialogVisibility}
 				handleDialogClose={handleDialogClose}
-				initialValues={{ id: uuidv4(), timestamp: Date.now(), title: '', description: '', category: name, price: '', backgrounds: ['', '', '', '', ''], visibility: false, topMenu: false }}
+				initialValues={{ id: uuidv4(), timestamp: Date.now(), title: '', description: '', category: categoryID, price: '', backgrounds: ['', '', '', '', ''], visibility: false, topMenu: false }}
 			/>
 
 			<Button

@@ -88,7 +88,7 @@ const AddNewItemDialog = ({ dialogVisibility, handleDialogClose, initialValues }
 									>
 										{categories.map(category => (
 
-											<MenuItem key={category.title} value={category.title}>{ fromKebabToTitle(category.title) }</MenuItem>
+											<MenuItem key={category.id} value={category.id}>{ fromKebabToTitle(category.title) }</MenuItem>
 
 										))}
 									</Field>

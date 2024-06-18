@@ -47,7 +47,7 @@ const MenuCard = ({ item }) => {
 
 			</Paper>
 			<Collapse in={expanded}>
-				<CategoryBody name={item?.title} />
+				<CategoryBody name={item?.title} categoryID={item?.id} />
 			</Collapse>
 		</Box>
 

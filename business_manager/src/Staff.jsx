@@ -103,10 +103,10 @@ function Staff() {
 			<PageTitle title='Staff' style={{ marginBottom: '50px' }} />
 
 			<TableTitle
-				title='Worker Action'
-				titleBody='Add a new worker to your business'
+				title='Staff Action'
+				titleBody='Add a new staff member to your business'
 				action={{
-					title: 'new worker',
+					title: 'New Staff Member',
 					startIcon: <PersonAddIcon />,
 					callback: handleDialogOpenClose
 				}}
