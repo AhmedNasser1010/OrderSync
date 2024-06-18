@@ -8,7 +8,7 @@ import Stack from '@mui/material/Stack';
 // Components
 import RegistrationForm from './Component/RegistrationForm.jsx';
 
-const Login = () => {
+const Signup = () => {
 	return (
 
 		<Paper
@@ -23,10 +23,10 @@ const Login = () => {
 			}}
 		>
 			<Stack sx={{ width: '100%' }}>
-				<Typography variant='h1' gutterBottom>Login</Typography>
+				<Typography variant='h1' gutterBottom>Signup</Typography>
 
-				<RegistrationForm action='login' />
-				<p>You have no account <Link to='/signup' style={{ color: 'blue' }}>Signup a new one</Link></p>
+				<RegistrationForm action='signup' />
+				<p>Already have account <Link to='/login' style={{ color: 'blue' }}>Login</Link></p>
 
 			</Stack>
 		</Paper>
@@ -34,4 +34,4 @@ const Login = () => {
 	)
 }
 
-export default Login;
+export default Signup;

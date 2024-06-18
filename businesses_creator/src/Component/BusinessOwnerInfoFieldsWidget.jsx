@@ -53,14 +53,6 @@ const BusinessOwnerInfoFieldsWidget = ({ businessOwnerInfoValues, initialValues,
 			initialValues={initialValues}
 			validationSchema={businessOwnerInfoValidationSchema}
 			onSubmit={values => {
-				// !!!!! Here should we have a function to check if the user email is used before !!!!!
-				// if (values.contact.email !== ####) {
-				// 	setReadyToSubmit(true);
-				// 	businessOwnerInfoValues({...values}, "owner");	
-				// } else {
-				// 	setReadyToSubmit(false);
-				// 	setAuthError("email is used before")
-				// }
 				setReadyToSubmit(true);
 				businessOwnerInfoValues({...values}, "owner");
 			}}
@@ -98,8 +90,7 @@ const BusinessOwnerInfoFieldsWidget = ({ businessOwnerInfoValues, initialValues,
 								sx={{ marginBottom: "0.5rem" }}
 							/>
 							<Field
-								{ ...muiTextFieldProps(errors, touched, values, 'password', 'Password') }
-								type="password"
+								{ ...muiTextFieldProps(errors, touched, values, 'uid', 'User ID') }
 								sx={{ marginBottom: "0.5rem" }}
 							/>
 						</Stack>

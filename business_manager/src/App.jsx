@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addUser } from "./rtk/slices/userSlice.js";
 import { addMenu } from './rtk/slices/menuSlice.js';
 import { initBusiness } from './rtk/slices/businessSlice.js';
+import { setUserRegisterStatus } from './rtk/slices/conditionalValuesSlice'
 
 // Functions
 import startApp from "./functions/startApp.js";
@@ -22,30 +23,43 @@ import User from "./User";
 import Orders from './Orders';
 import Menu from "./Menu";
 import Settings from './Settings'
-import Login from "./Login";
 import Workers from "./Workers"
+import Login from "./Login";
+import Signup from './Signup';
+import NoBusinessFound from './Component/NoBusinessFound';
 
 function App() {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 	const saveToCloudBtnStatus = useSelector(state => state.conditionalValues.saveToCloudBtnStatus);
+	const userRegisterStatus = useSelector(state => state.conditionalValues.userRegisterStatus)
+
 
 	useEffect(() => {
 
 		startApp()
 			.then(userData => {
-				if (userData.userInfo.role !== 'BUSINESS_MANAGER') {
-          AUTH_signout()
-          navigate("/login")
-          return
-        }
+				if (userData) {
+					if (userData.userInfo.role !== 'BUSINESS_MANAGER') {
+						dispatch(setUserRegisterStatus('LOGGED_OUT'))
+						AUTH_signout()
+						navigate("/login")
+						return
+					}
 
-				dispatch(addUser(userData));
-				DB_GET_DOC('menus', userData.accessToken).then(res => dispatch(addMenu(res)));
-				DB_GET_DOC('businesses', userData.accessToken).then(res => dispatch(initBusiness(res)));
-				navigate("/workers");
+					dispatch(setUserRegisterStatus('LOGGED_IN'))
+					dispatch(addUser(userData));
+					DB_GET_DOC('menus', userData.accessToken).then(res => dispatch(addMenu(res)));
+					DB_GET_DOC('businesses', userData.accessToken).then(res => dispatch(initBusiness(res)));
+					navigate("/workers");
+
+				} else {
+					dispatch(setUserRegisterStatus('LOGGED_IN_NO_BUSINESS'))
+				}
+
 			}).catch(error => {
 				console.log(error);
+				dispatch(setUserRegisterStatus('LOGGED_OUT'))
 				navigate("/login");
 			})
 
@@ -63,28 +77,48 @@ function App() {
 		return () => {
 			window.removeEventListener('beforeunload', handleBeforeUnload);
 		};
-	}, [saveToCloudBtnStatus]);
+	}, [saveToCloudBtnStatus])
+
+	 useEffect(() => {
+    userRegisterStatus === 'LOGGED_OUT' && navigate('/login')
+    userRegisterStatus === 'LOGGED_IN_NO_BUSINESS' && navigate('/')
+    userRegisterStatus === 'LOGGED_IN' && navigate('/user')
+  }, [userRegisterStatus])
 
 
 	return (
 
 		<>
-			<div className="side-bar-container"><SideBar /></div>
-			<div className="content">
-				
-				<Routes>
-					<Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
-					<Route path="/user" element={<PrivateRoute><User /></PrivateRoute>} />
-					<Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
-					<Route path="/menu" element={<PrivateRoute><Menu /></PrivateRoute>} />
-					<Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
-					<Route path="/workers" element={<PrivateRoute><Workers /></PrivateRoute>} />
-					<Route path="/login" element={<Login />} />
-				</Routes>
+			{
+				userRegisterStatus === 'LOGGED_IN' &&
+					<>
+						<div className="side-bar-container"><SideBar /></div>
+						<div className="content">
+							<Routes>
+								<Route path="/" element={<Home />} />
+								<Route path="/user" element={<User />} />
+								<Route path="/orders" element={<Orders />} />
+								<Route path="/menu" element={<Menu />} />
+								<Route path="/settings" element={<Settings />} />
+								<Route path="/workers" element={<Workers />} />
+							</Routes>
+						</div>
+					</>
+			}
 
-			</div>
+			{
+				userRegisterStatus === 'LOGGED_OUT' &&
+					<Routes>
+						<Route path="/login" element={<Login />} />
+						<Route path="/signup" element={<Signup />} />
+					</Routes>
+			}
+
+			{
+				userRegisterStatus === 'LOGGED_IN_NO_BUSINESS' && <Routes><Route path='/' element={<NoBusinessFound />} /></Routes>
+			}
 			
-		</>
+	</>
 
 	);
 }

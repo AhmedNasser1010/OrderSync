@@ -4,8 +4,6 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase.js";
 
 import DB_GET_DOC from "./DB_GET_DOC.js";
-import _updateAnArray from "./_updateAnArray.js";
-import userRegRecordData from "./userRegRecordData.js";
 
 // Functions
 import AUTH_signout from "./AUTH_signout.js";
@@ -21,25 +19,23 @@ const AUTH_loginUser = async (values, onSubmit) => {
 
     } else {
 
-    // auth login
-    const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-    const userID = userCredential.user.uid;
+      // auth login
+      const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+      const userID = userCredential.user.uid;
+      const data = await DB_GET_DOC("users", userID);
 
-    // record user login
-    const record = await userRegRecordData("LOGIN");
-    _updateAnArray("users", userID, "registrationHistory", record);
+      if (data) {
+        // check if the login user are business owner
+        if (data.userInfo.role !== "BUSINESS_MANAGER") {
+          AUTH_signout(false);
+          onSubmit(false, "auth/invalid-credential");
+          return;
+        }
 
-    // get user data
-    const data = await DB_GET_DOC("users", userID);
-
-    // check if the login user are business owner
-    if (data.userInfo.role !== "BUSINESS_MANAGER") {
-      AUTH_signout(false);
-      onSubmit(false, "auth/invalid-credential");
-      return;
-    }
-
-    onSubmit(true, undefined, data);
+        onSubmit(true, undefined, data);
+      } else {
+        onSubmit(true, undefined, null)
+      }
 
     }
 

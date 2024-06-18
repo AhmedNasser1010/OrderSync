@@ -15,8 +15,13 @@ const startApp = async () => {
 
 	// get user data
   const data = await DB_GET_DOC("users", uid)
+
+  if (data) {
+    return data
+  } else {
+    return false
+  }
   
-  return data
 }
 
 export default startApp

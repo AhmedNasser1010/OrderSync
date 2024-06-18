@@ -6,7 +6,8 @@ export const conditionalValuesSlice = createSlice({
     disableMenuDnD: false,
     saveToCloudBtnStatus: 'ON_SAVED',
     settingsSaveToCloude: 'ON_SAVED',
-    savingOrdersTimer: 5
+    savingOrdersTimer: 5,
+    userRegisterStatus: 'LOGGED_OUT'
   },
   reducers: {
     setDisableMenuDnD: (state, { payload }) => {
@@ -26,6 +27,9 @@ export const conditionalValuesSlice = createSlice({
     },
     savingOrdersTimerIsLoading: (state, { payload }) => {
       return { ...state, savingOrdersTimer: 'Saving' }
+    },
+    setUserRegisterStatus: (state, { payload }) => {
+      return { ...state, userRegisterStatus: payload }
     }
   },
 })
@@ -37,7 +41,8 @@ export const {
   setSettingsSaveToCloudeStatus,
   decreaseSavingOrdersTimer,
   resetSavingOrdersTimer,
-  savingOrdersTimerIsLoading
+  savingOrdersTimerIsLoading,
+  setUserRegisterStatus
 } = conditionalValuesSlice.actions;
 
 export default conditionalValuesSlice.reducer;

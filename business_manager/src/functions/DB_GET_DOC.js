@@ -13,13 +13,12 @@ const DB_GET_DOC = async (collectionName, subCollectionID) => {
       return docSnap.data();
 
     } else {
-
-      console.error("Firestore: Document does not exist");
-
+      return false
     }
 
   } catch (error) {
     console.error(error);
+    return false
   }
 }
 

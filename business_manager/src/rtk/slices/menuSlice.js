@@ -1,28 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  items: [],
-  categories: [],
-};
-
-// const initialState = {
-//   items: [
-//     { title: 'Espresso', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 2.50, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
-//     { title: 'Cappuccino', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 3.50, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
-//     { title: 'Chai', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'hot-drinks', price: 1.00, backgrounds: ['', '', '', '', ''], visibility: true },
-//     { title: 'Iced Latte', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 4.00, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
-//     { title: 'Cold Brew', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', category: 'cold-drinks', price: 3.75, backgrounds: ['http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50', 'http://via.placeholder.com/50x50'], visibility: true },
-//   ],
-//   categories: [
-//     { title: 'hot-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['http://via.placeholder.com/50x50', '', '', '', ''], visibility: true },
-//     { title: 'cold-drinks', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['', '', '', '', ''], visibility: true },
-//     { title: 'other', description: 'Lorem ipsum dolor sit, amet consectetur, adipisicing elit.', backgrounds: ['', '', '', '', ''], visibility: false },
-//   ],
-// };
-
 export const menuSlice = createSlice({
   name: 'menu',
-  initialState: initialState,
+  initialState: {
+    items: [],
+    categories: [],
+  },
   reducers: {
     addMenu: (state, { payload }) => {
       return {...payload};
@@ -187,7 +170,6 @@ export const menuSlice = createSlice({
         items: [
           ...state.items.map(item => {
             if (item.title === payload.item.title) {
-              console.log(item.title)
               return {
                 ...item,
                 topMenu: payload.topMenuValue

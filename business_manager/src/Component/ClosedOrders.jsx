@@ -84,7 +84,10 @@ function ClosedOrders() {
 	const [rows, setRows] = useState([])
 
 	useEffect(() => {
-		closedOrders.length === 0 && DB_GET_DOC('orders', accessToken).then(res => dispatch(setClosedOrders(res.closed)))
+		closedOrders.length === 0 && DB_GET_DOC('orders', accessToken)
+		.then(res => {
+			res && dispatch(setClosedOrders(res.closed))
+		})
 	}, [])
 
 	useEffect(() => {

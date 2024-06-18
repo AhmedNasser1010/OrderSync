@@ -4,7 +4,6 @@ import { setOpenedOrders, newTestOrder } from './rtk/slices/ordersSlice';
 import { resetSavingOrdersTimer, decreaseSavingOrdersTimer, savingOrdersTimerIsLoading } from './rtk/slices/conditionalValuesSlice';
 import DB_GET_DOC from './functions/DB_GET_DOC';
 import _updateAnArray from './functions/_updateAnArray';
-import returnTestOrder from './functions/returnTestOrder';
 import PageTitle from './Component/PageTitle';
 import CustomTabPanel from './Component/CustomTabPanel';
 import Box from '@mui/material/Box';
@@ -22,9 +21,11 @@ import ClosedOrders from './Component/ClosedOrders';
 
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "./firebase.js";
+import useDummyOrder from './hooks/useDummyOrder'
 
 
 const Orders = () => {
+	const dummyOrder = useDummyOrder()
 	const dispatch = useDispatch();
 	const [tabValue, setTabValue] = useState(0);
 	const accessToken = useSelector(state => state.user.accessToken);
@@ -49,7 +50,9 @@ const Orders = () => {
 		const docRef = doc(db, 'orders', accessToken);
 
 		const unsub = onSnapshot(docRef, doc => {
-			dispatch(setOpenedOrders(doc.data().open));
+			if (doc.exists()) {
+				doc.data().open.length > 0 && dispatch(setOpenedOrders(doc.data().open))
+			}
 		})
 
 		return () => {
@@ -64,9 +67,10 @@ const Orders = () => {
 	}
 
 	const handleAddTestOrder = () => {
-		const dummyOrder = returnTestOrder();
-		_updateAnArray('orders', accessToken, 'open', dummyOrder);
-		dispatch(newTestOrder(dummyOrder));
+		if (dummyOrder) {
+			_updateAnArray('orders', accessToken, 'open', dummyOrder)
+			dispatch(newTestOrder(dummyOrder))
+		}
 	}
 
 	return (

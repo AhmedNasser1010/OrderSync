@@ -70,7 +70,7 @@ export const businessOwnerInfoValidationSchema = object({
   	phone: string().required("Phone number is required").matches(phoneNumberRegex, 'Phone number is not valid. Example: +201117073085'),
   	address: string().required("Addres is required"),
   }),
-  password: string().required("Password is required").min(6, "Password is too short").max(30, "Password is too long"),
+  uid: string().required("User ID is required"),
 });
 
 export const businessPaymentMethodsValidationSchema = object({
@@ -96,7 +96,7 @@ const AddNewBusiness = () => {
 	const [isSubmited, setIsSubmited] = useState(false);
 	const [submitColor, setSubmitColor] = useState(undefined);
   const [businessValues, setBusinessValues] = useState({
-  	accessToken: `${uuidv4()}_${auth.currentUser.uid}`,
+  	accessToken: uuidv4(),
   	business: {
 			name: '',
 			industry: '',
@@ -115,7 +115,7 @@ const AddNewBusiness = () => {
 				phone: '',
 				address: '',
 			},
-			password: '',
+			uid: '',
 		},
 		services: {
 			openingHours: {
@@ -165,7 +165,7 @@ const AddNewBusiness = () => {
   			
   			dispatch(addBusiness(businessValues));
 				dispatch(pushAccesTokenToTheUser(businessValues.accessToken));
-				navigate("/login");
+				navigate("/businesses");
   		})
   		.catch(error => {
   			setSubmitErrorVisibility(true);
