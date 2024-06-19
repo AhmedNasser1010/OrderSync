@@ -29,7 +29,7 @@ const getMenu = async (req, res, next) => {
       apiData = {
         ...apiData,
         items: apiData.items.filter(item =>
-          apiData.categories.some(category => item.category === category.title)
+          apiData.categories.some(category => item.category === category.id)
         )
       }
 

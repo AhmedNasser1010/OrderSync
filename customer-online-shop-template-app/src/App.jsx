@@ -13,7 +13,7 @@ import Home from './Home'
 import Checkout from './Checkout'
 
 const API_URL = 'https://ordersync-demo.onrender.com/api/'
-const X_SECRET_KEY = 'c7075de1-4683-4844-93f4-e1518044330a_JQMI4Qnft7WKe56Yg5bkjtTQsAA3'
+const X_SECRET_KEY = '4d10754c-0a04-492c-9f41-df7ed0ca580e'
 
 function App() {
   const dispatch = useDispatch()
@@ -31,11 +31,12 @@ function App() {
       redirect: "follow"
     };
 
-    !menu.items && !menu.items && fetch(`${API_URL}menu`, requestOptions)
+    if (menu.items.length === 0 || menu.categories.length === 0 ) {
+    fetch(`${API_URL}menu`, requestOptions)
       .then(res => res.json())
       .then(result => dispatch(setMenu(result)))
-      .catch(error => console.error(error))
-    
+      .catch(error => console.error(error))  
+    }
   }, [])
 
   useEffect(() => {

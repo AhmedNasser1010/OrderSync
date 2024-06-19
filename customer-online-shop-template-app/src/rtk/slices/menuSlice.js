@@ -2,13 +2,19 @@ import { createSlice } from '@reduxjs/toolkit';
 
 export const menuSlice = createSlice({
   name: 'cart',
-  initialState: {},
+  initialState: {
+    items: [],
+    categories: []
+  },
   reducers: {
     setMenu: (state, { payload }) => {
       return payload;
     },
     clearMenu: (state, { payload }) => {
-      return {};
+      return {
+        items: [],
+        categories: []
+      }
     }
   },
 })

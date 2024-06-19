@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useState, useEffect, useMemo } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../rtk/slices/cartSlice'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -121,6 +121,7 @@ const PriceAfter = styled.span`
 function MenuCardOnWindow({ item, toggleWindow }) {
 	const dispatch = useDispatch()
 	const { id, title, backgrounds, description, rating, category, price, discount } = item
+	const categories = useSelector(state => state.menu.categories)
 	const [itemQuantity, setItemQuantity] = useState(1)
 	const [itemPrice, setItemPrice] = useState(price)
 
@@ -131,6 +132,10 @@ function MenuCardOnWindow({ item, toggleWindow }) {
 		}))
 		toggleWindow()
 	}
+
+	const selectedCategory = useMemo(() => {
+		return categories.filter(cate => cate.id === category)[0]
+	}, [categories])
 
 	const handleItemQuantity = (plus) => {
 		if (plus) {
@@ -165,7 +170,7 @@ function MenuCardOnWindow({ item, toggleWindow }) {
 					</Rating>
 					<Category>
 						<div>
-							<p>{ category }</p>
+							<p>{ selectedCategory.title }</p>
 							<SubmitBtn onMouseUp={handleAddToCart}>Place Order</SubmitBtn>
 						</div>
 						<Price>

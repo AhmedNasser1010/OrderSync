@@ -97,6 +97,12 @@ const AddNewBusiness = () => {
 	const [submitColor, setSubmitColor] = useState(undefined);
   const [businessValues, setBusinessValues] = useState({
   	accessToken: uuidv4(),
+  	settings: {
+  		siteControl: {
+  			closeMsg: '',
+  			isStrictOpen: true,
+  		},
+  	},
   	business: {
 			name: '',
 			industry: '',

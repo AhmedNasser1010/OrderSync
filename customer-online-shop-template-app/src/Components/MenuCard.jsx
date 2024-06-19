@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
+import { useSelector } from 'react-redux'
 
 import priceAfterDiscount from '../utils/priceAfterDiscount'
 
@@ -60,6 +61,11 @@ const PriceAfter = styled.span``
 
 function MenuCard({ style, onMouseUp, data }) {
 	const { id, title, perviewImage, rating, category, price, discount } = data
+	const categories = useSelector(state => state.menu.categories)
+
+	const selectedCategory = useMemo(() => {
+		return categories.filter(cate => cate.id === category)[0]
+	}, [categories])
 
 	return (
 
@@ -78,7 +84,7 @@ function MenuCard({ style, onMouseUp, data }) {
 					{ rating }
 				</RatingContainer>
 				<Category>
-					<p>{ category }</p>
+					<p>{ selectedCategory.title }</p>
 					<Price>
 						{ !discount &&
 							<p>

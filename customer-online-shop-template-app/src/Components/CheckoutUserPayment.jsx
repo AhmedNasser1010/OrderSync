@@ -15,7 +15,7 @@ import CheckoutPageTitle from './CheckoutPageTitle'
 import PopupWindow from './PopupWindow'
 
 const API_URL = 'https://ordersync-demo.onrender.com/api/'
-const X_SECRET_KEY = 'c7075de1-4683-4844-93f4-e1518044330a_JQMI4Qnft7WKe56Yg5bkjtTQsAA3'
+const X_SECRET_KEY = '4d10754c-0a04-492c-9f41-df7ed0ca580e'
 
 const Payment = styled.div``
 const RadioFormWrapper = styled.div`
