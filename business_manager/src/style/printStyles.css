@@ -1,0 +1,24 @@
+@media print {
+  .page-end {
+    page-break-before: always;
+  }
+  /*h1, h3, h4 {
+    page-break-before: always;
+  }*/
+  /*p, span, td, th {
+    page-break-inside: avoid;
+  }*/
+  /*table {
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }*/
+  /*thead {
+    display: table-header-group;
+  }
+  tfoot {
+    display: table-footer-group;
+  }*/
+}

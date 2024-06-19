@@ -1,5 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useReactToPrint } from 'react-to-print';
+import styled from 'styled-components'
 import DB_UPDATE_NESTED_VALUE from '../functions/DB_UPDATE_NESTED_VALUE';
 import _updateAnArray from '../functions/_updateAnArray';
 import { changeOrderState, deleteOrder, setOpenedOrders, storeOrder } from '../rtk/slices/ordersSlice';
@@ -11,7 +13,14 @@ import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import NextPlanIcon from '@mui/icons-material/NextPlan';
 import AddchartIcon from '@mui/icons-material/Addchart';
+import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded'
 import Button from '@mui/material/Button';
+
+import Invoice from './Invoice'
+
+const InvoiceLayer = styled.div`
+	display: none;
+`
 
 const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 	const dispatch = useDispatch();
@@ -24,6 +33,34 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 	const openOrdersCounter = useRef(0);
 	const closedOrdersCounter = useRef(0);
 	const [finalDayClosedOrderRecord, setFinalDayClosedOrderRecord] = useState({});
+	const componentRef = useRef(null)
+	const business = useSelector(state => state.business)
+	const menu = useSelector(state => state.menu.items)
+
+	const orders = useMemo(() => {
+		let ordersMap = []
+		selected?.map(id => openOrders.map(order => order.id === id && ordersMap.push(order)))
+
+	  return ordersMap?.map(order => {
+	    const selectedMenuItems = order.cart.map(cartItem => {
+	      const menuItem = menu.find(menuItem => menuItem.id === cartItem.id)
+	      return menuItem ? { ...menuItem, quantity: cartItem.quantity } : null
+	    }).filter(item => item !== null)
+
+	    const totalPrice = selectedMenuItems.reduce((total, item) => {
+	      return {
+	      	total: total + (parseFloat(item.price) * item.quantity),
+	      	totalDiscounted: item?.discount?.code ? 0 : total + (parseFloat(item.price) * item.quantity)
+	      }
+	    }, 0)
+
+	    return {
+	      selectedMenuItems,
+	      orderData: order,
+	      price: totalPrice
+	    }
+	  })
+	}, [menu, selected])
 
 	const nextTableStatusMap = {
 		RECEIVED: 'ON_GOING',
@@ -78,6 +115,10 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 		})
 	}
 
+	const handlePrint = useReactToPrint({
+		content: () => componentRef.current,
+	})
+
 	useEffect(() => {
 		openOrdersCounter.current++
 		closedOrdersCounter.current++
@@ -97,6 +138,19 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 
 	return (
 		<Toolbar>
+			<InvoiceLayer>
+				<div ref={componentRef}>
+					{
+						orders.length > 0 &&
+							<Invoice
+								business={business}
+								orders={orders}
+							/>
+					}
+				</div>
+			</InvoiceLayer>
+
+
 			{numSelected > 0 ? (
 				<Typography
 					sx={{ flex: '1 1 100%' }}
@@ -119,6 +173,11 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 
 			{numSelected > 0 ? (
 				<>
+					<Tooltip title="Print Invoice" sx={{ display: 'block', transform: 'translateY(4px)' }}>
+						<IconButton>
+							<ReceiptLongRoundedIcon onMouseUp={handlePrint} />
+						</IconButton>
+					</Tooltip>
 					<Tooltip title="To Back" sx={{ display: tableStatus === 'RECEIVED' && 'none' }}>
 						<IconButton>
 							<NextPlanIcon onMouseUp={handleToBack} />

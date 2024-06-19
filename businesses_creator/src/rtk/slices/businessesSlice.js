@@ -55,9 +55,8 @@ export const businessesSlice = createSlice({
 						}
 					}
 			    _addDoc("users", userData, payload.owner.uid)
-
-			    // add menu to this business
 			    _addDoc("menus", {items: [], categories: []}, payload.accessToken)
+			    _addDoc("orders", {open: [], closed: []}, payload.accessToken)
 					
 			  });
 			return [...state, payload]
