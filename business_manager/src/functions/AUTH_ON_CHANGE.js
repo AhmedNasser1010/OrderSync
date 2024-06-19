@@ -1,7 +1,7 @@
 import { auth } from "../firebase.js"
 import DB_GET_DOC from "./DB_GET_DOC.js"
 
-const startApp = async () => {
+const AUTH_ON_CHANGE = async () => {
 
 	// get user id
 	const uid = await new Promise((resolve) => {
@@ -24,4 +24,4 @@ const startApp = async () => {
   
 }
 
-export default startApp
+export default AUTH_ON_CHANGE

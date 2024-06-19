@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react'
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "./firebase.js"
 import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
-import { initStaff, newStaff } from './rtk/slices/staffSlice'
 
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import PeopleIcon from '@mui/icons-material/People'
@@ -62,26 +59,6 @@ function Staff() {
 	const handleDialogOpenClose = () => {
 		setDialogIsOpen(dialogIsOpen => !dialogIsOpen)
 	}
-
-	useEffect(() => {
-		const fetchUsers = async () => {
-			try {
-				const usersCollection = collection(db, "users");
-				const q = query(usersCollection, where("accessToken", "==", accessToken))
-				const querySnapshot = await getDocs(q)
-
-				const data = querySnapshot.docs.map(doc => doc.data())
-				const filterDatadata = data.filter(data => data.userInfo.role === 'ORDER_CAPTAIN' || data.userInfo.role === 'DELIVERY_CAPTAIN')
-
-				return filterDatadata
-			} catch (error) {
-				console.error("Error querying users:", error)
-				return []
-			}
-		}
-
-		!staff.length && fetchUsers().then(res => dispatch(initStaff(res)))
-	}, [])
 
 	useEffect(() => {
 		const rowCellsMap = staff.map(user => {

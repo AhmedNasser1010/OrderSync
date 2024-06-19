@@ -3,8 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { object, string, date, array, boolean } from 'yup';
 import { useDispatch } from 'react-redux';
-import { addUser } from "../rtk/slices/userSlice.js";
-import { setUserRegisterStatus } from '../rtk/slices/conditionalValuesSlice'
+
+import { setUserRegisterStatus, setIsGetAppData } from '../rtk/slices/conditionalValuesSlice'
+import { addUser } from '../rtk/slices/userSlice'
+import { initStaff } from '../rtk/slices/staffSlice'
+import { addMenu } from '../rtk/slices/menuSlice'
+import { initBusiness } from '../rtk/slices/businessSlice'
+import { setOpenedOrders } from '../rtk/slices/ordersSlice'
 
 // MUI
 import Stack from '@mui/material/Stack';
@@ -18,7 +23,9 @@ import MuiTextField from "./MuiTextField.jsx";
 import AUTH_loginUser from "../functions/AUTH_loginUser.js";
 import AUTH_SIGNUP from "../functions/AUTH_SIGNUP.js";
 import AUTH_signout from "../functions/AUTH_signout.js";
-
+import fetchStaff from '../functions/fetchStaff'
+import DB_GET_DOC from '../functions/DB_GET_DOC'
+import AUTH_ON_CHANGE from '../functions/AUTH_ON_CHANGE'
 
 // Login validation schema
 let loginValidationSchema = object({
@@ -50,6 +57,32 @@ const RegistrationForm = ({ action }) => {
 		}
 	}
 
+	const handleGetAppData = (userData) => {
+		if (userData) {
+			dispatch(setIsGetAppData(true))
+			const accessToken = userData.accessToken
+
+			if (userData.userInfo.role !== 'BUSINESS_MANAGER') {
+				dispatch(setUserRegisterStatus('LOGGED_OUT'))
+				dispatch(setIsGetAppData(false))
+				AUTH_signout()
+				navigate("/login")
+				return
+			}
+
+			dispatch(setUserRegisterStatus('LOGGED_IN'))
+			dispatch(addUser(userData))
+			fetchStaff(accessToken).then(res => dispatch(initStaff(res)))
+			DB_GET_DOC('menus', accessToken).then(res => dispatch(addMenu(res)))
+			DB_GET_DOC('businesses', accessToken).then(res => dispatch(initBusiness(res)))
+
+			dispatch(setIsGetAppData(false))
+
+		} else {
+			dispatch(setUserRegisterStatus('LOGGED_IN_NO_BUSINESS'))
+		}
+	}
+
 	return (
 		<Box>
 			<Formik
@@ -65,8 +98,7 @@ const RegistrationForm = ({ action }) => {
 						AUTH_loginUser(values, (isPassed, error, result) => {
 							if (isPassed) {
 								if (result) {
-									dispatch(addUser(result))
-									dispatch(setUserRegisterStatus('LOGGED_IN'))
+									handleGetAppData(result)
 									navigate('/')
 								} else {
 									dispatch(setUserRegisterStatus('LOGGED_IN_NO_BUSINESS'))
@@ -81,8 +113,7 @@ const RegistrationForm = ({ action }) => {
 						AUTH_SIGNUP(values, (isPassed, error, result) => {
 							if (isPassed) {
 								if (result) {
-									dispatch(addUser(result))
-									dispatch(setUserRegisterStatus('LOGGED_IN'))
+									handleGetAppData(result)
 									navigate('/')
 								} else {
 									dispatch(setUserRegisterStatus('LOGGED_IN_NO_BUSINESS'))

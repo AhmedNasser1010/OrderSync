@@ -52,7 +52,7 @@ const headCells = [
 	},
 ];
 
-const CompletedOrders = ({ tableData, tableStatus }) => {
+const CompletedOrders = ({ headCells, tableData, tableStatus }) => {
 	const dispatch = useDispatch();
 	const [processRows, setProcessRows] = useState([]);
 	const menuItems = useSelector(state => state.menu?.items)

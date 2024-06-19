@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import NextPlanIcon from '@mui/icons-material/NextPlan';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import AddchartIcon from '@mui/icons-material/Addchart';
 import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded'
 import Button from '@mui/material/Button';
@@ -180,7 +181,7 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 					</Tooltip>
 					<Tooltip title="To Back" sx={{ display: tableStatus === 'RECEIVED' && 'none' }}>
 						<IconButton>
-							<NextPlanIcon onMouseUp={handleToBack} />
+							<ArrowLeftIcon onMouseUp={handleToBack} />
 						</IconButton>
 					</Tooltip>
 					<Tooltip title="To Next" sx={{ display: tableStatus === 'COMPLETED' && 'none' }}>

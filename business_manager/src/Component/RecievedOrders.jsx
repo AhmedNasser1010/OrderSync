@@ -7,52 +7,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import Box from '@mui/material/Box';
 
-const headCells = [
-	{
-		id: 'index',
-		numeric: false,
-		disablePadding: true,
-		label: '#',
-	},
-	{
-		id: 'id',
-		numeric: false,
-		disablePadding: false,
-		label: 'ID',
-	},
-	{
-		id: 'customer',
-		numeric: false,
-		disablePadding: true,
-		label: 'Customer',
-		startIcon: (
-			<Stack direction='row'>
-				<CheckCircleIcon sx={{ fontSize: 'small', transform: 'translate(25%, -10%)' }} />
-				<CheckCircleOutlineIcon sx={{ fontSize: 'small', transform: 'translate(-25%, 10%)' }} />
-			</Stack>
-		),
-	},
-	{
-		id: 'order',
-		numeric: false,
-		disablePadding: false,
-		label: 'Order',
-	},
-	{
-		id: 'ago',
-		numeric: false,
-		disablePadding: false,
-		label: 'Ago',
-	},
-	{
-		id: 'totla',
-		numeric: false,
-		disablePadding: false,
-		label: 'Total',
-	},
-];
-
-const RecievedOrders = ({ tableData, tableStatus }) => {
+const RecievedOrders = ({ headCells, tableData, tableStatus }) => {
 	const dispatch = useDispatch();
 	const [processRows, setProcessRows] = useState([]);
 	const menuItems = useSelector(state => state.menu?.items)

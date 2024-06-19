@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useSelector } from 'react-redux'
 import Stack from '@mui/material/Stack';
 import CustomCollapsedTableRow from './CustomCollapsedTableRow';
 import TableRow from '@mui/material/TableRow';
@@ -7,9 +8,19 @@ import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import Dialog from '@mui/material/Dialog'
+
+import AssignBadge from './AssignBadge'
+import AssignDialog from './AssignDialog'
 
 const CustomTableRow = ({ row = [], selected, index, handleSetSelected }) => {
+	const orders = useSelector(state => state.orders.open)
 	const [isOpen, setIsOpen] = useState(false);
+	const [assignDialogIsOpen, setAssignDialogIsOpen] = useState(false);
+
+	const currentOrder = useMemo(() => {
+		return orders.filter(order => order.id === row.id)[0] || {}
+	}, [row, orders])
 
 	const isSelected = (id) => selected.indexOf(id) !== -1;
 
@@ -31,6 +42,10 @@ const CustomTableRow = ({ row = [], selected, index, handleSetSelected }) => {
 		}
 		handleSetSelected(newSelected);
 	};
+
+	const handleOpenClose = () => {
+		setAssignDialogIsOpen(assignDialogIsOpen => !assignDialogIsOpen)
+	}
 
 	const isItemSelected = isSelected(row.id);
 	const labelId = `enhanced-table-checkbox-${index}`;
@@ -71,12 +86,20 @@ const CustomTableRow = ({ row = [], selected, index, handleSetSelected }) => {
 						{ i === 0 ? `#${value.split('-')[0]}` : value }
 					</TableCell>
 				)) }
+				<TableCell onMouseUp={handleOpenClose}>
+					<AssignBadge status={currentOrder?.assign?.status} />
+				</TableCell>
 			</TableRow>
 			<TableRow>
 				<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
 					<CustomCollapsedTableRow isOpen={isOpen} row={row} />
 				</TableCell>
 			</TableRow>
+			<AssignDialog
+				isOpen={assignDialogIsOpen}
+				handleOpenClose={handleOpenClose}
+				currentOrder={currentOrder}
+			/>
 		</>
 
 	);

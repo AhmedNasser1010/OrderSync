@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
@@ -18,17 +18,15 @@ const Orders = styled.div`
 function Queue() {
 	const orders = useSelector(state => state.orders)
 	const user = useSelector(state => state.user)
-	const [filteredOrder, setFilteredOrder] = useState([])
 
-	useEffect(() => {
-		setFilteredOrder(orders.filter(order => {
+	const queueOrders = useMemo(() => {
+		return orders.filter(order => {
 			if (user.userInfo.role === 'ORDER_CAPTAIN') {
-				return order.status === 'ON_GOING'
+				return order.status === 'ON_GOING' && order.assign.to === user.userInfo.uid && order.assign.status === 'on-going'
 			} else if (user.userInfo.role === 'DELIVERY_CAPTAIN') {
-				return order.status === 'IN_DELIVERY'
+				return order.status === 'IN_DELIVERY' && order.assign.to === user.userInfo.uid && order.assign.status === 'on-delivery'
 			}
-			return false
-		}))
+		})
 	}, [orders])
 
 	return (
@@ -37,7 +35,7 @@ function Queue() {
 			<PageTitle>Queue</PageTitle>
 
 			<Orders>
-				{ filteredOrder.map(order => (<OrderCard key={order.id} order={order} />)) }
+				{ queueOrders.map(order => (<OrderCard key={order.id} order={order} />)) }
 			</Orders>
 		</Container>
 

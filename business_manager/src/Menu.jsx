@@ -45,10 +45,6 @@ const Menu = () => {
 	const [menuValuesSnapshot, setMenuValuesSnapshot] = useState(menuValues);
 	const [onceRun, setOnceRun] = useState(false);
 
-	useEffect(() => {
-		!categories.length && DB_GET_DOC('menus', user.accessToken).then(res => dispatch(addMenu(res)))
-	}, [])
-
 	// setup indexed from categories
 	useEffect(() => {
 		setIndexes(prevIndexes => categories.map((item, i) => i + 1));

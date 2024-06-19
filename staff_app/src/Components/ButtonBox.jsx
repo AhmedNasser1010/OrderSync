@@ -30,7 +30,11 @@ function ButtonBox({ id, status }) {
 				if (id === order.id) {
 					return {
 						...order,
-						status: status
+						status: status,
+						assign: {
+							...order.assign,
+							status: user.userInfo.role === 'DELIVERY_CAPTAIN' ? 'completed' : 'on-going'
+						}
 					}
 				}
 				return order

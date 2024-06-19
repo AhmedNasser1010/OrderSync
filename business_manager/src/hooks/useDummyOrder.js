@@ -13,6 +13,10 @@ const useDummyOrder = () => {
 			id: randomOrderId(),
 			timestamp: Date.now(),
 			status: 'RECEIVED',
+			assign: {
+				to: '',
+				status: 'pickup'
+			},
 			payment: {
 				method: 'CASH'
 			},
