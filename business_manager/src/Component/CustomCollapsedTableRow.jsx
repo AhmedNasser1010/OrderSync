@@ -146,7 +146,7 @@ const CustomCollapsedTableRow = ({ isOpen, row }) => {
 			  		<span>Address: </span><span>{fullOrderDetails?.location?.address}</span>
 			  	</MoreDetailsItem>
 			  	<MoreDetailsItem>
-			  		<span>Location: </span><span><a style={{ color: 'blue', cursor: 'pointer' }} target='_blank' href={`https://www.google.com/maps?q=${fullOrderDetails?.location?.positions[fullOrderDetails?.location?.positions?.selected][0]},${fullOrderDetails?.location?.positions[fullOrderDetails?.location?.positions?.selected][1]}`}>Google Maps</a></span>
+			  		<span>Location: </span><span><a style={{ color: 'blue', cursor: 'pointer' }} target='_blank' href={`https://www.google.com/maps?q=${fullOrderDetails?.location?.latlng[0]},${fullOrderDetails?.location?.latlng[1]}`}>Google Maps</a></span>
 			  	</MoreDetailsItem>
 			  </MoreDetailsFlexBox>
 			</MoreDetails>
