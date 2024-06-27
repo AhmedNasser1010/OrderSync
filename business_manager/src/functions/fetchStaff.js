@@ -3,6 +3,9 @@ import { db } from "../firebase.js"
 
 const fetchStaff = async (accessToken) => {
 	try {
+		window.read += 1
+		console.log('Read: ', window.read)
+
 		const usersCollection = collection(db, "users");
 		const q = query(usersCollection, where("accessToken", "==", accessToken))
 		const querySnapshot = await getDocs(q)

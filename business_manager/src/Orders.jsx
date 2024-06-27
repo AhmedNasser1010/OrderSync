@@ -97,7 +97,8 @@ const Orders = () => {
 		const docRef = doc(db, 'orders', accessToken);
 
 		const unsub = onSnapshot(docRef, doc => {
-			console.log('orders subscripe')
+			window.read += 1
+			console.log('Read: ', window.read)
 			if (doc.exists()) {
 				doc.data().open?.length > 0 && dispatch(setOpenedOrders(doc.data().open))
 			}

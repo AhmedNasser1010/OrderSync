@@ -3,6 +3,8 @@ import { db } from "../firebase.js";
 
 const DB_GET_DOC = async (collectionName, subCollectionID) => {
   try {
+    window.read += 1
+    console.log('Read: ', window.read)
   	
     const docRef = doc(db, collectionName, subCollectionID);
     

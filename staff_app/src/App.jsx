@@ -58,6 +58,8 @@ function App() {
     if (user?.accessToken) docRef = doc(db, 'orders', user.accessToken)
 
     const unsub = user?.accessToken && onSnapshot(docRef, doc => {
+      window.read += 1
+      console.log('Read: ', window.read)
       dispatch(initOrders(doc.data().open))
     })
 

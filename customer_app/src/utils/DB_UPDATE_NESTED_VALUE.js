@@ -3,6 +3,8 @@ import { db } from "../config/firebase.js";
 
 const DB_UPDATE_NESTED_VALUE = async (collection, subcollection, path, value) => {
   try {
+    window.write += 1
+    console.log('Write: ', window.write)
 
     const docRef = doc(db, collection, subcollection);
 

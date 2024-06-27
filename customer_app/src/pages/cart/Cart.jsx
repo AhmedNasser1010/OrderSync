@@ -78,6 +78,9 @@ const Cart = () => {
 
 	useEffect(() => {
 		dispatch(addCheckout({
+			assign: {
+				status: 'pickup'
+			},
 			user: {
 				name: user?.userInfo?.name,
 				phone: user?.userInfo?.phone,
@@ -147,8 +150,21 @@ const Cart = () => {
 
 	const handlePayment = () => {
 		setDisableSubmit(true)
+
+    if (!user?.userInfo?.uid) {
+    	toast('Please log in first and update your contact information before continuing with your order.', {
+    		icon: '🤌',
+    		className: "font-ProximaNovaSemiBold",
+				position: "top-center",
+				duration: 4000
+    	})
+			dispatch(toggleLoginSidebar())
+			return false
+    }
+
 		validationSchema.validate(checkout, { abortEarly: false })
     .then(valid => {
+
     	if (accessToken) {
     		if (valid.location.latlng[0] === 29.620106778124843 && valid.location.latlng[1] === 31.255811811669496) {
     			dispatch(toggleLoginSidebar())

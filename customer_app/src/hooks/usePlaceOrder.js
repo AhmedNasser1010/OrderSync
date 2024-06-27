@@ -9,6 +9,8 @@ import randomOrderId from '../utils/randomOrderId.js'
 const usePlaceOrder = () => {
   const newOrder = async (data, accessToken) => {
     try {
+      window.write += 1
+      console.log('Write: ', window.write)
 
       const orderRef = doc(db, 'orders', accessToken)
 

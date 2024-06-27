@@ -3,6 +3,8 @@ import { db } from "../firebase.js"
 
 const DB_DELETE_SUBCOLLECTION = async (collection, subcollection) => {
 	try {
+		window.write += 1
+		console.log('Write: ', window.write)
 
 		await deleteDoc(doc(db, collection, subcollection));
 

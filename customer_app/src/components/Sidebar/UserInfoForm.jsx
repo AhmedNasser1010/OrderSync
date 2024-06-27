@@ -22,12 +22,14 @@ function UserInfoForm({ setExpandUserInfo }) {
 
 	const initialValues = {
 		name: user?.userInfo?.name || '',
-		phone: user?.userInfo?.secondPhone?.slice(2) || ''
+		phone: user?.userInfo?.phone?.slice(2) || '',
+		secondPhone: user?.userInfo?.secondPhone?.slice(2) || '',
 	}
 
 	const validationSchema = object({
-		name: string().required('name is required').min(3).max(25).notOneOf([user?.userInfo?.name]),
-		phone: string().required('phone is required').notOneOf([user?.userInfo?.phone.slice(2)]).matches(phoneNumberRegex),
+		name: string().min(3).max(25),
+		phone: string().matches(phoneNumberRegex),
+		secondPhone: string().matches(phoneNumberRegex),
 	})
 
 	const InputWrapperProps = (name, placeholder, errors, touched) => {
@@ -51,21 +53,31 @@ function UserInfoForm({ setExpandUserInfo }) {
 						userInfo: {
 							...user.userInfo,
 							name: values.name,
-							secondPhone: '+2' + values.phone
+							phone: values.phone ? '+2' + values.phone : '',
+							secondPhone: values.secondPhone ? '+2' + values.secondPhone : ''
 						}
 					}
-					DB_ADD_DOC('customers', user?.userInfo?.uid, finalUserData).then(res => {
-						setExpandUserInfo(false)
-						dispatch(initUser(finalUserData))
-						dispatch(toggleLoginSidebar())
-						document.body.classList.remove("overflow-hidden")
-					})
+
+					const notSameName = finalUserData?.userInfo?.name !== user?.userInfo?.name
+					const notPrimaryNum = finalUserData?.userInfo?.phone !== user?.userInfo?.phone
+					const notSecondNum = finalUserData?.userInfo?.secondPhone !== user?.userInfo?.secondPhone
+
+					setExpandUserInfo(false)
+					dispatch(toggleLoginSidebar())
+					document.body.classList.remove("overflow-hidden")
+
+					if (notSameName || notPrimaryNum || notSecondNum) {
+						DB_ADD_DOC('customers', user?.userInfo?.uid, finalUserData).then(res => {
+							dispatch(initUser(finalUserData))
+						})
+					}
 				}}
 			>
 				{({ errors, touched }) => (
 					<FormContainer>
 						<Field className={`w-full p-5 border border-gray-300 ${errors.name && 'text-red-500'}`} {...InputWrapperProps('name', 'Name', errors, touched)} />
-						<Field className={`w-full p-5 border border-gray-300 border-t-0 mb-5 ${errors.phone && 'text-red-500'}`} {...InputWrapperProps('phone', 'Second Phone Number', errors, touched)} />
+						<Field className={`w-full p-5 border border-gray-300 border-t-0 ${errors.phone && 'text-red-500'}`} {...InputWrapperProps('phone', 'Primary Phone Number', errors, touched)} />
+						<Field className={`w-full p-5 border border-gray-300 border-t-0 mb-5 ${errors.secondPhone && 'text-red-500'}`} {...InputWrapperProps('secondPhone', 'Second Phone Number', errors, touched)} />
 						<button type='submit' className='w-full bg-color-2 py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer'>Save</button>
 					</FormContainer>
 				)}

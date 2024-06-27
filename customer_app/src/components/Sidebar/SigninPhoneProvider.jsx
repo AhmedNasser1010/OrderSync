@@ -132,7 +132,7 @@ function SigninPhoneProvider({ status, setStatus }) {
   		if (user?.uid) {
   			if (status === 'SIGNUP') {
   				if (isLoggedInBefore === false) {
-    				DB_ADD_DOC('customers', user.uid, customerSchema(user, formData))
+    				DB_ADD_DOC('customers', user.uid, customerSchema({ user: user?.uid, name: formData?.name, phone: formData?.phoneNumber, refferredBy: formData?.referral, provider: 'Phone' }))
   					.then(res => res && window.location.reload())
   				}
   			} else if (status === "LOGIN") {

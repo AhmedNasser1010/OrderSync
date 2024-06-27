@@ -3,6 +3,9 @@ import { db } from "../config/firebase.js";
 
 const DB_GET_COLLECTION = async (collectionName) => {
   try {
+    window.read += 1
+    console.log('Read: ', window.read)
+
     const collectionRef = collection(db, collectionName);
     
     const querySnapshot = await getDocs(collectionRef);

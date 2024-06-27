@@ -12,6 +12,7 @@ import { clearCart } from "../../utils/cartSlice.js"
 import AUTH_SIGNOUT from '../../utils/AUTH_SIGNOUT'
 
 import SigninPhoneProvider from './SigninPhoneProvider'
+import SignupGoogleProvider from './SignupGoogleProvider'
 import UserInfoForm from './UserInfoForm'
 import UserAddress from './UserAddress'
 
@@ -48,12 +49,12 @@ const LoginSidebar = () => {
                     <div>
                       <h2 className='text-color-1 text-3xl font-ProximaNovaMed'>{ status === 'SIGNUP' ? 'Signup' : 'Login' }</h2>
                       <p className='text-[#686b78] mt-2 font-ProximaNovaMed text-sm pr-5'>
-                        {
+                        {/*
                           status === "SIGNUP" ?
                             <span>Or <span onMouseUp={() => setStatus("LOGIN")} className='text-bold text-indigo-500 cursor-pointer'>Login</span></span>
                             :
                             <span>Or <span onMouseUp={() => setStatus("SIGNUP")} className='text-bold text-indigo-500 cursor-pointer'>Signup a new account</span></span>
-                        }
+                        */}
                       </p>
                       <p className='font-ProximaNovaThin mt-1'>and <span className='text-color-2 font-ProximaNovaMed'>Enjoy your time</span></p>
                     </div>
@@ -62,12 +63,13 @@ const LoginSidebar = () => {
                     </div>
                   </div>
 
-                  <SigninPhoneProvider status={status} setStatus={setStatus} />
+                  {/*<SigninPhoneProvider status={status} setStatus={setStatus} />*/}
+                  <SignupGoogleProvider />
                 </>
                 :
                 <>
                   {user?.userInfo && <h2 className='font-ProximaNovaSemiBold text-2xl flex items-center'>Welcome {user?.userInfo?.name} </h2>}
-                  <button onClick={() => setExpandUserInfo(expandUserInfo => !expandUserInfo)} className={`settings-btn relative w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer mt-5 mb-5 ${user?.userInfo?.name ? 'bg-color-11' : 'bg-red-500'}`}><span className='text-xl absolute left-[20px] top-[50%] -translate-y-1/2'>{ user?.userInfo?.name ? <IoIosCheckmarkCircle /> : <IoIosCloseCircle /> }</span> Update User Information</button>
+                  <button onClick={() => setExpandUserInfo(expandUserInfo => !expandUserInfo)} className={`settings-btn relative w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer mt-5 mb-5 ${user?.userInfo?.name && user?.userInfo?.phone && user?.userInfo?.secondPhone ? 'bg-color-11' : 'bg-red-500'}`}><span className='text-xl absolute left-[20px] top-[50%] -translate-y-1/2'>{ user?.userInfo?.name && user?.userInfo?.phone && user?.userInfo?.secondPhone ? <IoIosCheckmarkCircle /> : <IoIosCloseCircle /> }</span> Update User Information</button>
                   { expandUserInfo && <UserInfoForm setExpandUserInfo={setExpandUserInfo} />}
                   <button onClick={() => setExpandUserAddress(expandUserAddress => !expandUserAddress)} className={`settings-btn relative w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer mt-5 mb-5 ${user?.locations?.home?.address && user?.locations?.home?.latlng[0] && user?.locations?.home?.latlng[0] !== 29.620106778124843 && user?.locations?.home?.latlng[1] !== 31.255811811669496 ? 'bg-color-11' : 'bg-red-500'}`}><span className='text-xl absolute left-[20px] top-[50%] -translate-y-1/2'>{ user?.locations?.home?.address && user?.locations?.home?.latlng[0] && user?.locations?.home?.latlng[0] !== 29.620106778124843 && user?.locations?.home?.latlng[1] !== 31.255811811669496 ? <IoIosCheckmarkCircle /> : <IoIosCloseCircle />}</span> Update User Address</button>
                   { expandUserAddress && <UserAddress setExpandUserAddress={setExpandUserAddress} />}

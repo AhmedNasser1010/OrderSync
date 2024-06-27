@@ -110,7 +110,7 @@ function Order() {
 							orderData.order &&
 								<>
 									{ orderData.order.location.address !== '' && <span>Address: { orderData.order.location.address }</span> }
-									<a target='_blank' href={`https://www.google.com/maps?q=${orderData.order.location.positions[orderData.order.location.positions.selected][0]},${orderData.order.location.positions[orderData.order.location.positions.selected][1]}`}>Location: Maps</a>
+									<a target='_blank' href={`https://www.google.com/maps?q=${orderData.order.location.latlng[0]},${orderData.order.location.latlng[1]}`}>Location: Maps</a>
 								</>
 						}
 					</InfoBox>

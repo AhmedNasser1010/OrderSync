@@ -15,3 +15,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>,
 )
+
+
+window.read = 0
+window.write = 0

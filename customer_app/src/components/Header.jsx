@@ -32,6 +32,19 @@ const Header = () => {
     AUTH_ON_CHANGE().then(user => user && dispatch(initUser(user)))
   }, [])
 
+   useEffect(() => {
+    if (user?.userInfo?.uid && user?.userInfo?.phone) {
+      toast('Great! After successfully logging in, please update your contact information to be able to place orders.', {
+        icon: '👏',
+        className: "font-ProximaNovaSemiBold",
+        position: "top-center",
+        duration: 4000
+      })
+
+      dispatch(toggleLoginSidebar())
+    }
+  }, [])
+
   return (
     <>
       <header className="shadow-md w-full fixed left-0 top-0 right-0 h-20 z-10 md:px-5 text-color-1 bg-white px-3">

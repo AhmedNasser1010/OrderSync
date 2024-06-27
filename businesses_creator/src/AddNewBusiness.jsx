@@ -105,9 +105,12 @@ const AddNewBusiness = () => {
   	},
   	business: {
 			name: '',
+			nameInAR: '',
 			industry: '',
 			address: '',
 			location: '',
+			cover: 'https://i.imgur.com/yKrmaGN.jpg',
+			icon: 'https://i.imgur.com/17YC6QJ.png'
 		},
 		owner: {
 			basic: {
@@ -133,12 +136,17 @@ const AddNewBusiness = () => {
 				friday: {start: '', end: ''},
 				saturday: {start: '', end: ''},
 			},
+			deliveryTax: {
+				min: 0,
+				max: 0
+			},
 			paymentMethods: {
 				cash: false,
 				vodafoneCash: false,
 				etisalatCash: false,
 			},
 		},
+		
 		createdOn: String(Date.now()),});
   const [submitErrorVisibility, setSubmitErrorVisibility] = useState(false);
 

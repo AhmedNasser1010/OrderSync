@@ -3,6 +3,8 @@ import { db } from "../firebase.js";
 
 const _updateAnArray = async (collection, subcollection, arrayPath, value) => {
   try {
+    window.write += 1
+    console.log('Write: ', window.write)
 
     const docRef = doc(db, collection, subcollection);
 

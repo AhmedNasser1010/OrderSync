@@ -1,4 +1,4 @@
-const customerSchema = (user, formData) => {
+const customerSchema = ({ uid, name, email, phone, refferredBy, avatar, provider }) => {
 	return {
 		restaurants: [],
 		locations: {
@@ -10,15 +10,17 @@ const customerSchema = (user, formData) => {
 			city: 'El Ayat',
 		},
 		userInfo: {
-			name: formData?.name,
-			phone: user?.phoneNumber,
+			name: name || '',
+			email: email || '',
+			phone: phone || '',
 			secondPhone: '',
-			avatar: '',
-			uid: user?.uid,
+			avatar: avatar || '',
+			uid: uid,
+			provider
 		},
 		referral: {
 			successReferred: [],
-			referredBy: formData?.referral,
+			referredBy: refferredBy || '',
 			isFirstOrder: true,
 		},
 	}

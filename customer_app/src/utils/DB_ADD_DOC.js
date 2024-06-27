@@ -3,6 +3,8 @@ import { db } from "../config/firebase.js"
 
 const DB_ADD_DOC = async (collectionName, accessToken, data) => {
   try {
+    window.write += 1
+    console.log('Write: ', window.write)
 
     await setDoc(doc(db, collectionName, accessToken), {...data})
 
