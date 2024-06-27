@@ -2,7 +2,7 @@
   "name": "Cairo Eat",
   "short_name": "CairoEat",
   "description": "Food Delivery Online From Your Favorit Local Restaurants",
-  "start_url": "/",
+  "start_url": "https://cairo-eat-demo.netlify.app/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
@@ -11,6 +11,12 @@
       "src": "/assets/icon.png",
       "sizes": "500x500",
       "type": "image/png"
+    },
+    {
+      "src": "/assets/icon.png",
+      "sizes": "500x500",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
