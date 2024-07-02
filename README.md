@@ -1,65 +1,124 @@
-
 <img src="images/cover.png" alt="cover" />
 
-# OrderSync 🛵🔗
+# MeRRo
 
-[**Demo Version Ready To Use**](demo-test.md)
+[**Demo Version Ready To Use!!**](demo-test.md)
 
-## 🔶 Table of Contents
-- [Diagrams](#🔶-diagrams)
-- [Description](#🔶-description)
-- [Technologies](#🔶-technologies)
-- [Applications](#🔶-Applications)
-- [Contributing](#🔶-contributing)
-- [Project Versions](#🔶-project-versions)
-- [License](#🔶-license)
+## Table of Contents
+1. [Introduction](#introduction)
+2. [Diagrams](#diagrams)
+3. [User Roles and Permissions](#user-roles-and-permissions)
+4. [App Features](#app-features)
+5. [Technical Requirements](#technical-requirements)
+6. [Order Workflow](#order-workflow)
+7. [Future Updates and Maintenance](#future-updates-and-maintenance)
+8. [Frequently Asked Questions (FAQs)](#frequently-asked-questions-faqs)
 
-## 🔶 Diagrams
+## Introduction
+
+### Brief Overview of the App
+MeRRo is a cutting-edge ordering system meticulously crafted for restaurants. Seamlessly integrating into applications, it boasts a robust back-end powered by Google Firebase, ensuring secure authentication. The MeRRo app delivers a streamlined and efficient online ordering experience.
+
+## Diagrams
 ![applications](images/applications.jpg)
 ![features](images/features.jpg)
 ![app&forwho&usage](images/app&forwho&usage.jpg)
 ![workflow](images/workflow.jpg)
 ![order-journey](images/order-journey.jpg)
 
-## 🔶 Description
-OrderSync is a cutting-edge ordering system meticulously crafted for developers and business owner. Seamlessly integrating into applications, it boasts a robust backend powered by Google Firebase ensuring secure authentication. With a blend of Google MatrialUI and JavaScript, coupled with the dynamic capailities of ReactJS, OrderSync delivers a streamlined and efficient online ordering experience. Simplify your development journey with OrderSync, where technology meets intuitive order management.
+## User Roles and Permissions
 
-## 🔶 Technologies
+### Business Manager App
+- Login/Signup
+- Manage orders (view, update, and close)
+- Read closed orders
+- Add and manage staff members
+- Manage restaurant menu
+- Settings
+  - Site control
 
-* JavaScript
-* ReactJS
-* MatrialUI
-* Firebase
+### Staff App
+- Login/Signup
+- Manage assigned orders (view and close)
 
-## 🔶 Applications
+### Customer Shop App
+- Login/Signup
+- Cart management
+- Settings
+  - Update user information (name, phone number)
+  - Update address with interactive map or manual text input
+- Browse restaurants and menus
+- Browse cuisine categories and top restaurant chains
+- View restaurants with online food delivery
+- Place orders
+- Collect loyalty points for each restaurant
 
-- [Business Creator](businesses_creator/)
-- [Business Manager](businesses_manager/)
-- [Staff Application](staff_app/)
-- [Customer Online Shop Template App](customer_online_shop_template/)
+## App Features
 
-**Provided APIs:**
-- Business Manager API. **Still BackStage**
-- Staff Application API. **Still BackStage**
-- [Customer Shop Third-Party API](user_gateway/)
+### Business Manager App
+- Orders management
+- Menu management
+- Staff members management
+- Reports
 
-## 🔶 Contributing
-Thank you for considering contributing to our project! We welcome contributions from the developer community to enhance the functionality and features of our web application.
+### Staff App
+- Read orders details by the role "Order Captain" or "Delivery Captain"
+- Submit order to next status
+- Reports
 
-1. Fork the repository.
-2. Create a new branch: `git checkout -b my-feature`
-3. Make your changes and commit them: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin my-feature`
-5. Open a pull request.
+### Customer Shop App
+- Read different restaurants based on city with their menus
+- User cart
+- Order placement with comment
+- Offer attractive discounts
+- Contact info with select location on map and find my location
 
-Please adhere to the coding conventions and standards followed in the project.
+## Technical Requirements
 
-**Finally, Thank you for your valuable contribution to making our web application even better.**
+| App              | Devices        | Provided On  |
+|------------------|----------------|--------------|
+| Business Manager | Desktop/Laptop | Website      |
+| Staff App        | Smartphone/Tablet | App/Website |
+| Customer Shop    | Any            | App/Website  |
 
-## 🔶 Project Versions
+## Order Workflow
 
-- **0.1.0 Demo version is coming soon! stay tuned**
+**Order Journey in Four Steps**
 
-## 🔶 License
+1. Customer places an order (Customer Shop).
+2. Business Manager reviews and accepts the order.
+3. Order Captain or Delivery Captain prepares the order.
+4. Delivery person delivers the order to the customer.
+
+## Future Updates and Maintenance
+
+**Upcoming Updates**
+- Design improvements
+- Enhanced reporting features
+
+## Frequently Asked Questions (FAQs)
+
+### Who would use the Business Manager App?
+Restaurant owners who need to manage their received orders.
+
+### Who would use the Staff App?
+Individuals looking to work as Order Captains or Delivery Captains in this business.
+
+### Who would use the Customer Shop App?
+Customers looking to browse menus, place orders, and manage their accounts.
+
+### Why use MeRRo as a business owner?
+
+1. **Increased Customer Base Network Effect:**
+   - The Customer Shop app features multiple restaurants in the same city, increasing visibility and potential customer base.
+
+3. **Comprehensive Reporting:**
+   - Access detailed reports on sales, order trends, and customer preferences for informed decision-making.
+
+## Project Versions
+
+ - 0.1.0 Demo
+
+## License
 
 This project is licensed under the [Apache-2.0 license](LICENSE).
