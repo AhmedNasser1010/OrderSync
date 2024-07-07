@@ -154,9 +154,9 @@ const Orders = () => {
 
 				<Box style={{ width: '100%' }}>
 
-					<Box sx={{ padding: '10px 10px 0 20px' }}>
+					{/*<Box sx={{ padding: '10px 10px 0 20px' }}>
 						<Button variant='contained' size='small' onMouseUp={handleAddTestOrder}>Test Order</Button>
-					</Box>
+					</Box>*/}
 
 					<CustomTabPanel tabValue={tabValue} index={0}>
 						<RecievedOrders headCells={headCells} tableData={orderFilter('RECEIVED')} tableStatus='RECEIVED' />

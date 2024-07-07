@@ -85,7 +85,7 @@ function App() {
 	 useEffect(() => {
     userRegisterStatus === 'LOGGED_OUT' && navigate('/login')
     userRegisterStatus === 'LOGGED_IN_NO_BUSINESS' && navigate('/')
-    userRegisterStatus === 'LOGGED_IN' && navigate('/user')
+    userRegisterStatus === 'LOGGED_IN' && navigate('/orders')
   }, [userRegisterStatus])
 
 
@@ -99,7 +99,7 @@ function App() {
 						<div className="content">
 							<Routes>
 								<Route path="/" element={<Home />} />
-								<Route path="/user" element={<User />} />
+								{/*<Route path="/user" element={<User />} />*/}
 								<Route path="/orders" element={<Orders />} />
 								<Route path="/menu" element={<Menu />} />
 								<Route path="/settings" element={<Settings />} />

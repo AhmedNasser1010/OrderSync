@@ -11,8 +11,10 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AutorenewSharpIcon from '@mui/icons-material/AutorenewSharp';
 import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
 
+import useLogout from './hooks/useLogout'
 
 import ShopControl from './Component/ShopControl'
+import WidgetTitle from './Component/WidgetTitle'
 
 const Page = styled.section`
 	padding: 40px 10px;
@@ -53,8 +55,31 @@ const Widget = styled.div`
 	padding: 20px;
 	width: 50%;
 `
+const WidgetOptionTitle = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+	& div h4 {
+		margin-bottom: 5px;
+	}
+	& div p {
+		font-size: 14px;
+		color: #00000099;
+	}
+	& div button {
+		all: unset;
+		background-color: #EF4444;
+    color: white;
+    padding: 5px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: small;
+	}
+`
 
 function Settings() {
+	const logout = useLogout()
 	const dispatch = useDispatch()
 	const accessToken = useSelector(state => state.user.accessToken)
 	const business = useSelector(state => state.business)
@@ -162,6 +187,21 @@ function Settings() {
 			<Widgets>
 				<Widget>
 					<ShopControl values={siteControl} handleSetSiteControl={handleSetSiteControl} />
+				</Widget>
+				<Widget>
+					<WidgetTitle
+						title="User"
+						description="User settings and informations"
+					/>
+					<WidgetOptionTitle>
+						<div>
+							<h4>Logout</h4>
+							<p>Logout from your account</p>
+						</div>
+						<div>
+							<button onMouseUp={logout}>LOGOUT</button>
+						</div>
+					</WidgetOptionTitle>
 				</Widget>
 			</Widgets>
 		</Page>
