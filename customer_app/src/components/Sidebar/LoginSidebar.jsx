@@ -84,15 +84,16 @@ const LoginSidebar = () => {
                   { expandUserInfo && <UserInfoForm setExpandUserInfo={setExpandUserInfo} />}
                   <button onClick={() => setExpandUserAddress(expandUserAddress => !expandUserAddress)} className={`settings-btn relative w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer mt-5 mb-5 ${user?.locations?.home?.address && user?.locations?.home?.latlng[0] && user?.locations?.home?.latlng[0] !== 29.620106778124843 && user?.locations?.home?.latlng[1] !== 31.255811811669496 ? 'bg-color-11' : 'bg-red-500'}`}><span className='text-xl absolute left-[20px] top-[50%] -translate-y-1/2'>{ user?.locations?.home?.address && user?.locations?.home?.latlng[0] && user?.locations?.home?.latlng[0] !== 29.620106778124843 && user?.locations?.home?.latlng[1] !== 31.255811811669496 ? <IoIosCheckmarkCircle /> : <IoIosCloseCircle />}</span> {t('Update User Address')}</button>
                   { expandUserAddress && <UserAddress setExpandUserAddress={setExpandUserAddress} />}
-                  <div className="flex w-full font-ProximaNovaSemiBold cursor-pointer mt-5 border border-color-11">
-                    <button className={`w-full p-4 ${lng === 'en' && 'bg-color-11 text-white order-1'}`} onClick={() => changeLanguage('en')}>English</button>
-                    <button className={`w-full p-4 ${lng === 'ar' && 'bg-color-11 text-white'}`} onClick={() => changeLanguage('ar')}>العربية</button>
-                  </div>
                   <div>
                     <p className='text-[#686b78] mt-2 font-ProximaNovaMed text-sm'>{t('Thank you for your time and patience. Come back soon !')}</p>
                   </div>
                 </>
             }
+
+            <div className="flex w-full font-ProximaNovaSemiBold cursor-pointer mt-5 border border-color-11">
+              <button className={`w-full p-4 ${lng === 'en' && 'bg-color-11 text-white order-1'}`} onClick={() => changeLanguage('en')}>English</button>
+              <button className={`w-full p-4 ${lng === 'ar' && 'bg-color-11 text-white'}`} onClick={() => changeLanguage('ar')}>العربية</button>
+            </div>
 
           </div>
         </div>
