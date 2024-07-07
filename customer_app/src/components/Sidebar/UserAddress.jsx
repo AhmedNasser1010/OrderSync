@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { initUser } from '../../rtk/slices/userSlice'
 import toast, { Toaster } from "react-hot-toast"
 import { toggleLoginSidebar } from '../../rtk/slices/toggleSlice'
+import { useTranslation } from 'react-i18next'
 
 import DB_ADD_DOC from '../../utils/DB_ADD_DOC'
 
@@ -24,6 +25,7 @@ const MapContainerStyled = styled(MapContainer)`
 `
 
 function UserAddress({ setExpandUserAddress }) {
+	const { t } = useTranslation()
 	const dispatch = useDispatch()
 	const user = useSelector(state => state.user)
 	const [address, setAddress] = useState(user?.locations?.home?.address || '')
@@ -71,9 +73,9 @@ function UserAddress({ setExpandUserAddress }) {
 					return res
 				}),
 				{
-					loading: 'Saving...',
-					success: 'Success.',
-					error: 'Could not save your settings.',
+					loading: t('Saving...'),
+					success: t('Success.'),
+					error: t('Could not save your settings.'),
 				},
 				{
 					success: {
@@ -119,8 +121,8 @@ function UserAddress({ setExpandUserAddress }) {
 				className={`w-full p-5 border border-gray-300 mb-5 ${!address && 'error'}`}
 				id='address'
 				type="text"
-				label='Address'
-				placeholder='Location Address'
+				label={t('Address')}
+				placeholder={t('Location Address')}
 				value={address}
 				onChange={handleAddressChange}
 			/>
@@ -129,7 +131,7 @@ function UserAddress({ setExpandUserAddress }) {
 				type='submit'
 				className='w-full bg-color-2 py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer'
 			>
-				Save
+				{t('Save')}
 			</button>
 		</Container>
 

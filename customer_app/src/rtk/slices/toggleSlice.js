@@ -5,6 +5,7 @@ const toggleSlice = createSlice({
   initialState: {
     isLocationSidebarOpen: false,
     isLoginSidebarOpen: false,
+    lng: 'ar'
   },
   reducers: {
     toggleLocationSidebar: (state) => {
@@ -13,8 +14,11 @@ const toggleSlice = createSlice({
     toggleLoginSidebar: (state) => {
       state.isLoginSidebarOpen = !state.isLoginSidebarOpen
     },
+    toggleLng: (state, { payload }) => {
+      state.lng = payload
+    },
   },
 })
 
-export const { toggleLocationSidebar, toggleLoginSidebar } = toggleSlice.actions
+export const { toggleLocationSidebar, toggleLoginSidebar, toggleLng } = toggleSlice.actions
 export default toggleSlice.reducer

@@ -12,6 +12,8 @@ import ShimmerMenu from './components/Shimmer/ShimmerMenu'
 import { Provider } from 'react-redux'
 import { store } from './rtk/store'
 import './css/index.css'
+import { I18nextProvider } from 'react-i18next'
+import i18n from './i18n'
 
 const appRouter = createBrowserRouter([
   {
@@ -42,7 +44,9 @@ const appRouter = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById('root'))
   .render(
     <Provider store={store}>
-      <RouterProvider router={appRouter} />
+      <I18nextProvider i18n={i18n}>
+        <RouterProvider router={appRouter} />
+      </I18nextProvider>
     </Provider>)
 
 

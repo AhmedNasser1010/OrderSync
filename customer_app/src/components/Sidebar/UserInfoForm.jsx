@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import DB_ADD_DOC from '../../utils/DB_ADD_DOC'
 import { initUser } from '../../rtk/slices/userSlice'
 import { toggleLoginSidebar } from '../../rtk/slices/toggleSlice'
+import { useTranslation } from 'react-i18next'
 
 const Container = styled.div``
 const FormContainer = styled(Form)`
@@ -17,6 +18,7 @@ const FormContainer = styled(Form)`
 const phoneNumberRegex = /01\w{8}/
 
 function UserInfoForm({ setExpandUserInfo }) {
+	const { t } = useTranslation()
 	const dispatch = useDispatch()
 	const user = useSelector(state => state.user)
 
@@ -75,10 +77,10 @@ function UserInfoForm({ setExpandUserInfo }) {
 			>
 				{({ errors, touched }) => (
 					<FormContainer>
-						<Field className={`w-full p-5 border border-gray-300 ${errors.name && 'text-red-500'}`} {...InputWrapperProps('name', 'Name', errors, touched)} />
-						<Field className={`w-full p-5 border border-gray-300 border-t-0 ${errors.phone && 'text-red-500'}`} {...InputWrapperProps('phone', 'Primary Phone Number', errors, touched)} />
-						<Field className={`w-full p-5 border border-gray-300 border-t-0 mb-5 ${errors.secondPhone && 'text-red-500'}`} {...InputWrapperProps('secondPhone', 'Second Phone Number', errors, touched)} />
-						<button type='submit' className='w-full bg-color-2 py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer'>Save</button>
+						<Field className={`w-full p-5 border border-gray-300 ${errors.name && 'text-red-500'}`} {...InputWrapperProps('name', t('Name'), errors, touched)} />
+						<Field className={`w-full p-5 border border-gray-300 border-t-0 ${errors.phone && 'text-red-500'}`} {...InputWrapperProps('phone', t('Primary Phone Number'), errors, touched)} />
+						<Field className={`w-full p-5 border border-gray-300 border-t-0 mb-5 ${errors.secondPhone && 'text-red-500'}`} {...InputWrapperProps('secondPhone', t('Second Phone Number'), errors, touched)} />
+						<button type='submit' className='w-full bg-color-2 py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer'>{t('Save')}</button>
 					</FormContainer>
 				)}
 			</Formik>

@@ -5,11 +5,15 @@ import { CiLocationOn } from "react-icons/ci"
 import { useDispatch, useSelector } from "react-redux"
 import { toggleLocationSidebar, toggleLoginSidebar } from "../utils/toggleSlice"
 import { LOGO_URL } from "../utils/constants"
+import { useTranslation } from 'react-i18next'
 
 import { initUser } from '../rtk/slices/userSlice'
 import AUTH_ON_CHANGE from '../utils/AUTH_ON_CHANGE'
+import useLanguageDirection from '../hooks/useLanguageDirection'
 
 const Header = () => {
+  useLanguageDirection()
+  const { t } = useTranslation()
   const dispatch = useDispatch()
   const cartItems = useSelector(state => state.cart.items)
   const user = useSelector(state => state.user)
@@ -34,7 +38,7 @@ const Header = () => {
 
    useEffect(() => {
     if (user?.userInfo?.uid && user?.userInfo?.phone) {
-      toast('Great! After successfully logging in, please update your contact information to be able to place orders.', {
+      toast(t('Great! After successfully logging in, please update your contact information to be able to place orders.'), {
         icon: '👏',
         className: "font-ProximaNovaSemiBold",
         position: "top-center",
@@ -58,19 +62,21 @@ const Header = () => {
               />
             </Link>
             <Link to=".">
-              <h1 style={{ fontSize: "1.3rem", fontWeight: "900" }}>
-                Cairo Eat
+              <h1
+                className="font-Beiruti text-3xl"
+              >
+                {t('Merro')}
               </h1>
             </Link>
             <button onClick={handleLocationSidebar} type='button' className='md:flex items-center gap-2 group sidebar-btn hidden'>
               {
                 !user?.locations?.city &&
                   <span className='custom-underline relative font-ProximaNovaBold text-sm group-hover:text-color-2'>
-                    Select
+                    {t('Select')}
                   </span>
               }
               {
-                user?.locations?.city ? <span className='block text-[#686b78] text-sm font-ProximaNovaThin group-hover:text-color-5'>{truncateStr(user?.locations?.city)}</span> : <></>
+                user?.locations?.city ? <span className='block text-[#686b78] text-sm font-ProximaNovaThin group-hover:text-color-5'>{t(user?.locations?.city)}</span> : <></>
               }
               <span className='text-color-2 text-xl'>
                 <IoIosArrowDown />
@@ -104,7 +110,7 @@ const Header = () => {
                 </svg>
               </div>
               {!user?.userInfo ? (
-                <span className="md:inline hidden">Sign In</span>
+                <span className="md:inline hidden">{t('Sign In')}</span>
               ) : (
                 <span className="md:inline hidden">{user?.userInfo?.name}</span>
               )}
@@ -144,7 +150,7 @@ const Header = () => {
                   </>
                 )}
               </div>
-              <span className="md:inline hidden">Cart</span>
+              <span className="md:inline hidden">{t('Cart')}</span>
             </Link>
           </ul>
         </div>

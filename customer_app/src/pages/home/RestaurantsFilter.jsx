@@ -1,6 +1,8 @@
 import { IoClose } from "react-icons/io5"
+import { useTranslation } from 'react-i18next'
 
 function RestaurantsFilter() {
+	const { t } = useTranslation()
 
 	const handleFastDelivery = () => {
 		// setFilteredRestaurants(AllRestaurants.filter(res => res?.info?.sla?.deliveryTime >= 30 && res?.info?.sla?.deliveryTime <= 50))
@@ -36,37 +38,37 @@ function RestaurantsFilter() {
 
 		<div className="filter-btns flex gap-3 2xl:justify-start justify-center md:flex-nowrap flex-wrap" onClick={handleActive}>
 			<button className='filter-btn font-GrotMed text-color-3 text-sm tracking-tight' onClick={handleFastDelivery}>
-				Fast Delivery
+				{t("Fast Delivery")}
 				<span className='text-lg ml-1 mb-[2px] hidden' onClick={() => window.location.reload()}>
 					<IoClose />
 				</span>
 			</button>
 			<button className='filter-btn font-GrotMed text-color-3 text-sm tracking-tight' onClick={handleRating}>
-				Rating 4.0+
+				{t("Rating 4.0+")}
 				<span className='text-lg ml-1 mb-[2px] hidden' onClick={() => window.location.reload()}>
 					<IoClose />
 				</span>
 			</button>
 			<button className='filter-btn font-GrotMed text-color-3 text-sm tracking-tight' onClick={handlePureVeg}>
-				Pure Veg
+				{t("Pure Veg")}
 				<span className='text-lg ml-1 mb-[2px] hidden' onClick={() => window.location.reload()}>
 					<IoClose />
 				</span>
 			</button>
 			<button className='filter-btn font-GrotMed text-color-3 text-sm tracking-tight' onClick={handleOffers}>
-				Offers
+				{t("Offers")}
 				<span className='text-lg ml-1 mb-[2px] hidden' onClick={() => window.location.reload()}>
 					<IoClose />
 				</span>
 			</button>
 			<button className='filter-btn font-GrotMed text-color-3 text-sm tracking-tight' onClick={handlePriceRange300to600}>
-				Rs. 300-Rs. 600
+				{t("80-220 L.E.")}
 				<span className='text-lg ml-1 mb-[2px] hidden' onClick={() => window.location.reload()}>
 					<IoClose />
 				</span>
 			</button>
 			<button className='filter-btn font-GrotMed text-color-3 text-sm tracking-tight' onClick={handlePriceRangeLessthan300}>
-				Less than Rs. 300
+				{t("Less then 120 L.E.")}
 				<span className='text-lg ml-1 mb-[2px] hidden' onClick={() => window.location.reload()}>
 					<IoClose />
 				</span>

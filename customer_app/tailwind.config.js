@@ -31,6 +31,7 @@ export default {
       "ProximaNovaSemiBold": ["ProximaNova Condensed SemiBold"],
       "ProximaNovaBold": ["ProximaNova Condensed Bold"],
       "ProximaNovaBlack": ["ProximaNova Condensed Black"],
+      "Beiruti": ["Beiruti"],
     }
   },
   plugins: [

@@ -5,6 +5,8 @@ import 'leaflet/dist/leaflet.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToUserLocation } from '../../rtk/slices/checkoutSlice'
 import toast, { Toaster } from "react-hot-toast"
+import { useTranslation } from 'react-i18next'
+
 
 import LocationButton from './LocationButton'
 import AddMarker from './AddMarker'
@@ -53,6 +55,7 @@ const RadioInputP = styled.p`
 `
 
 function CheckoutUserAddress({ handleCurrentState }) {
+	const { t } = useTranslation()
 	const dispatch = useDispatch()
 	const user = useSelector(state => state.user)
 	const [newCustomMark, setNewCustomMark] = useState(null)
@@ -77,7 +80,7 @@ function CheckoutUserAddress({ handleCurrentState }) {
 	}
 
 	const handleOnRadioChange = (e) => {
-		!newCustomMark && toast.error("First, select your custom location on the map.", {
+		!newCustomMark && toast.error(t("First, select your custom location on the map."), {
 	      className: "font-ProximaNovaSemiBold",
 	      position: "top-center",
 	      duration: 3000

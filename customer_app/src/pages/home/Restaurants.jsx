@@ -1,10 +1,12 @@
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import RestaurantsFilter from './RestaurantsFilter'
 import RestaurantCard, { withOfferLabel } from '../../components/RestaurantCard'
 
 function Restaurants() {
+	const { t } = useTranslation()
 	const restaurants = useSelector(state => state.restaurants)
 
 	return (
@@ -13,7 +15,7 @@ function Restaurants() {
 				(restaurants && restaurants?.length != 0) &&
 				<>
 					<section id='restaurants'>
-						<h2 className='font-GrotBlack text-2xl pb-5 pt-5 2xl:text-start text-center sm:px-0 px-2'>Restaurants with online food delivery in Ayyat</h2>
+						<h2 className='font-GrotBlack text-2xl pb-5 pt-5 2xl:text-start text-center sm:px-0 px-2'>{t("Restaurants with online food delivery in El-Ayat")}</h2>
 
 						<RestaurantsFilter />
 
@@ -24,11 +26,11 @@ function Restaurants() {
 								    {
 								      // res?.info?.aggregatedDiscountInfoV3 ? <RestaurantCardwithOffer info={res?.info} /> : <RestaurantCard info={res?.info} />
 								    	<RestaurantCard info={{
-											    areaName: 'Ayyat',
+											    areaName: t("El-Ayat"),
 											    name: res?.business?.name,
 											    avgRating: '4.5',
 											    cloudinaryImageId: res?.business?.cover,
-											    sla: '30-45 min',
+											    sla: '30-45 ' + t('min'),
 											    cuisines: ['Pizza', 'Krib', 'Shawrma'],
 											    availability: true,
 										  	}}

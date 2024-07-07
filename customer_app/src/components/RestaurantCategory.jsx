@@ -3,10 +3,12 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io"
 import { useDispatch, useSelector } from 'react-redux'
 import toast, { Toaster } from 'react-hot-toast'
 import { addToCart, setRestaurant, clearCart } from '../rtk/slices/cartSlice'
+import { useTranslation } from 'react-i18next'
 
 import priceAfterDiscount from '../utils/priceAfterDiscount'
 
 const RestaurantCategory = ({ id, resId, title, ShowItem, handleShowItem, ResInfoData }) => {
+  const { t } = useTranslation()
   const itemCards = []
   const dispatch = useDispatch()
   const menuItems = useSelector(state => state.menu.items)
@@ -27,11 +29,11 @@ const RestaurantCategory = ({ id, resId, title, ShowItem, handleShowItem, ResInf
     const isSameRes = currentResId === '' ? true : resId === currentResId
 
       if(isItemInCart){
-        toast.error('Already added to the Cart');
+        toast.error(t('Already added to the Cart'));
       }
       else{
         if(isSameRes){
-          toast.success('Added to the Cart');
+          toast.success(t('Added to the Cart'));
           dispatch(addToCart({ id: item.id, quantity: 1 }))
           dispatch(setRestaurant(resId))
           setShowPopup(false)
@@ -45,7 +47,7 @@ const RestaurantCategory = ({ id, resId, title, ShowItem, handleShowItem, ResInf
   const handleClearCart = () => {
     dispatch(clearCart())
     setShowPopup(false)
-    toast.success('Cart is cleared Successfully', {
+    toast.success(t('Cart is cleared Successfully'), {
       className: "font-ProximaNovaSemiBold",
       position: "top-center",
       duration: 1500

@@ -8,6 +8,7 @@ import { clearCart } from '../../rtk/slices/cartSlice'
 import priceAfterDiscount from '../../utils/priceAfterDiscount'
 import { useNavigate } from 'react-router-dom'
 import toast, { Toaster } from "react-hot-toast"
+import { useTranslation } from 'react-i18next'
 
 import Divider from './Divider'
 import Tip from './Tip'
@@ -90,6 +91,7 @@ const StyledWindow = styled.div`
 `
 
 function CheckoutUserPayment({ handleCurrentState, res }) {
+	const { t } = useTranslation()
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
 	const placeOrder = usePlaceOrder()
@@ -123,9 +125,9 @@ function CheckoutUserPayment({ handleCurrentState, res }) {
 				return false
 			}),
 			{
-				loading: 'Saving...',
-				success: 'Success.',
-				error: 'Could not save your order.',
+				loading: t('Saving...'),
+				success: t('Success.'),
+				error: t('Could not save your order.'),
 			},
 			{
 				success: {

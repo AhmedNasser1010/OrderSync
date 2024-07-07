@@ -1,8 +1,10 @@
 import { IoLogoGoogle } from "react-icons/io"
+import { useTranslation } from 'react-i18next'
 
 import useSignupGoogleProvider from '../../hooks/useSignupGoogleProvider'
 
 function SignupGoogleProvider() {
+	const { t } = useTranslation()
 	const signupGoogleProvider = useSignupGoogleProvider()
 
 
@@ -14,7 +16,7 @@ function SignupGoogleProvider() {
 				onMouseUp={signupGoogleProvider}
 			>
 				{/*<IoLogoGoogle className='absolute top-1/2 -translate-y-1/2' />*/}
-				Login With Google
+				{t('Login With Google')}
 			</button>
 		</div>
 

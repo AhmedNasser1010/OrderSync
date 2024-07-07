@@ -1,7 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next'
 
 const RestaurantInfo = ({ resMainInfo }) => {
+  const { t } = useTranslation()
   const {
     city,
     name,
@@ -22,7 +24,7 @@ const RestaurantInfo = ({ resMainInfo }) => {
               to="/"
               className="inline-flex items-center text-xs font-medium"
             >
-              Home
+              {t("Home")}
             </Link>
           </li>
           <li>
@@ -42,7 +44,7 @@ const RestaurantInfo = ({ resMainInfo }) => {
                   d="m1 9 4-4-4-4"
                 />
               </svg>
-              <span className="ms-1 text-xs font-medium">{city}</span>
+              <span className="ms-1 text-xs font-medium">{t(city)}</span>
             </div>
           </li>
           <li aria-current="page">

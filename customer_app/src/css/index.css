@@ -72,6 +72,11 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: "Beiruti";
+    src: url("fonts/Beiruti-VariableFont_wght.ttf");
+}
+
 .sidebar-btn:hover .custom-underline::after {
     background-color: #fc8019;
 }
@@ -197,4 +202,31 @@ input.error {
 
 input.error::placeholder {
     color: #ef4444;
+}
+
+/* Example CSS to handle RTL */
+body[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+body[dir="ltr"] {
+  direction: ltr;
+  text-align: left;
+}
+
+.location-sidebar {
+    /* Base styles for your sidebar */
+    width: 300px;
+    /* Additional styles... */
+}
+
+.location-sidebar[dir="rtl"] {
+    right: 0;
+    left: auto;
+}
+
+.location-sidebar[dir="ltr"] {
+    left: 0;
+    right: auto;
 }

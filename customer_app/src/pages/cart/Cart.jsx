@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import toast, { Toaster } from "react-hot-toast";
 import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 
 
 import { quantityHandle, clearCart } from '../../rtk/slices/cartSlice'
@@ -62,6 +63,7 @@ const StyledWindow = styled.div`
 `
 
 const Cart = () => {
+	const { t } = useTranslation()
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const cartItems = useSelector(state => state.cart.items)
@@ -134,7 +136,7 @@ const Cart = () => {
 
 	const handleClearAll = () => {
 		dispatch(clearCart())
-		toast.success('Cart is cleared Successfully', {
+		toast.success(t('Cart is cleared Successfully'), {
 			className: "font-ProximaNovaSemiBold",
 			position: "top-center",
 			duration: 1500
@@ -152,7 +154,7 @@ const Cart = () => {
 		setDisableSubmit(true)
 
     if (!user?.userInfo?.uid) {
-    	toast('Please log in first and update your contact information before continuing with your order.', {
+    	toast(t('Please log in first and update your contact information before continuing with your order.'), {
     		icon: '🤌',
     		className: "font-ProximaNovaSemiBold",
 				position: "top-center",
@@ -168,7 +170,7 @@ const Cart = () => {
     	if (accessToken) {
     		if (valid.location.latlng[0] === 29.620106778124843 && valid.location.latlng[1] === 31.255811811669496) {
     			dispatch(toggleLoginSidebar())
-    			toast.error('Error update your location address first', {
+    			toast.error(t('Error update your location address first'), {
     				className: "font-ProximaNovaSemiBold",
 						position: "top-center",
 						duration: 3000
@@ -196,9 +198,9 @@ const Cart = () => {
 			    	return false
 		    	}),
 		    	{
-						loading: 'Sending...',
-						success: 'Success.',
-						error: 'An unexpected error occurred while sending your order. Please try again.',
+						loading: t('Sending...'),
+						success: t('Success.'),
+						error: t('An unexpected error occurred while sending your order. Please try again.'),
 					},
 					{
 						success: {
@@ -216,7 +218,7 @@ const Cart = () => {
 
 		    
     	} else {
-    		toast.error('Error restaurant id not found.', {
+    		toast.error(t('Error restaurant id not found.'), {
 		    	className: "font-ProximaNovaSemiBold text-red-500",
 					position: "top-center",
 					duration: 3000
@@ -231,7 +233,7 @@ const Cart = () => {
       		dispatch(toggleLoginSidebar())
       	}
 
-      	toast.error(err, {
+      	toast.error(t(err), {
       		duration: Number(`${i+2}500`),
       		className: "font-ProximaNovaSemiBold",
 					position: "top-center",
@@ -247,9 +249,9 @@ const Cart = () => {
 					<div className='mx-auto pt-5 mb-10 md:w-1/2 min-h-screen'>
 						<div className='flex items-center justify-center flex-col mt-20'>
 							<img src="/assets/empty-cart.webp" alt="empty-cart" className='w-72 h-64' />
-							<h2 className='mt-6 text-xl text-color-6 font-ProximaNovaSemiBold'>Your cart is empty</h2>
-							<p className='mt-1 text-color-8 font-ProximaNovaThin text-sm'>You can go to home page to view more restaurants</p>
-							<Link to="/" className='uppercase mt-7 py-3 px-5 bg-color-2 text-white font-ProximaNovaBold cursor-pointer border-0 text-[15px] text-center'>see restaurants near you</Link>
+							<h2 className='mt-6 text-xl text-color-6 font-ProximaNovaSemiBold'>{t('Your cart is empty')}</h2>
+							<p className='mt-1 text-color-8 font-ProximaNovaThin text-sm'>{t("You can go to home page to view more restaurants")}</p>
+							<Link to="/" className='uppercase mt-7 py-3 px-5 bg-color-2 text-white font-ProximaNovaBold cursor-pointer border-0 text-[15px] text-center'>{t("see restaurants near you")}</Link>
 						</div>
 					</div>
 					:
@@ -262,7 +264,7 @@ const Cart = () => {
 									</div>
 									<div className='tracking-tighter'>
 										<h2 className='font-ProximaNovaMed sm:text-2xl text-lg'>{resInfo?.business?.name}</h2>
-										<p className='font-ProximaNovaThin sm:text-base text-sm -mt-1'>Ayyat</p>
+										<p className='font-ProximaNovaThin sm:text-base text-sm -mt-1'>{t("El-Ayat")}</p>
 									</div>
 								</div>
 								{
@@ -301,7 +303,7 @@ const Cart = () => {
 									<>
 									<div className="discount flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
 										<div>
-											<h3 className="font-ProximaNovaSemiBold">Total Price:</h3>
+											<h3 className="font-ProximaNovaSemiBold">{t("Total Price:")}</h3>
 										</div>
 										{ 
 											resInfo?.services?.deliveryfee ? <div>
@@ -313,7 +315,7 @@ const Cart = () => {
 									</div>
 									<div className="flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
 										<div>
-											<h3 className="font-ProximaNovaSemiBold">Total Price Dsicounted:</h3>
+											<h3 className="font-ProximaNovaSemiBold">{t("Total Price Dsicounted:")}</h3>
 										</div>
 										{
 											resInfo?.services?.deliveryfee ? <div>
@@ -329,7 +331,7 @@ const Cart = () => {
 									cartTotalPrice.total === cartTotalPrice.discount &&
 										<div className="flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
 											<div>
-												<h3 className="font-ProximaNovaSemiBold">Total Price:</h3>
+												<h3 className="font-ProximaNovaSemiBold">{t("Total Price:")}</h3>
 											</div>
 											{ 
 												resInfo?.services?.deliveryfee ? <div>
@@ -344,13 +346,13 @@ const Cart = () => {
 									className='w-full p-3 border border-gray-300'
 									id='comment'
 									type="text"
-									placeholder='Comment, extras'
+									placeholder={t('Comment, extras')}
 									value={comment}
 									onChange={handleComment}
 								/>
 								<div className="flex items-center justify-center gap-2 mt-2 checkout-btns">
-									<button onClick={() => !disableSubmit && handlePayment()} className="bg-color-11 border border-color-11 text-white hover:bg-white hover:text-color-11">Place Order</button>
-									<button onClick={handleClearAll} className="border border-red-500 bg-red-500 text-white hover:bg-white hover:text-red-500">Clear All</button>
+									<button onClick={() => !disableSubmit && handlePayment()} className="bg-color-11 border border-color-11 text-white hover:bg-white hover:text-color-11">{t('Place Order')}</button>
+									<button onClick={handleClearAll} className="border border-red-500 bg-red-500 text-white hover:bg-white hover:text-red-500">{t('Clear All')}</button>
 								</div>
 							</div>
 						</div>
@@ -363,7 +365,7 @@ const Cart = () => {
 					>
 						<StyledWindow>
 							<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 50.00 50.00" xmlSpace="preserve" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle style={{ fill: '#25AE88' }} cx="25" cy="25" r="25"></circle> <polyline style={{ fill: 'none', stroke: '#FFFFFF', strokeWidth: '4.2', strokeLinecap: 'round', strokeLinejoin: 'round', strokeMiterlimit: '10' }} points=" 38,15 22,33 12,25 "></polyline> </g></svg>
-							<p className='text-[#686b78] mt-2 font-ProximaNovaMed text-sm pr-5'>Your order has been received. The delivery captain will contact you when it's ready.</p>
+							<p className='text-[#686b78] mt-2 font-ProximaNovaMed text-sm pr-5'>{t("Your order has been received. The delivery captain will contact you when it's ready.")}</p>
 						</StyledWindow>
 					</PopupWindow>
 			}

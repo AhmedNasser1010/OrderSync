@@ -1,3 +1,6 @@
+import useLanguageDirection from "../../hooks/useLanguageDirection"
+import { useTranslation } from 'react-i18next'
+
 const categories = [
 	{ id: 'q', img: 'https://i.imgur.com/Ypbkc4l.jpg' },
 	{ id: 'w', img: 'https://i.imgur.com/Xd34D3D.jpg' },
@@ -20,6 +23,8 @@ const categories = [
 ]
 
 function WhatsOnYourMind() {
+	const direction = useLanguageDirection()
+	const { t } = useTranslation()
 
 	const handleFoodScrollLeft = () => {
 		const foodCategory = document.querySelector(".food-category");
@@ -34,9 +39,9 @@ function WhatsOnYourMind() {
 	return (
 
 		<section id='img-carousel' className="relative">
-			<h2 className='font-GrotBlack text-2xl pb-5'>What's on your mind?</h2>
-			<div className="scroll-buttons absolute top-0 flex gap-2 right-10">
-				<button onClick={handleFoodScrollLeft} className="scroll-left text-white flex justify-center cursor-pointer">
+			<h2 className='font-GrotBlack text-2xl pb-5'>{t("What's on your mind?")}</h2>
+			<div className={`scroll-buttons absolute top-0 flex gap-2 ${direction === 'rtl' ? 'left-10': 'right-10'}`}>
+				<button onClick={handleFoodScrollLeft} className={`scroll-left text-white flex justify-center cursor-pointer ${direction === 'rtl' && 'order-1'}`}>
 					<svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true" strokecolor="rgba(2, 6, 12, 0.92)" fillcolor="rgba(2, 6, 12, 0.92)"><path d="M7.46869 3.43394C7.79171 3.13249 8.29794 3.14998 8.59939 3.473C8.90083 3.79602 8.88334 4.30225 8.56033 4.60369L5.0839 7.84795C4.94511 7.97748 4.82252 8.0921 4.71414 8.19502L15.0937 8.19502C15.5355 8.19502 15.8937 8.5532 15.8937 8.99502C15.8937 9.43685 15.5355 9.79502 15.0937 9.79502L4.6665 9.79502C4.78625 9.90939 4.92436 10.0386 5.08389 10.1875L8.51791 13.3922C8.84092 13.6937 8.8584 14.1999 8.55695 14.5229C8.2555 14.8459 7.74927 14.8634 7.42626 14.5619L3.95463 11.3221C3.54648 10.9413 3.18179 10.601 2.92647 10.2871C2.64873 9.94573 2.41671 9.53755 2.41672 9.01769C2.41672 8.49783 2.64874 8.08965 2.92648 7.74824C3.18181 7.43439 3.54649 7.09412 3.95465 6.7133L7.46869 3.43394Z" fill="rgba(2, 6, 12, 0.92)" fillOpacity="0.92"></path></svg>
 				</button>
 				<button onClick={handleFoodScrollRight} className="scroll-right flex justify-center cursor-pointer">
