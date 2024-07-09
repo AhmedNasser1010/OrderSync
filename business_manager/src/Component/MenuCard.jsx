@@ -25,7 +25,7 @@ const MenuCard = ({ item }) => {
 
 	return (
 
-		<Box sx={{ maxWidth: '600px', opacity: item?.visibility ? '100%' : '60%' }}>
+		<Box sx={{ opacity: item?.visibility ? '100%' : '60%' }}>
 			<Paper
 				onMouseEnter={() => setHovered(true)}
 				onMouseLeave={() => setHovered(false)}

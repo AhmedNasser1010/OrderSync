@@ -10,6 +10,8 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import { setSaveToCloudBtnStatus } from '../rtk/slices/conditionalValuesSlice';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+import { setDiscountDialog } from '../rtk/slices/conditionalValuesSlice'
 
 const MenuCardManageMiniMenu = ({ item, buttonStyles, hovered = true, categoryOrItem }) => {
 	const dispatch = useDispatch();
@@ -17,6 +19,7 @@ const MenuCardManageMiniMenu = ({ item, buttonStyles, hovered = true, categoryOr
 	const expandMore = Boolean(expandMoreAnchorEl);
 	const [visibility, setVisibility] = useState(item?.visibility);
 	const [topMenu, setTopMenu] = useState(item?.topMenu);
+	const discountDialog = useSelector(state => state.conditionalValues.discountDialog)
 
 	const handleOpenExpandMore = (event) => {
     setExpandMoreAnchorEl(event.currentTarget);
@@ -42,6 +45,10 @@ const MenuCardManageMiniMenu = ({ item, buttonStyles, hovered = true, categoryOr
 		categoryOrItem === 'category' && dispatch(topCategory({ item, topMenuValue }));
 		categoryOrItem === 'item' && dispatch(topItem({ item, topMenuValue }));
 		dispatch(setSaveToCloudBtnStatus('ON_CHANGES'));
+	}
+
+	const handleDiscountDialog = () => {
+		dispatch(setDiscountDialog({ id: item.id, isOpen: true, type: categoryOrItem }))
 	}
 
 	const handleDelete = () => {
@@ -81,6 +88,17 @@ const MenuCardManageMiniMenu = ({ item, buttonStyles, hovered = true, categoryOr
 					</ListItemIcon>
 					<Typography>Delete</Typography>
 				</MenuItem>
+
+
+				{
+					categoryOrItem !== "category" &&
+						<MenuItem onMouseUp={handleDiscountDialog}>
+							<ListItemIcon>
+								<LocalOfferIcon fontSize="small" />
+							</ListItemIcon>
+							<Typography>Discount</Typography>
+						</MenuItem>
+				}
 
 				<MenuItem onMouseUp={handleCategoryVisibility}>
 					<Switch size="small" checked={visibility} sx={{ transform: 'translateX(-10px)' }} />

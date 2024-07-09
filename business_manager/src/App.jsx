@@ -85,7 +85,7 @@ function App() {
 	 useEffect(() => {
     userRegisterStatus === 'LOGGED_OUT' && navigate('/login')
     userRegisterStatus === 'LOGGED_IN_NO_BUSINESS' && navigate('/')
-    userRegisterStatus === 'LOGGED_IN' && navigate('/orders')
+    userRegisterStatus === 'LOGGED_IN' && navigate('/menu')
   }, [userRegisterStatus])
 
 

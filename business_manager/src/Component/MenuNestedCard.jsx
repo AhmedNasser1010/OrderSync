@@ -40,6 +40,25 @@ const MenuNestedCard = ({ item }) => {
 		dispatch(setDisableMenuDnD(false));
 	}
 
+	const fromDiscountCodeToText = () => {
+		let symbol = ""
+		const value = item.discount.code.split('-')[1]
+
+		switch (item.discount.code.split('-')[0]) {
+			case 'P':
+				symbol = '%'
+				break
+			case 'FIXED':
+				symbol = 'ج.م'
+				break
+			default:
+				symbol = ''
+				break
+		}
+
+		return `${value}${symbol}`
+	}
+
 	return (
 
 		<Paper
@@ -75,8 +94,15 @@ const MenuNestedCard = ({ item }) => {
 						initialValues={item}
 					/>
 
-					{/* bro don't forget to get the currency from the business data instead of the static value */}
-					<span style={{ color: '#4a4a4a', fontSize: '12px' }}>{ Number(item?.price).toFixed(2) } USD</span>
+					{
+						item?.discount ?
+							<Stack direction='row' spacing={1}>
+								<span style={{ color: '#ef8e00', fontSize: '12px' }}>{ fromDiscountCodeToText() }</span>
+								<span style={{ color: '#4a4a4a', fontSize: '12px' }}>{ Number(item?.price) }ج.م</span>
+							</Stack>
+						:
+							<span style={{ color: '#4a4a4a', fontSize: '12px' }}>{ Number(item?.price) }ج.م</span>
+					}
 
 				</Stack>
 

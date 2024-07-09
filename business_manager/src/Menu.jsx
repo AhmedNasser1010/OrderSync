@@ -31,6 +31,9 @@ import _addDoc from './functions/_addDoc';
 import AutorenewSharpIcon from '@mui/icons-material/AutorenewSharp';
 import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
 import DB_GET_DOC from './functions/DB_GET_DOC';
+import MUIDialog from './Component/MUIDialog'
+import DiscountDialog from './Component/DiscountDialog'
+import { setDiscountDialog } from './rtk/slices/conditionalValuesSlice'
 
 const Menu = () => {
 	const dispatch = useDispatch();
@@ -44,11 +47,12 @@ const Menu = () => {
 	const [saveBtnStyles, setSaveBtnStyles] = useState({});
 	const [menuValuesSnapshot, setMenuValuesSnapshot] = useState(menuValues);
 	const [onceRun, setOnceRun] = useState(false);
+	const discountDialog = useSelector(state => state.conditionalValues.discountDialog)
 
 	// setup indexed from categories
 	useEffect(() => {
 		setIndexes(prevIndexes => categories.map((item, i) => i + 1));
-	}, [categories])
+	}, [menuValues])
 
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -206,6 +210,15 @@ const Menu = () => {
 			>
 				Add New Category
 			</Button>
+
+			<MUIDialog
+				isOpen={discountDialog.isOpen}
+				closeCallback={() => dispatch(setDiscountDialog({ id: '', isOpen: false, type: '' }))}
+				title='Discount'
+				description='Add discount to this item'
+			>
+				<DiscountDialog id={discountDialog.id} type={discountDialog.type} />
+			</MUIDialog>
 
 		</Box>
 
