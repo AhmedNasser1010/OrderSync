@@ -9,7 +9,7 @@ const PageTitle = ({ style, title }) => {
 			<Typography
 				variant="h2"
 				gutterBottom
-				sx={{ fontSize: '3em' }}
+				sx={{ fontSize: '3em', marginLeft: '15px' }}
 			>
 				{ title }
 			</Typography>

@@ -13,7 +13,8 @@ export const conditionalValuesSlice = createSlice({
       isOpen: false,
       id: '',
       type: ''
-    }
+    },
+    printedOrders: []
   },
   reducers: {
     setDisableMenuDnD: (state, { payload }) => {
@@ -42,6 +43,9 @@ export const conditionalValuesSlice = createSlice({
     },
     setDiscountDialog: (state, { payload }) => {
       return { ...state, discountDialog: payload }
+    },
+    setPrintedOrders: (state, { payload }) => {
+      return { ...state, printedOrders: [...state.printedOrders, payload] }
     }
   },
 })
@@ -56,7 +60,8 @@ export const {
   savingOrdersTimerIsLoading,
   setUserRegisterStatus,
   setIsGetAppData,
-  setDiscountDialog
+  setDiscountDialog,
+  setPrintedOrders
 } = conditionalValuesSlice.actions;
 
 export default conditionalValuesSlice.reducer;

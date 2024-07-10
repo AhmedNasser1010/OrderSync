@@ -22,6 +22,7 @@ import SideBar from "./Component/SideBar.jsx"
 import Home from "./Home";
 import User from "./User";
 import Orders from './Orders';
+import ClosedOrders from './Component/ClosedOrders'
 import Menu from "./Menu";
 import Settings from './Settings'
 import Staff from "./Staff"
@@ -85,7 +86,7 @@ function App() {
 	 useEffect(() => {
     userRegisterStatus === 'LOGGED_OUT' && navigate('/login')
     userRegisterStatus === 'LOGGED_IN_NO_BUSINESS' && navigate('/')
-    userRegisterStatus === 'LOGGED_IN' && navigate('/menu')
+    userRegisterStatus === 'LOGGED_IN' && navigate('/orders')
   }, [userRegisterStatus])
 
 
@@ -101,6 +102,7 @@ function App() {
 								<Route path="/" element={<Home />} />
 								{/*<Route path="/user" element={<User />} />*/}
 								<Route path="/orders" element={<Orders />} />
+								<Route path="/closed-orders" element={<ClosedOrders />} />
 								<Route path="/menu" element={<Menu />} />
 								<Route path="/settings" element={<Settings />} />
 								<Route path="/staff" element={<Staff />} />

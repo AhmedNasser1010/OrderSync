@@ -64,14 +64,14 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 	}, [menu, selected])
 
 	const nextTableStatusMap = {
-		RECEIVED: 'ON_GOING',
-		ON_GOING: 'IN_DELIVERY',
+		RECEIVED: 'IN_PROGRESS',
+		IN_PROGRESS: 'IN_DELIVERY',
 		IN_DELIVERY: 'COMPLETED'
 	};
 	const prevTableStatusMap = {
 		COMPLETED: 'IN_DELIVERY',
-		IN_DELIVERY: 'ON_GOING',
-		ON_GOING: 'RECEIVED'
+		IN_DELIVERY: 'IN_PROGRESS',
+		IN_PROGRESS: 'RECEIVED'
 	};
 	const nextTableStatus = nextTableStatusMap[tableStatus] || 'RECEIVED';
 	const prevTableStatus = prevTableStatusMap[tableStatus] || 'RECEIVED';

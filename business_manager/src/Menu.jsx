@@ -34,6 +34,7 @@ import DB_GET_DOC from './functions/DB_GET_DOC';
 import MUIDialog from './Component/MUIDialog'
 import DiscountDialog from './Component/DiscountDialog'
 import { setDiscountDialog } from './rtk/slices/conditionalValuesSlice'
+import PageTitle from './Component/PageTitle'
 
 const Menu = () => {
 	const dispatch = useDispatch();
@@ -174,51 +175,55 @@ const Menu = () => {
 
 	return (
 
-		<Box style={{ marginTop: '100px', marginBottom: '20px' }}>
+		<Box>
 
-			<Button
-				sx={{ marginBottom: '10px', fontSize: '11px', transition: '0.3s' }}
-				onMouseUp={handleToCloudeBtnSave}
-				{...saveBtnStyles}
-			>
-				{ saveBtnStyles?.label }
-			</Button>
+			<PageTitle title="Menu Setup" style={{ marginBottom: '50px' }} />
 
-			<DndContext
-				sensors={sensors}
-				collisionDetection={closestCenter}
-				onDragEnd={handleDragEnd}
-			>
+			<div style={{ margin: '0px 15px 20px 15px' }}>
+				<Button
+					sx={{ marginBottom: '10px', fontSize: '11px', transition: '0.3s' }}
+					onMouseUp={handleToCloudeBtnSave}
+					{...saveBtnStyles}
+				>
+					{ saveBtnStyles?.label }
+				</Button>
 
-				<SortableContext items={indexes} strategy={verticalListSortingStrategy} disabled={disableMenuDnD}>
-					{indexes.map((index, i) =>
-						<SortableItem key={index} id={index} >
-							<MenuCard item={categories[index - 1]} />
-						</SortableItem>
-					)}
-				</SortableContext>
+				<DndContext
+					sensors={sensors}
+					collisionDetection={closestCenter}
+					onDragEnd={handleDragEnd}
+				>
 
-			</DndContext>
+					<SortableContext items={indexes} strategy={verticalListSortingStrategy} disabled={disableMenuDnD}>
+						{indexes.map((index, i) =>
+							<SortableItem key={index} id={index} >
+								<MenuCard item={categories[index - 1]} />
+							</SortableItem>
+						)}
+					</SortableContext>
 
-			<AddNewCategoryDialog dialogVisibility={dialogVisibility} handleDialogClose={handleDialogClose} />
+				</DndContext>
 
-			<Button
-				variant="outlined"
-				sx={btnStyle}
-				startIcon={<PlaylistAddIcon />}
-				onClick={handleDialogOpen}
-			>
-				Add New Category
-			</Button>
+				<AddNewCategoryDialog dialogVisibility={dialogVisibility} handleDialogClose={handleDialogClose} />
 
-			<MUIDialog
-				isOpen={discountDialog.isOpen}
-				closeCallback={() => dispatch(setDiscountDialog({ id: '', isOpen: false, type: '' }))}
-				title='Discount'
-				description='Add discount to this item'
-			>
-				<DiscountDialog id={discountDialog.id} type={discountDialog.type} />
-			</MUIDialog>
+				<Button
+					variant="outlined"
+					sx={btnStyle}
+					startIcon={<PlaylistAddIcon />}
+					onClick={handleDialogOpen}
+				>
+					Add New Category
+				</Button>
+
+				<MUIDialog
+					isOpen={discountDialog.isOpen}
+					closeCallback={() => dispatch(setDiscountDialog({ id: '', isOpen: false, type: '' }))}
+					title='Discount'
+					description='Add discount to this item'
+				>
+					<DiscountDialog id={discountDialog.id} type={discountDialog.type} />
+				</MUIDialog>
+			</div>
 
 		</Box>
 

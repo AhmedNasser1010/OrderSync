@@ -20,6 +20,7 @@ const ActionBtns = styled.div``
 const Action = styled(Button)``
 
 function TableTitle({ title, titleBody, action }) {
+	console.log(action.disabled)
 	return (
 
 		<Parent>
@@ -30,6 +31,7 @@ function TableTitle({ title, titleBody, action }) {
 			{ action.title &&
 				<ActionBtns>
 					<Action
+						disabled={action?.disabled || false}
 						onMouseUp={action.callback}
 						variant="contained"
 						size='small'

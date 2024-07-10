@@ -21,6 +21,7 @@ import Typography from '@mui/material/Typography'
 import Collapse from '@mui/material/Collapse'
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Box from '@mui/material/Box'
+import PageTitle from './PageTitle'
 
 const descendingComparator = (a, b, orderBy) => {
 	if (b[orderBy] < a[orderBy]) {
@@ -40,16 +41,16 @@ const getComparator = (order, orderBy) => {
 
 const headCells = [
 	{
-		id: 'id',
-		numeric: false,
-		disablePadding: false,
-		label: 'ID',
-	},
-	{
 		id: 'index',
 		numeric: false,
 		disablePadding: false,
 		label: '#',
+	},
+	{
+		id: 'expand',
+		numeric: false,
+		disablePadding: false,
+		label: 'Expand',
 	},
 	{
 		id: 'day',
@@ -151,71 +152,64 @@ function ClosedOrders() {
 	return (
 
 		<Box>
-			<Toolbar>
-				<Typography
-					sx={{ flex: '1 1 100%' }}
-					variant="h6"
-					id="tableTitle"
-					component="div"
-				>
-					Closed Orders
-				</Typography>
-			</Toolbar>
+			<PageTitle title='Closed Orders' style={{ marginBottom: '50px' }} />
 
-			<TableContainer component={Paper}>
-				<Table
-					sx={{ minWidth: 650 }}
-					aria-label="simple table"
-				>
-					
-					<TableHead>
-						<TableRow>
-							{headCells.map(headCell => (
+			<div style={{ margin: '0 15px' }}>
+				<TableContainer component={Paper}>
+					<Table
+						sx={{ minWidth: 650 }}
+						aria-label="simple table"
+					>
+						
+						<TableHead>
+							<TableRow>
+								{headCells.map(headCell => (
 
-								<TableCell
-									key={uuidv4()}
-									align='left'
-								>
-									<TableSortLabel
-										active={orderBy === headCell.id}
-										direction={orderBy === headCell.id ? order : 'asc'}
-										onClick={createSortHandler(headCell.id)}
+									<TableCell
+										key={uuidv4()}
+										align='left'
 									>
-										{headCell.label}
-									</TableSortLabel>
-								</TableCell>
+										<TableSortLabel
+											active={orderBy === headCell.id}
+											direction={orderBy === headCell.id ? order : 'asc'}
+											onClick={createSortHandler(headCell.id)}
+										>
+											{headCell.label}
+										</TableSortLabel>
+									</TableCell>
 
-							))}
-						</TableRow>
-					</TableHead>
-
-					<TableBody>
-						{visibleRows.map((row, index) => (
-							<ClosedOrdersRow row={row} index={index} />
-						))}
-						{emptyRows > 0 && (
-							<TableRow
-								style={{
-									height: (dense ? 33 : 53) * emptyRows,
-								}}
-							>
-								<TableCell colSpan={6} />
+								))}
 							</TableRow>
-						)}
-					</TableBody>
+						</TableHead>
 
-				</Table>
-			</TableContainer>
+						<TableBody>
+							{visibleRows.map((row, index) => (
+								<ClosedOrdersRow row={row} index={index} />
+							))}
+							{emptyRows > 0 && (
+								<TableRow
+									style={{
+										height: (dense ? 33 : 53) * emptyRows,
+									}}
+								>
+									<TableCell colSpan={6} />
+								</TableRow>
+							)}
+						</TableBody>
 
-			<TablePagination
-				rowsPerPageOptions={[5, 10, 30]}
-				component="div"
-				count={rows?.length}
-				rowsPerPage={rowsPerPage}
-				page={page}
-				onPageChange={handleChangePage}
-				onRowsPerPageChange={handleChangeRowsPerPage}
-			/>
+					</Table>
+				</TableContainer>
+
+				<TablePagination
+					rowsPerPageOptions={[5, 10, 30]}
+					component="div"
+					count={rows?.length}
+					rowsPerPage={rowsPerPage}
+					page={page}
+					onPageChange={handleChangePage}
+					onRowsPerPageChange={handleChangeRowsPerPage}
+				/>
+			</div>
 		</Box>
 
 	)

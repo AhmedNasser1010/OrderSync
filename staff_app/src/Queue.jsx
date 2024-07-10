@@ -22,7 +22,7 @@ function Queue() {
 	const queueOrders = useMemo(() => {
 		return orders.filter(order => {
 			if (user.userInfo.role === 'ORDER_CAPTAIN') {
-				return order.status === 'ON_GOING' && order.assign.to === user.userInfo.uid && order.assign.status === 'on-going'
+				return order.status === 'IN_PROGRESS' && order.assign.to === user.userInfo.uid && order.assign.status === 'on-going'
 			} else if (user.userInfo.role === 'DELIVERY_CAPTAIN') {
 				return order.status === 'IN_DELIVERY' && order.assign.to === user.userInfo.uid && order.assign.status === 'on-delivery'
 			}

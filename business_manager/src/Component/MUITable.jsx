@@ -49,7 +49,7 @@ const stableSort = (array, comparator) => {
 	}
 }
 
-const MUITable = ({ rowCells, headCells }) => {
+const MUITable = ({ style, rowCells, headCells }) => {
 	const [order, setOrder] = useState('asc');
 	const [orderBy, setOrderBy] = useState('');
 	const [selected, setSelected] = useState([]);
@@ -91,7 +91,7 @@ const MUITable = ({ rowCells, headCells }) => {
 
 	return (
 
-		<Box>
+		<Box sx={style}>
 {/*			<TableToolbar
 				selected={selected}
 				handleSetSelected={handleSetSelected}

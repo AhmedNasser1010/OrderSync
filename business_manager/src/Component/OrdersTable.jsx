@@ -139,6 +139,7 @@ const OrdersTable = ({ tableData, headCells, tableStatus }) => {
 								selected={selected}
 								index={index}
 								handleSetSelected={handleSetSelected}
+								tableStatus={tableStatus}
 							/>
 						);
 					})}

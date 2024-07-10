@@ -58,7 +58,7 @@ function AssignDialog({ isOpen, handleOpenClose, currentOrder }) {
 
 	const readyToAssignStaff = useMemo(() => {
 		return staff.filter(member => {
-			if (currentOrder.status === 'RECEIVED' || currentOrder.status === 'ON_GOING') {
+			if (currentOrder.status === 'RECEIVED' || currentOrder.status === 'IN_PROGRESS') {
 				return member.userInfo.role === 'ORDER_CAPTAIN'
 			} else if (currentOrder.status === 'IN_DELIVERY') {
 				return member.userInfo.role === 'DELIVERY_CAPTAIN'
@@ -88,7 +88,7 @@ function AssignDialog({ isOpen, handleOpenClose, currentOrder }) {
 			.catch(err => err)
 		}
 
-		if (currentOrder.status === 'ON_GOING' && currentOrder.assign.status === 'pickup') {
+		if (currentOrder.status === 'IN_PROGRESS' && currentOrder.assign.status === 'pickup') {
 			trigger(convertAssign('on-going'))
 		} else if (currentOrder.status === 'IN_DELIVERY' && currentOrder.assign.status === 'on-going') {
 			trigger(convertAssign('on-delivery'))

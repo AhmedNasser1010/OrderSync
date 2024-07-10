@@ -36,6 +36,7 @@ const NewWorkerForm = ({ handleDialogOpenClose }) => {
 	const dispatch = useDispatch()
 	const accessToken = useSelector(state => state.user.accessToken)
 	const [isDisabled, setIsDisabled] = useState(false)
+	const business = useSelector(state => state.business)
 
 	const filedPops = (errors, touched, name, label) => {
 		return {
@@ -81,8 +82,8 @@ const NewWorkerForm = ({ handleDialogOpenClose }) => {
 							<Field {...filedPops(errors, touched, 'email', 'Email')} />
 							<Field {...filedPops(errors, touched, 'role', 'Role')} select>
 								<MenuItem value='SELECT'>Select user role</MenuItem>
-								<MenuItem value='ORDER_CAPTAIN'>Orders Captain</MenuItem>
-								<MenuItem value='DELIVERY_CAPTAIN'>Delivery Captain</MenuItem>
+								{ business?.settings?.orderManagement?.assign?.forCooks && <MenuItem value='ORDER_CAPTAIN'>Orders Captain</MenuItem> }
+								{ business?.settings?.orderManagement?.assign?.forDeliveryWorkers && <MenuItem value='DELIVERY_CAPTAIN'>Delivery Captain</MenuItem> }
 							</Field>
 						</Stack>
 

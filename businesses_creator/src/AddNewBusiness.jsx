@@ -102,6 +102,10 @@ const AddNewBusiness = () => {
   			closeMsg: '',
   			isStrictOpen: true,
   		},
+  		orderManagement: {
+  			forCooks: false,
+  			forDeliveryWorkers: false
+  		}
   	},
   	business: {
 			name: '',

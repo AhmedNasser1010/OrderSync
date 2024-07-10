@@ -55,6 +55,7 @@ function Staff() {
 	const staff = useSelector(state => state.staff)
 	const [rowCells, setRowCells] = useState([])
 	const [dialogIsOpen, setDialogIsOpen] = useState(false)
+	const business = useSelector(state => state.business)
 
 	const handleDialogOpenClose = () => {
 		setDialogIsOpen(dialogIsOpen => !dialogIsOpen)
@@ -76,26 +77,29 @@ function Staff() {
 
 	return (
 
-		<Container>
+		<div>
 			<PageTitle title='Staff' style={{ marginBottom: '50px' }} />
 
-			<TableTitle
-				title='Staff Action'
-				titleBody='Add a new staff member to your business'
-				action={{
-					title: 'New Staff Member',
-					startIcon: <PersonAddIcon />,
-					callback: handleDialogOpenClose
-				}}
-			/>
+			<div style={{ margin: '0 15px' }}>
+				<TableTitle
+					title='Staff Action'
+					titleBody='Add a new staff member to your business'
+					action={{
+						title: 'New Staff Member',
+						startIcon: <PersonAddIcon />,
+						callback: handleDialogOpenClose,
+						disabled: business?.settings?.orderManagement?.assign?.forDeliveryWorkers || business?.settings?.orderManagement?.assign?.forCooks ? false : true
+					}}
+				/>
 
-			<MUITable
-				rowCells={rowCells}
-				headCells={headCells}
-			/>
+				<MUITable
+					rowCells={rowCells}
+					headCells={headCells}
+				/>
+			</div>
 
 			<AddNewWorkerDialog isOpen={dialogIsOpen} handleDialogOpenClose={handleDialogOpenClose} />
-		</Container>
+		</div>
 
 	)
 }

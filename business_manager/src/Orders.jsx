@@ -19,6 +19,11 @@ import RestaurantMenuIcon from '@mui/icons-material/RestaurantMenu';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PaymentsIcon from '@mui/icons-material/Payments';
 import ScheduleSendIcon from '@mui/icons-material/ScheduleSend';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import { IoArchive } from "react-icons/io5";
+import { GiCook } from "react-icons/gi";
+import { MdDeliveryDining } from "react-icons/md";
+import { IoMdDoneAll } from "react-icons/io";
 
 import { doc, onSnapshot } from "firebase/firestore"
 import { db } from "./firebase.js"
@@ -75,12 +80,21 @@ const headCells = [
 		label: (<span style={{ display: 'flex', alignItems: 'center', color: '#4b4a4a' }}><PaymentsIcon sx={{ marginRight: '5px' }} /> Total</span>),
 	},
 	{
+		id: 'print',
+		numeric: false,
+		disablePadding: false,
+		label: (<span style={{ display: 'flex', alignItems: 'center', color: '#4b4a4a' }}><ReceiptIcon sx={{ marginRight: '5px' }} /> Print</span>),
+	},
+	{
 		id: 'assign',
 		numeric: false,
 		disablePadding: false,
 		label: (<span style={{ display: 'flex', alignItems: 'center', color: '#4b4a4a' }}><ScheduleSendIcon sx={{ marginRight: '5px' }} /> Assign</span>),
 	},
 ]
+
+const headCellsNoAssign = headCells.filter(cell => cell.id !== 'assign')
+const headCellsForReceived = headCellsNoAssign.filter(cell => cell.id !== 'print')
 
 const Orders = () => {
 	const dummyOrder = useDummyOrder()
@@ -92,6 +106,7 @@ const Orders = () => {
 	const [isSaving, setIsSaving] = useState(false);
 	const intervalRef = useRef(null);
 	const savingOrdersTimer = useSelector(state => state.conditionalValues.savingOrdersTimer)
+	const business = useSelector(state => state.business)
 
 	useEffect(() => {
 		const docRef = doc(db, 'orders', accessToken);
@@ -109,7 +124,9 @@ const Orders = () => {
 		return {
 			id: `simple-tab-${index}`,
 			'aria-controls': `simple-tabpanel-${index}`,
-
+			sx: {
+				width: '100%'
+			}
 		};
 	}
 	const handleChangeTabChange = (event, newValue) => {
@@ -137,18 +154,17 @@ const Orders = () => {
 
 			<Stack direction="row" sx={{ minHeight: 'calc(100vh - 75px)' }}>
 
-				<Box sx={{ borderRight: 1, borderColor: 'divider' }}>
+				<Box sx={{ borderRight: 1, borderColor: 'divider', minWidth: '130px' }}>
 					<Tabs
 						value={tabValue}
 						onChange={handleChangeTabChange}
 						orientation="vertical"
-						variant='scrollable'
+						sx={{ height: '100%', position: 'relative' }}
 					>
-						<Tab label="Recieved" {...a11yProps(0)} />
-						<Tab label="On Going" {...a11yProps(1)} />
-						<Tab label="In Delivery" {...a11yProps(2)} />
-						<Tab label="Completed" {...a11yProps(3)} />
-						<Tab label="Closed" {...a11yProps(4)} sx={{ borderTop: '1px solid #0000001f' }} />
+						<Tab label="Recieved" {...a11yProps(0)} icon={<IoArchive style={{ fontSize: '1.3rem' }} />} />
+						<Tab label="In Progress" {...a11yProps(1)} icon={<GiCook style={{ fontSize: '1.8rem' }} />} />
+						<Tab label="In Delivery" {...a11yProps(2)} icon={<MdDeliveryDining style={{ fontSize: '1.8rem' }} />} />
+						<Tab label="Completed" {...a11yProps(3)} icon={<IoMdDoneAll style={{ fontSize: '1.5rem' }} />} style={{ borderTop: '1px solid rgba(0, 0, 0, 0.12)', position: 'absolute', bottom: '0', left: '0' }} />
 					</Tabs>
 				</Box>
 
@@ -159,19 +175,16 @@ const Orders = () => {
 					</Box>*/}
 
 					<CustomTabPanel tabValue={tabValue} index={0}>
-						<RecievedOrders headCells={headCells} tableData={orderFilter('RECEIVED')} tableStatus='RECEIVED' />
+						<RecievedOrders headCells={headCellsForReceived} tableData={orderFilter('RECEIVED')} tableStatus='RECEIVED' />
 					</CustomTabPanel>
 					<CustomTabPanel tabValue={tabValue} index={1}>
-						<OnGoingOrders headCells={headCells} tableData={orderFilter('ON_GOING')} tableStatus='ON_GOING' />
+						<OnGoingOrders headCells={business?.settings?.orderManagement?.assign?.forCooks ? headCells : headCellsNoAssign} tableData={orderFilter('IN_PROGRESS')} tableStatus='IN_PROGRESS' />
 					</CustomTabPanel>
 					<CustomTabPanel tabValue={tabValue} index={2}>
-						<InDeliveryOrders headCells={headCells} tableData={orderFilter('IN_DELIVERY')} tableStatus='IN_DELIVERY' />
+						<InDeliveryOrders headCells={business?.settings?.orderManagement?.assign?.forDeliveryWorkers ? headCells : headCellsNoAssign} tableData={orderFilter('IN_DELIVERY')} tableStatus='IN_DELIVERY' />
 					</CustomTabPanel>
 					<CustomTabPanel tabValue={tabValue} index={3}>
-						<CompletedOrders headCells={headCells} tableData={orderFilter('COMPLETED')} tableStatus='COMPLETED' />
-					</CustomTabPanel>
-					<CustomTabPanel tabValue={tabValue} index={4}>
-						<ClosedOrders />
+						<CompletedOrders headCells={headCellsNoAssign} tableData={orderFilter('COMPLETED')} tableStatus='COMPLETED' />
 					</CustomTabPanel>
 
 				</Box>

@@ -19,7 +19,6 @@ ul, li, a {
 
 .content {
 	width: calc(100% - 200px);
-	margin: 0 15px;
 }
 
 * {
