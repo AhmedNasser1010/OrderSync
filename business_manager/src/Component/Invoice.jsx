@@ -146,7 +146,12 @@ function Invoice({ business, orders }) {
 						</MiddleSpan>
 						<QrWrapper>
 							<QrBg>
-								<QRCode style={{ outline: '12px solid white' }} value={order.orderData.id} />
+								<QRCode
+									style={{ outline: '12px solid white' }}
+									value={
+										`Order Now! https://merro.netlify.app\nInvoice No: ${order.orderData.id}\n\nMade with <3 by Ahmed Nasser\n01117073085`
+									}
+								/>
 								<QrTitle>SCAN ME</QrTitle>
 							</QrBg>
 						</QrWrapper>

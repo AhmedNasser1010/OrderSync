@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import Tab from '@mui/material/Tab'
 import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded'
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded'
+import { MdQrCodeScanner } from "react-icons/md"
 
 const Nav = styled.div`
 	position: fixed;
@@ -32,6 +33,15 @@ function Navbar() {
 				onMouseUp={() => {
 					setSelected('queue')
 					navigate('/queue')
+				}}
+			/>
+			<Tab
+				icon={<MdQrCodeScanner style={{ fontSize: '1.5rem' }} />}
+				label="QR Scan"
+				sx={{ color: selected === 'order-qrscan' && 'blue' }}
+				onMouseUp={() => {
+					setSelected('order-qrscan')
+					navigate('/order-qrscan')
 				}}
 			/>
 			<Tab

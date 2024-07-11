@@ -7,15 +7,13 @@ import { store } from './rtk/store'
 import { Provider } from 'react-redux'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
     <BrowserRouter>
       <Provider store={store}>
         <App />
       </Provider>
-    </BrowserRouter>
-  </React.StrictMode>,
+    </BrowserRouter>,
 )
 
-
+// React.StrictMode
 window.read = 0
 window.write = 0

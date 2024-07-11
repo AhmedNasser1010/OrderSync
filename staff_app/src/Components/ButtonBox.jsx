@@ -33,6 +33,7 @@ function ButtonBox({ id, status }) {
 						status: status,
 						assign: {
 							...order.assign,
+							closedBy: user.userInfo.role === 'DELIVERY_CAPTAIN' ? user.userInfo.uid : null,
 							status: user.userInfo.role === 'DELIVERY_CAPTAIN' ? 'completed' : 'on-going'
 						}
 					}
@@ -43,12 +44,19 @@ function ButtonBox({ id, status }) {
 	}
 
 	const handleToNext = () => {
+		const finalOrders = changeOrderStatus(id, status, orders)
+
 		DB_UPDATE_NESTED_VALUE(
 			'orders',
 			user.accessToken,
 			'open',
-			changeOrderStatus(id, status, orders)
+			finalOrders
 		)
+		.then(res => {
+			if (res) {
+				dispatch(initOrders(finalOrders))
+			}
+		})
 
 		navigate('/queue')
 	}

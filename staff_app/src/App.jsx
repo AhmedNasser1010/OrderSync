@@ -6,9 +6,12 @@ import { addUser } from "./rtk/slices/userSlice.js"
 import { setUserRegisterStatus } from './rtk/slices/conditionalValuesSlice'
 import { initOrders } from './rtk/slices/ordersSlice'
 import { initMenu } from './rtk/slices/menuSlice'
+import { initBusiness } from './rtk/slices/businessSlice'
 import styled from 'styled-components'
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "./firebase.js";
+import { Toaster } from 'react-hot-toast'
+
 
 import LOGIN_IN_APP_STAR from './utils/LOGIN_IN_APP_STAR'
 import DB_GET_DOC from './utils/DB_GET_DOC'
@@ -19,6 +22,7 @@ import Signup from './Signup'
 import NewUserComponent from './NewUserComponent'
 import Navbar from './Navbar'
 import Queue from './Queue'
+import OrderQRScan from './OrderQRScan'
 import Settings from './Settings'
 import Order from './Components/Order'
 
@@ -27,12 +31,15 @@ function App() {
   const navigate = useNavigate()
   const userRegisterStatus = useSelector(state => state.conditionalValues.userRegisterStatus)
   const user = useSelector(state => state.user)
+  const business = useSelector(state => state.business)
 
   useEffect(() => {
     LOGIN_IN_APP_STAR()
     .then(res => {
       if (res) {
-        if (res.userInfo.role !== 'ORDER_CAPTAIN' || res.userInfo.role !== 'DELIVERY_CAPTAIN') {
+        // The ORDER_CAPTAIN is disabled for now
+        // res.userInfo.role !== 'ORDER_CAPTAIN' || res.userInfo.role !== 'DELIVERY_CAPTAIN'
+        if (res.userInfo.role !== 'DELIVERY_CAPTAIN') {
           AUTH_SIGNOUT()
           navigate("/login")
           return
@@ -53,26 +60,38 @@ function App() {
     userRegisterStatus === 'LOGGED_IN' && navigate('/queue')
   }, [userRegisterStatus])
 
-  useEffect(() => {
-    let docRef = null
-    if (user?.accessToken) docRef = doc(db, 'orders', user.accessToken)
+  // useEffect(() => {
+  //   let docRef = null
+  //   if (user?.accessToken) docRef = doc(db, 'orders', user.accessToken)
 
-    const unsub = user?.accessToken && onSnapshot(docRef, doc => {
-      window.read += 1
-      console.log('Read: ', window.read)
-      dispatch(initOrders(doc.data().open))
-    })
+  //   const unsub = user?.accessToken && onSnapshot(docRef, doc => {
+  //     window.read += 1
+  //     console.log('Read: ', window.read)
+  //     dispatch(initOrders(doc.data().open))
+  //   })
 
-    return () => {
-      unsub && unsub()
-    }
-  }, [user])
+  //   return () => {
+  //     unsub && unsub()
+  //   }
+  // }, [user])
 
+  // Get menu data
   useEffect(() => {
     if (user?.accessToken) {
       DB_GET_DOC('menus', user.accessToken)
       .then(res => {
         dispatch(initMenu(res.items))
+      })
+      .catch(err => console.log(error))
+    }
+  }, [user])
+
+  // Get business data
+  useEffect(() => {
+    if (user?.accessToken) {
+      DB_GET_DOC('businesses', user.accessToken)
+      .then(res => {
+        dispatch(initBusiness(res))
       })
       .catch(err => console.log(error))
     }
@@ -100,12 +119,18 @@ function App() {
             <>
               <Route path="/queue" element={<Queue />} />
               <Route path="/queue/:id" element={<Order />} />
+              <Route path="/order-qrscan" element={<OrderQRScan />} />
               <Route path="/settings" element={<Settings />} />
             </>
         }
       </Routes>
 
       { userRegisterStatus === 'LOGGED_IN' && <Navbar /> }
+
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+      />
     </>
 
   )
