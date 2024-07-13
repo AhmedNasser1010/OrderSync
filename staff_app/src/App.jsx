@@ -15,7 +15,9 @@ import { Toaster } from 'react-hot-toast'
 
 import LOGIN_IN_APP_STAR from './utils/LOGIN_IN_APP_STAR'
 import DB_GET_DOC from './utils/DB_GET_DOC'
+import DB_DOC_SUBSCRIBE from './utils/DB_DOC_SUBSCRIBE'
 import AUTH_SIGNOUT from './utils/AUTH_SIGNOUT'
+import useDriverTracking from './hooks/useDriverTracking'
 
 import Login from './Login'
 import Signup from './Signup'
@@ -29,10 +31,19 @@ import Order from './Components/Order'
 function App() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const { driverTracking, clearTracking } = useDriverTracking()
   const userRegisterStatus = useSelector(state => state.conditionalValues.userRegisterStatus)
   const user = useSelector(state => state.user)
   const business = useSelector(state => state.business)
+  const [userIsFounded, setUserIsFounded] = useState(false)
 
+  useEffect(() => {
+    if (user?.accessToken) {
+      !userIsFounded && setUserIsFounded(true)
+    }
+  }, [user])
+
+  // Auto login and get user data
   useEffect(() => {
     LOGIN_IN_APP_STAR()
     .then(res => {
@@ -84,7 +95,7 @@ function App() {
       })
       .catch(err => console.log(error))
     }
-  }, [user])
+  }, [userIsFounded])
 
   // Get business data
   useEffect(() => {
@@ -94,6 +105,30 @@ function App() {
         dispatch(initBusiness(res))
       })
       .catch(err => console.log(error))
+    }
+  }, [userIsFounded])
+
+  // User document subscribe
+  useEffect(() => {
+    if (user?.accessToken) {
+      const docRef = doc(db, 'users', user.userInfo.uid)
+
+      const unsub = onSnapshot(docRef, doc => {
+        window.read += 1
+        console.log('Read: ', window.read)
+        if (doc.exists()) {
+          dispatch(addUser(doc.data()))
+        }
+      })
+    }
+  }, [userIsFounded])
+
+  useEffect(() => {
+    clearTracking()
+    driverTracking()
+
+    return () => {
+      clearTracking()
     }
   }, [user])
 

@@ -4,6 +4,11 @@ const workerSchema = (data) => {
 	return {
 		accessToken,
 		joinDate: Date.now(),
+		trackingFeature: role === 'DELIVERY_CAPTAIN' ? true : false,
+		online: {
+			byManager: true,
+			byUser: false
+		},
 		userInfo: {
 			email,
 			name,

@@ -10,13 +10,23 @@ export const userSlice = createSlice({
     clearUser: (state) => {
       return {}
     },
+    setUserOnlineStatus: (state, { payload }) => {
+      return {
+        ...state,
+        online: {
+          ...state.online,
+          byUser: payload
+        }
+      }
+    }
   },
 })
 
 
 export const {
   addUser,
-  clearUser
+  clearUser,
+  setUserOnlineStatus
 } = userSlice.actions
 
 export default userSlice.reducer

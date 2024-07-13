@@ -62,15 +62,18 @@ function Staff() {
 	}
 
 	useEffect(() => {
-		const rowCellsMap = staff.map(user => {
-			const id = user.userInfo.uid
-			const name = user.userInfo.name || ''
-			const email = user.userInfo.email
-			const phone = user.userInfo.phone || ''
-			const role = user.userInfo.role
+		const rowCellsMap = staff?.map(user => {
+			if (user?.userInfo) {
+				const id = user.userInfo.uid
+				const name = user.userInfo.name || ''
+				const email = user.userInfo.email
+				const phone = user.userInfo.phone || ''
+				const role = user.userInfo.role
+				const online = user.online
 
-			return { id, name, email, phone, role, action: <StaffTableActions id={id} /> }
-		})
+				return { id, name, email, phone, role, action: <StaffTableActions id={id} online={online} /> }
+			}
+		}).filter(user => user)
 
 		setRowCells(rowCellsMap)
 	}, [staff])

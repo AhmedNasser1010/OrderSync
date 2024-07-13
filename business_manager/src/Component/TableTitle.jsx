@@ -20,7 +20,6 @@ const ActionBtns = styled.div``
 const Action = styled(Button)``
 
 function TableTitle({ title, titleBody, action }) {
-	console.log(action.disabled)
 	return (
 
 		<Parent>
