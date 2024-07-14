@@ -7,6 +7,7 @@ import checkoutSlice from "./slices/checkoutSlice.js"
 import toggleSlice from './slices/toggleSlice.js'
 import userSlice from './slices/userSlice.js'
 import restaurantsSlice from './slices/restaurantsSlice.js'
+import trackingSlice from './slices/trackingSlice.js'
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     checkout: checkoutSlice,
     toggle: toggleSlice,
     user: userSlice,
-    restaurants: restaurantsSlice
+    restaurants: restaurantsSlice,
+    tracking: trackingSlice
   }
 })

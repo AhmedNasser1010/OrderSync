@@ -10,11 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-brands-svg-icons": "^6.5.2",
     "@fortawesome/free-regular-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@mui/lab": "^5.0.0-alpha.172",
+    "@mui/material": "^5.16.1",
     "@reduxjs/toolkit": "^2.2.1",
     "animejs": "^3.2.2",
     "firebase": "^10.8.0",

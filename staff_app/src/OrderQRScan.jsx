@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
 import DB_GET_DOC from './utils/DB_GET_DOC'
+import DB_UPDATE_NESTED_VALUE from './utils/DB_UPDATE_NESTED_VALUE'
 import { initOrders } from './rtk/slices/ordersSlice'
 import { initQueue } from './rtk/slices/queueSlice'
 
@@ -42,6 +43,35 @@ function OrderQRScan() {
 
 	}
 
+	const onScanSuccess = (orders, order) => {
+		
+		const mergedOrders = orders.map(o => {
+			if (o.id === order.id) {
+				return {
+					...order,
+					assign: {
+						...order.assign,
+						driver: user.userInfo.uid
+					}
+				}
+			} else {
+				return o
+			}
+		})
+
+		DB_UPDATE_NESTED_VALUE('orders', user.accessToken, 'open', mergedOrders)
+		.then(res => {
+			if (res) {
+				dispatch(initOrders(mergedOrders))
+				dispatch(initQueue([...queue, order]))
+				navigate('/queue')
+				toast.success('Your order is successfully added to your queue.', {
+					duration: 3000,
+				})
+			}
+		})
+	}
+
 	useEffect(() => {
 		scanError === 'Not invoice' && toast.error('This is not a correct invoice qrcode!')
 	}, [scanError])
@@ -51,18 +81,18 @@ function OrderQRScan() {
 		.then(res => {
 			if (res) {
 				const data = res.open
-				dispatch(initOrders(data))
 
-				const isIncludedBefore = data.find(order => order.id === orderId)
+				console.log('data', data)
+				const order = data.find(order => order.id === orderId)
 
-				if (isIncludedBefore) {
+				if (order) {
 
 					const orderIsAddedBefore = queue.find(qu => qu.id === orderId)
 
 					if (orderIsAddedBefore) {
 						toast.error('This order has been added before!')
 					} else {
-						if (isIncludedBefore?.status !== 'IN_DELIVERY') {
+						if (order?.status !== 'IN_DELIVERY') {
 							toast.success(
 								`This order is not ready yet.`
 								, {
@@ -70,11 +100,16 @@ function OrderQRScan() {
 								duration: 5000,
 							})
 						} else {
-							dispatch(initQueue([...queue, isIncludedBefore]))
-							navigate('/queue')
-							toast.success('Your order is successfully added to your queue.', {
-								duration: 3000,
-							})
+
+							const ifDriver = user.userInfo.role === 'DELIVERY_CAPTAIN' && !order.assign.driver
+							// const ifCook = user.userInfo.role === 'DELIVERY_CAPTAIN' && !order.assign.driver
+
+							if (ifDriver) {
+								// On scan success
+								onScanSuccess(data, order)
+							} else {
+								toast.error('This order has been assigned to another driver!')
+							}
 						}
 					}
 

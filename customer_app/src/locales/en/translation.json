@@ -77,5 +77,16 @@
   "Save": "Save",
   "Name": "Name",
   "Primary Phone Number": "Primary Phone Number",
-  "Second Phone Number": "Second Phone Number"
+  "Second Phone Number": "Second Phone Number",
+  "Order Tracking": "Order Tracking",
+  "Dispatched": "Dispatched",
+  "Successfully dispatched": "Successfully dispatched",
+  "Preparation": "Preparation",
+  "Currently being prepared": "Currently being prepared",
+  "Delivery": "Delivery",
+  "On its way to you": "On its way to you",
+  "Restaurant": "Restaurant",
+  "You": "You",
+  "Driver": "Driver",
+  "Phone": "Phone"
 }

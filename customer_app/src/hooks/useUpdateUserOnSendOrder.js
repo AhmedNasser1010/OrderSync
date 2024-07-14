@@ -11,7 +11,7 @@ const useUpdateUserOnSendOrder = () => {
 	const cart = useSelector(state => state.cart.items)
 
 
-	const updateUserOnSendOrder = (accessToken, user) => {
+	const updateUserOnSendOrder = (accessToken, user, placedOrder) => {
 
 		const selectedMenuItems = cart?.map(cartItem => {
 		  const matchedItem = menuItems?.find(menuItem => menuItem?.id === cartItem?.id)
@@ -46,7 +46,11 @@ const useUpdateUserOnSendOrder = () => {
 			      totalOrders: 1,
 			      lastOrderTime: Date.now()
 			    }
-			  ]
+			  ],
+			  trackedOrder: {
+				  id: placedOrder.id,
+			    restaurant: accessToken
+				}
 			}
 
 			DB_ADD_DOC('customers', user.userInfo.uid, userCopy)
@@ -65,7 +69,11 @@ const useUpdateUserOnSendOrder = () => {
 				      totalOrders: 1,
 				      lastOrderTime: Date.now()
 				    }
-				  ]
+				  ],
+				  trackedOrder: {
+				  	id: placedOrder.id,
+			    	restaurant: accessToken
+				  }
 				}
 
 				DB_ADD_DOC('customers', user.userInfo.uid, userCopy)
@@ -89,7 +97,11 @@ const useUpdateUserOnSendOrder = () => {
 							}
 						}
 						return res
-					})
+					}),
+					trackedOrder: {
+				  	id: placedOrder.id,
+			    	restaurant: accessToken
+				  }
 				}
 
 				DB_ADD_DOC('customers', user.userInfo.uid, userCopy)

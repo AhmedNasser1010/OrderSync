@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { initOrders, changeOrderState } from '../rtk/slices/ordersSlice'
 
 import DB_UPDATE_NESTED_VALUE from '../utils/DB_UPDATE_NESTED_VALUE'
+import DB_DELETE_NESTED_VALUE from '../utils/DB_DELETE_NESTED_VALUE'
 
 import Button from '@mui/material/Button'
 
@@ -18,7 +19,7 @@ const Buttons = styled.div`
 	}
 `
 
-function ButtonBox({ id, status }) {
+function ButtonBox({ order, id, status }) {
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
 	const user = useSelector(state => state.user)
@@ -33,7 +34,6 @@ function ButtonBox({ id, status }) {
 						status: status,
 						assign: {
 							...order.assign,
-							closedBy: user.userInfo.role === 'DELIVERY_CAPTAIN' ? user.userInfo.uid : null,
 							status: user.userInfo.role === 'DELIVERY_CAPTAIN' ? 'completed' : 'on-going'
 						}
 					}
@@ -54,6 +54,9 @@ function ButtonBox({ id, status }) {
 		)
 		.then(res => {
 			if (res) {
+
+				DB_DELETE_NESTED_VALUE('customers', order.user.uid, 'trackedOrder')
+
 				dispatch(initOrders(finalOrders))
 			}
 		})

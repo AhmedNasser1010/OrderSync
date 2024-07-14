@@ -9,12 +9,14 @@ import { useTranslation } from 'react-i18next'
 
 import { quantityHandle, clearCart } from '../../rtk/slices/cartSlice'
 import { addCheckout, clearCheckout } from '../../rtk/slices/checkoutSlice'
-import { toggleLoginSidebar } from '../../rtk/slices/toggleSlice'
+import { initUser } from '../../rtk/slices/userSlice'
+import { toggleLoginSidebar, toggleOrderSidebar } from '../../rtk/slices/toggleSlice'
 import PopupWindow from '../../components/PopupWindow'
 
 import priceAfterDiscount from '../../utils/priceAfterDiscount'
 import randomOrderId from '../../utils/randomOrderId'
 import DB_ARRAY_UNION from '../../utils/DB_ARRAY_UNION'
+import DB_ADD_DOC from '../../utils/DB_ADD_DOC'
 import useUpdateUserOnSendOrder from '../../hooks/useUpdateUserOnSendOrder.js'
 
 // .matches(/^\+201\d{9}$/, 'Second phone number must be a valid Egyptian phone number').required('Second phone number is required')
@@ -81,9 +83,12 @@ const Cart = () => {
 	useEffect(() => {
 		dispatch(addCheckout({
 			assign: {
+				driver: null,
+				cook: null,
 				status: 'pickup'
 			},
 			user: {
+				uid: user?.userInfo?.uid,
 				name: user?.userInfo?.name,
 				phone: user?.userInfo?.phone,
 				secondPhone: user?.userInfo?.secondPhone
@@ -153,6 +158,16 @@ const Cart = () => {
 	const handlePayment = () => {
 		setDisableSubmit(true)
 
+		if (user?.trackedOrder?.id) {
+			toast.error(t('You already have an a order in progress'), {
+    		className: "font-ProximaNovaSemiBold",
+				position: "top-center",
+				duration: 4000
+    	})
+			dispatch(toggleOrderSidebar())
+			return false
+		}
+
     if (!user?.userInfo?.uid) {
     	toast(t('Please log in first and update your contact information before continuing with your order.'), {
     		icon: '🤌',
@@ -188,10 +203,12 @@ const Cart = () => {
 		    	DB_ARRAY_UNION('orders', accessToken, 'open', final)
 		    	.then(res => {
 			    	if (res) {
-			    		updateUserOnSendOrder(accessToken, user)
+			    		updateUserOnSendOrder(accessToken, user, final)
 			    		dispatch(clearCart())
 			    		dispatch(clearCheckout())
 			    		setWindowIsOpen(true)
+			    		navigate('/')
+			    		dispatch(toggleOrderSidebar())
 			    		return true
 			    	}
 			    	setDisableSubmit(false)

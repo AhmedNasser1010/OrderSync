@@ -1,20 +1,45 @@
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+
 const RestaurantCard = ({ info }) => {
+  const { t, i18n } = useTranslation()
   const {
     areaName,
     name,
+    nameInAr,
     avgRating,
     cloudinaryImageId,
     sla,
     cuisines,
     availability,
-  } = info;
+  } = info
+  const [resName, setResName] = useState(nameInAr)
+
+   useEffect(() => {
+    const handleLanguageChange = (lng) => {
+      if (lng === 'ar') {
+        console.log('ar')
+        setResName(nameInAr)
+      } else {
+        console.log('en')
+        setResName(name)
+      }
+      
+    }
+
+    i18n.on('languageChanged', handleLanguageChange)
+
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange)
+    };
+  }, [i18n])
 
   const truncateCuisine = (str) => {
-    return str.length >= 33 ? str.slice(0, 33) + "..." : str;
+    return str?.length >= 33 ? str.slice(0, 33) + "..." : str;
   };
 
   const truncateResName = (str) => {
-    return str.length >= 30 ? str.slice(0, 30) + "..." : str;
+    return str?.length >= 30 ? str.slice(0, 30) + "..." : str;
   };
 
   return (
@@ -31,7 +56,7 @@ const RestaurantCard = ({ info }) => {
             </div>
             <div className="ml-3">
               <h2 className="font-GrotBold text-lg tracking-tighter text-color-3">
-                {truncateResName(name)}
+                {truncateResName(resName)}
               </h2>
               <div className="font-GrotBold flex gap-1 text-color-3">
                 <svg
@@ -93,7 +118,7 @@ const RestaurantCard = ({ info }) => {
             </div>
             <div className="ml-3">
               <h2 className="font-GrotBold text-lg tracking-tighter text-color-3">
-                {truncateResName(name)}
+                {truncateResName(resName)}
               </h2>
               <div className="font-GrotBold flex gap-1 text-color-3">
                 <svg

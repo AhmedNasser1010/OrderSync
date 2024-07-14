@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { object, string, date, array, boolean } from 'yup';
+import { object, string, date, array, boolean, number } from 'yup';
 import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 import { addBusiness } from "./rtk/slices/businessesSlice.js";
@@ -33,10 +33,16 @@ const timeRegex = /^\d{2}:\d{2}$/;
 
 // Validation Schemas
 export const businessInfoValidationSchema = object({
-	name: string().required("Business name is required").min(3, "Business name are too short").max(20, "Business name are too long"),
+	name: string().required("Business name is required").min(3, "Business name is too short").max(20, "Business name is too long"),
+	nameInAr: string().required("Business arabic name is required").min(3, "Business arabic name is too short").max(20, "Business arabic name is too long"),
+	icon: string().required("Business icon is required"),
+	cover: string().required("Business cover is required"),
   industry: string().required("Business industry type is required"),
   address: string().required("Business Address is required"),
-  location: string().matches(locationCodeRegex, `Location code are not valid. Example: 26°50'49.1"N 29°44'20.4"E`)
+  latlng: array()
+    .of(number().required("The field can't be empty"))
+    .length(2, 'Latitude and longitude must contain exactly two numbers')
+    .required('Latitude and longitude is required')
 });
 
 export const businessOpeningHoursValidationSchema = object({
@@ -109,12 +115,12 @@ const AddNewBusiness = () => {
   	},
   	business: {
 			name: '',
-			nameInAR: '',
+			nameInAr: '',
 			industry: '',
 			address: '',
-			location: '',
-			cover: 'https://i.imgur.com/yKrmaGN.jpg',
-			icon: 'https://i.imgur.com/17YC6QJ.png'
+			latlng: ['', ''],
+			cover: '',
+			icon: ''
 		},
 		owner: {
 			basic: {
@@ -145,9 +151,7 @@ const AddNewBusiness = () => {
 				max: 0
 			},
 			paymentMethods: {
-				cash: false,
-				vodafoneCash: false,
-				etisalatCash: false,
+				cash: true,
 			},
 		},
 		
@@ -234,7 +238,7 @@ const AddNewBusiness = () => {
 
 				<Stack direction="row" spacing={3}>
 					<BusinessOpeningHoursFieldsWidget businessOpeningHoursValues={handleBusinessValuesChanges} initialValues={businessValues.services.openingHours} />
-					<BusinessPaymentMethodsFieldsWidget businessPaymentMethodsValues={handleBusinessValuesChanges} initialValues={businessValues.services.paymentMethods} />
+					{/*<BusinessPaymentMethodsFieldsWidget businessPaymentMethodsValues={handleBusinessValuesChanges} initialValues={businessValues.services.paymentMethods} />*/}
 				</Stack>
 
 				<Button

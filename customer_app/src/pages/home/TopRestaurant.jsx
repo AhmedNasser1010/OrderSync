@@ -57,6 +57,7 @@ function TopRestaurant() {
 								      <RestaurantCard info={{
 											    areaName: 'El-Ayat',
 											    name: res?.business?.name,
+											    nameInAr: res?.business?.nameInAr || res?.business?.name,
 											    avgRating: '4.5',
 											    cloudinaryImageId: res?.business?.cover,
 											    sla: '30-45 min',

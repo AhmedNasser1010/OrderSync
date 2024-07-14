@@ -76,5 +76,16 @@
   "Save": "حفظ",
   "Name": "الاسم",
   "Primary Phone Number": "رقم الهاتف الأساسي",
-  "Second Phone Number": "رقم الهاتف الثاني"
+  "Second Phone Number": "رقم الهاتف الثاني",
+  "Order Tracking": "تتبع الطلب",
+  "Dispatched": "تم الشحن",
+  "Successfully dispatched": "تم الشحن بنجاح",
+  "Preparation": "التحضير",
+  "Currently being prepared": "جاري التحضير",
+  "Delivery": "التوصيل",
+  "On its way to you": "في الطريق ليك",
+  "Restaurant": "المطعم",
+  "You": "أنت",
+  "Driver": "السواق",
+  "Phone": "التليفون"
 }

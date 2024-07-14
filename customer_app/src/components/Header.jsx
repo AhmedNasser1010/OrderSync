@@ -2,10 +2,14 @@ import { useEffect } from 'react'
 import { Link } from "react-router-dom"
 import { IoIosArrowDown } from "react-icons/io"
 import { CiLocationOn } from "react-icons/ci"
+import { MdDeliveryDining } from "react-icons/md"
 import { useDispatch, useSelector } from "react-redux"
-import { toggleLocationSidebar, toggleLoginSidebar } from "../utils/toggleSlice"
+import { toggleLocationSidebar, toggleLoginSidebar, toggleOrderSidebar } from "../rtk/slices/toggleSlice"
 import { LOGO_URL } from "../utils/constants"
 import { useTranslation } from 'react-i18next'
+import toast from "react-hot-toast"
+import { doc, onSnapshot } from "firebase/firestore"
+import { db } from '../config/firebase'
 
 import { initUser } from '../rtk/slices/userSlice'
 import AUTH_ON_CHANGE from '../utils/AUTH_ON_CHANGE'
@@ -23,6 +27,11 @@ const Header = () => {
     document.body.classList.add("overflow-hidden")
   }
 
+  const handleOrdderSidebar = () => {
+    dispatch(toggleOrderSidebar())
+    document.body.classList.add("overflow-hidden")
+  }
+
   const handleLoginSidebar = () => {
     dispatch(toggleLoginSidebar())
     document.body.classList.add("overflow-hidden")
@@ -33,7 +42,28 @@ const Header = () => {
   }
 
   useEffect(() => {
-    AUTH_ON_CHANGE().then(user => user && dispatch(initUser(user)))
+    let unsub = null
+
+    AUTH_ON_CHANGE()
+    .then(uid => {
+      if (uid) {
+
+        const userRef = doc(db, 'customers', uid)
+
+        unsub = onSnapshot(userRef, doc => {
+          window.read += 1
+          console.log('Read: ', window.read)
+
+          if (doc.exists()) {
+            dispatch(initUser(doc.data()))
+          }
+        })
+      }
+    })
+
+    return () => {
+      unsub && unsub()
+    }
   }, [])
 
    useEffect(() => {
@@ -94,6 +124,13 @@ const Header = () => {
           </div>
 
           <ul className="font-ProximaNovaMed flex items-center md:gap-5 gap-4">
+            {
+              user?.trackedOrder?.id &&
+              <MdDeliveryDining
+                className='text-color-11 text-3xl cursor-pointer'
+                onMouseUp={handleOrdderSidebar}
+              />
+            }
             <button
               onClick={handleLoginSidebar}
               className="flex items-center gap-2 group hover:text-color-2"

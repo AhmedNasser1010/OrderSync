@@ -13,11 +13,8 @@ const AUTH_ON_CHANGE = async () => {
     })
   })
 
-	// get user data
-  const data = await DB_GET_DOC("customers", uid)
-
-  if (data) {
-    return data
+  if (uid) {
+    return uid
   } else {
     return false
   }

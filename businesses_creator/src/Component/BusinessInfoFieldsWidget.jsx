@@ -36,8 +36,13 @@ const BusinessInfoFieldsWidget = ({ businessInfoValues, initialValues, filledVal
 		initialValues={initialValues}
 		validationSchema={businessInfoValidationSchema}
 		onSubmit={values => {
+			const finalValues = {
+				...values,
+				latlng: [Number(values.latlng[0]), Number(values.latlng[1])]
+			}
+			console.log(finalValues)
 			setReadyToSubmit(true);
-			businessInfoValues({...values}, "business");
+			businessInfoValues({...finalValues}, "business");
 		}}
 	>
 		{({ isSubmitting, errors, touched, values }) => (
@@ -47,16 +52,37 @@ const BusinessInfoFieldsWidget = ({ businessInfoValues, initialValues, filledVal
 					<Typography variant="h6" gutterBottom>Business Info</Typography>
 					<Stack spacing={1}>
 						<Field { ...muiTextFieldProps(errors, touched, values, 'name', 'Name') } />
+						<Field { ...muiTextFieldProps(errors, touched, values, 'nameInAr', 'Arabic Name') } />
+						<Stack direction='row' spacing={1}>
+							<Field { ...muiTextFieldProps(errors, touched, values, 'icon', 'Icon') } fullWidth />
+							<Field { ...muiTextFieldProps(errors, touched, values, 'cover', 'Cover') } fullWidth />
+						</Stack>
 			    	<Field { ...muiTextFieldProps(errors, touched, values, 'industry', 'Indystry Type') } select>
 			    		<MenuItem value="coffe-shop">Coffee Shop</MenuItem>
 			    		<MenuItem value="restaurant">Restaurant</MenuItem>
-			    		<MenuItem value="online-shopping">Online Shopping</MenuItem>
-			    		<MenuItem value="gym-programs">Gym Programs</MenuItem>
-			    		<MenuItem value="it">IT</MenuItem>
 			    	</Field>
 			    	<Stack direction='row' spacing={1}>
 			    		<Field { ...muiTextFieldProps(errors, touched, values, 'address', 'Address') } fullWidth />
-			    		<Field { ...muiTextFieldProps(errors, touched, values, 'location', 'Location') } fullWidth />
+			    		<Stack direction='row' spacing={1}>
+			    			<Field
+			    				InputLabelProps={filledValues && values && values.latlng[0] !== '' && { shrink: true }}
+			    				error={errors && touched && errors.latlng && errors.latlng[0] && touched.latlng && touched.latlng[0] && true}
+			    				helperText={errors && touched && errors.latlng && errors.latlng[0] && touched.latlng && touched.latlng[0] && errors.latlng[0]}
+			    				component={MuiTextField}
+			    				name='latlng[0]'
+			    				label='Latitude'
+			    				fullWidth
+			    			/>
+			    			<Field
+			    				InputLabelProps={filledValues && values && values.latlng[1] !== '' && { shrink: true }}
+			    				error={errors && touched && errors.latlng && errors.latlng[1] && touched.latlng && touched.latlng[1] && true}
+			    				helperText={errors && touched && errors.latlng && errors.latlng[1] && touched.latlng && touched.latlng[1] && errors.latlng[1]}
+			    				component={MuiTextField}
+			    				name='latlng[1]'
+			    				label='Longitude'
+			    				fullWidth
+			    			/>
+			    		</Stack>
 			    	</Stack>
 			    	<Button
 							variant="outlined"

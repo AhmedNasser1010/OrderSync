@@ -139,11 +139,11 @@ const BusinessSettings = () => {
 						initialValues={businessValues.services?.openingHours}
 						filledValues={true}
 					/>
-					<BusinessPaymentMethodsFieldsWidget
+					{/*<BusinessPaymentMethodsFieldsWidget
 						businessPaymentMethodsValues={handleBusinessValuesChanges}
 						initialValues={businessValues.services?.paymentMethods}
 						filledValues={true}
-					/>
+					/>*/}
 				</Stack>
 
 				<Stack

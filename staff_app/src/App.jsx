@@ -5,6 +5,7 @@ import { increseRead, increseWrite } from './rtk/slices/apiUsageSlice'
 import { addUser } from "./rtk/slices/userSlice.js"
 import { setUserRegisterStatus } from './rtk/slices/conditionalValuesSlice'
 import { initOrders } from './rtk/slices/ordersSlice'
+import { initQueue } from './rtk/slices/queueSlice'
 import { initMenu } from './rtk/slices/menuSlice'
 import { initBusiness } from './rtk/slices/businessSlice'
 import styled from 'styled-components'
@@ -120,6 +121,23 @@ function App() {
           dispatch(addUser(doc.data()))
         }
       })
+    }
+  }, [userIsFounded])
+
+  // Get user queue orders
+  useEffect(() => {
+    if (user?.accessToken) {
+      DB_GET_DOC('orders', user.accessToken)
+      .then(res => {
+        if (res) {
+          const orders = res.open
+          const queueOrderFinded = orders.filter(order => user.userInfo.role === 'DELIVERY_CAPTAIN' && order?.assign?.driver === user.userInfo.uid)
+
+          dispatch(initOrders(orders))
+          dispatch(initQueue(queueOrderFinded))
+        }
+      })
+      .catch(err => console.log(error))
     }
   }, [userIsFounded])
 
