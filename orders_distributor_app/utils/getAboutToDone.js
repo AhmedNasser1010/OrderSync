@@ -1,22 +1,38 @@
+const { performance } = require('perf_hooks')
 const timestampsDifferenceInMs = require('./timestampsDifferenceInMs')
+const { debuggingMode, divideOn, maxExtraOrdersLength } = require('../constants.js')
 
 function getAboutToDone(orders, cookTime) {
-	if (!orders.length) return []
+	const start = performance.now()
+	
+	if (!orders.length) {
+		const end = performance.now()
+		debuggingMode && console.log(`PASSED  13 ${(end - start).toFixed(2)}ms`)
+
+		return []
+	}
 
 	const filteredOrders = []
 
 	for (const order of orders) {
-		const acceptedPassedTime = cookTime[0] / 1.2
+		const acceptedPassedTime = cookTime[0] / divideOn
 		const dirrerenceTimestamp = timestampsDifferenceInMs(order.statusUpdateAgo, Date.now())
 		const differenceInMs = new Date(dirrerenceTimestamp).getMinutes() * 1000
-
-		// console.log(`${differenceInMs} > ${acceptedPassedTime}`)
 
 		differenceInMs > acceptedPassedTime && filteredOrders.push(order)
 
 	}
 
-	if (filteredOrders.length >= 4) return filteredOrders.slice(0, 3)
+	if (filteredOrders.length >= maxExtraOrdersLength) {
+		const end = performance.now()
+		debuggingMode && console.log(`PASSED  13 ${(end - start).toFixed(2)}ms`)
+
+		return filteredOrders.slice(0, 3)
+	}
+
+	const end = performance.now()
+	debuggingMode && console.log(`PASSED  13 ${(end - start).toFixed(2)}ms`)
+
 	return filteredOrders
 }
 

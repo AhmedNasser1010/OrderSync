@@ -1,9 +1,9 @@
+const { performance } = require('perf_hooks')
 const { onSnapshot, collection } = require("firebase/firestore")
 const { db } = require('../config/firebase.js')
 const filteredAvailableDrivers = require('./filteredAvailableDrivers.js')
 const findDriversWithinDistance = require('./findDriversWithinDistance.js')
-
-const maxQueueLength = [0, 1, 2, 3]
+const { debuggingMode, maxQueueLength } = require('../constants.js')
 
 function getDriversLessQueue(drivers) {
 	const driversWithQueue = []
@@ -25,6 +25,8 @@ function getDriversLessQueue(drivers) {
 
 async function findDriversWithQueue(drivers, order, resLocation) {
 	try {
+		const start = performance.now()
+		
 		if (!drivers && drivers.length) {
 			console.log('ASSIGN: Error while "findDriversWithQueue", `drivers` not found')
 			return []
@@ -32,7 +34,12 @@ async function findDriversWithQueue(drivers, order, resLocation) {
 
 		const driversWithLessQueue = getDriversLessQueue(drivers)
 
-		if (driversWithLessQueue.length) return driversWithLessQueue
+		if (driversWithLessQueue.length) {
+			const end = performance.now()
+			debuggingMode && console.log(`PASSED  7 ${(end - start).toFixed(2)}ms`)
+
+			return driversWithLessQueue
+		}
 
 		const unsub = onSnapshot(collection(db, "drivers"), async querySnapshot => {
 			const drivers = []
@@ -47,6 +54,10 @@ async function findDriversWithQueue(drivers, order, resLocation) {
 
 			if (driversWithLessQueue.length) {
 				unsub()
+
+				const end = performance.now()
+				debuggingMode && console.log(`PASSED  7 ${(end - start).toFixed(2)}ms`)
+
 				return driversWithLessQueue
 			}
 

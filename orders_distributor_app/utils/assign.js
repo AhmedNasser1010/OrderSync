@@ -1,10 +1,14 @@
+const { performance } = require('perf_hooks')
 const { UPDATE_NESTED_VALUE } = require('./FIRESTORE/DB_CONTROLLERS.js')
 const { store } = require('../store.js')
+const { debuggingMode } = require('../constants.js')
 
 async function assign(driver, orders) {
-	const accessToken = orders[0].accessToken
 
 	try {
+		const start = performance.now()
+
+		const accessToken = orders[0].accessToken
 		let ordersAfter = []
 		let driverQueue = driver.queue
 
@@ -45,6 +49,9 @@ async function assign(driver, orders) {
 
 		if (!updateDriverPassed) throw new new Error('something wrong happend during update driver queue')
 		if (!updateResOrdersPassed) throw new new Error('something wrong happend during update restaurant orders')
+
+		const end = performance.now()
+		debuggingMode && console.log(`PASSED  14 ${(end - start).toFixed(2)}ms`)
 
 		return true
 	} catch(e) {

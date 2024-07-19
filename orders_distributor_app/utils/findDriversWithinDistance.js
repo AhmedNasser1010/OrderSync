@@ -1,9 +1,11 @@
+const { performance } = require('perf_hooks')
 const getDistanceFromLatlngInKm = require('./getDistanceFromLatlngInKm')
 const handleNoDriverWithinDistance = require('./handleNoDriverWithinDistance')
-
-const distances = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3]
+const { debuggingMode, distances } = require('../constants.js')
 
 function findDriversWithinDistance(order, drivers, resLocation) {
+	const start = performance.now()
+	
 	const closestDrivers = []
 
 	for (const distance of distances) {
@@ -17,7 +19,12 @@ function findDriversWithinDistance(order, drivers, resLocation) {
 			}
 		}
 
-		if (closestDrivers.length) return { drivers: closestDrivers, distance }
+		if (closestDrivers.length) {
+			const end = performance.now()
+			debuggingMode && console.log(`PASSED  6 ${(end - start).toFixed(2)}ms`)
+
+			return { drivers: closestDrivers, distance }
+		}
 
 	}
 

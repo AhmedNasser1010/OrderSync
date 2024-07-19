@@ -1,9 +1,10 @@
+const { performance } = require('perf_hooks')
 const getDistanceFromLatlngInKm = require('./getDistanceFromLatlngInKm')
-
-// 200m
-const maxDistanceInKm = 0.2
+const { debuggingMode, maxDistanceInKm } = require('../constants.js')
 
 function getNeardyOrders(currentResInProgressOrders, mainOrder) {
+	const start = performance.now()
+	
 	const closestOrders = []
 
 	for (const order of currentResInProgressOrders) {
@@ -14,6 +15,9 @@ function getNeardyOrders(currentResInProgressOrders, mainOrder) {
 		}
 
 	}
+
+	const end = performance.now()
+	debuggingMode && console.log(`PASSED  12 ${(end - start).toFixed(2)}ms`)
 
 	return closestOrders
 

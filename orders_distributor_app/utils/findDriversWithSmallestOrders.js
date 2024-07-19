@@ -1,4 +1,8 @@
+const { performance } = require('perf_hooks')
+const { debuggingMode } = require('../constants.js')
+
 function findDriversWithSmallestOrders(drivers) {
+	const start = performance.now()
 
 	const filteredDrivers = []
 
@@ -10,7 +14,12 @@ function findDriversWithSmallestOrders(drivers) {
 			driver.closedOrdersToday === count && filteredDrivers.push(driver)
 		}
 
-		if (filteredDrivers.length) return filteredDrivers
+		if (filteredDrivers.length) {
+			const end = performance.now()
+			debuggingMode && console.log(`PASSED  8 ${(end - start).toFixed(2)}ms`)
+
+			return filteredDrivers
+		}
 
 	}
 		
