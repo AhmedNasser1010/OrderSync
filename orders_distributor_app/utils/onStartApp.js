@@ -12,6 +12,7 @@ async function onStartApp() {
 		console.log('Starting...')
 		setState('user')
 		setState('restaurants')
+		setState('drivers')
 		
 		const user = await GET_DOC('users', userUid)
 		.then(res => {
@@ -22,7 +23,7 @@ async function onStartApp() {
 			return null
 		})
 		.catch(e => {
-			console.error(e)
+			console.error('Error while app start get users data: ', e)
 			return null
 		})
 
@@ -41,7 +42,7 @@ async function onStartApp() {
 		console.clear()
 		startMsg()
 	} catch(e) {
-		console.error(e)
+		console.error('Error while app start: ', e)
 	}
 
 }

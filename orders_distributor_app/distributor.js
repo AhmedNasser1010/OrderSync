@@ -13,6 +13,9 @@ const {
 } = require('./utils/all.js')
 const { store, setState, setValue } = require('./store.js')
 const test = require('./utils/test.js')
+const assign = require('./commands/assign/main.js')
+const get = require('./commands/get/main.js')
+const storeMapping = require('./commands/storeMapping/main.js')
 
 onStartApp()
 
@@ -37,17 +40,20 @@ function processInput(input) {
 			logs()
 			break
 		case 'drivers':
-			drivers(input.trim())
+			drivers(input)
 			break
 		case 'store':
-			console.log(store)
+			storeMapping(input)
 			break
-		case 'store state':
-			
+		case 'get':
+			get(input)
 			break
 		case 'test':
 		case 't':
 			test()
+			break
+		case 'assign':
+			assign(input)
 			break
 		default:
 			unknownCommand(input)

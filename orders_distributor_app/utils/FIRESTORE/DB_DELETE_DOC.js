@@ -12,7 +12,7 @@ const DB_DELETE_DOC = async (collectionName, subCollectionID) => {
 
     return true
   } catch (error) {
-    console.error(error)
+    console.error('Error while delete document: ', error)
     return false
   }
 }

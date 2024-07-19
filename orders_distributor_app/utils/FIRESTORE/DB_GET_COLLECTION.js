@@ -22,7 +22,7 @@ const DB_GET_COLLECTION = async (collectionName) => {
     return null
 
   } catch (error) {
-    console.error(error)
+    console.error('Error while get collection: ', error)
     return null
   }
 }

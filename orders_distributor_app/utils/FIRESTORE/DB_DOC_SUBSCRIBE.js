@@ -21,7 +21,7 @@ const DB_DOC_SUBSCRIBE = (collectionName, docId, callback) => {
 			},
 		)
 	} catch (e) {
-		console.error(e)
+		console.error('Error while doc subscribe: ', e)
 		return null
 	}
 }

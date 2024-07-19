@@ -18,7 +18,7 @@ const DB_GET_DOC = async (collectionName, subCollectionID) => {
     }
 
   } catch (error) {
-    console.error(error)
+    console.error('Error while get docment: ', error)
     return false
   }
 }

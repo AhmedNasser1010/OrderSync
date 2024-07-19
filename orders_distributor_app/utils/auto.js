@@ -29,6 +29,7 @@ async function auto(status) {
 }
 
 function on() {
+  console.log(Date.now())
   setState('orders')
   const businessIDs = store.user.values.data.businesses
   const q = query(collection(db, "orders"), where("accessToken", "in", businessIDs))
