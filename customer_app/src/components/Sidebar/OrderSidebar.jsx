@@ -23,6 +23,9 @@ import { toggleOrderSidebar } from "../../rtk/slices/toggleSlice"
 import { initOrder, initDriver, initRes } from '../../rtk/slices/trackingSlice'
 import useLanguageDirection from "../../hooks/useLanguageDirection"
 import { restaurantMapIcon, driverMapIcon, personMapIcon } from './mapCustomMarker'
+import DB_GET_DOC from '../../utils/DB_GET_DOC'
+import DB_UPDATE_NESTED_VALUE from '../../utils/DB_UPDATE_NESTED_VALUE'
+import DB_DELETE_NESTED_VALUE from '../../utils/DB_DELETE_NESTED_VALUE'
 
 const MapContainerStyled = styled(MapContainer)`
 	width: 100%;
@@ -39,9 +42,17 @@ function OrderSidebar() {
 	const tracking = useSelector(state => state.tracking)
 	const restaurants = useSelector(state => state.restaurants)
 	const [driverId, setDriverId] = useState(tracking?.order?.assign?.driver || null)
+	const [isAvailableToEdit, setIsAvailableToEdit] = useState(true)
 
 	useEffect(() => {
-		setDriverId(tracking?.order?.assign?.driver)
+		if (tracking.order) {
+			setDriverId(tracking.order.assign.driver)
+			if (tracking.order.status !== 'RECEIVED') {
+				setIsAvailableToEdit(false)
+			} else {
+				setIsAvailableToEdit(true)
+			}
+		}
 	}, [tracking])
 
 	const handleCloseSidebar = () => {
@@ -113,6 +124,30 @@ function OrderSidebar() {
 			unsubDriver && unsubDriver()
 		}
 	}, [isOrderSidebarOpen, driverId])
+
+	const handleOrderCancel = async () => {
+		try {
+			console.log(tracking)
+		
+			const currentResOrders = await DB_GET_DOC('orders', tracking.res.accessToken)
+			const ordersAfter = currentResOrders.open.filter(order => order.id !== tracking.order.id)
+
+			DB_UPDATE_NESTED_VALUE('orders', tracking.res.accessToken, 'open', ordersAfter)
+			.then(res => {
+				if (res) {
+					DB_DELETE_NESTED_VALUE('customers', user.userInfo.uid, 'trackedOrder')
+				}
+			})
+		} catch(e) {
+			console.log('Encountered error while order delete', e)
+		}
+	}
+	const handleOrderEdit = () => {
+		console.log('order edit')
+	}
+	const handleShowResContact = () => {
+		console.log('handleShowResContact')
+	}
 
 	return (
 		<>
@@ -243,6 +278,21 @@ function OrderSidebar() {
 							<Polyline positions={[tracking?.order?.location?.latlng, [tracking?.res?.business?.latlng[0] + 0.0008, tracking?.res?.business?.latlng[1] + 0.0008]]} />
 						}
 					</MapContainerStyled>
+
+					<div className="flex relative mt-10 mb-10">
+						{
+							isAvailableToEdit ?
+							<>
+								{/*<button onMouseUp={handleOrderEdit} className='w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-color-11'>{t('Edit Items')}</button>*/}
+								<button onMouseUp={handleOrderCancel} className='w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-red-500'>{t('Order Cancel')}</button>	
+							</>
+							:
+							<button onMouseUp={handleShowResContact} className='w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-gray-500'>
+								{t('Cancellations and modifications')}<br/>
+								{ tracking?.res?.business?.contactNumbers && tracking.res.business.contactNumbers[0].slice(2) }
+							</button>
+						}
+					</div>
 				</div>
 
 			</div>
