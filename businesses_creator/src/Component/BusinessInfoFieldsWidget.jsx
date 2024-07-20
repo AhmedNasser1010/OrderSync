@@ -40,9 +40,8 @@ const BusinessInfoFieldsWidget = ({ businessInfoValues, initialValues, filledVal
 				...values,
 				latlng: [Number(values.latlng[0]), Number(values.latlng[1])]
 			}
-			console.log(finalValues)
 			setReadyToSubmit(true);
-			businessInfoValues({...finalValues}, "business");
+			businessInfoValues(finalValues, "business");
 		}}
 	>
 		{({ isSubmitting, errors, touched, values }) => (

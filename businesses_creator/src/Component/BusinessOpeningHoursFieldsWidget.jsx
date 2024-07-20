@@ -56,7 +56,7 @@ const BusinessOpeningHoursFieldsWidget = ({ businessOpeningHoursValues, initialV
 			validationSchema={businessOpeningHoursValidationSchema}
 			onSubmit={values => {
 				setReadyToSubmit(true);
-				businessOpeningHoursValues({...values}, 'services.openingHours');
+				businessOpeningHoursValues(values, 'services.openingHours');
 			}}
 		>
 			{({ isSubmitting, errors, touched, values }) => (

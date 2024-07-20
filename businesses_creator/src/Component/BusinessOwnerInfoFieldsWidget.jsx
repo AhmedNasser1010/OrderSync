@@ -54,7 +54,7 @@ const BusinessOwnerInfoFieldsWidget = ({ businessOwnerInfoValues, initialValues,
 			validationSchema={businessOwnerInfoValidationSchema}
 			onSubmit={values => {
 				setReadyToSubmit(true);
-				businessOwnerInfoValues({...values}, "owner");
+				businessOwnerInfoValues(values, "owner");
 			}}
 		>
 			{({ isSubmitting, errors, touched, values}) => (

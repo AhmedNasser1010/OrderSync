@@ -1,5 +1,6 @@
 const { performance } = require('perf_hooks')
 const { debuggingMode } = require('../constants.js')
+const { store } = require('../store.js')
 
 function findDriversWithSmallestOrders(drivers) {
 	const start = performance.now()
@@ -11,7 +12,12 @@ function findDriversWithSmallestOrders(drivers) {
 		if (count >= 100) return drivers
 
 		for (const driver of drivers) {
-			driver.closedOrdersToday === count && filteredDrivers.push(driver)
+			console.log(driver.uid)
+			const closedOrdersTodayByDriver = store.orders.values.reduce((acc, order) => {
+		    if (order.status === 'COMPLETED' && order.assign.driver === driver.uid) acc++
+		    return acc
+			}, 0)
+			closedOrdersTodayByDriver === count && filteredDrivers.push(driver)
 		}
 
 		if (filteredDrivers.length) {

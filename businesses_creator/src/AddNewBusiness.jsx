@@ -23,6 +23,7 @@ import PageTitle from "./Component/PageTitle.jsx";
 import BusinessOwnerInfoFieldsWidget from "./Component/BusinessOwnerInfoFieldsWidget.jsx";
 import BusinessInfoFieldsWidget from "./Component/BusinessInfoFieldsWidget.jsx";
 import BusinessOpeningHoursFieldsWidget from "./Component/BusinessOpeningHoursFieldsWidget.jsx";
+import BusinessCookTimeWidget from "./Component/BusinessCookTimeWidget.jsx";
 import BusinessPaymentMethodsFieldsWidget from "./Component/BusinessPaymentMethodsFieldsWidget.jsx";
 
 // RegEx
@@ -54,6 +55,8 @@ export const businessOpeningHoursValidationSchema = object({
   friday: object({start: string(), end: string()}),
   saturday: object({start: string(), end: string()}),
 });
+
+export const businessCookTimeValidationSchema = array().of(number().required('min/max is required')).length(2, 'cook time must contain exactly two numbers').required('cook time is required')
 
 export const businessOwnerInfoValidationSchema = object({
 	basic: object({
@@ -92,6 +95,7 @@ const businessSchema = object({
   services: object({
   	openingHourse: businessOpeningHoursValidationSchema,
   	paymentMethods: businessPaymentMethodsValidationSchema,
+  	cookTime: businessCookTimeValidationSchema
   }),
   createdOn: string(),
 });
@@ -109,8 +113,10 @@ const AddNewBusiness = () => {
   			isStrictOpen: true,
   		},
   		orderManagement: {
-  			forCooks: false,
-  			forDeliveryWorkers: false
+  			assign: {
+  				forCooks: false,
+  				forDeliveryWorkers: false
+  			}
   		}
   	},
   	business: {
@@ -146,10 +152,7 @@ const AddNewBusiness = () => {
 				friday: {start: '', end: ''},
 				saturday: {start: '', end: ''},
 			},
-			deliveryTax: {
-				min: 0,
-				max: 0
-			},
+			cookTime: [10000, 20000],
 			paymentMethods: {
 				cash: true,
 			},
@@ -168,14 +171,14 @@ const AddNewBusiness = () => {
   			...businessValues,
   			services: {
   				...businessValues.services,
-  				[splitedName]: {...values}
+  				[splitedName]: values
   			}
   		});
   		return null;
 
   	};
 
-  	setBusinessValues({...businessValues, [name]: {...values}});
+  	setBusinessValues({...businessValues, [name]: values});
 
   };
 
@@ -238,6 +241,7 @@ const AddNewBusiness = () => {
 
 				<Stack direction="row" spacing={3}>
 					<BusinessOpeningHoursFieldsWidget businessOpeningHoursValues={handleBusinessValuesChanges} initialValues={businessValues.services.openingHours} />
+					<BusinessCookTimeWidget businessCookTimeValues={handleBusinessValuesChanges} initialValues={businessValues.services.cookTime} />
 					{/*<BusinessPaymentMethodsFieldsWidget businessPaymentMethodsValues={handleBusinessValuesChanges} initialValues={businessValues.services.paymentMethods} />*/}
 				</Stack>
 

@@ -25,7 +25,8 @@ export const ordersSlice = createSlice({
             if (IDs.includes(stateObject.id)) {
               return {
                 ...stateObject,
-                status: status
+                status: status,
+                statusUpdatedSince: Number(Date.now())
               };
             }
             return stateObject;

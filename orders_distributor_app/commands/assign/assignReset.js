@@ -3,7 +3,7 @@ const { UPDATE_NESTED_VALUE, SET_DOC } = require('../../utils/FIRESTORE/DB_CONTR
 const assignLog = require('../../utils/assignLog.js')
 const { store } = require('../../store.js')
 
-function assignReset() {
+function assignReset(isForce) {
 	const start = performance.now()
 
 	const allArdersAfter = [
@@ -13,7 +13,8 @@ function assignReset() {
 				assign: {
 					...order.assign,
 					driver: null,
-					driverStartAt: null
+					driverStartAt: null,
+					cancelAutoAssign: isForce
 				}
 			}
 		})

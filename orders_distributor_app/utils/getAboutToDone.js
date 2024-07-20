@@ -16,7 +16,7 @@ function getAboutToDone(orders, cookTime) {
 
 	for (const order of orders) {
 		const acceptedPassedTime = cookTime[0] / divideOn
-		const dirrerenceTimestamp = timestampsDifferenceInMs(order.statusUpdateAgo, Date.now())
+		const dirrerenceTimestamp = timestampsDifferenceInMs(order.statusUpdatedSince, Date.now())
 		const differenceInMs = new Date(dirrerenceTimestamp).getMinutes() * 1000
 
 		differenceInMs > acceptedPassedTime && filteredOrders.push(order)

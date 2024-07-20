@@ -7,8 +7,9 @@ const { store, setValue } = require('../../store.js')
 const { getFirestore, collection, query, where, getDocs } = require("firebase/firestore")
 const { db } = require('../../config/firebase.js')
 
-const assignToRegEx = /assign\s+([^\s]+)\s+to\s+([^\s]+)/
-const unassignRegEx = /assign\s+([^\s]+)\s+remove\s+([^\s]+)/
+const assignToRegEx = /^assign\s+([^\s]+)\s+to\s+([^\s]+)$/
+const unassignRegEx = /^assign\s+([^\s]+)\s+remove\s+([^\s]+)$/
+const unassignForceRegEx = /^assign\s+(\S+)\s+remove\s+(\S+)\s+-force$/
 
 async function assign(input) {
 	try {
@@ -45,14 +46,24 @@ async function assign(input) {
 			const driverId = match[2]
 	  	assignTo(orderId, driverId)
 			return
-		} else if (input.match(unassignRegEx)) {
-			const match = input.match(unassignRegEx)
-	  	const orderId = match[1]
-			const driverId = match[2]
-	  	unassign(orderId, driverId)
+		} else if (input.match(unassignForceRegEx)) {
+			const match = input.match(unassignForceRegEx)
+			const driverId = match[1]
+	  	const orderId = match[2]
+	  	unassign(orderId, driverId, true)
 			return
-		} else if (input === 'assign -reset') {
-			assignReset()
+		}	else if (input.match(unassignRegEx)) {
+			const match = input.match(unassignRegEx)
+			const driverId = match[1]
+	  	const orderId = match[2]
+	  	unassign(orderId, driverId, false)
+			return
+		}
+		else if (input === 'assign -reset') {
+			assignReset(false)
+			return
+		} else if (input === 'assign -reset -force') {
+			assignReset(true)
 			return
 		}
 

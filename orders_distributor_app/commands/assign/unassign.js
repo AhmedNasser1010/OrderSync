@@ -3,7 +3,7 @@ const { UPDATE_NESTED_VALUE, GET_DOC } = require('../../utils/FIRESTORE/DB_CONTR
 const assignLog = require('../../utils/assignLog.js')
 const { store } = require('../../store.js')
 
-async function unassign(orderId, driverId) {
+async function unassign(orderId, driverId, isForce) {
 
 	try {
 		const start = performance.now()
@@ -25,7 +25,8 @@ async function unassign(orderId, driverId) {
 				...currentOrder.assign,
 				status: 'delivery',
 				driver: null,
-				driverStartAt: null
+				driverStartAt: null,
+				cancelAutoAssign: isForce
 			}
 		}
 

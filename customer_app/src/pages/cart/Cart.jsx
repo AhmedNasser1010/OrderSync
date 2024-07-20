@@ -85,7 +85,10 @@ const Cart = () => {
 			assign: {
 				driver: null,
 				cook: null,
-				status: 'pickup'
+				status: 'pickup',
+				cancelAutoAssign: false,
+				driverStartAt: null,
+				cookStartAt: null
 			},
 			user: {
 				uid: user?.userInfo?.uid,
@@ -196,7 +199,8 @@ const Cart = () => {
 		      ...valid,
 		      id: randomOrderId(),
 		      status: 'RECEIVED',
-		      timestamp: Date.now(),
+		      timestamp: Number(Date.now()),
+		      statusUpdatedSince: Number(Date.now()),
 		    }
 
 		    toast.promise(

@@ -24,6 +24,7 @@ import PageTitle from "./Component/PageTitle.jsx";
 import BusinessOwnerInfoFieldsWidget from "./Component/BusinessOwnerInfoFieldsWidget.jsx";
 import BusinessInfoFieldsWidget from "./Component/BusinessInfoFieldsWidget.jsx";
 import BusinessOpeningHoursFieldsWidget from "./Component/BusinessOpeningHoursFieldsWidget.jsx";
+import BusinessCookTimeWidget from "./Component/BusinessCookTimeWidget.jsx";
 import BusinessPaymentMethodsFieldsWidget from "./Component/BusinessPaymentMethodsFieldsWidget.jsx";
 
 const BusinessSettings = () => {
@@ -58,14 +59,14 @@ const BusinessSettings = () => {
   			...businessValues,
   			services: {
   				...businessValues.services,
-  				[splitedName]: {...values}
+  				[splitedName]: values
   			}
   		});
   		return null;
 
   	};
 
-  	setBusinessValues({...businessValues, [name]: {...values}});
+  	setBusinessValues({...businessValues, [name]: values});
 
   };
 
@@ -137,6 +138,11 @@ const BusinessSettings = () => {
 					<BusinessOpeningHoursFieldsWidget
 						businessOpeningHoursValues={handleBusinessValuesChanges}
 						initialValues={businessValues.services?.openingHours}
+						filledValues={true}
+					/>
+					<BusinessCookTimeWidget
+						businessCookTimeValues={handleBusinessValuesChanges}
+						initialValues={businessValues.services?.cookTime}
 						filledValues={true}
 					/>
 					{/*<BusinessPaymentMethodsFieldsWidget
