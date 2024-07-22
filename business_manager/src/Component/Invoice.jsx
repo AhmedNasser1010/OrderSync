@@ -149,7 +149,7 @@ function Invoice({ business, orders }) {
 								<QRCode
 									style={{ outline: '12px solid white' }}
 									value={
-										`Order Now! https://merro.netlify.app\nInvoice No: ${order.orderData.id}\n\nMade with <3 by Ahmed Nasser\n01117073085`
+										`Order Now! https://merro.netlify.app\nInvoice No: ${order.orderData.id}*${business.accessToken}\n\nMade with <3 by Ahmed Nasser\n01117073085`
 									}
 								/>
 								<QrTitle>SCAN ME</QrTitle>
