@@ -6,11 +6,6 @@ import { useTranslation } from 'react-i18next'
 import RestaurantCard, { withOfferLabel } from '../../components/RestaurantCard'
 import useLanguageDirection from "../../hooks/useLanguageDirection"
 
-const topChainsIDs = [
-	'4d10754c-0a04-492c-9f41-df7ed0ca580e',
-	'71e3adf2-1315-4b7c-8235-bbf3fb91fba8'
-]
-
 function TopRestaurant() {
 	const { t } = useTranslation()
 	const direction = useLanguageDirection()
@@ -18,10 +13,8 @@ function TopRestaurant() {
 	const RestaurantCardwithOffer = withOfferLabel(RestaurantCard)
 
 	const topChains = useMemo(() => {
-		return restaurants.filter(restaurant => 
-			topChainsIDs.some(id => restaurant.accessToken === id)
-		)
-	}, [restaurants, topChainsIDs])
+		return restaurants.filter(restaurant => restaurant?.topChains)
+	}, [restaurants])
 
 	const handleTopChainLeft = () => {
 		const topCategory = document.querySelector(".top-chain-category");

@@ -4,9 +4,6 @@ const { store, setState, setValue } = require('../store.js')
 const { db } = require("../config/firebase")
 const { doc, onSnapshot, collection, query, where, getDocs } = require("firebase/firestore")
 
-// User uid is static right now!!!!!!!
-const userUid = 'mXbSx5DmWyc4uzTHKkvmbmvpXev2'
-
 async function onStartApp() {
 	try {
 		console.log('Starting...')
@@ -14,7 +11,7 @@ async function onStartApp() {
 		setState('restaurants')
 		setState('drivers')
 		
-		const user = await GET_DOC('users', userUid)
+		const user = await GET_DOC('users', process.env.USER_ID)
 		.then(res => {
 			if (res) {
 				setValue('user', res)
