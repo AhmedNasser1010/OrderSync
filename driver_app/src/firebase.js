@@ -2,13 +2,13 @@ import { getAuth } from "firebase/auth"
 import { initializeApp } from "firebase/app"
 import { getFirestore } from "firebase/firestore"
 
-!import.meta.env.VITE_FIREBASE_API && console.error('Error FIREBASE_API .env value not found!')
-!import.meta.env.VITE_FIREBASE_AUTHDOMAIN && console.error('Error FIREBASE_AUTHDOMAIN .env value not found!')
-!import.meta.env.VITE_PROJECT_ID && console.error('Error PROJECT_ID .env value not found!')
-!import.meta.env.VITE_STORAGE_BUCKET && console.error('Error STORAGE_BUCKET .env value not found!')
-!import.meta.env.VITE_MESS_SEND_ID && console.error('Error MESS_SEND_ID .env value not found!')
-!import.meta.env.VITE_APP_ID && console.error('Error APP_ID .env value not found!')
-!import.meta.env.VITE_MEASUREMENT_ID && console.error('Error MEASUREMENT_ID .env value not found!')
+!import.meta.env.VITE_FIREBASE_API && console.error('Error VITE_FIREBASE_API .env value not found!')
+!import.meta.env.VITE_FIREBASE_AUTHDOMAIN && console.error('Error VITE_FIREBASE_AUTHDOMAIN .env value not found!')
+!import.meta.env.VITE_PROJECT_ID && console.error('Error VITE_PROJECT_ID .env value not found!')
+!import.meta.env.VITE_STORAGE_BUCKET && console.error('Error VITE_STORAGE_BUCKET .env value not found!')
+!import.meta.env.VITE_MESS_SEND_ID && console.error('Error VITE_MESS_SEND_ID .env value not found!')
+!import.meta.env.VITE_APP_ID && console.error('Error VITE_APP_ID .env value not found!')
+!import.meta.env.VITE_MEASUREMENT_ID && console.error('Error VITE_MEASUREMENT_ID .env value not found!')
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API,
