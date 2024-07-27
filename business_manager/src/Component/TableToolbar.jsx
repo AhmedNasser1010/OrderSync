@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useReactToPrint } from 'react-to-print';
 import styled from 'styled-components'
 import DB_UPDATE_NESTED_VALUE from '../functions/DB_UPDATE_NESTED_VALUE';
+import DB_DELETE_NESTED_VALUE from '../functions/DB_DELETE_NESTED_VALUE';
 import _updateAnArray from '../functions/_updateAnArray';
 import { changeOrderState, deleteOrder, setOpenedOrders, storeOrder } from '../rtk/slices/ordersSlice';
 import toTitle from '../functions/toTitle';
@@ -31,12 +32,11 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 	const openOrders = useSelector(state => state.orders.open);
 	const closedOrders = useSelector(state => state.orders.closed);
 	const apiWaitingRef = useRef(false);
-	const openOrdersCounter = useRef(0);
-	const closedOrdersCounter = useRef(0);
 	const [finalDayClosedOrderRecord, setFinalDayClosedOrderRecord] = useState({});
 	const componentRef = useRef(null)
 	const business = useSelector(state => state.business)
 	const menu = useSelector(state => state.menu.items)
+	const ordersLoaded = useRef(false)
 
 	const orders = useMemo(() => {
 		let ordersMap = []
@@ -98,7 +98,13 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 	}
 
 	const handleDelete = () => {
-		handleUpdateData(() => dispatch(deleteOrder(selected)))
+		handleUpdateData(() => {
+			selected.map(selectedID => {
+				const order = orders.filter(order => order.orderData.id === selectedID)[0]
+				DB_DELETE_NESTED_VALUE('customers', order.orderData.user.uid, 'trackedOrder')
+				dispatch(deleteOrder(selectedID))
+			})
+		})
 	}
 
 	const handleToNext = () => {
@@ -121,20 +127,12 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 	})
 
 	useEffect(() => {
-		openOrdersCounter.current++
-		closedOrdersCounter.current++
-	}, [])
-
-	useEffect(() => {
-		openOrdersCounter.current === 3 && handleUpdateDataToTheCloude();
-		if (openOrdersCounter.current === 2) openOrdersCounter.current = 3;
+		ordersLoaded.current && handleUpdateDataToTheCloude()
+		if (openOrders.length) ordersLoaded.current = true
 	}, [openOrders])
 
 	useEffect(() => {
-		if (closedOrdersCounter.current === 3) {
-			_updateAnArray('orders', accessToken, 'closed', closedOrders.at(-1));
-		}
-		if (closedOrdersCounter.current === 2) closedOrdersCounter.current = closedOrdersCounter.current + 1;
+		_updateAnArray('orders', accessToken, 'closed', closedOrders.at(-1))
 	}, [closedOrders])
 
 	return (
@@ -179,17 +177,17 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 							<ReceiptLongRoundedIcon onMouseUp={handlePrint} />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title="To Back" sx={{ display: tableStatus === 'RECEIVED' && 'none' }}>
+					<Tooltip title="To Back" sx={{ display: tableStatus === 'RECEIVED' || tableStatus === 'IN_DELIVERY' && 'none' }}>
 						<IconButton>
 							<ArrowLeftIcon onMouseUp={handleToBack} />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title="To Next" sx={{ display: tableStatus === 'COMPLETED' && 'none' }}>
+					<Tooltip title="To Next" sx={{ display: tableStatus === 'COMPLETED' || tableStatus === 'IN_DELIVERY' && 'none' }}>
 						<IconButton>
 							<NextPlanIcon onMouseUp={handleToNext} />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title="Delete" sx={{ display: tableStatus === 'COMPLETED' && 'none' }}>
+					<Tooltip title="Delete" sx={{ display: tableStatus === 'COMPLETED' || tableStatus === 'IN_DELIVERY' && 'none' }}>
 						<IconButton>
 							<DeleteIcon onMouseUp={handleDelete} />
 						</IconButton>
