@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToUserLocation } from '../../rtk/slices/checkoutSlice'
-import toast, { Toaster } from "react-hot-toast"
+import toast from "react-hot-toast"
 import { useTranslation } from 'react-i18next'
 
 
@@ -123,7 +123,6 @@ function CheckoutUserAddress({ handleCurrentState }) {
 	return (
 
 		<Container>
-			<Toaster />
 			<CheckoutPageTitle title='Address & Location' />
 			<MapContainerStyled
 				center={markers[0].latlng}

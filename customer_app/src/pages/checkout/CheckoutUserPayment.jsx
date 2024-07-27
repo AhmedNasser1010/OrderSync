@@ -7,7 +7,7 @@ import { addCheckout, clearCheckout } from '../../rtk/slices/checkoutSlice'
 import { clearCart } from '../../rtk/slices/cartSlice'
 import priceAfterDiscount from '../../utils/priceAfterDiscount'
 import { useNavigate } from 'react-router-dom'
-import toast, { Toaster } from "react-hot-toast"
+import toast from "react-hot-toast"
 import { useTranslation } from 'react-i18next'
 
 import Divider from './Divider'
@@ -171,7 +171,6 @@ function CheckoutUserPayment({ handleCurrentState, res }) {
 	return (
 
 		<Payment>
-			<Toaster />
 			<CheckoutPageTitle title='Payment Method' />
 			<RadioFormWrapper>
 				<RadioInputWrapper htmlFor='cash' style={{ borderColor: paymentMethod === 'CASH' && 'blue' }}>

@@ -90,5 +90,6 @@
   "Driver": "Driver",
   "Phone": "Phone",
   "Cancellations and modifications": "Cancellations and modifications",
-  "Order Cancel": "Order Cancel"
+  "Order Cancel": "Order Cancel",
+  "Location is required": "Location is required"
 }

@@ -7,6 +7,7 @@ import OrderSidebar from './components/Sidebar/OrderSidebar'
 import ScrollToTop from "./components/ScrollToTop"
 import LoginSidebar from "./components/Sidebar/LoginSidebar"
 import useRestaurants from './hooks/useRestaurants'
+import { Toaster } from "react-hot-toast"
 
 import { trackingReset } from './rtk/slices/trackingSlice'
 
@@ -31,6 +32,11 @@ const App = () => {
       <LoginSidebar />
       { user?.trackedOrder?.id && <OrderSidebar /> }
       <ScrollToTop />
+      <Toaster toastOptions={{
+          className: 'font-ProximaNovaSemiBold',
+          position: 'top-center'
+        }}
+      />
     </>
   )
 }

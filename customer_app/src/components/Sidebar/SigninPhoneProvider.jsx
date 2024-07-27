@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { auth } from "../../config/firebase"
 import { RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth'
 import { string } from 'yup'
-import toast, { Toaster } from "react-hot-toast"
+import toast from "react-hot-toast"
 
 import useSignupUserPhoneProvider from '../../hooks/useSignupUserPhoneProvider'
 import useVerifyOtp from '../../hooks/useVerifyOtp'
@@ -148,7 +148,6 @@ function SigninPhoneProvider({ status, setStatus }) {
 	return (
 
 		<div className='flex flex-col'>
-			<Toaster />
 			{
 				!hasFilled &&
 					<>

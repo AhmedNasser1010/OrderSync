@@ -6,9 +6,10 @@ import Control from 'react-leaflet-custom-control'
 import 'leaflet/dist/leaflet.css'
 import { useDispatch, useSelector } from 'react-redux'
 import { initUser } from '../../rtk/slices/userSlice'
-import toast, { Toaster } from "react-hot-toast"
+import toast from "react-hot-toast"
 import { toggleLoginSidebar } from '../../rtk/slices/toggleSlice'
 import { useTranslation } from 'react-i18next'
+import { markerMapIcon } from './mapCustomMarker'
 
 import DB_ADD_DOC from '../../utils/DB_ADD_DOC'
 
@@ -89,12 +90,17 @@ function UserAddress({ setExpandUserAddress }) {
 		}
 	}
 
+	useEffect(() => {
+		if (user && user.locations[user.locations.selected].latlng) {
+			addMarker(user.locations[user.locations.selected].latlng)
+		}
+	}, [user])
+
 	return (
 
 		<Container>
-		<Toaster />
 			<MapContainerStyled
-				center={[29.620106778124843, 31.255811811669496]}
+				center={user.locations[user.locations.selected].latlng || [29.620106778124843, 31.255811811669496]}
 				zoom={18}
 				scrollWheelZoom={true}
 			>
@@ -104,7 +110,7 @@ function UserAddress({ setExpandUserAddress }) {
 				/>
 				{
 					markers?.map((mark, idx) => (
-						<Marker key={idx} position={mark?.latlng}>
+						<Marker key={idx} position={mark?.latlng} icon={markerMapIcon}>
 							<Popup>
 								{ mark.popup }
 							</Popup>

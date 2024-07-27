@@ -2,6 +2,7 @@ import L from 'leaflet'
 import resIcon from '../../../public/assets/shop-svgrepo-com.svg'
 import driverIcon from '../../../public/assets/motor-scooter-svgrepo-com.svg'
 import personIcon from '../../../public/assets/person-boy-svgrepo-com.svg'
+import marker from '../../../public/assets/marker.svg'
 
 // Define custom icon
 const restaurantMapIcon = L.icon({
@@ -25,4 +26,11 @@ const personMapIcon = L.icon({
   popupAnchor: [0, -32],
 })
 
-export { restaurantMapIcon, driverMapIcon, personMapIcon }
+const markerMapIcon = L.icon({
+  iconUrl: marker,
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+})
+
+export { restaurantMapIcon, driverMapIcon, personMapIcon, markerMapIcon }

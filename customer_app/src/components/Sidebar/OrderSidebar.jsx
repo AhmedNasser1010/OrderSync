@@ -44,6 +44,9 @@ function OrderSidebar() {
 	const [driverId, setDriverId] = useState(tracking?.order?.assign?.driver || null)
 	const [isAvailableToEdit, setIsAvailableToEdit] = useState(true)
 
+	console.log(tracking)
+	console.log(driverId)
+
 	useEffect(() => {
 		if (tracking.order) {
 			setDriverId(tracking.order.assign.driver)
@@ -100,7 +103,7 @@ function OrderSidebar() {
 			})
 
 			if (driverId) {
-				const driverRef = doc(db, 'users', driverId)
+				const driverRef = doc(db, 'drivers', driverId)
 
 				unsubDriver = onSnapshot(driverRef, doc => {
 					window.read += 1

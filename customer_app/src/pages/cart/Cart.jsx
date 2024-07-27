@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
@@ -25,7 +25,7 @@ const validationSchema = Yup.object().shape({
 	comment: Yup.string(),
 	user: Yup.object().shape({
 		name: Yup.string().required('Name is required'),
-		phone: Yup.string().matches(/^\+201\d{9}$/, 'Phone number must be a valid Egyptian phone number').required('Phone number is required'),
+		phone: Yup.string().required('Phone number is required').matches(/^\+201\d{9}$|^01\d{9}$/, 'Phone number must be a valid Egyptian phone number'),
 		secondPhone: Yup.string(),
 	}).required('User information is required'),
 	location: Yup.object().shape({
@@ -248,12 +248,39 @@ const Cart = () => {
     })
     .catch(err => {
     	setDisableSubmit(false)
-      console.log('Validation failed:', err.errors)
-      err.errors.map((err, i) => {
-      	if (err === 'Address is required' || err === 'User location is required' || err === 'Name is required' || err === 'Phone number is required') {
-      		dispatch(toggleLoginSidebar())
-      	}
+      // console.log('Validation failed:', err.errors)
 
+    	if (err.errors.includes("Name is required")) {
+      	toast.error(t('Name is required'))
+      	dispatch(toggleLoginSidebar())
+      	return
+      }
+
+      if (err.errors.includes("Phone number is required")) {
+      	toast.error(t('Phone number is required'))
+      	dispatch(toggleLoginSidebar())
+      	return
+      }
+
+      if (err.errors.includes("Phone number must be a valid Egyptian phone number")) {
+      	toast.error(t("Phone number must be a valid Egyptian phone number"))
+      	dispatch(toggleLoginSidebar())
+      	return
+      }
+
+      if (err.errors.includes("location.latlng[0] is a required field") || err.errors.includes("location.latlng[1] is a required field")) {
+      	toast.error(t("Location is required"))
+      	dispatch(toggleLoginSidebar())
+      	return
+      }
+
+      if (err.errors.includes("Address is required")) {
+      	toast.error(t("Address is required"))
+      	dispatch(toggleLoginSidebar())
+      	return
+      }
+
+      err.errors.map((err, i) => {
       	toast.error(t(err), {
       		duration: Number(`${i+2}500`),
       		className: "font-ProximaNovaSemiBold",
@@ -390,11 +417,6 @@ const Cart = () => {
 						</StyledWindow>
 					</PopupWindow>
 			}
-			<Toaster toastOptions={{
-				className: 'font-ProximaNovaSemiBold',
-				position: 'top-center',
-				duration: 1500,
-			}} />
 
 		</>
 

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react"
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io"
 import { useDispatch, useSelector } from 'react-redux'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import { addToCart, setRestaurant, clearCart } from '../rtk/slices/cartSlice'
 import { useTranslation } from 'react-i18next'
 
@@ -118,12 +118,6 @@ const RestaurantCategory = ({ id, resId, title, ShowItem, handleShowItem, ResInf
           }
         </>
       }
-
-      <Toaster toastOptions={{
-        className: 'font-ProximaNovaSemiBold',
-        position: 'top-center',
-        duration: 1500,
-      }} />
     </>
   )
 }

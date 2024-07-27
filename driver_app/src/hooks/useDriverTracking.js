@@ -8,12 +8,12 @@ import DB_UPDATE_NESTED_VALUE from '../utils/DB_UPDATE_NESTED_VALUE'
 const useDriverTracking = () => {
 	const dispatch = useDispatch()
 	const user = useSelector(state => state.user)
-	const updateTime = 120000
+	const updateTime = 60000
 	const locationInterval = useRef(null)
 	let lastLocation = useRef([null, null])
 
 	const driverTracking = () => {
-		if (user?.accessToken && user?.trackingFeature) {
+		if (user.uid) {
 			locationInterval.current = setInterval(async () => {
 				let newLocation = [null, null]
 				
@@ -26,11 +26,11 @@ const useDriverTracking = () => {
 
 				const isOnline = user?.online?.byUser && user?.online?.byManager
 				const notNull = newLocation[0] !== null && newLocation[1] !== null
-				const isFarther150Meter = getDistanceFromLatlngInKm(lastLocation.current, newLocation) >= 0.150
+				const isFarther100Meter = getDistanceFromLatlngInKm(lastLocation.current, newLocation) >= 0.1
 
-				if (isOnline && notNull && isFarther150Meter) {
+				if (isOnline && notNull && isFarther100Meter) {
 					lastLocation.current = newLocation
-					DB_UPDATE_NESTED_VALUE('drivers', user.userInfo.uid, 'liveLocation', newLocation)
+					DB_UPDATE_NESTED_VALUE('drivers', user.uid, 'liveLocation', newLocation)
 				}
 			}, updateTime)
 		}

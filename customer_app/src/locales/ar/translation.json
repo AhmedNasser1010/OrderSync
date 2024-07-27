@@ -89,5 +89,6 @@
   "Driver": "السواق",
   "Phone": "التليفون",
   "Cancellations and modifications": "الإلغاء والتعديلات",
-  "Order Cancel": "إلغاء الطلب"
+  "Order Cancel": "إلغاء الطلب",
+  "Location is required": "الموقع مطلوب"
 }
