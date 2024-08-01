@@ -11,22 +11,17 @@ import RegistrationForm from './Component/RegistrationForm.jsx';
 const Login = () => {
 	return (
 
-		<Paper
-			elevation={0}
-			sx={{ 
-				padding: '1em',
-				position: 'fixed',
-				top: '30%',
-				left: '50%',
-				transform: 'translate(-50%, -50%)',
-				minWidth: '500px'
-			}}
-		>
+		<Paper elevation={0} sx={{
+			textAlign: 'center',
+			padding: '20px',
+    	width: 'calc(100% - 40px)',
+    	height: 'calc(100vh - 40px)'
+		}}>
 			<Stack sx={{ width: '100%' }}>
 				<Typography variant='h1' gutterBottom>Login</Typography>
 
 				<RegistrationForm action='login' />
-				<p>You have no account <Link to='/signup' style={{ color: 'blue' }}>Signup a new one</Link></p>
+				<p style={{	marginTop: '15px' }}>You have no account <Link to='/signup' style={{ color: 'blue' }}>Signup a new one</Link></p>
 
 			</Stack>
 		</Paper>

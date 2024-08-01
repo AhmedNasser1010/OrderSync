@@ -175,7 +175,7 @@ const Menu = () => {
 
 	return (
 
-		<Box>
+		<Box sx={{ marginTop: '20px' }}>
 
 			<PageTitle title="Menu Setup" style={{ marginBottom: '50px' }} />
 
@@ -194,7 +194,12 @@ const Menu = () => {
 					onDragEnd={handleDragEnd}
 				>
 
-					<SortableContext items={indexes} strategy={verticalListSortingStrategy} disabled={disableMenuDnD}>
+					<SortableContext
+						items={indexes}
+						strategy={verticalListSortingStrategy}
+						disabled={true}
+						// disabled={disableMenuDnD}
+					>
 						{indexes.map((index, i) =>
 							<SortableItem key={index} id={index} >
 								<MenuCard item={categories[index - 1]} />

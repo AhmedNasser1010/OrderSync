@@ -106,13 +106,13 @@ const OrdersTable = ({ tableData, headCells, tableStatus }) => {
 
 	return (
 
-		<Box>
+		<Box className='orders-table'>
 			<TableToolbar
 				selected={selected}
 				handleSetSelected={handleSetSelected}
 				tableStatus={tableStatus}
 			/>
-			<TableContainer component={Paper}>
+			<TableContainer component={Paper} className='orders-table-container'>
 
 			<Table
 				sx={{ minWidth: 650 }}
@@ -130,7 +130,7 @@ const OrdersTable = ({ tableData, headCells, tableStatus }) => {
 					headCells={headCells}
 				/>
 
-				<TableBody>
+				<TableBody className='orders-table-body' sx={{ padding: '0px' }}>
 					{visibleRows?.map((row, index) => {
 						return (
 							<CustomTableRow

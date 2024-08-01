@@ -101,7 +101,12 @@ const CategoryBody = ({ name, categoryID }) => {
 				collisionDetection={closestCenter}
 				onDragEnd={handleDragEnd}
 			>
-				<SortableContext items={indexes} strategy={verticalListSortingStrategy} disabled={disableMenuDnD}>
+				<SortableContext
+					items={indexes}
+					strategy={verticalListSortingStrategy}
+					disabled={true}
+					// disabled={disableMenuDnD}
+				>
 					{indexes?.map((index, i) =>
 						<SortableItem key={i} id={index} >
 							<MenuNestedCard item={filteredItems[index - 1]} />

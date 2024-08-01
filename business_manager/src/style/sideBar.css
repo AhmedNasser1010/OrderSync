@@ -1,14 +1,13 @@
 .side-bar {
 	background-color: #eee;
-	position: fixed;
 	width: calc(200px - 40px);
-	height: 100vh;
+	height: calc(100vh - 40px);
 	padding: 20px 0px 20px 40px;
 }
 
 .side-bar .logo {
 	display: block;
-	font-size: 24px;
+	font-size: 24px !important;
   font-weight: bold;
   cursor: pointer;
   margin-bottom: 25px;
@@ -25,3 +24,8 @@
 }
 
 .side-bar ul li a {}
+
+.side-bar .exit-menu,
+.side-bar .menu-icon {
+	display: none;
+}

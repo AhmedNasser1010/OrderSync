@@ -57,8 +57,10 @@ const Widget = styled.div`
 	background-color: white;
 	border-radius: 8px;
 	padding: 20px;
-	width: calc(50% - 40px - 0.5rem);
+	width: 100%;
 `
+// width: calc(50% - 40px - 0.5rem);
+
 const WidgetOptionTitle = styled.div`
   display: flex;
   align-items: center;

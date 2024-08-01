@@ -3,7 +3,7 @@ const customerSchema = ({ uid, name, email, phone, refferredBy, avatar, provider
 		restaurants: [],
 		locations: {
 			home: {
-				latlng: [null, null],
+				latlng: [0, 0],
 				address: '',
 			},
 			selected: 'home',

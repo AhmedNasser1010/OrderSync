@@ -35,6 +35,7 @@ function App() {
 	const navigate = useNavigate()
 	const saveToCloudBtnStatus = useSelector(state => state.conditionalValues.saveToCloudBtnStatus);
 	const userRegisterStatus = useSelector(state => state.conditionalValues.userRegisterStatus)
+	const navigationBar = useSelector(state => state.conditionalValues.enableNavigationBar)
 
 	const handleGetAppData = (userData) => {
 		if (userData) {
@@ -95,8 +96,8 @@ function App() {
 		<>
 			{
 				userRegisterStatus === 'LOGGED_IN' &&
-					<>
-						<div className="side-bar-container"><SideBar /></div>
+					<div className='main-container'>
+						<SideBar />
 						<div className="content">
 							<Routes>
 								<Route path="/" element={<Home />} />
@@ -108,7 +109,7 @@ function App() {
 								<Route path="/staff" element={<Staff />} />
 							</Routes>
 						</div>
-					</>
+					</div>
 			}
 
 			{

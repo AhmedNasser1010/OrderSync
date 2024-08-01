@@ -3,6 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const conditionalValuesSlice = createSlice({
   name: 'conditionalValues',
   initialState: {
+    enableNavigationBar: true,
     disableMenuDnD: false,
     saveToCloudBtnStatus: 'ON_SAVED',
     settingsSaveToCloude: 'ON_SAVED',
@@ -17,6 +18,10 @@ export const conditionalValuesSlice = createSlice({
     printedOrders: []
   },
   reducers: {
+    enableNavigationBar: (state, { payload }) => {
+      // return state.enableNavigationBar = payload
+      return { ...state, enableNavigationBar: payload }
+    },
     setDisableMenuDnD: (state, { payload }) => {
       return { ...state, disableMenuDnD: payload };
     },
@@ -52,6 +57,7 @@ export const conditionalValuesSlice = createSlice({
 
 
 export const {
+  enableNavigationBar,
   setDisableMenuDnD,
   setSaveToCloudBtnStatus,
   setSettingsSaveToCloudeStatus,

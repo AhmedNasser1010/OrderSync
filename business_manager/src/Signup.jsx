@@ -13,20 +13,18 @@ const Signup = () => {
 
 		<Paper
 			elevation={0}
-			sx={{ 
-				padding: '1em',
-				position: 'fixed',
-				top: '30%',
-				left: '50%',
-				transform: 'translate(-50%, -50%)',
-				minWidth: '500px'
+			sx={{
+				textAlign: 'center',
+				padding: '20px',
+    		width: 'calc(100% - 40px)',
+    		height: 'calc(100vh - 40px)'
 			}}
 		>
 			<Stack sx={{ width: '100%' }}>
 				<Typography variant='h1' gutterBottom>Signup</Typography>
 
 				<RegistrationForm action='signup' />
-				<p>Already have account <Link to='/login' style={{ color: 'blue' }}>Login</Link></p>
+				<p style={{	marginTop: '15px' }}>Already have account <Link to='/login' style={{ color: 'blue' }}>Login</Link></p>
 
 			</Stack>
 		</Paper>

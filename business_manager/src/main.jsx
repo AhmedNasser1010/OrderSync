@@ -8,6 +8,7 @@ import { Provider } from 'react-redux'
 // styles
 import './style/sideBar.css'
 import './style/keyframs.css'
+import "./style/mediaSM.css"
 
 // Fonts
 import '@fontsource/roboto/300.css'

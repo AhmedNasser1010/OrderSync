@@ -45,8 +45,8 @@ function UserAddress({ setExpandUserAddress }) {
 
 	const onSubmit = () => {
 		const notSameLatlng = markers[0]?.latlng[0] && markers[0]?.latlng[0] !== user?.locations?.home?.latlng[0] && markers[0]?.latlng[1] !== user?.locations?.home?.latlng[1]
-		const notDefaultLatlng = markers[0]?.latlng[0] !== 29.620106778124843 && markers[0]?.latlng[1] !== 31.255811811669496
-		const notSameAddress = address !== user?.locations?.home?.address
+		const notDefaultLatlng = markers[0]?.latlng[0] !== 29.620106778124843 && markers[0]?.latlng[1] !== 31.255811811669496 || markers[0]?.latlng[0] !== 0 && markers[0]?.latlng[1] !== 0
+		const notSameAddress = address !== user?.locations?.home?.address && address !== ''
 
 		if ((notSameLatlng && notDefaultLatlng) || notSameAddress) {
 
@@ -99,8 +99,18 @@ function UserAddress({ setExpandUserAddress }) {
 	return (
 
 		<Container>
+			<input
+				className={`w-full p-5 border border-gray-300 ${!address && 'error'}`}
+				id='address'
+				type="text"
+				label={t('Address')}
+				placeholder={t('Address, street, villagem, a known place')}
+				value={address}
+				onChange={handleAddressChange}
+			/>
+			<Divider style={{ margin: '20px 0' }} />
 			<MapContainerStyled
-				center={user.locations[user.locations.selected].latlng || [29.620106778124843, 31.255811811669496]}
+				center={user.locations[user.locations.selected].latlng[0] || user.locations[user.locations.selected].latlng[1] ? user.locations[user.locations.selected].latlng : [29.620106778124843, 31.255811811669496]}
 				zoom={18}
 				scrollWheelZoom={true}
 			>
@@ -122,20 +132,10 @@ function UserAddress({ setExpandUserAddress }) {
 					<LocationButton addMarker={addMarker} />
 				</Control>
 			</MapContainerStyled>
-			<Divider style={{ margin: '20px 0' }} />
-			<input
-				className={`w-full p-5 border border-gray-300 mb-5 ${!address && 'error'}`}
-				id='address'
-				type="text"
-				label={t('Address')}
-				placeholder={t('Location Address')}
-				value={address}
-				onChange={handleAddressChange}
-			/>
 			<button
 				onMouseUp={onSubmit}
 				type='submit'
-				className='w-full bg-color-2 py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer'
+				className='w-full bg-color-2 py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer mt-5'
 			>
 				{t('Save')}
 			</button>

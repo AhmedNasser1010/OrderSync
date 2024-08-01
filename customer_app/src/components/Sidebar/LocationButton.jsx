@@ -9,19 +9,27 @@ function LocationButton({ addMarker }) {
 	const { t } = useTranslation()
 	const map = useMap()
 
+	const sucsessCallback = (position) => {
+		const latlng = [position.coords.latitude, position.coords.longitude]
+		if (latlng) {
+			map.flyTo(latlng, 15)
+			addMarker(latlng)
+		} else {
+			console.warn(t('Location not available yet.'))
+		}
+	}
+
+	const errorCallback = (error) => {
+		console.error('Error getting location:', error)
+	}
+
+	const options = {
+		enableHighAccuracy: true
+	}
+
 	const findMyLocation = () => {
 		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition((position) => {
-				const latlng = [position.coords.latitude, position.coords.longitude]
-				if (latlng) {
-					map.flyTo(latlng, 15)
-					addMarker(latlng)
-				} else {
-					console.warn(t('Location not available yet.'))
-				}
-			}, (error) => {
-				console.error('Error getting location:', error)
-			})
+			navigator.geolocation.getCurrentPosition(sucsessCallback, errorCallback, options)
 		} else {
 			console.warn(t('Geolocation is not supported by this browser.'))
 		}

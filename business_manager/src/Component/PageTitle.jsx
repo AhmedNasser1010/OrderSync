@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 const PageTitle = ({ style, title }) => {
 	return (
 
-		<Box sx={style}>
+		<Box sx={style} className='page-title'>
 			<Typography
 				variant="h2"
 				gutterBottom

@@ -2,15 +2,20 @@ html {
 	background-color: #f5f3ef;
 }
 
-#root {
-	display: flex;
+body {
 	/* font-family: monospace; */
 	font-family: "Roboto";
 	color: #1a1a1a;
+/*	overflow: hidden;*/
 }
 
 ul, li, a {
 	all: unset;
+}
+
+.main-container {
+	display: flex;
+	overflow: hidden;
 }
 
 .side-bar-container {
@@ -18,7 +23,10 @@ ul, li, a {
 }
 
 .content {
-	width: calc(100% - 200px);
+	width: 100%;
+/*	height: 600px;*/
+/*	overflow-x: hidden;*/
+/*	overflow-y: scroll;*/
 }
 
 * {

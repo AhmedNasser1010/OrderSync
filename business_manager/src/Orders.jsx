@@ -12,6 +12,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
+import Paper from '@mui/material/Paper';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import FingerprintIcon from '@mui/icons-material/Fingerprint'
@@ -107,6 +108,20 @@ const Orders = () => {
 	const intervalRef = useRef(null);
 	const savingOrdersTimer = useSelector(state => state.conditionalValues.savingOrdersTimer)
 	const business = useSelector(state => state.business)
+	const [innerWidth, setInnerWidth] = useState(window.innerWidth)
+
+	useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setInnerWidth(width);
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+        window.removeEventListener('resize', handleResize);
+    }
+	}, [])
 
 	useEffect(() => {
 		const docRef = doc(db, 'orders', accessToken);
@@ -125,7 +140,7 @@ const Orders = () => {
 			id: `simple-tab-${index}`,
 			'aria-controls': `simple-tabpanel-${index}`,
 			sx: {
-				width: '100%'
+				width: innerWidth <= 650 ? `${innerWidth/3}px` : '100%'
 			}
 		};
 	}
@@ -152,23 +167,27 @@ const Orders = () => {
 
 			<PageTitle title='Orders' />
 
-			<Stack direction="row" sx={{ minHeight: 'calc(100vh - 75px)' }}>
+			<Stack direction="row" sx={{ minHeight: 'calc(100vh - 75px)', flexDirection: innerWidth <= 650 ? 'column-reverse' : 'row' }}>
 
-				<Box sx={{ borderRight: 1, borderColor: 'divider', minWidth: '130px' }}>
+				<Box sx={{ borderRight: 1, borderColor: 'divider', minWidth: '130px', backgroundColor: 'transparent' }} className='tabs-box'>
 					<Tabs
 						value={tabValue}
 						onChange={handleChangeTabChange}
-						orientation="vertical"
+						orientation={innerWidth <= 650 ? 'horizontal' : 'vertical'}
+						scrollButtons={false}
+						variant={innerWidth <= 650 ? "scrollable" : "standard"}
 						sx={{ height: '100%', position: 'relative' }}
+						className="tabs"
+						component={Paper}
 					>
 						<Tab label="Recieved" {...a11yProps(0)} icon={<IoArchive style={{ fontSize: '1.3rem' }} />} />
 						<Tab label="In Progress" {...a11yProps(1)} icon={<GiCook style={{ fontSize: '1.8rem' }} />} />
 						<Tab label="In Delivery" {...a11yProps(2)} icon={<MdDeliveryDining style={{ fontSize: '1.8rem' }} />} />
-						<Tab label="Completed" {...a11yProps(3)} icon={<IoMdDoneAll style={{ fontSize: '1.5rem' }} />} style={{ borderTop: '1px solid rgba(0, 0, 0, 0.12)', position: 'absolute', bottom: '0', left: '0' }} />
+						<Tab className='done-orders-tab' label="Completed" {...a11yProps(3)} icon={<IoMdDoneAll style={{ fontSize: '1.5rem' }} />} style={{ borderTop: '1px solid rgba(0, 0, 0, 0.12)', position: 'absolute', bottom: '0', left: '0' }} />
 					</Tabs>
 				</Box>
 
-				<Box style={{ width: '100%' }}>
+				<Box style={{ width: '100%' }} className='tables-box'>
 
 					{/*<Box sx={{ padding: '10px 10px 0 20px' }}>
 						<Button variant='contained' size='small' onMouseUp={handleAddTestOrder}>Test Order</Button>
