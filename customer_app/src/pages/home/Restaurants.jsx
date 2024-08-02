@@ -15,7 +15,7 @@ function Restaurants() {
 				(restaurants && restaurants?.length != 0) &&
 				<>
 					<section id='restaurants'>
-						<h2 className='font-GrotBlack text-2xl pb-5 pt-5 2xl:text-start text-center sm:px-0 px-2'>{t("Restaurants with online food delivery in El-Ayat")}</h2>
+						<h2 className='font-GrotBlack text-2xl pb-5 pt-5 2xl:text-start text-center sm:px-0 px-2'>{t("Restaurants with online food delivery to El Ayat")}</h2>
 
 						<RestaurantsFilter />
 
