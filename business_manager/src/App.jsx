@@ -64,6 +64,7 @@ function App() {
 	}
 
 	useEffect(() => {
+		console.log('test')
 		AUTH_ON_CHANGE()
 		.then(userData => {
 			handleGetAppData(userData)
