@@ -18,7 +18,6 @@ const App = () => {
   const user = useSelector(state => state.user)
 
   useEffect(() => {
-    console.log('test')
     if (!user?.trackedOrder?.id) {
       dispatch(trackingReset())
       document.body.classList.remove("overflow-hidden")
