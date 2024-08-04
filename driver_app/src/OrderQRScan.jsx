@@ -10,7 +10,6 @@ import { initOrders } from './rtk/slices/ordersSlice'
 import { initQueue } from './rtk/slices/queueSlice'
 
 import Container from './Components/Container'
-import PageTitle from './Components/PageTitle'
 import Scanner from './Components/Scanner'
 
 
@@ -143,7 +142,6 @@ function OrderQRScan() {
 	return (
 
 		<Container style={{ overflow: 'hidden' }}>
-			<PageTitle>QR Scan</PageTitle>
 			<Scanner
 				callback={{
 					success: (result, scanner) => success(result, scanner),

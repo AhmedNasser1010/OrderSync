@@ -6,6 +6,7 @@ import { addUser } from "./rtk/slices/userSlice.js"
 import { setUserRegisterStatus } from './rtk/slices/conditionalValuesSlice'
 import { initOrders } from './rtk/slices/ordersSlice'
 import { initQueue } from './rtk/slices/queueSlice'
+import { initPartnerServices } from './rtk/slices/partnerServicesSlice'
 import { initBusiness } from './rtk/slices/businessSlice'
 import styled from 'styled-components'
 import { doc, onSnapshot } from "firebase/firestore";
@@ -19,6 +20,7 @@ import DB_DOC_SUBSCRIBE from './utils/DB_DOC_SUBSCRIBE'
 import AUTH_SIGNOUT from './utils/AUTH_SIGNOUT'
 import useDriverTracking from './hooks/useDriverTracking'
 
+import Header from './Header'
 import Login from './Login'
 import Signup from './Signup'
 import NewUserComponent from './NewUserComponent'
@@ -65,6 +67,12 @@ function App() {
   // User document subscribe
   useEffect(() => {
     if (user?.uid) {
+
+      DB_GET_DOC('users', user?.partnerId)
+      .then(partner => {
+        dispatch(initPartnerServices(partner.services))
+      })
+
       const docRef = doc(db, 'drivers', user.uid)
 
       const unsub = onSnapshot(docRef, doc => {
@@ -96,6 +104,7 @@ function App() {
   return (
 
     <>
+      { userRegisterStatus === 'LOGGED_IN' && <Header /> }
       <Routes>
         {
           userRegisterStatus === 'LOGGED_OUT' &&

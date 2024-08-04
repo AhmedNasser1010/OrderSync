@@ -115,7 +115,7 @@ const Cart = () => {
 
 
 	useEffect(() => {
-		if (resInfo) {
+		if (resInfo && user.locations) {
 			const userDistanceFromRes = getDistanceFromLatlngInKm(user.locations[user.locations.selected].latlng, resInfo.business.latlng)
 			const fees = getDeliveryFees(userDistanceFromRes, services.deliveryFees)
 			setDeliveryFees(fees)

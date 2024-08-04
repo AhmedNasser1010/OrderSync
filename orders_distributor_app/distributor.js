@@ -16,6 +16,7 @@ const test = require('./utils/test.js')
 const assign = require('./commands/assign/main.js')
 const get = require('./commands/get/main.js')
 const storeMapping = require('./commands/storeMapping/main.js')
+const due = require('./commands/due/main.js')
 
 onStartApp()
 
@@ -54,6 +55,9 @@ function processInput(input) {
 			break
 		case 'assign':
 			assign(input)
+			break
+		case 'due':
+			due(input)
 			break
 		default:
 			unknownCommand(input)

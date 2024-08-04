@@ -8,6 +8,7 @@ import userSlice from "./slices/userSlice.js"
 import ordersSlice from "./slices/ordersSlice.js"
 import menusSlice from "./slices/menusSlice.js"
 import queueSlice from './slices/queueSlice.js'
+import partnerServicesSlice from './slices/partnerServicesSlice.js'
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
     user: userSlice,
     orders: ordersSlice,
     menus: menusSlice,
-    queue: queueSlice
+    queue: queueSlice,
+    partnerServices: partnerServicesSlice
   }
 })

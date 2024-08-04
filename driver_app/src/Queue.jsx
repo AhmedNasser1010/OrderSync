@@ -6,15 +6,17 @@ import Box from '@mui/material/Box'
 
 import { initQueue } from './rtk/slices/queueSlice'
 
-import PageTitle from './Components/PageTitle'
 import Container from './Components/Container'
 import OrderCard from './Components/OrderCard'
+import Dues from './Components/Dues'
+import Divider from '@mui/material/Divider'
 
 const Orders = styled.div`
 	display: flex;
 	flex-direction: column;
 	gap: 1rem;
-	width: 80%;
+	padding: 0 15px;
+	width: calc(100% - 30px);
 `
 
 function Queue() {
@@ -26,9 +28,9 @@ function Queue() {
 	return (
 
 		<Container>
-			<PageTitle>Queue {queue?.length}</PageTitle>
-
 			<Orders>
+				<Dues />
+				<Divider />
 				{
 					queue?.map(order => <OrderCard key={order.id} order={order} />)
 				}

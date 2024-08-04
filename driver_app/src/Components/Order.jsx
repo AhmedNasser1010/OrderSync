@@ -4,9 +4,9 @@ import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import Divider from '@mui/material/Divider'
+import priceAfterDiscount from '../utils/priceAfterDiscount'
 
 import Container from './Container'
-import PageTitle from './PageTitle'
 import OrderItem from './OrderItem'
 import ButtonBox from './ButtonBox'
 
@@ -50,6 +50,7 @@ function Order() {
 	const [order, setOrder] = useState(null)
 	const [orderItems, setOrderItems] = useState(null)
 	const [orderData, setOrderData] = useState({ order: null, orderItems: [] })
+	const [orderTotal, setOrderTotal] = useState(0)
 
 	useEffect(() => {
 		if (menus.length > 0 && queue.length > 0 && param.id) {
@@ -71,11 +72,17 @@ function Order() {
 		}
 	}, [menus, param.id])
 
+	useEffect(() => {
+		let total = 0
+		orderData.orderItems?.map(item => {
+			item.discount ? total += priceAfterDiscount(item.price, item.discount.code) * item.quantity : total += item.price * item.quantity
+		})
+		setOrderTotal(total)
+	}, [orderData.orderItems])
+
 	return (
 
 		<Container>
-			<PageTitle>Order</PageTitle>
-
 			<Sections>
 				<Section>
 					<SectionTitle>Items</SectionTitle>
@@ -116,7 +123,7 @@ function Order() {
 					</InfoBox>
 				</Section>
 
-				<ButtonBox order={orderData.order} id={orderData.order && orderData.order.id} />
+				<ButtonBox order={orderData.order} id={orderData.order && orderData.order.id} orderTotal={orderTotal} />
 			</Sections>
 		</Container>
 

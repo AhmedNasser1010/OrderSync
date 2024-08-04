@@ -7,15 +7,18 @@ import Divider from '@mui/material/Divider'
 import priceAfterDiscount from '../utils/priceAfterDiscount'
 
 const Order = styled.div`
+	padding: 20px;
 	cursor: pointer;
 	box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 	border-radius: 8px;
 	opacity: ${({ $status }) => $status === 'IN_DELIVERY' ? '1' : '0.5'};
 `
 const Title = styled.h3`
-	font-size: 1.5rem;
-	font-weight: 500;
-	padding: 10px;
+	font-size: large;
+  color: #0000007a;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
 `
 const Content = styled.div`
 	padding: 10px;
@@ -54,15 +57,13 @@ function OrderCard({ order }) {
 	return (
 
 		<Order onMouseUp={() => navigate(`/queue/${order.id}`)} $status={order.status}>
-			<Title>Order</Title>
-			<Divider />
+			<Title>ORDER / {order.id.split('-')[0]}</Title>
 			<Content>
-				<span>ID: { order.id }</span>
 				<span>Name: { order.user.name }</span>
 				<span>Phone: { order.user.phone }</span>
 				<a target='_blank' href={`https://www.google.com/maps?q=${order.location.latlng[0]},${order.location.latlng[1]}`}>Location: Maps</a>
 				{ order.location.address !== '' && <span>Address: { order.location.address }</span> }
-				<span>Total: { orderTotal }LE</span>
+				<span>Total: { orderTotal+order.deliveryFees }LE</span>
 				<span>Items: { cartItems.join(',') }</span>
 			</Content>
 		</Order>

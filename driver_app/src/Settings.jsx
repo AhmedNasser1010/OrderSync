@@ -9,7 +9,6 @@ import { setUserRegisterStatus } from './rtk/slices/conditionalValuesSlice'
 import Button from '@mui/material/Button'
 import Switch from '@mui/material/Switch'
 
-import PageTitle from './Components/PageTitle'
 import Container from './Components/Container'
 import Widget from './Components/Widget/Widget'
 import WidgetOption from './Components/Widget/WidgetOption'
@@ -54,8 +53,6 @@ function Settings() {
 	return (
 
 		<Container>
-			<PageTitle>Settings</PageTitle>
-
 			<Widgets>
 				<Widget
 					title='Online status'
