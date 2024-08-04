@@ -12,7 +12,7 @@ const RecievedOrders = ({ headCells, tableData, tableStatus }) => {
 	const [processRows, setProcessRows] = useState([]);
 	const menuItems = useSelector(state => state.menu?.items)
 
-	const createData = (id, user, cart, timestamp) => {
+	const createData = (id, user, cart, timestamp, deliveryFees) => {
 
 		// name process
 		let name = user.name
@@ -57,10 +57,10 @@ const RecievedOrders = ({ headCells, tableData, tableStatus }) => {
 		// total = `${total}LE`
 		let total
 		if (totalPrice === totalPriceDiscounted) {
-			total = `${totalPrice}LE`
+			total = `${totalPrice+deliveryFees}LE`
 		} else {
 			total = <div>
-				<span style={{ color: 'red' }}>{ totalPrice }</span> <span style={{ color: 'green' }}>{ totalPriceDiscounted }LE</span>
+				<span style={{ color: 'red' }}>{ totalPrice+deliveryFees }</span> <span style={{ color: 'green' }}>{ totalPriceDiscounted+deliveryFees }LE</span>
 			</div>
 		}
 
@@ -86,7 +86,7 @@ const RecievedOrders = ({ headCells, tableData, tableStatus }) => {
 
 	// process incoming data to data rows
 	useEffect(() => {
-		setProcessRows(tableData?.map(order => createData(order.id, order.user, order.cart, order.timestamp)));
+		setProcessRows(tableData?.map(order => createData(order.id, order.user, order.cart, order.timestamp, order.deliveryFees)));
 	}, [tableData, menuItems])
 
 	return (

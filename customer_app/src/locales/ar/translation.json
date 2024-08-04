@@ -16,8 +16,8 @@
   "Your cart is empty": "سلتك فاضية",
   "You can go to home page to view more restaurants": "ممكن تروح الصفحة الرئيسية تشوف مطاعم اكتر",
   "see restaurants near you": "شوف المطاعم القريبة منك",
-  "Total Price:": "السعر الكلي:",
-  "Total Price Dsicounted:": "السعر الكلي بعد الخصم:",
+  "Total Price": "السعر الكلي",
+  "Total Price Dsicounted": "السعر الكلي بعد الخصم",
   "Place Order": "اعمل طلب",
   "Clear All": "امسح الكل",
   "Your order has been received. The delivery captain will contact you when it's ready.": "طلبك اتسجل. عامل التوصيل هيتصل بيك لما يبقى جاهز.",
@@ -91,5 +91,6 @@
   "Cancellations and modifications": "الإلغاء والتعديلات",
   "Order Cancel": "إلغاء الطلب",
   "Location is required": "الموقع مطلوب",
-  "Address, street, villagem, a known place": "العنوان، شارع، قرية، مكان معروف"
+  "Address, street, villagem, a known place": "العنوان، شارع، قرية، مكان معروف",
+  "Delivery Fees": "رسوم التوصيل"
 }

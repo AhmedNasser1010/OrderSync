@@ -18,6 +18,10 @@ import randomOrderId from '../../utils/randomOrderId'
 import DB_ARRAY_UNION from '../../utils/DB_ARRAY_UNION'
 import DB_ADD_DOC from '../../utils/DB_ADD_DOC'
 import useUpdateUserOnSendOrder from '../../hooks/useUpdateUserOnSendOrder.js'
+import getDistanceFromLatlngInKm from '../../utils/getDistanceFromLatlngInKm'
+import getDeliveryFees from '../../utils/getDeliveryFees'
+
+import OrderInfo from './OrderInfo'
 
 // .matches(/^\+201\d{9}$/, 'Second phone number must be a valid Egyptian phone number').required('Second phone number is required')
 
@@ -76,9 +80,10 @@ const Cart = () => {
 	const accessToken = useSelector(state => state.cart.restaurant)
 	const user = useSelector(state => state.user)
 	const [comment, setComment] = useState('')
-	const [windowIsOpen, setWindowIsOpen] = useState(false)
 	const [disableSubmit, setDisableSubmit] = useState(false)
 	const updateUserOnSendOrder = useUpdateUserOnSendOrder()
+	const services = useSelector(state => state.services)
+	const [deliveryFees, setDeliveryFees] = useState(services.deliveryFees)
 
 	useEffect(() => {
 		dispatch(addCheckout({
@@ -107,6 +112,15 @@ const Cart = () => {
 	const resInfo = useMemo(() => {
 		return restaurants?.filter(restaurant => restaurant.accessToken === cartRestaurantID)[0]
 	}, [restaurants, cartRestaurantID])
+
+
+	useEffect(() => {
+		if (resInfo) {
+			const userDistanceFromRes = getDistanceFromLatlngInKm(user.locations[user.locations.selected].latlng, resInfo.business.latlng)
+			const fees = getDeliveryFees(userDistanceFromRes, services.deliveryFees)
+			setDeliveryFees(fees)
+		}
+	}, [resInfo])
 
 	const selectedItems = useMemo(() => {
 		return cartItems?.map(cartItem => {
@@ -197,6 +211,7 @@ const Cart = () => {
     		}
 	      const final = {
 		      ...valid,
+		      deliveryFees,
 		      id: randomOrderId(),
 		      status: 'RECEIVED',
 		      timestamp: Number(Date.now()),
@@ -210,7 +225,6 @@ const Cart = () => {
 			    		updateUserOnSendOrder(accessToken, user, final)
 			    		dispatch(clearCart())
 			    		dispatch(clearCheckout())
-			    		setWindowIsOpen(true)
 			    		navigate('/')
 			    		dispatch(toggleOrderSidebar())
 			    		return true
@@ -346,32 +360,25 @@ const Cart = () => {
 										</div>
 									))
 								}
+								<OrderInfo deliveryFees={deliveryFees} />
 								{
 									cartTotalPrice.total !== cartTotalPrice.discount &&
 									<>
 									<div className="discount flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
 										<div>
-											<h3 className="font-ProximaNovaSemiBold">{t("Total Price:")}</h3>
+											<h3 className="font-ProximaNovaSemiBold">{t("Total Price")}</h3>
 										</div>
-										{ 
-											resInfo?.services?.deliveryfee ? <div>
-												<span className="egp font-ProximaNovaSemiBold">{parseInt(cartTotalPrice.total + resInfo?.services?.deliveryfee)} {`(${String(parseInt(cartTotalPrice.total))} + ${String(resInfo?.services?.deliveryfee)})`}</span>
-											</div> : <div>
-												<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.total}</span>
-											</div>
-										}
+										<div>
+											<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.total+deliveryFees}</span>
+										</div>
 									</div>
 									<div className="flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
 										<div>
-											<h3 className="font-ProximaNovaSemiBold">{t("Total Price Dsicounted:")}</h3>
+											<h3 className="font-ProximaNovaSemiBold">{t("Total Price Dsicounted")}</h3>
 										</div>
-										{
-											resInfo?.services?.deliveryfee ? <div>
-												<span className="egp font-ProximaNovaSemiBold">{parseInt(cartTotalPrice.discount + resInfo?.services?.deliveryfee)} {`(${String(parseInt(cartTotalPrice.discount))} + ${String(resInfo?.services?.deliveryfee)})`}</span>
-											</div> : <div>
-												<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.discount}</span>
-											</div>
-										}
+										<div>
+											<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.discount+deliveryFees}</span>
+										</div>
 									</div>
 									</>
 								}
@@ -379,15 +386,11 @@ const Cart = () => {
 									cartTotalPrice.total === cartTotalPrice.discount &&
 										<div className="flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
 											<div>
-												<h3 className="font-ProximaNovaSemiBold">{t("Total Price:")}</h3>
+												<h3 className="font-ProximaNovaSemiBold">{t("Total Price")}</h3>
 											</div>
-											{ 
-												resInfo?.services?.deliveryfee ? <div>
-													<span className="egp font-ProximaNovaSemiBold">{parseInt(cartTotalPrice.total + resInfo?.services?.deliveryfee)} {`(${String(parseInt(cartTotalPrice.total))} + ${String(resInfo?.services?.deliveryfee)})`}</span>
-												</div> : <div>
-													<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.total}</span>
-												</div>
-											}
+											<div>
+												<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.total+deliveryFees}</span>
+											</div>
 										</div>
 								}
 								<input
@@ -406,18 +409,6 @@ const Cart = () => {
 						</div>
 					</>
 			}
-			{	windowIsOpen &&
-					<PopupWindow
-						isOpen={windowIsOpen}
-						onWindowClose={() => navigate('/')}
-					>
-						<StyledWindow>
-							<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 50.00 50.00" xmlSpace="preserve" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <circle style={{ fill: '#25AE88' }} cx="25" cy="25" r="25"></circle> <polyline style={{ fill: 'none', stroke: '#FFFFFF', strokeWidth: '4.2', strokeLinecap: 'round', strokeLinejoin: 'round', strokeMiterlimit: '10' }} points=" 38,15 22,33 12,25 "></polyline> </g></svg>
-							<p className='text-[#686b78] mt-2 font-ProximaNovaMed text-sm pr-5'>{t("Your order has been received. The delivery captain will contact you when it's ready.")}</p>
-						</StyledWindow>
-					</PopupWindow>
-			}
-
 		</>
 
 	)

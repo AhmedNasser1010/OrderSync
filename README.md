@@ -14,6 +14,18 @@
 7. [Future Updates and Maintenance](#future-updates-and-maintenance)
 8. [Frequently Asked Questions (FAQs)](#frequently-asked-questions-faqs)
 
+Demo:
+Store: https://merro-dev.vercel.app
+Manager: https://merro-restaurant-dev.vercel.app
+Rider: https://merro-rider-dev.vercel.app
+Partner: 
+
+Production:
+Store: https://merro.vercel.app
+Manager: https://merro-restaurant.vercel.app
+Rider: https://merro-rider.vercel.app
+Partner: https://merro-partner.netlify.app
+
 ## Introduction
 
 ### Brief Overview of the App

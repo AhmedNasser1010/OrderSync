@@ -7,6 +7,7 @@ import conditionalValuesSlice from "./slices/conditionalValuesSlice.js"
 import ordersSlice from './slices/ordersSlice.js'
 import businessSlice from './slices/businessSlice.js'
 import staffSlice from './slices/staffSlice.js'
+import partnerServicesSlice from './slices/partnerServicesSlice.js'
 
 export const store = configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export const store = configureStore({
     orders: ordersSlice,
     business: businessSlice,
     staff: staffSlice,
+    partnerServices: partnerServicesSlice
   }
 });

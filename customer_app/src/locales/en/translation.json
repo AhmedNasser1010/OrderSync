@@ -16,8 +16,8 @@
   "Your cart is empty": "Your cart is empty",
   "You can go to home page to view more restaurants": "You can go to home page to view more restaurants",
   "see restaurants near you": "see restaurants near you",
-  "Total Price:": "Total Price:",
-  "Total Price Dsicounted:": "Total Price Dsicounted:",
+  "Total Price": "Total Price",
+  "Total Price Dsicounted": "Total Price Dsicounted",
   "Place Order": "Place Order",
   "Clear All": "Clear All",
   "Your order has been received. The delivery captain will contact you when it's ready.": "Your order has been received. The delivery captain will contact you when it's ready.",
@@ -92,5 +92,6 @@
   "Cancellations and modifications": "Cancellations and modifications",
   "Order Cancel": "Order Cancel",
   "Location is required": "Location is required",
-  "Address, street, villagem, a known place": "Address, street, villagem, a known place"
+  "Address, street, villagem, a known place": "Address, street, villagem, a known place",
+  "Delivery Fees": "Delivery Fees"
 }

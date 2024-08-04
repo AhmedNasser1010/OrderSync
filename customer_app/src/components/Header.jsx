@@ -12,7 +12,9 @@ import { doc, onSnapshot } from "firebase/firestore"
 import { db } from '../config/firebase'
 
 import { initUser } from '../rtk/slices/userSlice'
+import { initServices } from '../rtk/slices/servicesSlice'
 import AUTH_ON_CHANGE from '../utils/AUTH_ON_CHANGE'
+import DB_GET_DOC from '../utils/DB_GET_DOC'
 import useLanguageDirection from '../hooks/useLanguageDirection'
 
 const Header = () => {
@@ -78,6 +80,17 @@ const Header = () => {
       dispatch(toggleLoginSidebar())
     }
   }, [])
+
+
+  useEffect(() => {
+    const partnerID = import.meta.env.VITE_PARTNER_ID
+    if (user?.userInfo?.uid) {
+      DB_GET_DOC('users', partnerID)
+      .then(partner => {
+        dispatch(initServices(partner?.services))
+      })
+    }
+  }, [user?.userInfo?.uid])
 
   return (
     <>

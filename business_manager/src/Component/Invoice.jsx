@@ -27,6 +27,7 @@ const Icon = styled.img`
 `
 const Title = styled.h3`
 	font-size: 2rem;
+	text-align: center;
 `
 const Contact = styled.div`
 	display: flex;
@@ -122,6 +123,11 @@ function Invoice({ business, orders }) {
 										</tr>
 									))
 								}
+								<tr style={{ boxShadow: 'rgba(27, 31, 35, 0.15) 0px 1.8px 0px 0px' }}>
+									<td style={{ width: '200px', padding: '10px 0 15px 10px' }}>Delivery Fees</td>
+									<td></td>
+									<td>{ order.orderData.deliveryFees }</td>
+								</tr>
 							</tbody>
 							<tfoot
 								style={{ fontSize: '1rem', fontWeight: 'bold', backgroundColor: '#f3f3f3' }}
@@ -149,7 +155,7 @@ function Invoice({ business, orders }) {
 								<QRCode
 									style={{ outline: '12px solid white' }}
 									value={
-										`Order Now! https://merro.netlify.app\nInvoice No: ${order.orderData.id}*${business.accessToken}\n\nMade with <3 by Ahmed Nasser\n01117073085`
+										`Order Now! https://merro.vercel.app\nInvoice No: ${order.orderData.id}*${business.accessToken}\n\nMade with <3 by Ahmed Nasser\n01117073085`
 									}
 								/>
 								<QrTitle>SCAN ME</QrTitle>

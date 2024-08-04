@@ -8,6 +8,7 @@ import { setUserRegisterStatus, setIsGetAppData } from './rtk/slices/conditional
 import { addUser } from './rtk/slices/userSlice'
 import { initStaff } from './rtk/slices/staffSlice'
 import { addMenu } from './rtk/slices/menuSlice'
+import { initPartnerServices } from './rtk/slices/partnerServicesSlice'
 import { initBusiness } from './rtk/slices/businessSlice'
 import { setOpenedOrders } from './rtk/slices/ordersSlice'
 import fetchStaff from './functions/fetchStaff'
@@ -55,6 +56,9 @@ function App() {
 			fetchStaff(accessToken).then(res => dispatch(initStaff(res)))
 			DB_GET_DOC('menus', accessToken).then(res => dispatch(addMenu(res)))
 			DB_GET_DOC('businesses', accessToken).then(res => dispatch(initBusiness(res)))
+
+			// const VITE_PARTNER_ID = import.meta.env.VITE_PARTNER_ID
+			// DB_GET_DOC('users', VITE_PARTNER_ID).then(partner => dispatch(initPartnerServices(partner?.services)))
 
 			dispatch(setIsGetAppData(false))
 

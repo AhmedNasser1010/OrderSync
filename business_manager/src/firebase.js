@@ -9,6 +9,7 @@ import { getFirestore } from "firebase/firestore";
 !import.meta.env.VITE_MESS_SEND_ID && console.error('Error VITE_MESS_SEND_ID .env value not found!')
 !import.meta.env.VITE_APP_ID && console.error('Error VITE_APP_ID .env value not found!')
 !import.meta.env.VITE_MEASUREMENT_ID && console.error('Error VITE_MEASUREMENT_ID .env value not found!')
+!import.meta.env.VITE_PARTNER_ID && console.error('Error VITE_PARTNER_ID .env value not found!')
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API,

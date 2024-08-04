@@ -18,6 +18,7 @@ import AddchartIcon from '@mui/icons-material/Addchart';
 import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded'
 import Button from '@mui/material/Button';
 
+import priceAfterDiscount from '../functions/priceAfterDiscount'
 import Invoice from './Invoice'
 
 const InvoiceLayer = styled.div`
@@ -48,12 +49,15 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 	      return menuItem ? { ...menuItem, quantity: cartItem.quantity } : null
 	    }).filter(item => item !== null)
 
-	    const totalPrice = selectedMenuItems.reduce((total, item) => {
-	      return {
-	      	total: total + (parseFloat(item.price) * item.quantity),
-	      	totalDiscounted: item?.discount?.code ? 0 : total + (parseFloat(item.price) * item.quantity)
-	      }
-	    }, 0)
+	    const totalPrice = selectedMenuItems.reduce((totals, item) => {
+			  const itemTotal = parseFloat(item.price) * item.quantity
+			  return {
+			    total: totals.total + itemTotal,
+			    totalDiscounted: item?.discount?.code ? totals.totalDiscounted + priceAfterDiscount(parseFloat(item.price), item.discount.code) * item.quantity : totals.totalDiscounted + itemTotal
+			  }
+			}, { total: order.deliveryFees, totalDiscounted: order.deliveryFees })
+
+	    console.log(totalPrice)
 
 	    return {
 	      selectedMenuItems,
