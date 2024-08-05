@@ -16,10 +16,15 @@ const TitleBody = styled.p`
 	font-size: 14px;
 	color: #434343;
 `
-const ActionBtns = styled.div``
+const ActionBtns = styled.div`
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+`
 const Action = styled(Button)``
 
-function TableTitle({ title, titleBody, action }) {
+function TableTitle({ title, titleBody, actions }) {
 	return (
 
 		<Parent>
@@ -27,20 +32,23 @@ function TableTitle({ title, titleBody, action }) {
 				<Title>{ title }</Title>
 				<TitleBody>{ titleBody }</TitleBody>
 			</Content>
-			{ action.title &&
-				<ActionBtns>
-					<Action
-						disabled={action?.disabled || false}
-						onMouseUp={action.callback}
-						variant="contained"
-						size='small'
-						startIcon={action.startIcon}
-						endIcon={action.endIcon}
-						>
-						{ action.title }
-					</Action>
-				</ActionBtns>
-			}
+			<ActionBtns>
+				{
+					actions?.map(action => (
+						<Action
+							key={action.id}
+							disabled={action?.disabled || false}
+							onMouseUp={action.callback}
+							variant="contained"
+							size='small'
+							startIcon={action.startIcon}
+							endIcon={action.endIcon}
+							>
+							{ action.title }
+						</Action>
+					))
+				}
+			</ActionBtns>
 		</Parent>
 
 	)

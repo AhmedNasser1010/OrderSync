@@ -14,9 +14,10 @@ async function getDrivers() {
 			if (drivers) {
 				setState('drivers')
 				setValue('drivers', drivers)
-				driversData = drivers
+				const globalDrivers = drivers.filter(driver => driver.sync === 'GLOBAL')
+				driversData = globalDrivers
 
-				return drivers
+				return globalDrivers
 			}
 			console.log('ASSIGN: Error while "getDrivers" no drivers founded')
 

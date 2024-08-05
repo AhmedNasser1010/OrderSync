@@ -20,7 +20,7 @@ const validationSchema = object({
 	name: string().required('User name is required'),
 	phone: string().required('User phone is required'),
 	email: string().email('Invalid email address').required('Email address is required'),
-	role: string().oneOf(['ORDER_CAPTAIN', 'DELIVERY_CAPTAIN'], 'Invalid selection').required('User role is required'),
+	role: string().oneOf(['ORDER_CAPTAIN', 'DRIVER'], 'Invalid selection').required('User role is required'),
 	uid: string().required('User id is required')
 })
 
@@ -59,7 +59,7 @@ const NewWorkerForm = ({ handleDialogOpenClose }) => {
 			onSubmit={values => {
 				setIsDisabled(true)
 				const data = workerSchema({ ...values, accessToken })
-				_addDoc('users', data, values.uid)
+				_addDoc('drivers', data, values.uid)
 				.then(res => {
 					if (res) {
 						dispatch(newStaff(data))
@@ -83,7 +83,7 @@ const NewWorkerForm = ({ handleDialogOpenClose }) => {
 							<Field {...filedPops(errors, touched, 'role', 'Role')} select>
 								<MenuItem value='SELECT'>Select user role</MenuItem>
 								{ business?.settings?.orderManagement?.assign?.forCooks && <MenuItem value='ORDER_CAPTAIN'>Orders Captain</MenuItem> }
-								{ business?.settings?.orderManagement?.assign?.forDeliveryWorkers && <MenuItem value='DELIVERY_CAPTAIN'>Delivery Captain</MenuItem> }
+								{ business?.settings?.orderManagement?.assign?.forDeliveryWorkers && <MenuItem value='DRIVER'>Delivery Captain</MenuItem> }
 							</Field>
 						</Stack>
 

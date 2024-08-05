@@ -10,6 +10,8 @@ import EmailIcon from '@mui/icons-material/Email'
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone'
 import FlagIcon from '@mui/icons-material/Flag'
 import KeyIcon from '@mui/icons-material/Key'
+import { FaMoneyBillWave } from "react-icons/fa"
+import { IoReloadCircle } from "react-icons/io5"
 
 import Container from './Component/Container'
 import MUITable from './Component/MUITable'
@@ -17,6 +19,9 @@ import PageTitle from './Component/PageTitle'
 import TableTitle from './Component/TableTitle'
 import StaffTableActions from './Component/StaffTableActions'
 import AddNewWorkerDialog from './Component/AddNewWorkerDialog'
+
+import fetchStaff from './functions/fetchStaff'
+import { initStaff } from './rtk/slices/staffSlice'
 
 const headCells = [
 	{
@@ -30,6 +35,10 @@ const headCells = [
 	{
 		id: 'name',
 		label: (<span style={{ display: 'flex', alignItems: 'center', color: '#4b4a4a' }}><BadgeIcon sx={{ marginRight: '5px' }} /> Name</span>),
+	},
+	{
+		id: 'dues',
+		label: (<span style={{ display: 'flex', alignItems: 'center', color: '#4b4a4a' }}><FaMoneyBillWave style={{ marginRight: '5px', fontSize: '1.3rem' }} /> Dues</span>),
 	},
 	{
 		id: 'email',
@@ -61,17 +70,34 @@ function Staff() {
 		setDialogIsOpen(dialogIsOpen => !dialogIsOpen)
 	}
 
+	const handleReload = async () => {
+		try {
+			const staffMembers = await fetchStaff(accessToken)
+
+			if (staffMembers.length) {
+				dispatch(initStaff(staffMembers))
+				return
+			}
+
+			console.error('Error while reload staff members: Staff members data not found')
+			return
+		} catch(e) {
+			console.error('Error while reload staff members: ')
+		}
+	}
+
 	useEffect(() => {
 		const rowCellsMap = staff?.map(user => {
 			if (user?.userInfo) {
-				const id = user.userInfo.uid
+				const id = user.uid
 				const name = user.userInfo.name || ''
+				const dues = user.ordersDues
 				const email = user.userInfo.email
 				const phone = user.userInfo.phone || ''
 				const role = user.userInfo.role
 				const online = user.online
 
-				return { id, name, email, phone, role, action: <StaffTableActions id={id} online={online} /> }
+				return { id, name, dues, email, phone, role, action: <StaffTableActions id={id} online={online} /> }
 			}
 		}).filter(user => user)
 
@@ -87,12 +113,22 @@ function Staff() {
 				<TableTitle
 					title='Staff Action'
 					titleBody='Add a new staff member to your business'
-					action={{
-						title: 'New Staff Member',
-						startIcon: <PersonAddIcon />,
-						callback: handleDialogOpenClose,
-						disabled: business?.settings?.orderManagement?.assign?.forDeliveryWorkers || business?.settings?.orderManagement?.assign?.forCooks ? false : true
-					}}
+					actions={[
+						{
+							id: 1,
+							title: 'Reload',
+							startIcon: <IoReloadCircle />,
+							callback: handleReload,
+							disabled: business?.settings?.orderManagement?.assign?.forDeliveryWorkers || business?.settings?.orderManagement?.assign?.forCooks ? false : true
+						},
+						{
+							id: 2,
+							title: 'New Staff Member',
+							startIcon: <PersonAddIcon />,
+							callback: handleDialogOpenClose,
+							disabled: business?.settings?.orderManagement?.assign?.forDeliveryWorkers || business?.settings?.orderManagement?.assign?.forCooks ? false : true
+						}
+					]}
 				/>
 
 				<MUITable

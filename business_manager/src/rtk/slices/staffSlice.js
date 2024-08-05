@@ -17,19 +17,30 @@ export const staffSlice = createSlice({
       ]
     },
     deleteWorker: (state, { payload }) => {
-      return state.filter(worker => worker.userInfo.uid !== payload)
+      return state.filter(worker => worker.uid !== payload)
     },
     workerOnlineStatus: (state, { payload }) => {
       const { id, value } = payload
-      console.log(payload)
       return state.map(worker => {
-        if (worker.userInfo.uid === id) {
+        if (worker.uid === id) {
           return {
             ...worker,
             online: {
               ...worker.online,
               byManager: value
             }
+          }
+        } else {
+          return worker
+        }
+      })
+    },
+    resetDues: (state, { payload }) => {
+      return state.map(worker => {
+        if (worker.uid === payload) {
+          return {
+            ...worker,
+            ordersDues: 0
           }
         } else {
           return worker
@@ -45,7 +56,8 @@ export const {
 	clearStaff,
   newStaff,
   deleteWorker,
-  workerOnlineStatus
+  workerOnlineStatus,
+  resetDues
 } = staffSlice.actions
 
 export default staffSlice.reducer

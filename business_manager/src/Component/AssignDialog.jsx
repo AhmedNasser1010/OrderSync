@@ -8,6 +8,8 @@ import DialogTitle from './DialogTitle'
 
 import DB_UPDATE_NESTED_VALUE from '../functions/DB_UPDATE_NESTED_VALUE'
 
+import assign from '../functions/assign'
+
 
 const DialogParent = styled(Dialog)``
 const StaffBox = styled.div`
@@ -25,7 +27,7 @@ const Member = styled.div`
 	gap: 1rem;
 	width: calc(50% - 28px);
 	padding: 10px;
-	background-color: #eee;
+	background-color: ${({ $active }) => $active ? '#00968861' : '#eee'};
 	border-radius: 10px;
 	cursor: pointer;
 `
@@ -60,38 +62,15 @@ function AssignDialog({ isOpen, handleOpenClose, currentOrder }) {
 		return staff.filter(member => {
 			if (currentOrder.status === 'RECEIVED' || currentOrder.status === 'IN_PROGRESS') {
 				return member.userInfo.role === 'ORDER_CAPTAIN'
-			} else if (currentOrder.status === 'IN_DELIVERY') {
-				return member.userInfo.role === 'DELIVERY_CAPTAIN'
+			} else if (currentOrder.status === 'IN_DELIVERY' || currentOrder.status === 'COMPLETED') {
+				return member.userInfo.role === 'DRIVER'
 			}
 		})
 	}, [staff, currentOrder])
 
-	const handleAssignMember = (uid) => {
-
-		const convertAssign = (status) => {
-			return [
-				...orders.map(order => {
-					if (order.id === currentOrder.id) {
-						return {
-							...order,
-							assign: { to: uid, status: status }
-						}
-					}
-					return order
-				})
-			]
-		}
-
-		const trigger = async (data) => {
-			DB_UPDATE_NESTED_VALUE('orders', accessToken, `open`, data)
-			.then(res => res)
-			.catch(err => err)
-		}
-
-		if (currentOrder.status === 'IN_PROGRESS' && currentOrder.assign.status === 'pickup') {
-			trigger(convertAssign('on-going'))
-		} else if (currentOrder.status === 'IN_DELIVERY' && currentOrder.assign.status === 'on-going') {
-			trigger(convertAssign('on-delivery'))
+	const handleAssignStaffMember = (member) => {
+		if (currentOrder.status === 'IN_DELIVERY') {
+			assign(member, currentOrder, orders)
 		}
 	}
 
@@ -106,7 +85,7 @@ function AssignDialog({ isOpen, handleOpenClose, currentOrder }) {
 			<StaffBox>
 				{
 					readyToAssignStaff?.map(member => (
-						<Member onMouseUp={() => handleAssignMember(member.userInfo.uid)}>
+						<Member onMouseUp={() => handleAssignStaffMember(member)} $active={member.queue.find(qu => qu.assign.driver === currentOrder.assign.driver)}>
 							<MemberFirst>
 								<Img src={member.userInfo.avatar || 'https://i.imgur.com/0vpif1n.png'} />
 							</MemberFirst>
@@ -115,7 +94,7 @@ function AssignDialog({ isOpen, handleOpenClose, currentOrder }) {
 								<Span>{ member.userInfo.phone }</Span>
 							</MemberMiddle>
 							<MemberLast>
-								<Dot $online={member.online || true} />
+								<Dot $online={member.online.byManager && member.online.byUser} />
 							</MemberLast>
 						</Member>
 					))

@@ -21,7 +21,7 @@ async function assign(driver, orders) {
 				...order,
 				assign: {
 					...order.assign,
-					status: 'delivery',
+					status: 'on-delivery',
 					driver: driver.uid,
 					driverStartAt: Number(Date.now())
 				}

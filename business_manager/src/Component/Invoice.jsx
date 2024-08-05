@@ -135,14 +135,14 @@ function Invoice({ business, orders }) {
 								<tr>
 									<td style={{ width: '200px', padding: '10px 0 15px 10px' }}>Total</td>
 									<td></td>
-									<td>{ order.price.total }LE</td>
+									<td>{ order.price.total+order.orderData.deliveryFees }LE</td>
 								</tr>
 								{
 									order.price.totalDiscounted !== order.price.total &&
 										<tr>
 											<td style={{ width: '200px', padding: '10px 0 15px 10px' }}>Discounted To</td>
 											<td></td>
-											<td>{ order.price.totalDiscounted }LE</td>
+											<td>{ order.price.totalDiscounted+order.orderData.deliveryFees }LE</td>
 										</tr>
 								}
 							</tfoot>

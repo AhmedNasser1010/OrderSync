@@ -203,7 +203,7 @@ const Orders = () => {
 						<InDeliveryOrders headCells={business?.settings?.orderManagement?.assign?.forDeliveryWorkers ? headCells : headCellsNoAssign} tableData={orderFilter('IN_DELIVERY')} tableStatus='IN_DELIVERY' />
 					</CustomTabPanel>
 					<CustomTabPanel tabValue={tabValue} index={3}>
-						<CompletedOrders headCells={headCellsNoAssign} tableData={orderFilter('COMPLETED')} tableStatus='COMPLETED' />
+						<CompletedOrders headCells={business?.settings?.orderManagement?.assign?.forDeliveryWorkers ? headCells : headCellsNoAssign} tableData={orderFilter('COMPLETED')} tableStatus='COMPLETED' />
 					</CustomTabPanel>
 
 				</Box>

@@ -211,6 +211,7 @@ const Cart = () => {
     		}
 	      const final = {
 		      ...valid,
+		      accessToken,
 		      deliveryFees,
 		      id: randomOrderId(),
 		      status: 'RECEIVED',

@@ -57,8 +57,6 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 			  }
 			}, { total: order.deliveryFees, totalDiscounted: order.deliveryFees })
 
-	    console.log(totalPrice)
-
 	    return {
 	      selectedMenuItems,
 	      orderData: order,
@@ -181,17 +179,17 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 							<ReceiptLongRoundedIcon onMouseUp={handlePrint} />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title="To Back" sx={{ display: tableStatus === 'RECEIVED' || tableStatus === 'IN_DELIVERY' && 'none' }}>
+					<Tooltip title="To Back" sx={{ display: tableStatus === 'RECEIVED' || (tableStatus === 'IN_DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>
 						<IconButton>
 							<ArrowLeftIcon onMouseUp={handleToBack} />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title="To Next" sx={{ display: tableStatus === 'COMPLETED' || tableStatus === 'IN_DELIVERY' && 'none' }}>
+					<Tooltip title="To Next" sx={{ display: tableStatus === 'COMPLETED' || (tableStatus === 'IN_DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>
 						<IconButton>
 							<NextPlanIcon onMouseUp={handleToNext} />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title="Delete" sx={{ display: tableStatus === 'COMPLETED' || tableStatus === 'IN_DELIVERY' && 'none' }}>
+					<Tooltip title="Delete" sx={{ display: tableStatus === 'COMPLETED' || (tableStatus === 'IN_DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>
 						<IconButton>
 							<DeleteIcon onMouseUp={handleDelete} />
 						</IconButton>

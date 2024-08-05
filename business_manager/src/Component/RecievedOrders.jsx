@@ -86,7 +86,15 @@ const RecievedOrders = ({ headCells, tableData, tableStatus }) => {
 
 	// process incoming data to data rows
 	useEffect(() => {
+		let updateDataInter = null
+		updateDataInter && clearInterval(updateDataInter)
+
 		setProcessRows(tableData?.map(order => createData(order.id, order.user, order.cart, order.timestamp, order.deliveryFees)));
+		updateDataInter = setInterval(() => setProcessRows(tableData?.map(order => createData(order.id, order.user, order.cart, order.timestamp, order.deliveryFees))), 60000)
+
+		return () => {
+		 updateDataInter && clearInterval(updateDataInter)
+		}
 	}, [tableData, menuItems])
 
 	return (
