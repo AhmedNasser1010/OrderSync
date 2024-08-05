@@ -2,29 +2,22 @@
 
 # MeRRo
 
-[**Demo Version Ready To Use!!**](demo-test.md)
-
 ## Table of Contents
-1. [Introduction](#introduction)
-2. [Diagrams](#diagrams)
-3. [User Roles and Permissions](#user-roles-and-permissions)
-4. [App Features](#app-features)
-5. [Technical Requirements](#technical-requirements)
-6. [Order Workflow](#order-workflow)
-7. [Future Updates and Maintenance](#future-updates-and-maintenance)
-8. [Frequently Asked Questions (FAQs)](#frequently-asked-questions-faqs)
+1. [Demo Online Links](#demo-online-links)
+2. [Introduction](#introduction)
+3. [Diagrams](#diagrams)
+4. [User Roles and Permissions](#user-roles-and-permissions)
+5. [App Features](#app-features)
+6. [Technical Requirements](#technical-requirements)
+7. [Order Workflow](#order-workflow)
+8. [Future Updates and Maintenance](#future-updates-and-maintenance)
+9. [Frequently Asked Questions (FAQs)](#frequently-asked-questions-faqs)
 
-Demo:
-Store: https://merro-dev.vercel.app
-Manager: https://merro-restaurant-dev.vercel.app
-Rider: https://merro-rider-dev.vercel.app
-Partner: 
-
-Production:
-Store: https://merro.vercel.app
-Manager: https://merro-restaurant.vercel.app
-Rider: https://merro-rider.vercel.app
-Partner: https://merro-partner.netlify.app
+## Demo Online Links
+Store Website: https://merro-dev.vercel.app<br/>
+Manager Website: https://merro-restaurant-dev.vercel.app<br/>
+Rider Website: https://merro-rider-dev.vercel.app<br/>
+Partner Website: <br/>
 
 ## Introduction
 
