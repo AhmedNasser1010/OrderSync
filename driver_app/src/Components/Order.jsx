@@ -50,7 +50,6 @@ function Order() {
 	const [order, setOrder] = useState(null)
 	const [orderItems, setOrderItems] = useState(null)
 	const [orderData, setOrderData] = useState({ order: null, orderItems: [] })
-	const [orderTotal, setOrderTotal] = useState(0)
 
 	useEffect(() => {
 		if (menus.length > 0 && queue.length > 0 && param.id) {
@@ -71,14 +70,6 @@ function Order() {
 			setOrderData(newOrderData)
 		}
 	}, [menus, param.id])
-
-	useEffect(() => {
-		let total = 0
-		orderData.orderItems?.map(item => {
-			item.discount ? total += priceAfterDiscount(item.price, item.discount.code) * item.quantity : total += item.price * item.quantity
-		})
-		setOrderTotal(total)
-	}, [orderData.orderItems])
 
 	return (
 
@@ -123,7 +114,7 @@ function Order() {
 					</InfoBox>
 				</Section>
 
-				<ButtonBox order={orderData.order} id={orderData.order && orderData.order.id} orderTotal={orderTotal} />
+				<ButtonBox order={orderData.order} id={orderData.order && orderData.order.id} />
 			</Sections>
 		</Container>
 

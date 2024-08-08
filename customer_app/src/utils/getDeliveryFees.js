@@ -4,7 +4,7 @@ function getDeliveryFees(userDistanceFromRes, deliveryFees) {
 	
 	if (fees < minFees) fees = minFees
 
-	return fees
+	return Math.round(fees)
 }
 
 export default getDeliveryFees

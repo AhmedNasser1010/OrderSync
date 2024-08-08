@@ -44,7 +44,8 @@ const useUpdateUserOnSendOrder = () => {
 			      totalAmount: myMenu.price?.discount ?? null,
 			      totalItems: totalItemsNum,
 			      totalOrders: 1,
-			      lastOrderTime: Date.now()
+			      lastOrderTime: Date.now(),
+			      fisrOrderTime: Date.now()
 			    }
 			  ],
 			  trackedOrder: {
@@ -67,7 +68,8 @@ const useUpdateUserOnSendOrder = () => {
 				      totalAmount: myMenu.price?.discount ?? null,
 				      totalItems: totalItemsNum,
 				      totalOrders: 1,
-				      lastOrderTime: Date.now()
+				      lastOrderTime: Date.now(),
+				      fisrOrderTime: Date.now()
 				    }
 				  ],
 				  trackedOrder: {

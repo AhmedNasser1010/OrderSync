@@ -57,7 +57,7 @@ const CompletedOrders = ({ headCells, tableData, tableStatus }) => {
 	const [processRows, setProcessRows] = useState([]);
 	const menuItems = useSelector(state => state.menu?.items)
 
-	const createData = (id, user, cart, timestamp, deliveryFees) => {
+	const createData = (id, user, cart, timestamp, deliveryFees, totalPrice) => {
 
 		// name process
 		let name = user.name
@@ -93,20 +93,16 @@ const CompletedOrders = ({ headCells, tableData, tableStatus }) => {
 		const order = cartNameArr.join(', ');
 
 		// total process
-		let totalPrice = 0;
-		let totalPriceDiscounted = 0;
-		cartItems.map(item => {
-			totalPrice += item.price * item.quantity
-			item.discount ? totalPriceDiscounted += priceAfterDiscount(item.price, item.discount.code) * item.quantity : totalPriceDiscounted += item.price * item.quantity
-		});
-		// total = `${total}LE`
 		let total
-		if (totalPrice === totalPriceDiscounted) {
-			total = `${totalPrice+deliveryFees}LE`
+		if (totalPrice.total === totalPrice.discount) {
+			total = `${totalPrice.total}LE`
 		} else {
-			total = <div>
-				<span style={{ color: 'red' }}>{ totalPrice+deliveryFees }</span> <span style={{ color: 'green' }}>{ totalPriceDiscounted+deliveryFees }LE</span>
-			</div>
+			total = (
+				<div>
+					<span style={{ color: 'red' }}>{ totalPrice.total }</span>
+					<span style={{ color: 'green' }}>{ totalPrice.discount }LE</span>
+				</div>
+			)
 		}
 
 		// timestemp process
@@ -134,8 +130,8 @@ const CompletedOrders = ({ headCells, tableData, tableStatus }) => {
 		let updateDataInter = null
 		updateDataInter && clearInterval(updateDataInter)
 
-		setProcessRows(tableData?.map(order => createData(order.id, order.user, order.cart, order.timestamp, order.deliveryFees)))
-		updateDataInter = setInterval(() => setProcessRows(tableData?.map(order => createData(order.id, order.user, order.cart, order.timestamp, order.deliveryFees))), 60000)
+		setProcessRows(tableData?.map(order => createData(order.id, order.user, order.cart, order.timestamp, order.deliveryFees, order.cartTotalPrice)))
+		updateDataInter = setInterval(() => setProcessRows(tableData?.map(order => createData(order.id, order.user, order.cart, order.timestamp, order.deliveryFees, order.cartTotalPrice))), 60000)
 
 		return () => {
 		 updateDataInter && clearInterval(updateDataInter)

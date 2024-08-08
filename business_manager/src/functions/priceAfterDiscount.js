@@ -1,20 +1,18 @@
 const priceAfterDiscount = (price, code) => {
 	let finalPrice = price
 
-	const discountCode = code.split('-')[0]
-	const discountValue = code.split('-')[1]
-	const discountContition = code.split('_')[1]
+	const splitedCode = code.split('_')[0]
+	const type = splitedCode.split('-')[0]
+	const value = splitedCode.split('-')[1]
 
 	if (true) {
-		switch (discountCode) {
+		switch (type) {
 			case 'FIXED':
-				finalPrice -= discountValue
+				finalPrice -= value
 				if (finalPrice <= 0.4) finalPrice = 0
 				break;
 			case 'P':
-				// const discountAmount = price * decimal
-				// finalPrice -= discountAmount
-				const decimal = discountValue / 100
+				const decimal = value / 100
 				 finalPrice = price * (1 - decimal);
 				break;
 			default:

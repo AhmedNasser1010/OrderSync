@@ -7,7 +7,7 @@ function OrderInfo({ deliveryFees }) {
 	return (
 
 		<div className='order-info text-sm'>
-			<div className='divider !my-3'></div>
+			<hr className='border-1 border-dashed border-b-[#d3d3d3] my-4'></hr>
 			<div className='flex flex-col gap-2 px-2'>
 
 				<Info label={t('Delivery Fees')}>
@@ -15,7 +15,7 @@ function OrderInfo({ deliveryFees }) {
 				</Info>
 
 			</div>
-			<div className='divider !my-3'></div>
+			<hr className='border-1 border-dashed border-b-[#d3d3d3] my-4'></hr>
 		</div>
 
 	)

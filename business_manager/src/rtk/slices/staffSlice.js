@@ -47,6 +47,14 @@ export const staffSlice = createSlice({
         }
       })
     },
+    updateStaff: (state, { payload }) => {
+      return state.map(member => {
+        if (member.uid === payload.uid) {
+          return payload
+        }
+        return member
+      })
+    }
   },
 })
 
@@ -57,7 +65,8 @@ export const {
   newStaff,
   deleteWorker,
   workerOnlineStatus,
-  resetDues
+  resetDues,
+  updateStaff
 } = staffSlice.actions
 
 export default staffSlice.reducer

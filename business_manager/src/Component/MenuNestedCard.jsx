@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { setDisableMenuDnD } from '../rtk/slices/conditionalValuesSlice';
 import Paper from '@mui/material/Paper';
@@ -9,6 +9,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import MenuNestedCardInfoBox from './MenuNestedCardInfoBox.jsx';
 import ModeIcon from '@mui/icons-material/Mode';
 import AddNewItemDialog from './AddNewItemDialog';
+import generateDiscountObj from '../functions/generateDiscountObj'
 
 const MenuNestedCard = ({ item }) => {
 	const dispatch = useDispatch();
@@ -41,10 +42,14 @@ const MenuNestedCard = ({ item }) => {
 	}
 
 	const fromDiscountCodeToText = () => {
-		let symbol = ""
-		const value = item.discount.code.split('-')[1]
+		const discountData = generateDiscountObj(item.discount)
+		let symbol = ''
+		let value = discountData.value
+		let condition = ''
 
-		switch (item.discount.code.split('-')[0]) {
+		if (discountData?.conditions?.length) condition = ' With Condition'
+
+		switch (discountData.type) {
 			case 'P':
 				symbol = '%'
 				break
@@ -56,7 +61,7 @@ const MenuNestedCard = ({ item }) => {
 				break
 		}
 
-		return `${value}${symbol}`
+		return `${value+symbol+condition}`
 	}
 
 	return (

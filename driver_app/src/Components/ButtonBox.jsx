@@ -20,7 +20,7 @@ const Buttons = styled.div`
 	}
 `
 
-function ButtonBox({ order, id, orderTotal }) {
+function ButtonBox({ order, id }) {
 	const navigate = useNavigate()
 	const dispatch = useDispatch()
 	const user = useSelector(state => state.user)
@@ -73,7 +73,7 @@ function ButtonBox({ order, id, orderTotal }) {
 				if (res) {
 					DB_DELETE_NESTED_VALUE('customers', order.user.uid, 'trackedOrder')
 					DB_UPDATE_NESTED_VALUE('drivers', user.uid, 'queue', updatedQueue)
-					DB_UPDATE_NESTED_VALUE('drivers', user.uid, 'ordersDues', user.ordersDues + orderTotal+order.deliveryFees)
+					DB_UPDATE_NESTED_VALUE('drivers', user.uid, 'ordersDues', user.ordersDues + (order?.cartTotalPrice?.discount || 1000))
 
 				}
 			})

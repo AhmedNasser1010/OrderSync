@@ -63,7 +63,7 @@ function OrderCard({ order }) {
 				<span>Phone: { order.user.phone }</span>
 				<a target='_blank' href={`https://www.google.com/maps?q=${order.location.latlng[0]},${order.location.latlng[1]}`}>Location: Maps</a>
 				{ order.location.address !== '' && <span>Address: { order.location.address }</span> }
-				<span>Total: { orderTotal+order.deliveryFees }LE</span>
+				<span>Total: { order?.cartTotalPrice?.discount || '???' }LE</span>
 				<span>Items: { cartItems.join(',') }</span>
 			</Content>
 		</Order>

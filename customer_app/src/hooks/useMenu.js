@@ -6,6 +6,8 @@ import priceAfterDiscount from '../utils/priceAfterDiscount'
 const useMenu = () => {
 	const menuItemsSelector = useSelector(state => state.menu.items)
 	const cartSelector = useSelector(state => state.cart.items)
+	const user = useSelector(state => state.user)
+	const resId = useSelector(state => state.cart.restaurant)
 
 	const total = (menuItemsArg, cartArg, selectedMenuItemsArg) => {
 		const menuItems = menuItemsArg || menuItemsSelector || []
@@ -17,7 +19,7 @@ const useMenu = () => {
 		})
 
 		const price = selectedMenuItems?.reduce((acc, item) => {
-		  const discountedPrice = priceAfterDiscount(item?.price, item?.discount?.code)
+		  const discountedPrice = priceAfterDiscount(item?.price, item?.discount, user, resId).finalPrice
 		  return {
 		    total: acc.total + (item.price * item.quantity),
 		    discount: acc.discount + (discountedPrice * item.quantity),

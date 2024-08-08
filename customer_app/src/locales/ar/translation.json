@@ -92,5 +92,9 @@
   "Order Cancel": "إلغاء الطلب",
   "Location is required": "الموقع مطلوب",
   "Address, street, villagem, a known place": "العنوان، شارع، قرية، مكان معروف",
-  "Delivery Fees": "رسوم التوصيل"
+  "Delivery Fees": "رسوم التوصيل",
+  "Items already in cart": "طلبات من مطعم اخر موجودة في السلة بالفعل",
+  "Your cart contains items from other restaurant. Would you like to reset your cart for adding items from this restaurant?": "سلتك فيها طلبات من مطعم تاني. تحب تفضي السلة عشان تضيف طلبات من المطعم ده؟",
+  "NO": "لا",
+  "YES, START AFRESH": "أيوة، نبدأ من جديد"
 }

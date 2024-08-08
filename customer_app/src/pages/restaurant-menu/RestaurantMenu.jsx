@@ -4,10 +4,9 @@ import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import useRestaurantMenu from '../../hooks/useRestaurantMenu'
-
-import RestaurantCategory from '../../components/RestaurantCategory'
+import RestaurantCategory from './RestaurantCategory'
+import RestaurantInfo from './RestaurantInfo'
 import ShimmerMenu from "../../components/Shimmer/ShimmerMenu"
-import RestaurantInfo from '../../components/RestaurantInfo'
 
 const RestaurantMenu = () => {
   const { t } = useTranslation()
@@ -15,7 +14,6 @@ const RestaurantMenu = () => {
   useRestaurantMenu(resId)
   const restaurants = useSelector(state => state.restaurants)
   const menu = useSelector(state => state.menu)
-  const [ShowIndex, setShowIndex] = useState(0)
 
   const res = useMemo(() => {
     return restaurants.filter(res => res.accessToken === resId)[0]
@@ -40,15 +38,6 @@ const RestaurantMenu = () => {
     feeDetails: 'fee fee'
   }
 
-  const handleShowItem = (CurrentIndex) => {
-    if (CurrentIndex === ShowIndex) {
-      setShowIndex(null)
-    }
-    else {
-      setShowIndex(CurrentIndex)
-    }
-  }
-
   if (menu && menu?.categories?.length === 0) {
     return <ShimmerMenu />
   }
@@ -70,8 +59,6 @@ const RestaurantMenu = () => {
                       id={category?.id}
                       resId={res?.accessToken}
                       title={category?.title}
-                      ShowItem={index === ShowIndex ? true : false}
-                      handleShowItem={() => handleShowItem(index)}
                       ResInfoData={ResInfoData}
                     />
                   </li>

@@ -93,5 +93,9 @@
   "Order Cancel": "Order Cancel",
   "Location is required": "Location is required",
   "Address, street, villagem, a known place": "Address, street, villagem, a known place",
-  "Delivery Fees": "Delivery Fees"
+  "Delivery Fees": "Delivery Fees",
+  "Items already in cart": "Items already in cart",
+  "Your cart contains items from other restaurant. Would you like to reset your cart for adding items from this restaurant?": "Your cart contains items from other restaurant. Would you like to reset your cart for adding items from this restaurant?",
+  "NO": "NO",
+  "YES, START AFRESH": "YES, START AFRESH"
 }

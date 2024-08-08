@@ -162,11 +162,14 @@ const CustomTableRow = ({ row = [], selected, index, handleSetSelected, tableSta
 					<CustomCollapsedTableRow isOpen={isOpen} row={row} />
 				</TableCell>
 			</TableRow>
-			<AssignDialog
-				isOpen={assignDialogIsOpen}
-				handleOpenClose={handleOpenClose}
-				currentOrder={currentOrder?.orderData}
-			/>
+			{
+				currentOrder?.orderData &&
+				<AssignDialog
+					isOpen={assignDialogIsOpen}
+					handleOpenClose={handleOpenClose}
+					currentOrder={currentOrder?.orderData}
+				/>
+			}
 		</>
 
 	);

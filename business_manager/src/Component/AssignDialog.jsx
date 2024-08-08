@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import styled from 'styled-components'
 
 import Dialog from '@mui/material/Dialog'
@@ -9,6 +9,8 @@ import DialogTitle from './DialogTitle'
 import DB_UPDATE_NESTED_VALUE from '../functions/DB_UPDATE_NESTED_VALUE'
 
 import assign from '../functions/assign'
+import DB_GET_DOC from '../functions/DB_GET_DOC'
+import { updateStaff } from '../rtk/slices/staffSlice'
 
 
 const DialogParent = styled(Dialog)``
@@ -54,6 +56,7 @@ const Dot = styled.span`
 `
 
 function AssignDialog({ isOpen, handleOpenClose, currentOrder }) {
+	const dispatch = useDispatch()
 	const orders = useSelector(state => state.orders.open)
 	const staff = useSelector(state => state.staff)
 	const accessToken = useSelector(state => state.business.accessToken)
@@ -70,7 +73,11 @@ function AssignDialog({ isOpen, handleOpenClose, currentOrder }) {
 
 	const handleAssignStaffMember = (member) => {
 		if (currentOrder.status === 'IN_DELIVERY') {
-			assign(member, currentOrder, orders)
+			DB_GET_DOC('drivers', member.uid)
+			.then(driver => {
+				dispatch(updateStaff(driver))
+				assign(member, currentOrder, orders, driver)
+			})
 		}
 	}
 

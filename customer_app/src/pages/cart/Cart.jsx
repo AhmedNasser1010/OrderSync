@@ -7,13 +7,14 @@ import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 
 
-import { quantityHandle, clearCart } from '../../rtk/slices/cartSlice'
+import { quantityHandle, clearCart, handleAddDiscount } from '../../rtk/slices/cartSlice'
 import { addCheckout, clearCheckout } from '../../rtk/slices/checkoutSlice'
 import { initUser } from '../../rtk/slices/userSlice'
 import { toggleLoginSidebar, toggleOrderSidebar } from '../../rtk/slices/toggleSlice'
 import PopupWindow from '../../components/PopupWindow'
 
 import priceAfterDiscount from '../../utils/priceAfterDiscount'
+import generateDiscountObj from '../../utils/generateDiscountObj'
 import randomOrderId from '../../utils/randomOrderId'
 import DB_ARRAY_UNION from '../../utils/DB_ARRAY_UNION'
 import DB_ADD_DOC from '../../utils/DB_ADD_DOC'
@@ -83,7 +84,7 @@ const Cart = () => {
 	const [disableSubmit, setDisableSubmit] = useState(false)
 	const updateUserOnSendOrder = useUpdateUserOnSendOrder()
 	const services = useSelector(state => state.services)
-	const [deliveryFees, setDeliveryFees] = useState(services.deliveryFees)
+	const [deliveryFees, setDeliveryFees] = useState(0)
 
 	useEffect(() => {
 		dispatch(addCheckout({
@@ -115,12 +116,14 @@ const Cart = () => {
 
 
 	useEffect(() => {
+		if (!user?.locations?.selected) return setDeliveryFees(0)
+		if (!user.locations[user.locations.selected].latlng[0] && !user.locations[user.locations.selected].latlng[1]) return setDeliveryFees(0)
 		if (resInfo && user.locations) {
 			const userDistanceFromRes = getDistanceFromLatlngInKm(user.locations[user.locations.selected].latlng, resInfo.business.latlng)
 			const fees = getDeliveryFees(userDistanceFromRes, services.deliveryFees)
 			setDeliveryFees(fees)
 		}
-	}, [resInfo])
+	}, [resInfo, user])
 
 	const selectedItems = useMemo(() => {
 		return cartItems?.map(cartItem => {
@@ -134,10 +137,12 @@ const Cart = () => {
 
 	const cartTotalPrice = useMemo(() => {
 		return selectedItems?.reduce((accumulator, item) => {
-			if (item?.discount?.code) {
+			const { finalPrice, isAvailableForUser } = priceAfterDiscount(item.price, item.discount, user, cartRestaurantID)
+			const discountIncluded = isAvailableForUser && item.price !== finalPrice
+			if (discountIncluded) {
 				return {
 					total: accumulator.total + item.price * item.quantity,
-					discount: accumulator.discount + priceAfterDiscount(item.price, item.discount.code) * item.quantity
+					discount: accumulator.discount + finalPrice * item.quantity
 				};
 			} else {
 				return {
@@ -145,8 +150,23 @@ const Cart = () => {
 					discount: accumulator.discount + item.price * item.quantity
 				};
 			}
-		}, { total: 0, discount: 0 });
-	}, [cartItems]);
+		}, { total: deliveryFees, discount: deliveryFees });
+	}, [cartItems, deliveryFees])
+
+	useEffect(() => {
+		if (selectedItems.length) {
+			selectedItems.map(item => {
+				const discountObj = item?.discount?.code ? generateDiscountObj(item?.discount) : null
+				if (discountObj) {
+					const { finalPrice, isAvailableForUser } = priceAfterDiscount(item.price, item.discount, user, cartRestaurantID)
+					const discountIncluded = isAvailableForUser && item.price !== finalPrice
+					if (discountIncluded) {
+						dispatch(handleAddDiscount({ id: item.id, discountCode: `${discountObj.type}-${discountObj.value}` }))
+					}
+				}
+			})
+		}
+	}, [])
 
 	const handleIncreaseQty = (item) => {
 		dispatch(quantityHandle({ id: item.id, quantity: '+' }))
@@ -212,11 +232,12 @@ const Cart = () => {
 	      const final = {
 		      ...valid,
 		      accessToken,
-		      deliveryFees,
 		      id: randomOrderId(),
 		      status: 'RECEIVED',
 		      timestamp: Number(Date.now()),
 		      statusUpdatedSince: Number(Date.now()),
+		      deliveryFees,
+		      cartTotalPrice
 		    }
 
 		    toast.promise(
@@ -232,7 +253,8 @@ const Cart = () => {
 			    	}
 			    	setDisableSubmit(false)
 			    	return false
-		    	}),
+		    	})
+		    	.catch(e => console.error(e)),
 		    	{
 						loading: t('Sending...'),
 						success: t('Success.'),
@@ -331,35 +353,39 @@ const Cart = () => {
 									</div>
 								</div>
 								{
-									selectedItems?.map(item => (
-										<div key={item?.id} className='item flex items-start justify-between pb-8'>
-											<div className='md:w-auto w-3/5'>
-												<img src="/assets/veg.png" alt="veg" />
-												<h4 className='text-base text-color-9 font-ProximaNovaMed'>{item?.name}</h4>
-												{
-													item?.price ? <span className={`egp text-sm font-ProximaNovaMed ${item?.discount?.code ? 'text-color-2' : 'text-color-9'}`}>{item?.discount?.code ? `${item?.price} > ${priceAfterDiscount(item?.price, item?.discount?.code)}` : item?.price}</span> : <span className='egp text-color-9 text-sm font-ProximaNovaMed'>??</span>
-												}
-												{
-													item?.discount?.message && <span className='text-sm font-ProximaNovaMed block text-color-2 mt-2'>{ item?.discount?.message }</span>
-												}
-												{
-													item?.description && <p className='text-color-10 mt-3 tracking-tight font-ProximaNovaThin text-sm md:w-3/4'>{item?.description}</p>
-												}
-											</div>
-											<div className='relative w-[118px] h-24'>
-												{
-													item?.backgrounds[0] && <button className='cursor-pointer w-[118px] h-24 rounded-md'>
-														<img src={item?.backgrounds[0]} alt="menu-img" className='rounded-md w-[118px] h-24 object-cover' />
-													</button>
-												}
-												<div className='absolute flex justify-around items-center text-x1 -bottom-2 left-1/2 -translate-x-1/2 z-[1] w-24 h-9 shadow-md shadow-color-7 bg-color-11 text-white text-center inline-block rounded text-sm font-ProximaNovaSemiBold uppercase'>
-													<button className='w-1/3 h-full' onMouseUp={() => handleIncreaseQty(item)}>+</button>
-													<span className='w-1/3'>{ item.quantity }</span>
-													<button className='w-1/3 h-full' onMouseUp={() => handleDecreaseQty(item)}>-</button>
+									selectedItems?.map(item => {
+										const { finalPrice, isAvailableForUser } = item?.discount?.code ? priceAfterDiscount(item.price, item.discount, user, resInfo.id) : { finalPrice: item.price, isAvailableForUser: false }
+                		const discountIncluded = isAvailableForUser && item.price !== finalPrice
+										return (
+											<div key={item?.id} className='item flex items-start justify-between pb-8'>
+												<div className='md:w-auto w-3/5'>
+													<img src="/assets/veg.png" alt="veg" />
+													<h4 className='text-base text-color-9 font-ProximaNovaMed'>{item?.title}</h4>
+													{
+		                        item?.discount?.message && <span className={`text-sm font-ProximaNovaMed block ${discountIncluded ? 'text-color-2' : 'text-[#3e4152a1]'} mt-2`}>{ item?.discount?.message }</span>
+		                      }
+		                      {
+		                        discountIncluded ? <span className='egp text-sm font-ProximaNovaMed text-color-2'>{`${item?.price} > ${finalPrice}`}</span> : <span className='egp text-sm font-ProximaNovaMed text-color-9'>{item.price}</span>
+		                      }
+		                      {
+		                        item?.description && <p className='text-color-10 mt-3 tracking-tight font-ProximaNovaThin text-sm md:w-3/4'>{item?.description}</p>
+		                      }
+												</div>
+												<div className='relative w-[118px] h-24'>
+													{
+														item?.backgrounds[0] && <button className='cursor-pointer w-[118px] h-24 rounded-md'>
+															<img src={item?.backgrounds[0]} alt="menu-img" className='rounded-md w-[118px] h-24 object-cover' />
+														</button>
+													}
+													<div className='absolute flex justify-around items-center text-x1 -bottom-2 left-1/2 -translate-x-1/2 z-[1] w-24 h-9 shadow-md shadow-color-7 bg-color-11 text-white text-center inline-block rounded text-sm font-ProximaNovaSemiBold uppercase'>
+														<button className='w-1/3 h-full' onMouseUp={() => handleIncreaseQty(item)}>+</button>
+														<span className='w-1/3'>{ item.quantity }</span>
+														<button className='w-1/3 h-full' onMouseUp={() => handleDecreaseQty(item)}>-</button>
+													</div>
 												</div>
 											</div>
-										</div>
-									))
+										)
+									})
 								}
 								<OrderInfo deliveryFees={deliveryFees} />
 								{
@@ -370,7 +396,7 @@ const Cart = () => {
 											<h3 className="font-ProximaNovaSemiBold">{t("Total Price")}</h3>
 										</div>
 										<div>
-											<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.total+deliveryFees}</span>
+											<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.total}</span>
 										</div>
 									</div>
 									<div className="flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
@@ -378,7 +404,7 @@ const Cart = () => {
 											<h3 className="font-ProximaNovaSemiBold">{t("Total Price Dsicounted")}</h3>
 										</div>
 										<div>
-											<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.discount+deliveryFees}</span>
+											<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.discount}</span>
 										</div>
 									</div>
 									</>
@@ -390,7 +416,7 @@ const Cart = () => {
 												<h3 className="font-ProximaNovaSemiBold">{t("Total Price")}</h3>
 											</div>
 											<div>
-												<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.total+deliveryFees}</span>
+												<span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.total}</span>
 											</div>
 										</div>
 								}

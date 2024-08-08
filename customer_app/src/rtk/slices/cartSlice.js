@@ -44,6 +44,21 @@ export const cartSlice = createSlice({
 		setRestaurant: (state, { payload }) => {
 			state.restaurant = payload;
 		},
+		handleAddDiscount: (state, { payload }) => {
+			const { id, discountCode } = payload
+			return {
+				...state,
+				items: state.items.map(item => {
+					if (item.id === id) {
+						return {
+							...item,
+							discountCode
+						}
+					}
+					return item
+				})
+			}
+		}
 	},
 });
 
@@ -54,6 +69,7 @@ export const {
 	quantityHandle,
 	deleteFromCart,
 	setRestaurant,
+	handleAddDiscount
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
