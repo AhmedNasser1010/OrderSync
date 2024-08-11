@@ -8,6 +8,7 @@ import ScrollToTop from "./components/ScrollToTop"
 import LoginSidebar from "./components/Sidebar/LoginSidebar"
 import useRestaurants from './hooks/useRestaurants'
 import { Toaster } from "react-hot-toast"
+import { HelmetProvider } from 'react-helmet-async'
 
 import { trackingReset } from './rtk/slices/trackingSlice'
 
@@ -16,6 +17,7 @@ const App = () => {
   useRestaurants()
   const restaurants = useSelector(state => state.restaurants)
   const user = useSelector(state => state.user)
+  const helmetContext = {}
 
   useEffect(() => {
     if (!user?.trackedOrder?.id) {
@@ -25,7 +27,7 @@ const App = () => {
   }, [user?.trackedOrder?.id])
   
   return (
-    <>
+    <HelmetProvider context={helmetContext}>
       <Header />
       <Outlet />
       <LocationSidebar />
@@ -37,7 +39,7 @@ const App = () => {
           position: 'top-center'
         }}
       />
-    </>
+    </HelmetProvider>
   )
 }
 

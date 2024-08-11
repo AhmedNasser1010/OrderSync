@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import toast from "react-hot-toast";
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-
+import SEO from '../../components/SEO'
 
 import { quantityHandle, clearCart, handleAddDiscount } from '../../rtk/slices/cartSlice'
 import { addCheckout, clearCheckout } from '../../rtk/slices/checkoutSlice'
@@ -329,6 +329,10 @@ const Cart = () => {
 
 	return (
 		<>
+			<SEO
+				title='زاجل ايتس | السلة'
+				description='اطلب أكل لذيذ أونلاين من مطاعمك المحلية المفضلة مع زاجل إيتس. توصيل أكل سريع وموثوق لحد بابك.'
+			/>
 			{
 				cartItems.length === 0 ?
 					<div className='mx-auto pt-5 mb-10 md:w-1/2 min-h-screen'>

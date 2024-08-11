@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
+import SEO from '../../components/SEO'
 import useRestaurantMenu from '../../hooks/useRestaurantMenu'
 import RestaurantCategory from './RestaurantCategory'
 import RestaurantInfo from './RestaurantInfo'
@@ -30,7 +31,7 @@ const RestaurantMenu = () => {
     id: resId,
     img: res?.business?.cover,
     place: t('El-Ayat'),
-    deliveryfee: 7/100
+    description: res?.business?.description,
   }
 
   const resMainInfo = {
@@ -41,7 +42,8 @@ const RestaurantMenu = () => {
     sla: '30-45 ' + t('min'),
     avgRating: '4.5',
     totalRatingsString: t('500+ ratings'),
-    feeDetails: 'fee fee'
+    feeDetails: 'fee fee',
+    description: res?.business?.description,
   }
 
   if (menu && !menu.categories.length || res.accessToken !== menu.accessToken) {
@@ -54,6 +56,10 @@ const RestaurantMenu = () => {
 
   return (
     <div className="mx-auto mt-24 mb-10 2xl:w-1/2 md:w-4/5 sm:px-7 px-2">
+      <SEO
+				title={` زاجل ايتس | ${ResInfoData.name}`}
+				description={`${ResInfoData.name} - نفسك في أكل من مطعم معين؟ اطلب أكلك المفضل من أقرب مطعم ليك في مصر مع زاجل إيتس. جعان اطلب أكلك دلوقتي واستمتع!`}
+			/>
       <>
         <RestaurantInfo resMainInfo={resMainInfo} />
         <hr className='border-1 border-dashed border-b-[#d3d3d3] my-4'></hr>
