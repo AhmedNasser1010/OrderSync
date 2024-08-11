@@ -132,7 +132,7 @@ const Header = () => {
               <div className="text-xl">
                 <CiLocationOn />
               </div>
-              <span className="text-sm font-ProximaNovaThin">Location</span>
+              <span className="text-sm font-ProximaNovaThin">{t('Location')}</span>
             </button>
           </div>
 
@@ -160,7 +160,7 @@ const Header = () => {
                 </svg>
               </div>
               {!user?.userInfo ? (
-                <span className="md:inline hidden">{t('Sign In')}</span>
+                <span>{t('Sign In')}</span>
               ) : (
                 <span className="md:inline hidden">{user?.userInfo?.name}</span>
               )}
@@ -200,7 +200,7 @@ const Header = () => {
                   </>
                 )}
               </div>
-              <span className="md:inline hidden">{t('Cart')}</span>
+              <span>{t('Cart')}</span>
             </Link>
           </ul>
         </div>

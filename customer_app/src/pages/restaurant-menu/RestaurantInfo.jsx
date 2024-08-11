@@ -72,7 +72,7 @@ const RestaurantInfo = ({ resMainInfo }) => {
         </ol>
       </div>
 
-      <div className="text-left mt-10">
+      <div className=" mt-10">
         <h1 className="font-GrotBlack text-2xl">{name}</h1>
 
         <div className="mt-14 flex justify-between">

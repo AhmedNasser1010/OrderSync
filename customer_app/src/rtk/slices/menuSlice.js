@@ -5,7 +5,7 @@ export const menuSlice = createSlice({
   initialState: {
     accessToken: '',
     items: [],
-    categries: []
+    categories: []
   },
   reducers: {
     initMenu: (state, { payload }) => {
@@ -15,7 +15,7 @@ export const menuSlice = createSlice({
       return {
         accessToken: '',
         items: [],
-        categries: []
+        categories: []
       }
     }
   },

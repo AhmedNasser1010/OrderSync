@@ -1,16 +1,16 @@
-import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { initMenu } from '../rtk/slices/menuSlice'
 import DB_GET_DOC from '../utils/DB_GET_DOC'
 
-const useRestaurantMenu = (resId) => {
+const useRestaurantMenu = () => {
   const dispatch = useDispatch()
 
-  const fetchRestaurantMenu = async _ => await DB_GET_DOC('menus', resId)
+  const resMenu = (resId) => {
+    DB_GET_DOC('menus', resId)
+    .then(menu => dispatch(initMenu(menu)))
+  }
 
-  useEffect(() => {
-    fetchRestaurantMenu().then(res => dispatch(initMenu(res)))
-  }, [])
+  return resMenu
 }
 
 export default useRestaurantMenu

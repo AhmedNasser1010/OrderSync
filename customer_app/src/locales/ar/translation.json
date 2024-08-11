@@ -96,5 +96,6 @@
   "Items already in cart": "طلبات من مطعم اخر موجودة في السلة بالفعل",
   "Your cart contains items from other restaurant. Would you like to reset your cart for adding items from this restaurant?": "سلتك فيها طلبات من مطعم تاني. تحب تفضي السلة عشان تضيف طلبات من المطعم ده؟",
   "NO": "لا",
-  "YES, START AFRESH": "أيوة، نبدأ من جديد"
+  "YES, START AFRESH": "أيوة، نبدأ من جديد",
+  "Location": "الموقع"
 }

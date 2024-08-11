@@ -10,17 +10,23 @@ import ShimmerMenu from "../../components/Shimmer/ShimmerMenu"
 
 const RestaurantMenu = () => {
   const { t } = useTranslation()
+  const { i18n } = useTranslation()
+  const lang = i18n?.language || 'ar'
   const { resId } = useParams()
-  useRestaurantMenu(resId)
+  const resMenu = useRestaurantMenu()
   const restaurants = useSelector(state => state.restaurants)
   const menu = useSelector(state => state.menu)
-
+  
   const res = useMemo(() => {
-    return restaurants.filter(res => res.accessToken === resId)[0]
+    return restaurants.filter(res => res.business.name === resId.split('-').join(' '))[0]
   }, [resId, restaurants])
 
+  useEffect(() => {
+    res?.accessToken && resMenu(res.accessToken)
+  }, [res])
+
   const ResInfoData = {
-    name: res?.business?.name,
+    name: lang === 'ar' ? res?.business?.nameInAr : res?.business?.name,
     id: resId,
     img: res?.business?.cover,
     place: t('El-Ayat'),
@@ -29,7 +35,7 @@ const RestaurantMenu = () => {
 
   const resMainInfo = {
     city: t('El-Ayat'),
-    name: res?.business?.name,
+    name: lang === 'ar' ? res?.business?.nameInAr : res?.business?.name,
     cuisines: ['Pizza', 'Krib', 'Shawrma'],
     areaName: t('El-Ayat'),
     sla: '30-45 ' + t('min'),
@@ -38,8 +44,12 @@ const RestaurantMenu = () => {
     feeDetails: 'fee fee'
   }
 
-  if (menu && menu?.categories?.length === 0) {
+  if (menu && !menu.categories.length || res.accessToken !== menu.accessToken) {
     return <ShimmerMenu />
+  } else {
+    const hash = window.location.hash
+    const el = hash && document.querySelector(hash) || null // null !!
+    el && el && el.scrollIntoView()
   }
 
   return (
@@ -52,9 +62,9 @@ const RestaurantMenu = () => {
           true ?
             <ul className="main-menu-container">
               {
-                menu?.categories?.map((category, index) => (
+                menu?.categories?.map((category, i) => (
 
-                  <li key={category?.id} className='cursor-pointer'>
+                  <li key={category?.id} className='cursor-pointer' id={`category-${i+1} ${category.id}`}>
                     <RestaurantCategory
                       id={category?.id}
                       resId={res?.accessToken}

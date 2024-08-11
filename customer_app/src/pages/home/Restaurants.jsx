@@ -22,7 +22,7 @@ function Restaurants() {
 						<div className='flex gap-8 flex-wrap mt-10 2xl:justify-start justify-center'>
 							{
 								restaurants?.map((res) => (
-								  <Link className='relative transition-all hover:scale-95' key={res?.accessToken} to={`/restaurants/${res?.accessToken}`}>
+								  <Link className='relative transition-all hover:scale-95' key={res?.accessToken} to={`/${res?.business.name.split(' ').join('-')}`}>
 								    {
 								      // res?.info?.aggregatedDiscountInfoV3 ? <RestaurantCardwithOffer info={res?.info} /> : <RestaurantCard info={res?.info} />
 								    	<RestaurantCard info={{

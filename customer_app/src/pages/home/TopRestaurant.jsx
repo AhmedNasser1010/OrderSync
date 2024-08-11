@@ -45,7 +45,7 @@ function TopRestaurant() {
 							{
 								topChains?.map((res) => (
 									<div className='cursor-pointer' key={res?.accessToken}>
-									  <Link className='relative transition-all hover:scale-95' to={`/restaurants/${res?.accessToken}`}>
+									  <Link className='relative transition-all hover:scale-95' to={`/${res?.business.name.split(' ').join('-')}`}>
 									    <RestaurantCard info={{
 										    areaName: 'El-Ayat',
 												name: res?.business?.name,
