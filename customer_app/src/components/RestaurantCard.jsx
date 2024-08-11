@@ -21,7 +21,6 @@ const RestaurantCard = ({ info }) => {
         console.log('ar')
         setResName(nameInAr)
       } else {
-        console.log('en')
         setResName(name)
       }
       

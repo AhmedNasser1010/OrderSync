@@ -108,7 +108,7 @@ const Header = () => {
               <h1
                 className="font-Beiruti text-3xl"
               >
-                {t('Merro')}
+                {t('Zajil Eats')}
               </h1>
             </Link>
             <button onClick={handleLocationSidebar} type='button' className='md:flex items-center gap-2 group sidebar-btn hidden'>
