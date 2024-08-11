@@ -97,16 +97,16 @@ const Header = () => {
       <header className="shadow-md w-full fixed left-0 top-0 right-0 h-20 z-10 md:px-5 text-color-1 bg-white px-3">
         <div className="flex justify-between items-center h-full container mx-auto">
           <div className="flex items-center md:gap-5 gap-2">
-            <Link to="/">
+            <Link to=".">
               <img
                 src={LOGO_URL}
                 alt="logo"
-                className="h-14 rounded-full border border-black"
+                className="md:h-14 h-12 rounded-full border border-black"
               />
             </Link>
             <Link to=".">
               <h1
-                className="font-Beiruti text-3xl"
+                className="font-Beiruti md:text-3xl text-2xl"
               >
                 {t('Zajil Eats')}
               </h1>
@@ -160,7 +160,7 @@ const Header = () => {
                 </svg>
               </div>
               {!user?.userInfo ? (
-                <span>{t('Sign In')}</span>
+                <span className="md:inline hidden">{t('Sign In')}</span>
               ) : (
                 <span className="md:inline hidden">{user?.userInfo?.name}</span>
               )}
