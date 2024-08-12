@@ -83,12 +83,16 @@ const Header = () => {
 
 
   useEffect(() => {
-    const partnerID = import.meta.env.VITE_PARTNER_ID
+    // Fetching delivery fees from firestore is pused right now for security rules issues
+    // const partnerID = import.meta.env.VITE_PARTNER_ID
+    // if (user?.userInfo?.uid) {
+    //   DB_GET_DOC('users', partnerID)
+    //   .then(partner => {
+    //     dispatch(initServices(partner?.services))
+    //   })
+    // }
     if (user?.userInfo?.uid) {
-      DB_GET_DOC('users', partnerID)
-      .then(partner => {
-        dispatch(initServices(partner?.services))
-      })
+      dispatch(initServices({ deliveryFees: 3.5 }))
     }
   }, [user?.userInfo?.uid])
 

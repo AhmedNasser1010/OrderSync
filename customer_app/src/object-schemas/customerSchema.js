@@ -10,6 +10,7 @@ const customerSchema = ({ uid, name, email, phone, refferredBy, avatar, provider
 			city: 'El Ayat',
 		},
 		userInfo: {
+			role: 'CUSTOMER',
 			name: name || '',
 			email: email || '',
 			phone: phone || '',

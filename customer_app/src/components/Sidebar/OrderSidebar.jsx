@@ -44,9 +44,6 @@ function OrderSidebar() {
 	const [driverId, setDriverId] = useState(tracking?.order?.assign?.driver || null)
 	const [isAvailableToEdit, setIsAvailableToEdit] = useState(true)
 
-	console.log(tracking)
-	console.log(driverId)
-
 	useEffect(() => {
 		if (tracking.order) {
 			setDriverId(tracking.order.assign.driver)
@@ -130,8 +127,6 @@ function OrderSidebar() {
 
 	const handleOrderCancel = async () => {
 		try {
-			console.log(tracking)
-		
 			const currentResOrders = await DB_GET_DOC('orders', tracking.res.accessToken)
 			const ordersAfter = currentResOrders.open.filter(order => order.id !== tracking.order.id)
 

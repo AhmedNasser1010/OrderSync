@@ -192,6 +192,34 @@ const Cart = () => {
 		}))
 	}
 
+	const handleOrderSubmission = async (final) => {
+	  try {
+	  	const updatedUser = await updateUserOnSendOrder(accessToken, user, final)
+
+	  	if (!updatedUser) {
+	  		setDisableSubmit(false)
+	      throw new Error('Operation failed update user')
+	  	}
+
+	    const ordersIsUpdated = await DB_ARRAY_UNION('orders', accessToken, 'open', final)
+
+	    if (!ordersIsUpdated) {
+	      setDisableSubmit(false)
+	      throw new Error('Operation failed update orders')
+	    }
+
+	    dispatch(clearCart())
+	    dispatch(clearCheckout())
+	    navigate('/')
+	    dispatch(toggleOrderSidebar())
+
+	    return true
+	  } catch (e) {
+	    console.error(e)
+	    throw e
+	  }
+	}
+
 	const handlePayment = () => {
 		setDisableSubmit(true)
 
@@ -240,40 +268,26 @@ const Cart = () => {
 		      cartTotalPrice
 		    }
 
-		    toast.promise(
-		    	DB_ARRAY_UNION('orders', accessToken, 'open', final)
-		    	.then(res => {
-			    	if (res) {
-			    		updateUserOnSendOrder(accessToken, user, final)
-			    		dispatch(clearCart())
-			    		dispatch(clearCheckout())
-			    		navigate('/')
-			    		dispatch(toggleOrderSidebar())
-			    		return true
-			    	}
-			    	setDisableSubmit(false)
-			    	return false
-		    	})
-		    	.catch(e => console.error(e)),
-		    	{
-						loading: t('Sending...'),
-						success: t('Success.'),
-						error: t('An unexpected error occurred while sending your order. Please try again.'),
-					},
-					{
-						success: {
-							className: "font-ProximaNovaSemiBold",
-							position: "top-center",
-							duration: 3000
-						},
-						error: {
-							className: "font-ProximaNovaSemiBold text-red-500",
-							position: "top-center",
-							duration: 3000
-						},
-					}
-		    )
-
+				toast.promise(
+					handleOrderSubmission(final),
+				  {
+				    loading: t('Sending...'),
+				    success: t('Success.'),
+				    error: t('An unexpected error occurred while sending your order. Please try again.'),
+				  },
+				  {
+				    success: {
+				      className: "font-ProximaNovaSemiBold",
+				      position: "top-center",
+				      duration: 3000
+				    },
+				    error: {
+				      className: "font-ProximaNovaSemiBold text-red-500",
+				      position: "top-center",
+				      duration: 3000
+				    },
+				  }
+				);
 		    
     	} else {
     		toast.error(t('Error restaurant id not found.'), {

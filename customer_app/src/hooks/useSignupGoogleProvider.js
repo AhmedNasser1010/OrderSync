@@ -35,22 +35,15 @@ const useSignupGoogleProvider = () => {
 
         DB_ADD_DOC('customers', user.uid, createUserData)
         .then(res => {
-        	console.log(res)
         	if (res) {
         		window.location.reload()
         	}
         })
-        .catch(err => console.log(err))
       }
 
       return true
     } catch (error) {
-
-      const errorCode = error.code
-      const errorMessage = error.message
-      const email = error.customData.email
-      const credential = GoogleAuthProvider.credentialFromError(error)
-
+      console.error(error)
       return false
     }
   }
