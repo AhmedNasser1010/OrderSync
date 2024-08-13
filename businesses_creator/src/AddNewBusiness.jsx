@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 import { addBusiness } from "./rtk/slices/businessesSlice.js";
 import { pushAccesTokenToTheUser } from "./rtk/slices/userSlice.js";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 // Firebase
 import { auth } from "./firebase.js";
@@ -103,6 +103,7 @@ const businessSchema = object({
 const AddNewBusiness = () => {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
+	const user = useSelector(state => state.user)
 	const [isSubmited, setIsSubmited] = useState(false);
 	const [submitColor, setSubmitColor] = useState(undefined);
   const [businessValues, setBusinessValues] = useState({
@@ -188,7 +189,7 @@ const AddNewBusiness = () => {
   			setIsSubmited(true);
   			setSubmitColor(undefined);
   			
-  			dispatch(addBusiness(businessValues));
+  			dispatch(addBusiness({ ...businessValues, partnerUid: user.uid }));
 				dispatch(pushAccesTokenToTheUser(businessValues.accessToken));
 				navigate("/businesses");
   		})

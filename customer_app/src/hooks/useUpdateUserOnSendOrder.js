@@ -10,6 +10,17 @@ const useUpdateUserOnSendOrder = () => {
 	const menuItems = useSelector(state => state.menu.items)
 	const cart = useSelector(state => state.cart.items)
 
+	const userDataToTheCloud = (uid, data) => {
+		DB_ADD_DOC('customers', uid, data)
+		.then(res => {
+			if (res) {
+				dispatch(initUser(data))
+				return
+			}
+			throw new Error('Operation failed update user')
+		})
+	}
+
 
 	const updateUserOnSendOrder = async (accessToken, user, placedOrder) => {
 
@@ -46,7 +57,7 @@ const useUpdateUserOnSendOrder = () => {
 				      totalItems: totalItemsNum,
 				      totalOrders: 1,
 				      lastOrderTime: Date.now(),
-				      fisrOrderTime: Date.now()
+				      firstOrderTime: Date.now()
 				    }
 				  ],
 				  trackedOrder: {
@@ -55,9 +66,7 @@ const useUpdateUserOnSendOrder = () => {
 					}
 				}
 
-				const passed = await DB_ADD_DOC('customers', user.userInfo.uid, userCopy)
-				.then(res => res && dispatch(initUser(userCopy)))
-				return passed
+				userDataToTheCloud(user.userInfo.uid, userCopy)
 			} else {
 				if (isFirstTime) {
 
@@ -71,7 +80,7 @@ const useUpdateUserOnSendOrder = () => {
 					      totalItems: totalItemsNum,
 					      totalOrders: 1,
 					      lastOrderTime: Date.now(),
-					      fisrOrderTime: Date.now()
+					      firstOrderTime: Date.now()
 					    }
 					  ],
 					  trackedOrder: {
@@ -80,9 +89,7 @@ const useUpdateUserOnSendOrder = () => {
 					  }
 					}
 
-					const passed = await DB_ADD_DOC('customers', user.userInfo.uid, userCopy)
-					.then(res => res && dispatch(initUser(userCopy)))
-					return passed
+					userDataToTheCloud(user.userInfo.uid, userCopy)
 				} else {
 
 					const userCopy = {
@@ -109,12 +116,10 @@ const useUpdateUserOnSendOrder = () => {
 					  }
 					}
 
-					const passed = await DB_ADD_DOC('customers', user.userInfo.uid, userCopy)
-					.then(res => res && dispatch(initUser(userCopy)))
-					return passed
+					userDataToTheCloud(user.userInfo.uid, userCopy)
 				}
 			}
-			return false
+			return true
 		} catch(e) {
 			console.log(e)
 			return false

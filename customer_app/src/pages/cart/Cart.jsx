@@ -195,7 +195,7 @@ const Cart = () => {
 	const handleOrderSubmission = async (final) => {
 	  try {
 	  	const updatedUser = await updateUserOnSendOrder(accessToken, user, final)
-
+			
 	  	if (!updatedUser) {
 	  		setDisableSubmit(false)
 	      throw new Error('Operation failed update user')

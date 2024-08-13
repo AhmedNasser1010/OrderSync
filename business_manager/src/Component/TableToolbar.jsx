@@ -32,14 +32,12 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 	const accessToken = useSelector(state => state.user.accessToken);
 	const openOrders = useSelector(state => state.orders.open);
 	const closedOrders = useSelector(state => state.orders.closed);
-	const apiWaitingRef = useRef(false);
-	const [finalDayClosedOrderRecord, setFinalDayClosedOrderRecord] = useState({});
+	const apiWaitingRef = useRef(false)
 	const componentRef = useRef(null)
 	const business = useSelector(state => state.business)
 	const menu = useSelector(state => state.menu.items)
-	const ordersLoaded = useRef(false)
 
-	const orders = useMemo(() => {
+	const selectedOrders = useMemo(() => {
 		let ordersMap = []
 		selected?.map(id => openOrders.map(order => order.id === id && ordersMap.push(order)))
 
@@ -69,26 +67,15 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 		RECEIVED: 'IN_PROGRESS',
 		IN_PROGRESS: 'IN_DELIVERY',
 		IN_DELIVERY: 'COMPLETED'
-	};
+	}
 	const prevTableStatusMap = {
 		COMPLETED: 'IN_DELIVERY',
 		IN_DELIVERY: 'IN_PROGRESS',
 		IN_PROGRESS: 'RECEIVED'
-	};
-	const nextTableStatus = nextTableStatusMap[tableStatus] || 'RECEIVED';
-	const prevTableStatus = prevTableStatusMap[tableStatus] || 'RECEIVED';
-
-	const handleUpdateDataToTheCloude = () => {
-		const openOrdersBackup = openOrders;
-		DB_UPDATE_NESTED_VALUE('orders', accessToken, 'open', openOrders).then(res => {
-			if (res) {
-				apiWaitingRef.current = false;
-			} else {
-				apiWaitingRef.current = false;
-				dispatch(setOpenedOrders(openOrdersBackup));
-			}
-		})
 	}
+
+	const nextTableStatus = nextTableStatusMap[tableStatus] || 'RECEIVED'
+	const prevTableStatus = prevTableStatusMap[tableStatus] || 'RECEIVED'
 
 	const handleUpdateData = (callback) => {
 		if (!apiWaitingRef.current) {
@@ -100,52 +87,80 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 	}
 
 	const handleDelete = () => {
-		handleUpdateData(() => {
-			selected.map(selectedID => {
-				const order = orders.filter(order => order.orderData.id === selectedID)[0]
-				DB_DELETE_NESTED_VALUE('customers', order.orderData.user.uid, 'trackedOrder')
-				dispatch(deleteOrder(selectedID))
-			})
+		apiWaitingRef.current = true
+
+		const filteredOpenOrders = openOrders.filter(order => !selected.includes(order.id))
+		saveOpenOrderToTheCloud(filteredOpenOrders, () => dispatch(setOpenedOrders(filteredOpenOrders)))
+	}
+
+	const saveOpenOrderToTheCloud = (data, successCallback, failedCallback) => {
+		DB_UPDATE_NESTED_VALUE('orders', accessToken, 'open', data).then(res => {
+			handleSetSelected([])
+			if (res) {
+				successCallback && successCallback()
+				apiWaitingRef.current = false
+			}
+			failedCallback && failedCallback()
+			apiWaitingRef.current = false
 		})
 	}
 
-	const handleToNext = () => {
-		handleUpdateData(() => dispatch(changeOrderState({ IDs: selected, status: nextTableStatus })))
-	}
+	const handleOrderStage = (stage = 'FORWARD') => {
+		apiWaitingRef.current = true
+		
+		const updatedOpenOrders = openOrders.map(order => {
+			if (selected.includes(order.id)) {
+				return {
+					...order,
+					status: stage === 'FORWARD' ? nextTableStatus : prevTableStatus,
+					statusUpdatedSince: Number(Date.now())
+				}
+			}
+			return order
+		})
 
-	const handleToBack = () => {
-		handleUpdateData(() => dispatch(changeOrderState({ IDs: selected, status: prevTableStatus })))
+		saveOpenOrderToTheCloud(updatedOpenOrders, () => dispatch(setOpenedOrders(updatedOpenOrders)))
+		
 	}
 
 	const handleStore = () => {
-		handleUpdateData(() => {
-			dispatch(storeOrder(selected));
-			dispatch(deleteOrder(selected));
+		apiWaitingRef.current = true
+
+		const completedOrders = openOrders.filter(order => order.status === 'COMPLETED')
+
+		if (!completedOrders.length) {
+			console.log('No completed orders to close')
+			apiWaitingRef.current = false
+			return
+		}
+
+		_updateAnArray('orders', accessToken, 'closed', {
+			timestamp: Number(Date.now()),
+			orders: completedOrders
 		})
+		.then(passed => {
+			if (passed) {
+				const filteredFromCompleted = openOrders.filter(order => !completedOrders.includes(order))
+				saveOpenOrderToTheCloud(filteredFromCompleted, () => dispatch(setOpenedOrders(filteredFromCompleted)))
+			}
+			apiWaitingRef.current = false
+		})
+
 	}
 
 	const handlePrint = useReactToPrint({
 		content: () => componentRef.current,
 	})
 
-	useEffect(() => {
-		ordersLoaded.current && handleUpdateDataToTheCloude()
-		if (openOrders.length) ordersLoaded.current = true
-	}, [openOrders])
-
-	useEffect(() => {
-		_updateAnArray('orders', accessToken, 'closed', closedOrders.at(-1))
-	}, [closedOrders])
-
 	return (
 		<Toolbar>
 			<InvoiceLayer>
 				<div ref={componentRef}>
 					{
-						orders.length > 0 &&
+						selectedOrders.length > 0 &&
 							<Invoice
 								business={business}
-								orders={orders}
+								orders={selectedOrders}
 							/>
 					}
 				</div>
@@ -181,12 +196,12 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 					</Tooltip>
 					<Tooltip title="To Back" sx={{ display: tableStatus === 'RECEIVED' || (tableStatus === 'IN_DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>
 						<IconButton>
-							<ArrowLeftIcon onMouseUp={handleToBack} />
+							<ArrowLeftIcon onMouseUp={() => handleOrderStage('BACKWARD')} />
 						</IconButton>
 					</Tooltip>
 					<Tooltip title="To Next" sx={{ display: tableStatus === 'COMPLETED' || (tableStatus === 'IN_DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>
 						<IconButton>
-							<NextPlanIcon onMouseUp={handleToNext} />
+							<NextPlanIcon onMouseUp={() => handleOrderStage('FORWARD')} />
 						</IconButton>
 					</Tooltip>
 					<Tooltip title="Delete" sx={{ display: tableStatus === 'COMPLETED' || (tableStatus === 'IN_DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>

@@ -1,8 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { setOpenedOrders, newTestOrder } from './rtk/slices/ordersSlice';
-import { resetSavingOrdersTimer, decreaseSavingOrdersTimer, savingOrdersTimerIsLoading } from './rtk/slices/conditionalValuesSlice';
-import DB_GET_DOC from './functions/DB_GET_DOC';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import _updateAnArray from './functions/_updateAnArray';
 import PageTitle from './Component/PageTitle';
 import CustomTabPanel from './Component/CustomTabPanel';
@@ -10,8 +7,6 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -26,16 +21,10 @@ import { GiCook } from "react-icons/gi";
 import { MdDeliveryDining } from "react-icons/md";
 import { IoMdDoneAll } from "react-icons/io";
 
-import { doc, onSnapshot } from "firebase/firestore"
-import { db } from "./firebase.js"
-
 import RecievedOrders from './Component/RecievedOrders';
 import OnGoingOrders from './Component/OnGoingOrders';
 import InDeliveryOrders from './Component/InDeliveryOrders';
 import CompletedOrders from './Component/CompletedOrders';
-import ClosedOrders from './Component/ClosedOrders';
-
-import useDummyOrder from './hooks/useDummyOrder'
 
 const headCells = [
 	{
@@ -98,42 +87,10 @@ const headCellsNoAssign = headCells.filter(cell => cell.id !== 'assign')
 const headCellsForReceived = headCellsNoAssign.filter(cell => cell.id !== 'print')
 
 const Orders = () => {
-	const dummyOrder = useDummyOrder()
-	const dispatch = useDispatch();
 	const [tabValue, setTabValue] = useState(0);
-	const accessToken = useSelector(state => state.user.accessToken);
-	const currentOrdersLength = useSelector(state => state.orders.open?.length);
 	const orders = useSelector(state => state.orders.open);
-	const [isSaving, setIsSaving] = useState(false);
-	const intervalRef = useRef(null);
-	const savingOrdersTimer = useSelector(state => state.conditionalValues.savingOrdersTimer)
 	const business = useSelector(state => state.business)
-	const [innerWidth, setInnerWidth] = useState(window.innerWidth)
-
-	useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setInnerWidth(width);
-    }
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-        window.removeEventListener('resize', handleResize);
-    }
-	}, [])
-
-	useEffect(() => {
-		const docRef = doc(db, 'orders', accessToken);
-
-		const unsub = onSnapshot(docRef, doc => {
-			window.read += 1
-			console.log('Read: ', window.read)
-			if (doc.exists()) {
-				doc.data().open?.length > 0 && dispatch(setOpenedOrders(doc.data().open))
-			}
-		})
-	}, [])
+	const innerWidth = useSelector(state => state.conditionalValues.innerWidth)
 
 	const a11yProps = (index) => {
 		return {
@@ -144,21 +101,15 @@ const Orders = () => {
 			}
 		};
 	}
+
 	const handleChangeTabChange = (event, newValue) => {
 		setTabValue(newValue);
-	};
+	}
 
 	const orderFilter = (filterKey) => {
 		let result = [];
 		orders?.map(order => order?.status === filterKey && result.push(order));
 		return result;
-	}
-
-	const handleAddTestOrder = () => {
-		if (dummyOrder) {
-			_updateAnArray('orders', accessToken, 'open', dummyOrder)
-			dispatch(newTestOrder(dummyOrder))
-		}
 	}
 
 	return (
@@ -188,10 +139,6 @@ const Orders = () => {
 				</Box>
 
 				<Box style={{ width: '100%' }} className='tables-box'>
-
-					{/*<Box sx={{ padding: '10px 10px 0 20px' }}>
-						<Button variant='contained' size='small' onMouseUp={handleAddTestOrder}>Test Order</Button>
-					</Box>*/}
 
 					<CustomTabPanel tabValue={tabValue} index={0}>
 						<RecievedOrders headCells={headCellsForReceived} tableData={orderFilter('RECEIVED')} tableStatus='RECEIVED' />

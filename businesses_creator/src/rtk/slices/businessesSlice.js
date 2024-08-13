@@ -46,6 +46,8 @@ export const businessesSlice = createSlice({
 			  	const userData = {
 						accessToken: payload.accessToken,
 						joinDate: Date.now(),
+						partnerUid: payload.partnerUid,
+						uid: payload.owner.uid,
 						userInfo: {
 							email: payload.owner.contact.email,
 							name: `${payload.owner.basic.fName} ${payload.owner.basic.lName}`,

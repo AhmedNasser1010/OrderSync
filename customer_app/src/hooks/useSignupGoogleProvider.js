@@ -28,9 +28,10 @@ const useSignupGoogleProvider = () => {
         	name: user?.displayName,
         	email: user?.email,
         	phone: '',
-        	refferredBy: '',
+        	referredBy: '',
         	avatar: user?.photoURL,
-          provider: 'Google'
+          provider: 'Google',
+          partnerUid: user?.partnerUid
         })
 
         DB_ADD_DOC('customers', user.uid, createUserData)

@@ -1,5 +1,7 @@
-const customerSchema = ({ uid, name, email, phone, refferredBy, avatar, provider }) => {
+const customerSchema = ({ uid, name, email, phone, referredBy, avatar, provider, partnerUid }) => {
 	return {
+		partnerUid: partnerUid || null,
+		uid: uid,
 		restaurants: [],
 		locations: {
 			home: {
@@ -21,7 +23,7 @@ const customerSchema = ({ uid, name, email, phone, refferredBy, avatar, provider
 		},
 		referral: {
 			successReferred: [],
-			referredBy: refferredBy || '',
+			referredBy: referredBy || '',
 			isFirstOrder: true,
 		},
 	}

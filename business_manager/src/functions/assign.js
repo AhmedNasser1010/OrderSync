@@ -52,7 +52,7 @@ const unAssign = async (driver, order, updatedDriver, currentResOrders, isAddedB
 			}
 		}
 
-		const driverQueue = updatedDriver.queue.filter(qOrder => qOrder.id !== isAddedBeforeOrder.id) || []
+		driverQueue = updatedDriver.queue.filter(qOrder => qOrder.id !== isAddedBeforeOrder.id) || []
 
 		const ordersAfter = currentResOrders.map(resOrder => {
 			if (resOrder.id === order.id) {

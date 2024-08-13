@@ -15,7 +15,8 @@ export const conditionalValuesSlice = createSlice({
       id: '',
       type: ''
     },
-    printedOrders: []
+    printedOrders: [],
+    innerWidth: window.innerWidth
   },
   reducers: {
     enableNavigationBar: (state, { payload }) => {
@@ -51,6 +52,9 @@ export const conditionalValuesSlice = createSlice({
     },
     setPrintedOrders: (state, { payload }) => {
       return { ...state, printedOrders: [...state.printedOrders, payload] }
+    },
+    setInnerWidth: (state, { payload }) => {
+      return { ...state, innerWidth: payload }
     }
   },
 })
@@ -67,7 +71,8 @@ export const {
   setUserRegisterStatus,
   setIsGetAppData,
   setDiscountDialog,
-  setPrintedOrders
+  setPrintedOrders,
+  setInnerWidth
 } = conditionalValuesSlice.actions;
 
 export default conditionalValuesSlice.reducer;

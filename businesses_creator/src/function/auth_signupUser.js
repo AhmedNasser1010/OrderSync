@@ -14,6 +14,7 @@ const auth_signupUser = async (values, onSubmit) => {
 
     const userData = {
       joinDate: Date.now(),
+      uid: userID,
       userInfo: {
         uid: userID,
         email: values.email,

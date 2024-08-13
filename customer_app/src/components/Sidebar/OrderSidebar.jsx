@@ -64,7 +64,7 @@ function OrderSidebar() {
 		let unsubOrder = null
 		let unsubDriver = null
 
-		if (isOrderSidebarOpen && user?.trackedOrder?.id) {
+		if (user?.trackedOrder?.id) {
 
 			const orderRef = doc(db, 'orders', user?.trackedOrder?.restaurant)
 
@@ -73,29 +73,28 @@ function OrderSidebar() {
 				console.log('Read: ', window.read)
 
 				if (doc.exists()) {
-					const orders = doc.data()?.open
+					const orders = doc.data()?.open || []
 
-					if (orders.length > 0) {
-						const order = orders.find(order => order.user.uid === user.userInfo.uid && order.status !== 'COMPLETED') || null
-						
-						if (order) {
-							dispatch(initOrder(order))
+					const order = orders.find(order => order.user.uid === user.userInfo.uid && order.id === user.trackedOrder.id)
 
-							restaurants.map(res => {
-								if (res?.accessToken === user?.trackedOrder?.restaurant) {
-									dispatch(initRes(res))
-									return
-								}
-							})
-						} else {
-							console.log('1: Something wrong happend while trying to tracking your order')
-						}
-
+					if (!order) {
+						handleOrderIsCanceledByRes()
+						unsubOrder()
 						return
 					}
 
-					console.log('2: Something wrong happend while trying to tracking your order')
-					return
+					if (order && order.status === 'COMPLETED') {
+						dispatch(initOrder(order))
+						handleOrderIsCompleted()
+						unsubOrder()
+						return
+					}
+
+					if (order) {
+						dispatch(initOrder(order))
+						handleOrderIsNotCompletedYet()
+						return
+					}
 				}
 			})
 
@@ -120,7 +119,6 @@ function OrderSidebar() {
 
 
 		return () => {
-			unsubOrder && unsubOrder()
 			unsubDriver && unsubDriver()
 		}
 	}, [isOrderSidebarOpen, driverId])
@@ -140,11 +138,23 @@ function OrderSidebar() {
 			console.log('Encountered error while order delete', e)
 		}
 	}
-	const handleOrderEdit = () => {
-		console.log('order edit')
+
+	const handleOrderIsNotCompletedYet = () => {
+		// Update the related res to the order to get order res data if needed
+		restaurants.map(res => {
+			if (res?.accessToken === user?.trackedOrder?.restaurant) {
+				dispatch(initRes(res))
+				return
+			}
+		})
 	}
-	const handleShowResContact = () => {
-		console.log('handleShowResContact')
+
+	const handleOrderIsCompleted = () => {
+		DB_DELETE_NESTED_VALUE('customers', user.userInfo.uid, 'trackedOrder')
+	}
+
+	const handleOrderIsCanceledByRes = () => {
+		DB_DELETE_NESTED_VALUE('customers', user.userInfo.uid, 'trackedOrder')
 	}
 
 	return (
@@ -285,7 +295,7 @@ function OrderSidebar() {
 								<button onMouseUp={handleOrderCancel} className='w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-red-500'>{t('Order Cancel')}</button>	
 							</>
 							:
-							<button onMouseUp={handleShowResContact} className='w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-gray-500'>
+							<button className='w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-gray-500'>
 								{t('Cancellations and modifications')}<br/>
 								{ tracking?.res?.business?.contactNumbers && tracking.res.business.contactNumbers[0].slice(2) }
 							</button>

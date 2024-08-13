@@ -6,7 +6,7 @@ const DB_ADD_DOC = async (collectionName, accessToken, data) => {
     window.write += 1
     console.log('Write: ', window.write)
 
-    await setDoc(doc(db, collectionName, accessToken), {...data})
+    await setDoc(doc(db, collectionName, accessToken), data)
 
     return true
   } catch (error) {

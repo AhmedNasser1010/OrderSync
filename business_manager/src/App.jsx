@@ -2,15 +2,17 @@ import "./style/Normaliz.css"
 import "./style/all.css"
 
 import { useEffect } from "react"
+import { doc, onSnapshot } from "firebase/firestore"
+import { db } from "./firebase.js"
+import { setOpenedOrders } from './rtk/slices/ordersSlice';
 import { Routes, Route, useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from 'react-redux'
-import { setUserRegisterStatus, setIsGetAppData } from './rtk/slices/conditionalValuesSlice'
+import { setUserRegisterStatus, setIsGetAppData, setInnerWidth } from './rtk/slices/conditionalValuesSlice'
 import { addUser } from './rtk/slices/userSlice'
 import { initStaff } from './rtk/slices/staffSlice'
 import { addMenu } from './rtk/slices/menuSlice'
 import { initPartnerServices } from './rtk/slices/partnerServicesSlice'
 import { initBusiness } from './rtk/slices/businessSlice'
-import { setOpenedOrders } from './rtk/slices/ordersSlice'
 import fetchStaff from './functions/fetchStaff'
 import DB_GET_DOC from './functions/DB_GET_DOC'
 import AUTH_ON_CHANGE from './functions/AUTH_ON_CHANGE'
@@ -36,7 +38,8 @@ function App() {
 	const navigate = useNavigate()
 	const saveToCloudBtnStatus = useSelector(state => state.conditionalValues.saveToCloudBtnStatus);
 	const userRegisterStatus = useSelector(state => state.conditionalValues.userRegisterStatus)
-	const navigationBar = useSelector(state => state.conditionalValues.enableNavigationBar)
+	const user = useSelector(state => state.user)
+	const accessToken = user.accessToken
 
 	const handleGetAppData = (userData) => {
 		if (userData) {
@@ -56,9 +59,7 @@ function App() {
 			fetchStaff(accessToken).then(res => dispatch(initStaff(res)))
 			DB_GET_DOC('menus', accessToken).then(res => dispatch(addMenu(res)))
 			DB_GET_DOC('businesses', accessToken).then(res => dispatch(initBusiness(res)))
-
-			// const VITE_PARTNER_ID = import.meta.env.VITE_PARTNER_ID
-			// DB_GET_DOC('users', VITE_PARTNER_ID).then(partner => dispatch(initPartnerServices(partner?.services)))
+			DB_GET_DOC('users', userData.partnerUid).then(partner => partner && userData.partnerUid && dispatch(initPartnerServices(partner?.services)))
 
 			dispatch(setIsGetAppData(false))
 
@@ -94,6 +95,38 @@ function App() {
     userRegisterStatus === 'LOGGED_IN' && navigate('/menu')
   }, [userRegisterStatus])
 
+	useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      dispatch(setInnerWidth(width));
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+        window.removeEventListener('resize', handleResize);
+    }
+	}, [])
+
+	useEffect(() => {
+		let unsub = null
+
+		if (user?.accessToken) {
+			const docRef = doc(db, 'orders', accessToken)
+	
+			unsub = onSnapshot(docRef, doc => {
+				window.read += 1
+				console.log('Read: ', window.read)
+				if (doc.exists()) {
+					dispatch(setOpenedOrders(doc.data().open || []))
+				}
+			})
+		}
+
+		return () => {
+			unsub && unsub()
+		}
+	}, [user])
 
 	return (
 

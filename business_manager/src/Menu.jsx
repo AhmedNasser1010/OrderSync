@@ -52,7 +52,7 @@ const Menu = () => {
 
 	// setup indexed from categories
 	useEffect(() => {
-		setIndexes(prevIndexes => categories.map((item, i) => i + 1));
+		setIndexes(prevIndexes => categories ? categories.map((item, i) => i + 1) : []);
 	}, [menuValues])
 
 	const sensors = useSensors(
@@ -200,7 +200,7 @@ const Menu = () => {
 						disabled={true}
 						// disabled={disableMenuDnD}
 					>
-						{indexes.map((index, i) =>
+						{indexes?.map((index, i) =>
 							<SortableItem key={index} id={index} >
 								<MenuCard item={categories[index - 1]} />
 							</SortableItem>
