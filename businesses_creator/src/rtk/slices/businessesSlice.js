@@ -26,7 +26,11 @@ export const businessesSlice = createSlice({
 	initialState: [],
 	reducers: {
 		deleteBusiness: (state, { payload }) => {
+			const currentBus = state.filter(business => business.accessToken === payload)[0]
 			_deleteDoc("businesses", payload);
+			_deleteDoc("menus", payload);
+			_deleteDoc("orders", payload);
+			_deleteDoc("users", currentBus.owner.uid);
 			return state.filter(business => business.accessToken !== payload);
 		},
 		updateBusiness: (state, { payload }) => {
@@ -57,8 +61,8 @@ export const businessesSlice = createSlice({
 						}
 					}
 			    _addDoc("users", userData, payload.owner.uid)
-			    _addDoc("menus", {items: [], categories: [], accessToken: payload.accessToken}, payload.accessToken)
-			    _addDoc("orders", {open: [], closed: [], accessToken: payload.accessToken}, payload.accessToken)
+			    _addDoc("menus", {partnerUid: payload.partnerUid, items: [], categories: [], accessToken: payload.accessToken}, payload.accessToken)
+			    _addDoc("orders", {partnerUid: payload.partnerUid, open: [], closed: [], accessToken: payload.accessToken}, payload.accessToken)
 					
 			  });
 			return [...state, payload]

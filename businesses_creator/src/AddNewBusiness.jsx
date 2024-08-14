@@ -189,7 +189,7 @@ const AddNewBusiness = () => {
   			setIsSubmited(true);
   			setSubmitColor(undefined);
   			
-  			dispatch(addBusiness({ ...businessValues, partnerUid: user.uid }));
+  			dispatch(addBusiness({ ...businessValues, partnerUid: user.userInfo.uid }));
 				dispatch(pushAccesTokenToTheUser(businessValues.accessToken));
 				navigate("/businesses");
   		})
