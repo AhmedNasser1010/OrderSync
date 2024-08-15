@@ -37,9 +37,9 @@ function Checkout() {
 	}, [currentState])
 
 	useEffect(() => {
-		const isStrictOpen = res?.settings?.siteControl.isStrictOpen
+		const autoAvailability = res?.settings?.siteControl.autoAvailability
 		const openingHours = res?.services?.openingHours
-		if (workingDaysChecker(openingHours, isStrictOpen)) {
+		if (workingDaysChecker(openingHours, autoAvailability)) {
 			cart?.length ? setCurrentState('ON_USER_INFO') : setCurrentState('CART_IS_EMPTY')
 		} else {
 			setCurrentState('NOT_AVAILABLE')

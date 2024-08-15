@@ -111,7 +111,10 @@ const AddNewBusiness = () => {
   	settings: {
   		siteControl: {
   			closeMsg: '',
-  			isStrictOpen: true,
+  			availability: true,
+				autoAvailability: true,
+				isBusy: false,
+				temporaryPause: false
   		},
   		orderManagement: {
   			assign: {

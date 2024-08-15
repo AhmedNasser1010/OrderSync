@@ -24,7 +24,7 @@ function WidgetSwitcherContainer({ checked, handleOnClick, title, description })
 				<Title>{ title }</Title>
 				<Description>{ description }</Description>
 			</Content>
-			<Switcher checked={checked} onMouseUp={handleOnClick} />
+			<Switcher checked={checked} onMouseUp={(e) => handleOnClick(e)} />
 		</Container>
 
 	)

@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
 import styled from 'styled-components'
 
 import WidgetTitle from './WidgetTitle'
-import WidgetSwitcherContainer from './WidgetSwitcherContainer'
+import WidgetOption from './WidgetOption'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Android12Switch from '../theme/mui/Android12Switch'
 
 const Container = styled.div`
 
@@ -24,32 +25,68 @@ const TextArea = styled.textarea`
 	}
 `
 
-
 function ShopControl({ values, handleSetSiteControl }) {
 
-	const handleToggleIsStrictOpen = _ => handleSetSiteControl({...values, isStrictOpen: !values.isStrictOpen})
+	const handleSiteControl = (e) => {
+		const type = e.target.type
+		const name = e.target.name
+		const value = type === 'checkbox' ? e.target.checked : e.target.value
 
-	const handleTextAreaChange = e => handleSetSiteControl({...values, closeMsg: e.target.value})
+		console.log('type', type)
+		console.log('name', name)
+		console.log('value', value)
+
+		handleSetSiteControl({...values, [name]: value})
+		console.log('values', values)
+	}
 
 	return (
 
 		<Container>
 			<WidgetTitle
-				title='Site Control'
-				description='Control the website if there is maintenance'
+				title='Restaurant Control'
+				description='Control the restaurant availability.'
 			/>
-			<WidgetSwitcherContainer
-				checked={values?.isStrictOpen}
-				handleOnClick={handleToggleIsStrictOpen}
-				title='Website Control'
-				description='Open/Close website and type the reason'
-			/>
+			
+			<WidgetOption
+				title='Auto Availability Mode'
+				description='Enable or disable auto availability based on your daily working hours.'
+			>
+				<FormControlLabel
+					control={<Android12Switch onChange={handleSiteControl} name='autoAvailability' checked={values?.autoAvailability} />}
+				/>
+			</WidgetOption>
+			<WidgetOption
+				title='Restaurant Availability Control'
+				description='Open and close the restaurant'
+				disabled={values?.autoAvailability}
+			>
+				<FormControlLabel
+					control={<Android12Switch onChange={handleSiteControl} name='availability' checked={values?.availability} disabled={values?.autoAvailability} />}
+				/>
+			</WidgetOption>
+			<WidgetOption
+				title='Busy Status'
+				description='Notify users that you are currently busy.'
+			>
+				<FormControlLabel
+					control={<Android12Switch onChange={handleSiteControl} name='isBusy' checked={values?.isBusy} />}
+				/>
+			</WidgetOption>
+			<div className='border-t-2 my-5'></div>
+			<WidgetOption
+				title='Temporary Pause'
+				description='Temporary pause with the pause message.'
+			>
+				<FormControlLabel
+					control={<Android12Switch onChange={handleSiteControl} name='temporaryPause' checked={values?.temporaryPause} />}
+				/>
+			</WidgetOption>
 			<TextArea
-				name="close-message"
-				id="close-message"
-				onChange={handleTextAreaChange}
+				onChange={handleSiteControl}
 				value={values?.closeMsg}
 				placeholder='Close Message Content'
+				name='closeMsg'
 			/>
 		</Container>
 

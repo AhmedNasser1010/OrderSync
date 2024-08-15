@@ -28,7 +28,7 @@ const getBusinessInfo = async (req, res, next) => {
         },
         settings: {
           siteControl: {
-            isStrictOpen: data.settings.siteControl.isStrictOpen,
+            availability: data.settings.siteControl.availability,
             closeMsg: data.settings.siteControl.closeMsg
           }
         }
