@@ -12,6 +12,12 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AutorenewSharpIcon from '@mui/icons-material/AutorenewSharp';
 import ErrorOutlineSharpIcon from '@mui/icons-material/ErrorOutlineSharp';
 import Switch from '@mui/material/Switch';
+import TextField from '@mui/material/TextField'
+import InputAdornment from '@mui/material/InputAdornment'
+import { PiSubtitles } from "react-icons/pi"
+import { IoIosAlbums } from "react-icons/io"
+import { FaIcons } from "react-icons/fa6"
+import TableTitle from './Component/TableTitle'
 
 import useLogout from './hooks/useLogout'
 
@@ -93,17 +99,11 @@ function Settings() {
 	const businessSettings = useSelector(state => state.business?.settings)
 	const settingsSaveToCloude = useSelector(state => state.conditionalValues.settingsSaveToCloude);
 	const [saveBtnStyles, setSaveBtnStyles] = useState({})
-	const [businessValuesSnapshot, setBusinessValuesSnapshot] = useState(business)
-	const [siteControl, setSiteControl] = useState({})
+	const [siteControl, setSiteControl] = useState(business.settings.siteControl)
 	const [orderManagement, setOrderManagement] = useState(business.settings.orderManagement)
+	const [businessInfo, setBusinessInfo] = useState(business.business)
 
 	const handleSetSiteControl = data => setSiteControl(data)
-
-	// initail values
-	useEffect(() => {
-		setSiteControl(businessSettings?.siteControl)
-		setBusinessValuesSnapshot(business)
-	}, [businessSettings, business])
 
 	useEffect(() => {
 		handleSettingsBtnStart()
@@ -119,10 +119,13 @@ function Settings() {
 			if (orderManagement) {
 				if (JSON.stringify(orderManagement) !== JSON.stringify(business.settings.orderManagement)) thereIsChanges = true
 			}
+			if (businessInfo) {
+				if (JSON.stringify(businessInfo) !== JSON.stringify(business.business)) thereIsChanges = true
+			}
 		}
 
 		thereIsChanges ? dispatch(setSettingsSaveToCloudeStatus('ON_CHANGES')) : dispatch(setSettingsSaveToCloudeStatus('ON_SAVED'))
-	}, [business, siteControl, orderManagement])
+	}, [business, siteControl, orderManagement, businessInfo])
 
 	const handleSettingsBtnStart = () => {
 		switch (settingsSaveToCloude) {
@@ -169,6 +172,10 @@ function Settings() {
 
 			const finalChanges = {
 				...business,
+				business: {
+					...business.business,
+					...businessInfo
+				},
 				settings: {
 					...business.settings,
 					siteControl: siteControl,
@@ -194,20 +201,99 @@ function Settings() {
 		setOrderManagement(orderManagement => {return { ...orderManagement, assign: { ...orderManagement.assign, [name]: value} } })
 	}
 
+	const handleDisplayChange = (e) => {
+		const value = e.target.value
+		const name = e.target.name
+
+		setBusinessInfo(businessInfo => {
+			return {
+				...businessInfo,
+				[name]: value
+			}
+		})
+	}
+
 	return (
 
 		<Page>
 			<PageTitle>Settings</PageTitle>
-			<Button
-				sx={{ marginBottom: '10px', fontSize: '11px', transition: '0.3s' }}
-				onMouseUp={handleSettingsBtnSave}
-				{...saveBtnStyles}
-			>
-				{ saveBtnStyles?.label }
-			</Button>
+			<TableTitle
+				title='Settings'
+				titleBody='Save settings.'
+				buttons={[
+					<Button
+						sx={{ marginBottom: '10px', fontSize: '11px', transition: '0.3s' }}
+						onMouseUp={handleSettingsBtnSave}
+						size='small'
+						{...saveBtnStyles}
+					>
+						{ saveBtnStyles?.label }
+					</Button>
+				]}
+			/>
 			<Widgets>
 				<Widget>
 					<ShopControl values={siteControl} handleSetSiteControl={handleSetSiteControl} />
+				</Widget>
+				<Widget>
+					<WidgetTitle
+						title="Restaurant Display Settings"
+						description="Manage your restaurant's icon, cover, and promotional subtitles."
+					/>
+					<TextField
+						className='!mb-5'
+						id="promotional-subtitle"
+						label="Promotional Subtitle"
+						variant="outlined"
+						fullWidth
+						name='promotionalSubtitle'
+						defaultValue={business?.business?.promotionalSubtitle}
+						value={businessInfo?.promotionalSubtitle}
+						onChange={handleDisplayChange}
+						InputProps={{
+							startAdornment: (
+								<InputAdornment position="start">
+									<PiSubtitles className='text-2xl' />
+								</InputAdornment>
+							),
+						}}
+					/>
+					<TextField
+						className='!mb-5'
+						id="icon-link"
+						label="Icon Link"
+						variant="outlined"
+						fullWidth
+						name='icon'
+						defaultValue={business?.business?.icon}
+						value={businessInfo?.icon}
+						onChange={handleDisplayChange}
+						InputProps={{
+							startAdornment: (
+								<InputAdornment position="start">
+									<FaIcons className='text-xl' />
+								</InputAdornment>
+							),
+						}}
+					/>
+					<TextField
+						className='!mb-5'
+						id="cover-link"
+						label="Cover Link"
+						variant="outlined"
+						fullWidth
+						name='cover'
+						defaultValue={business?.business?.cover}
+						value={businessInfo?.cover}
+						onChange={handleDisplayChange}
+						InputProps={{
+							startAdornment: (
+								<InputAdornment position="start">
+									<IoIosAlbums className='text-xl' />
+								</InputAdornment>
+							),
+						}}
+					/>
 				</Widget>
 				<Widget>
 					<WidgetTitle

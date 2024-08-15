@@ -6,6 +6,7 @@ import { store } from './rtk/store'
 import { Provider } from 'react-redux'
 
 // styles
+import './style/index.css'
 import './style/sideBar.css'
 import './style/keyframs.css'
 import "./style/mediaSM.css"

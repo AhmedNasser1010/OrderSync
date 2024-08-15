@@ -127,7 +127,8 @@ const AddNewBusiness = () => {
 			address: '',
 			latlng: ['', ''],
 			cover: '',
-			icon: ''
+			icon: '',
+			promotionalSubtitle: '',
 		},
 		owner: {
 			basic: {

@@ -24,7 +24,7 @@ const ActionBtns = styled.div`
 `
 const Action = styled(Button)``
 
-function TableTitle({ title, titleBody, actions }) {
+function TableTitle({ title, titleBody, actions, buttons }) {
 	return (
 
 		<Parent>
@@ -47,6 +47,9 @@ function TableTitle({ title, titleBody, actions }) {
 							{ action.title }
 						</Action>
 					))
+				}
+				{
+					buttons?.map(btn => btn)
 				}
 			</ActionBtns>
 		</Parent>
