@@ -7,7 +7,7 @@ import SEO from '../../components/SEO'
 import useRestaurantMenu from '../../hooks/useRestaurantMenu'
 import RestaurantCategory from './RestaurantCategory'
 import RestaurantInfo from './RestaurantInfo'
-import ShimmerMenu from "../../components/Shimmer/ShimmerMenu"
+import ShimmerMenu from '../../components/Shimmer/ShimmerMenu'
 
 const RestaurantMenu = () => {
   const { t } = useTranslation()
@@ -15,11 +15,11 @@ const RestaurantMenu = () => {
   const lang = i18n?.language || 'ar'
   const { resId } = useParams()
   const resMenu = useRestaurantMenu()
-  const restaurants = useSelector(state => state.restaurants)
-  const menu = useSelector(state => state.menu)
-  
+  const restaurants = useSelector((state) => state.restaurants)
+  const menu = useSelector((state) => state.menu)
+
   const res = useMemo(() => {
-    return restaurants.filter(res => res.business.name === resId.split('-').join(' '))[0]
+    return restaurants.filter((res) => res.business.name === resId.split('-').join(' '))[0]
   }, [resId, restaurants])
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const RestaurantMenu = () => {
     id: resId,
     img: res?.business?.cover,
     place: t('El-Ayat'),
-    description: res?.business?.description,
+    description: res?.business?.description
   }
 
   const resMainInfo = {
@@ -43,51 +43,73 @@ const RestaurantMenu = () => {
     avgRating: '4.5',
     totalRatingsString: t('500+ ratings'),
     feeDetails: 'fee fee',
-    description: res?.business?.description,
+    description: res?.business?.description
   }
 
-  if (menu && !menu.categories.length || res.accessToken !== menu.accessToken) {
+  if ((menu && !menu.categories.length) || res.accessToken !== menu.accessToken) {
     return <ShimmerMenu />
   } else {
     const hash = window.location.hash
-    const el = hash && document.querySelector(hash) || null // null !!
+    const el = (hash && document.querySelector(hash)) || null // null !!
     el && el && el.scrollIntoView()
   }
 
   return (
     <div className="mx-auto mt-24 mb-10 2xl:w-1/2 md:w-4/5 sm:px-7 px-2">
       <SEO
-				title={` زاجل ايتس | ${ResInfoData.name}`}
-				description={`${ResInfoData.name} - نفسك في أكل من مطعم معين؟ اطلب أكلك المفضل من أقرب مطعم ليك في مصر مع زاجل إيتس. جعان اطلب أكلك دلوقتي واستمتع!`}
-			/>
-      <>
-        <RestaurantInfo resMainInfo={resMainInfo} />
-        <hr className='border-1 border-dashed border-b-[#d3d3d3] my-4'></hr>
+        title={` زاجل ايتس | ${ResInfoData.name}`}
+        description={`${ResInfoData.name} - نفسك في أكل من مطعم معين؟ اطلب أكلك المفضل من أقرب مطعم ليك في مصر مع زاجل إيتس. جعان اطلب أكلك دلوقتي واستمتع!`}
+      />
+      <RestaurantInfo resMainInfo={resMainInfo} />
+      <hr className="border-1 border-dashed border-b-[#d3d3d3] my-4"></hr>
+      {(!res?.settings?.siteControl?.availability && (
+        <p className="w-fit mx-auto px-3 py-1 rounded-full text-base font-medium bg-red-100 text-red-800">
+          {t(
+            'This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding.'
+          )}
+        </p>
+      )) ||
+        (res?.settings?.siteControl?.isBusy && (
+          <p className="w-fit mx-auto px-3 py-1 rounded-full text-base font-medium bg-yellow-100 text-yellow-800">
+            {t('This restaurant is currently busy, so your order may take longer than usual.')}
+          </p>
+        )) ||
+        (res?.settings?.siteControl?.temporaryPause && (
+          <p className="w-fit mx-auto px-3 py-1 rounded-full text-base font-medium bg-gray-100 text-gray-800">
+            {t(
+              "This restaurant is temporarily paused, so we can't take any orders at the moment. We apologize for the inconvenience."
+            )}
+          </p>
+        ))}
 
-        {
-          true ?
-            <ul className="main-menu-container">
-              {
-                menu?.categories?.map((category, i) => (
-
-                  <li key={category?.id} className='cursor-pointer' id={`category-${i+1} ${category.id}`}>
-                    <RestaurantCategory
-                      id={category?.id}
-                      resId={res?.accessToken}
-                      title={category?.title}
-                      ResInfoData={ResInfoData}
-                    />
-                  </li>
-
-                ))
-              }
-            </ul>
-            :
-            <h2 className="resMsg font-ProximaNovaMed text-sm">{t("Uh-oh! The outlet is not accepting orders at the moment. We're working to get them back online")}</h2>
-        }
-
-      </>
-
+      {true ? (
+        <ul className="main-menu-container">
+          {menu?.categories?.map((category, i) => (
+            <li
+              key={category?.id}
+              className="cursor-pointer"
+              id={`category-${i + 1} ${category.id}`}>
+              <RestaurantCategory
+                id={category?.id}
+                resId={res?.accessToken}
+                title={category?.title}
+                ResInfoData={ResInfoData}
+                resAvailability={{
+                  availability: res?.settings?.siteControl?.availability,
+                  temporaryPause: res?.settings?.siteControl?.temporaryPause,
+                  isBusy: res?.settings?.siteControl?.isBusy
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <h2 className="resMsg font-ProximaNovaMed text-sm">
+          {t(
+            "Uh-oh! The outlet is not accepting orders at the moment. We're working to get them back online"
+          )}
+        </h2>
+      )}
     </div>
   )
 }

@@ -98,5 +98,16 @@
   "NO": "لا",
   "YES, START AFRESH": "أيوة، نبدأ من جديد",
   "Location": "الموقع",
-  "Zajil Eats": "زاجل ايتس"
+  "Zajil Eats": "زاجل ايتس",
+  "Online": "متاح",
+  "Offline": "مغلق",
+  "Busy": "مشغول",
+  "Paused": "مغلق مؤقت",
+  "This restaurant is currently busy, so your order may take longer than usual.": "المطعم مشغول دلوقتي، فممكن الطلب بتاعك ياخد وقت أطول من المعتاد.",
+  "This restaurant is temporarily paused, so we can't take any orders at the moment. We apologize for the inconvenience.": "المطعم موقوف مؤقتاً، فمش قادرين نستقبل طلبات دلوقتي. نعتذر عن الإزعاج.",
+  "This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding.": "المطعم ده مغلق حالياً أو خارج أوقات العمل. من فضلك شوفنا تاني في أوقات العمل العادية. شكراً لتفهمك.",
+  "Restaurant Is Closed": "المطعم مغلق حاليا",
+  "Restaurant Is Paused": "المطعم مغلق مؤقت",
+  "All Restaurants": "جميع المطاعم",
+  "Close": "أغلاق"
 }

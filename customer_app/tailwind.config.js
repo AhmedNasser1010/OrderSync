@@ -32,6 +32,7 @@ export default {
       "ProximaNovaBold": ["ProximaNova Condensed Bold"],
       "ProximaNovaBlack": ["ProximaNova Condensed Black"],
       "Beiruti": ["Beiruti"],
+      "Cairo": '"Cairo", sans-serif'
     }
   },
   plugins: [

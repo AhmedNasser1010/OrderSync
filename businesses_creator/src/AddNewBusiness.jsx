@@ -128,10 +128,11 @@ const AddNewBusiness = () => {
 			nameInAr: '',
 			industry: '',
 			address: '',
-			latlng: ['', ''],
+			latlng: [0, 0],
 			cover: '',
 			icon: '',
 			promotionalSubtitle: '',
+			cuisines: ['Pizza', 'Krib', 'Shawrma']
 		},
 		owner: {
 			basic: {
@@ -157,7 +158,7 @@ const AddNewBusiness = () => {
 				friday: {start: '', end: ''},
 				saturday: {start: '', end: ''},
 			},
-			cookTime: [10000, 20000],
+			cookTime: [60000, 1200000],
 			paymentMethods: {
 				cash: true,
 			},

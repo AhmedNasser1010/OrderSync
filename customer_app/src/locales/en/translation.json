@@ -99,5 +99,16 @@
   "NO": "NO",
   "YES, START AFRESH": "YES, START AFRESH",
   "Location": "Location",
-  "Zajil Eats": "Zajil Eats"
+  "Zajil Eats": "Zajil Eats",
+  "Online": "Online",
+  "Offline": "Offline",
+  "Busy": "Busy",
+  "Paused": "Paused",
+  "This restaurant is currently busy, so your order may take longer than usual.": "This restaurant is currently busy, so your order may take longer than usual.",
+  "This restaurant is temporarily paused, so we can't take any orders at the moment. We apologize for the inconvenience.": "This restaurant is temporarily paused, so we can't take any orders at the moment. We apologize for the inconvenience.",
+  "This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding.": "This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding.",
+  "Restaurant Is Closed": "Restaurant Is Closed",
+  "Restaurant Is Paused": "Restaurant Is Paused",
+  "All Restaurants": "All Restaurants",
+  "Close": "Close"
 }
