@@ -35,6 +35,7 @@ const initialValues = {
 const NewWorkerForm = ({ handleDialogOpenClose }) => {
 	const dispatch = useDispatch()
 	const accessToken = useSelector(state => state.user.accessToken)
+	const partnerUid = useSelector(state => state.user.partnerUid)
 	const [isDisabled, setIsDisabled] = useState(false)
 	const business = useSelector(state => state.business)
 
@@ -58,7 +59,7 @@ const NewWorkerForm = ({ handleDialogOpenClose }) => {
 			validationSchema={validationSchema}
 			onSubmit={values => {
 				setIsDisabled(true)
-				const data = workerSchema({ ...values, accessToken })
+				const data = workerSchema({ ...values, accessToken, partnerUid })
 				_addDoc('drivers', data, values.uid)
 				.then(res => {
 					if (res) {

@@ -3,26 +3,26 @@ const { GET_DOC } = require('./FIRESTORE/DB_CONTROLLERS.js')
 const { store, setState, setValue } = require('../store.js')
 const { db } = require("../config/firebase")
 const { doc, onSnapshot, collection, query, where, getDocs } = require("firebase/firestore")
+const loginUser = require('./loginUser.js')
+const askQuestion = require('./askQuestion.js')
 
 async function onStartApp() {
 	try {
-		console.log('Starting...')
 		setState('user')
 		setState('restaurants')
 		setState('drivers')
+
+		const email = await askQuestion('Enter your email: ', 'testBusinessCreator@gmail.com')
+		const password = await askQuestion('Enter your password: ', '123456')
+
+		const userCredential = await loginUser(email, password)
+		const userID = userCredential.uid
 		
-		const user = await GET_DOC('users', process.env.USER_ID)
-		.then(res => {
-			if (res) {
-				setValue('user', res)
-				return res
-			}
-			return null
-		})
-		.catch(e => {
-			console.error('Error while app start get users data: ', e)
-			return null
-		})
+		console.clear()
+		console.log('Starting...')
+
+		const user = await GET_DOC('users', userID)
+		setValue('user', user || undefined)
 
 		const businessIDs = user.data.businesses
   	const q = query(collection(db, "businesses"), where("accessToken", "in", businessIDs))

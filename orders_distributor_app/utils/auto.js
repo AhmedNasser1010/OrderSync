@@ -2,7 +2,6 @@ const { doc, onSnapshot, collection, query, where } = require("firebase/firestor
 const { db } = require("../config/firebase")
 const { store, setState, setValue, setSubscribe } = require('../store.js')
 const getInDeliveryOrders = require('./getInDeliveryOrders')
-const getDrivers = require('./getDrivers')
 const filteredAvailableDrivers = require('./filteredAvailableDrivers')
 const getBelongingRes = require('./getBelongingRes')
 const findDriversWithinDistance = require('./findDriversWithinDistance')
@@ -16,6 +15,7 @@ const getAboutToDone = require('./getAboutToDone')
 const assign = require('./assign')
 const assignLog = require('./assignLog')
 const { debuggingMode } = require('../constants.js')
+const getGlobalDrivers = require('../commands/get/getGlobalDrivers.js')
 
 let unsubscribe = null
 
@@ -31,8 +31,17 @@ async function auto(status) {
 function on() {
   console.log(Date.now())
   setState('orders')
-  const businessIDs = store.user.values.data.businesses
-  const q = query(collection(db, "orders"), where("accessToken", "in", businessIDs))
+
+  const restaurants = store.restaurants.values
+  const restaurantsIDs = store.user.values.data.businesses
+  const businessIDsWithTrueAssign = restaurantsIDs.filter(resID => {
+    const restaurant = restaurants.find(res => res.accessToken === resID)
+    if (!restaurant.settings.orderManagement.assign.forDeliveryWorkers) {
+      return resID
+    }
+  })
+  const q = query(collection(db, "orders"), where("accessToken", "in", businessIDsWithTrueAssign))
+
 
   unsubscribe = onSnapshot(q, (querySnapshot) => {
     let finalAllOrders = []
@@ -77,7 +86,8 @@ setSubscribe(async (store) => {
 
 
     // Phase 2: Get all drivers
-    const drivers = await getDrivers()
+    const drivers = await getGlobalDrivers()
+    console.log('drivers', drivers)
     if (!drivers.length) return
 
     // Phase 3: Get the online drivers

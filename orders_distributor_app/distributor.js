@@ -18,6 +18,16 @@ const get = require('./commands/get/main.js')
 const storeMapping = require('./commands/storeMapping/main.js')
 const due = require('./commands/due/main.js')
 
+setState('rl')
+setValue('rl', readline.createInterface({
+	input: process.stdin,
+	output: process.stdout,
+}))
+
+store.rl.values.on("line", input => {
+	processInput(input)
+})
+
 onStartApp()
 
 function processInput(input) {
@@ -63,13 +73,3 @@ function processInput(input) {
 			unknownCommand(input)
 	}
 }
-
-setState('rl')
-setValue('rl', readline.createInterface({
-	input: process.stdin,
-	output: process.stdout,
-}))
-
-store.rl.values.on("line", input => {
-	processInput(input)
-})

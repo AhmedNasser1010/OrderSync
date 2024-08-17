@@ -7,7 +7,7 @@ function driverSchema(data) {
 		uid,
 		joinDate: Date.now(),
 		ordersDues: 0,
-		partnerId: store.user.values.userInfo.uid,
+		partnerUid: store.user.values.userInfo.uid,
 		online: {
 			byManager: true,
 			byUser: false

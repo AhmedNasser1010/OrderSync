@@ -1,8 +1,9 @@
 const workerSchema = (data) => {
-	const { accessToken, email, name, phone, role, uid } = data
+	const { partnerUid, accessToken, email, name, phone, role, uid } = data
 
 	return {
 		accessToken,
+		partnerUid,
 		joinDate: Date.now(),
 		trackingFeature: role === 'DRIVER' ? true : false,
 		ordersDues: 0,
@@ -14,7 +15,6 @@ const workerSchema = (data) => {
 		queue: [],
 		sync: 'LOCAL',
 		uid,
-		partnerId: import.meta.env.VITE_PARTNER_ID,
 		userInfo: {
 			email,
 			name,
