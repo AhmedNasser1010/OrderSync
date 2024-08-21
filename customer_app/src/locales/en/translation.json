@@ -110,5 +110,9 @@
   "Restaurant Is Closed": "Restaurant Is Closed",
   "Restaurant Is Paused": "Restaurant Is Paused",
   "All Restaurants": "All Restaurants",
-  "Close": "Close"
+  "Close": "Close",
+  "Add": "Add",
+  "Small": "Small",
+  "Medium": "Medium",
+  "Large": "Large"
 }

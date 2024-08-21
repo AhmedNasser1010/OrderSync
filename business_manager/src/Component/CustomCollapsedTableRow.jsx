@@ -27,17 +27,17 @@ const collapsHeadCells = [
 	{
 		id: 'index',
 		numeric: false,
-		label: '',
-	},
-	{
-		id: 'itemId',
-		numeric: false,
-		label: 'ID',
+		label: '#',
 	},
 	{
 		id: 'name',
 		numeric: false,
 		label: 'Name',
+	},
+	{
+		id: 'size',
+		numeric: false,
+		label: 'Size',
 	},
 	{
 		id: 'amount',
@@ -75,11 +75,15 @@ const CustomCollapsedTableRow = ({ isOpen, row }) => {
 		let items = []
 		menuItems?.map(menuItem => {
 			cart?.map(cartItem => {
-				if (menuItem.id === cartItem.id) items = [...items, {...menuItem, quantity: cartItem.quantity}]
+				if (menuItem.id === cartItem.id) items = [...items, {...menuItem, ...cartItem}]
 			})
 		})
 		setCart(items)
 	}, [])
+
+	const itemPrice = (item) => {
+		return item.sizes.find(s => s.size === item.selectedSize)?.price ?? item.price
+	}
 
 	return (
 
@@ -113,12 +117,12 @@ const CustomCollapsedTableRow = ({ isOpen, row }) => {
       				cart.map((cartItem, i) => (
       					<TableRow key={cartItem.id}>
       						<TableCell padding='none'>{ i+1 }</TableCell>
-      						<TableCell padding='none'>{ cartItem.id }</TableCell>
       						<TableCell padding='none'>{ cartItem.title }</TableCell>
+      						<TableCell padding='none'>{ cartItem.selectedSize }</TableCell>
       						<TableCell padding='none'>{ cartItem.quantity }</TableCell>
-      						<TableCell padding='none'>{ cartItem.price }LE</TableCell>
-      						{ !cartItem.discount && <TableCell padding='none'>{ cartItem.price * cartItem.quantity }LE</TableCell> }
-      						{ cartItem.discount && <TableCell padding='none'><span style={{ color: 'red' }}>{ cartItem.price * cartItem.quantity }</span> <span style={{ color: 'green' }}>{ priceAfterDiscount(cartItem.price, cartItem.discount.code) * cartItem.quantity }LE</span></TableCell> }
+      						<TableCell padding='none'>{ itemPrice(cartItem) }LE</TableCell>
+      						{ !cartItem.discountCode && <TableCell padding='none'>{ itemPrice(cartItem) * cartItem.quantity }LE</TableCell> }
+      						{ cartItem.discountCode && <TableCell padding='none'><span style={{ color: 'red' }}>{ itemPrice(cartItem) * cartItem.quantity }</span> <span style={{ color: 'green' }}>{ priceAfterDiscount(itemPrice(cartItem), cartItem.discountCode) * cartItem.quantity }LE</span></TableCell> }
       					</TableRow>
       				))
       			}

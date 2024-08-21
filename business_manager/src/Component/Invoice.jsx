@@ -68,7 +68,6 @@ const QrTitle = styled.h3`
 
 function Invoice({ business, orders }) {
 	return (
-
 		<>
 			{
 				orders.map(order => (
@@ -109,6 +108,7 @@ function Invoice({ business, orders }) {
 							>
 								<tr style={{ boxShadow: 'rgba(27, 31, 35, 0.15) 0px 1.8px 0px 0px' }}>
 									<td style={{ width: '200px', padding: '10px 0 15px 10px' }}>Item</td>
+									<td>Size</td>
 									<td>Qty</td>
 									<td>Price</td>
 								</tr>
@@ -118,13 +118,15 @@ function Invoice({ business, orders }) {
 									order.selectedMenuItems.map(item => (
 										<tr style={{ boxShadow: 'rgba(27, 31, 35, 0.15) 0px 1.8px 0px 0px' }}>
 											<td style={{ width: '200px', padding: '10px 0 15px 10px' }}>{ item.title }</td>
+											<td>{ item?.selectedSize ? item?.sizes?.find(s => s.size === item?.selectedSize)?.size : null }</td>
 											<td>{ item.quantity }</td>
-											<td>{ item.price }</td>
+											<td>{ item?.selectedSize ? item?.sizes?.find(s => s.size === item?.selectedSize)?.price : item.price }</td>
 										</tr>
 									))
 								}
 								<tr style={{ boxShadow: 'rgba(27, 31, 35, 0.15) 0px 1.8px 0px 0px' }}>
 									<td style={{ width: '200px', padding: '10px 0 15px 10px' }}>Delivery Fees</td>
+									<td></td>
 									<td></td>
 									<td>{ order.orderData.deliveryFees }</td>
 								</tr>
@@ -135,14 +137,16 @@ function Invoice({ business, orders }) {
 								<tr>
 									<td style={{ width: '200px', padding: '10px 0 15px 10px' }}>Total</td>
 									<td></td>
-									<td>{ order.price.total+order.orderData.deliveryFees }LE</td>
+									<td></td>
+									<td>{ order.orderData.cartTotalPrice.total }LE</td>
 								</tr>
 								{
-									order.price.totalDiscounted !== order.price.total &&
+									order.orderData.cartTotalPrice.discount !== order.orderData.cartTotalPrice.total &&
 										<tr>
 											<td style={{ width: '200px', padding: '10px 0 15px 10px' }}>Discounted To</td>
 											<td></td>
-											<td>{ order.price.totalDiscounted+order.orderData.deliveryFees }LE</td>
+											<td></td>
+											<td>{ order.orderData.cartTotalPrice.discount }LE</td>
 										</tr>
 								}
 							</tfoot>

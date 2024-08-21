@@ -44,21 +44,12 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 	  return ordersMap?.map(order => {
 	    const selectedMenuItems = order.cart.map(cartItem => {
 	      const menuItem = menu.find(menuItem => menuItem.id === cartItem.id)
-	      return menuItem ? { ...menuItem, quantity: cartItem.quantity } : null
+	      return menuItem ? { ...menuItem, ...cartItem } : null
 	    }).filter(item => item !== null)
-
-	    const totalPrice = selectedMenuItems.reduce((totals, item) => {
-			  const itemTotal = parseFloat(item.price) * item.quantity
-			  return {
-			    total: totals.total + itemTotal,
-			    totalDiscounted: item?.discount?.code ? totals.totalDiscounted + priceAfterDiscount(parseFloat(item.price), item.discount.code) * item.quantity : totals.totalDiscounted + itemTotal
-			  }
-			}, { total: order.deliveryFees, totalDiscounted: order.deliveryFees })
 
 	    return {
 	      selectedMenuItems,
-	      orderData: order,
-	      price: totalPrice
+	      orderData: order
 	    }
 	  })
 	}, [menu, selected])

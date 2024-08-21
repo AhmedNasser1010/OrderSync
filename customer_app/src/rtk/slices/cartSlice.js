@@ -16,7 +16,7 @@ export const cartSlice = createSlice({
 		},
 		quantityHandle: (state, { payload }) => {
 			state.items = state.items.reduce((acc, item) => {
-				if (item.id === payload.id) {
+				if (item.id === payload.id && item.selectedSize === payload.selectedSize) {
 					if (payload.quantity === "+") {
 						acc.push({ ...item, quantity: item.quantity + 1 });
 					} else if (payload.quantity === "-") {
@@ -37,9 +37,6 @@ export const cartSlice = createSlice({
 					duration: 1500,
 				})
 			}
-		},
-		deleteFromCart: (state, { payload }) => {
-			state.items = state.items.filter((item) => item.id !== payload);
 		},
 		setRestaurant: (state, { payload }) => {
 			state.restaurant = payload;
@@ -67,7 +64,6 @@ export const {
 	clearCart,
 	addToCart,
 	quantityHandle,
-	deleteFromCart,
 	setRestaurant,
 	handleAddDiscount
 } = cartSlice.actions;

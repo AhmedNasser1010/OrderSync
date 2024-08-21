@@ -43,21 +43,12 @@ const CustomTableRow = ({ row = [], selected, index, handleSetSelected, tableSta
 
 	  const selectedMenuItems = order.cart.map(cartItem => {
 	    const menuItem = menu.find(menuItem => menuItem.id === cartItem.id)
-	    return menuItem ? { ...menuItem, quantity: cartItem.quantity } : null
+	    return menuItem ? { ...menuItem, ...cartItem } : null
 	  }).filter(item => item !== null)
-
-	  const totalPrice = selectedMenuItems.reduce((total, item) => {
-	    const itemPrice = parseFloat(item.price) * item.quantity
-	    return {
-	      total: total.total + itemPrice,
-	      totalDiscounted: item.discount?.code ? total.totalDiscounted : total.totalDiscounted + itemPrice
-	    };
-	  }, { total: 0, totalDiscounted: 0 })
 
 	  return {
 	    selectedMenuItems,
 	    orderData: order,
-	    price: totalPrice
 	  };
 	}, [orders, row])
 

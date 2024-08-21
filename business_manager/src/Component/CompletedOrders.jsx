@@ -6,6 +6,7 @@ import Stack from '@mui/material/Stack';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import Box from '@mui/material/Box';
+import TimestampToHM from './TimestampToHM'
 
 const headCells = [
 	{
@@ -90,7 +91,7 @@ const CompletedOrders = ({ headCells, tableData, tableStatus }) => {
 		// cart process
 		let cartNameArr = [];
 		cartItems.map(item => cartNameArr.push(item.title));
-		const order = cartNameArr.join(', ');
+		const order = cartNameArr.join(', ').substring(0, 50) + (cartNameArr.join(', ').length > 50 ? '...' : '');
 
 		// total process
 		let total
@@ -105,37 +106,15 @@ const CompletedOrders = ({ headCells, tableData, tableStatus }) => {
 			)
 		}
 
-		// timestemp process
-		const currentTimestamp = Date.now();
-		const timeDifference = currentTimestamp - timestamp;
-
-		const minutes = Math.floor(timeDifference / (1000 * 60));
-		const hours = Math.floor(minutes / 60);
-
-		const remainingMinutes = minutes % 60;
-
-		let ago = '';
-		if (hours > 0) {
-			ago += `${hours}h, `;
-		}
-		if (remainingMinutes > 0 || ago === '') {
-			ago += `${remainingMinutes}m`;
-		}
+		// timestamp process
+		let ago = <TimestampToHM timestamp={timestamp} />
 
 		return { id, name, order, ago, total };
 	}
 
 	// process incoming data to data rows
 	useEffect(() => {
-		let updateDataInter = null
-		updateDataInter && clearInterval(updateDataInter)
-
 		setProcessRows(tableData?.map(order => createData(order.id, order.user, order.cart, order.timestamp, order.deliveryFees, order.cartTotalPrice)))
-		updateDataInter = setInterval(() => setProcessRows(tableData?.map(order => createData(order.id, order.user, order.cart, order.timestamp, order.deliveryFees, order.cartTotalPrice))), 60000)
-
-		return () => {
-		 updateDataInter && clearInterval(updateDataInter)
-		}
 	}, [tableData, menuItems])
 
 	return (

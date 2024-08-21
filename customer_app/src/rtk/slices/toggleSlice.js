@@ -6,7 +6,10 @@ const toggleSlice = createSlice({
     isLocationSidebarOpen: false,
     isLoginSidebarOpen: false,
     isOrderSidebarOpen: false,
-    lng: 'ar'
+    lng: 'ar',
+    showItemsAlreadyInCartPopup: false,
+    showResClosedPopup: false,
+    showResPausedPopup: false,
   },
   reducers: {
     toggleLocationSidebar: (state) => {
@@ -21,6 +24,20 @@ const toggleSlice = createSlice({
     toggleLng: (state, { payload }) => {
       state.lng = payload
     },
+    setShowItemsAlreadyInCartPopup: (state, { payload }) => {
+      state.showItemsAlreadyInCartPopup = payload === undefined ? !state.showItemsAlreadyInCartPopup : payload
+    },
+    setShowResClosedPopup: (state, { payload }) => {
+      state.showResClosedPopup = payload === undefined ? !state.showResClosedPopup : payload
+    },
+    setShowResPausedPopup: (state, { payload }) => {
+      state.showResPausedPopup = payload === undefined ? !state.showResPausedPopup : payload
+    },
+    resetPopupStates: (state) => {
+      state.showItemsAlreadyInCartPopup = false
+      state.showResClosedPopup = false
+      state.showResPausedPopup = false
+    },
   },
 })
 
@@ -28,6 +45,10 @@ export const {
   toggleLocationSidebar,
   toggleLoginSidebar,
   toggleOrderSidebar,
-  toggleLng
+  toggleLng,
+  setShowItemsAlreadyInCartPopup,
+  setShowResClosedPopup,
+  setShowResPausedPopup,
+  resetPopupStates
 } = toggleSlice.actions
 export default toggleSlice.reducer

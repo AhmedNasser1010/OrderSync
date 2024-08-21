@@ -109,5 +109,9 @@
   "Restaurant Is Closed": "المطعم مغلق حاليا",
   "Restaurant Is Paused": "المطعم مغلق مؤقت",
   "All Restaurants": "جميع المطاعم",
-  "Close": "أغلاق"
+  "Close": "أغلاق",
+  "Add": "أضف",
+  "Small": "صغير",
+  "Medium": "وسط",
+  "Large": "كبير"
 }

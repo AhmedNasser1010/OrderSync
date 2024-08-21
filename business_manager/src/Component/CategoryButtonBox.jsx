@@ -27,6 +27,7 @@ const CategoryButtonBox = ({ hovered, handleExpanded, expanded, item }) => {
 		opacity: hovered ? '100%' : '0',
 		transition: '0.3s',
 		padding: '5px',
+		fontSize: '30px'
 	};
 
 	return (

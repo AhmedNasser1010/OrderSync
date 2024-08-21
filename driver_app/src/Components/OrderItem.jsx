@@ -8,8 +8,8 @@ const Item = styled.div`
 	justify-content: space-between;
 `
 const Image = styled.img`
-	width: 120px;
-	border-radius: 30px;
+	width: 80px;
+	border-radius: 8px;
 `
 const Content = styled.div`
 	width: 100%;
@@ -23,14 +23,20 @@ const Content = styled.div`
 	}
 `
 
+const Title = styled.h4`
+	font-size: large !important;
+  font-weight: normal;
+`
+
 function OrderItem({ orderItem }) {
+	console.log(orderItem)
 	return (
 
 		<Item>
 			<Image src={orderItem.backgrounds[0]} alt="item image" />
 			<Content>
-				<h4>{ orderItem.title }</h4>
-				<span className='quantity'>X{ orderItem.quantity }</span>
+				<Title>{ orderItem.title }</Title>
+				<span className='quantity'>X{ orderItem.quantity }{ orderItem?.selectedSize && ` | Size: ${orderItem.sizes.find(s => s.size === orderItem.selectedSize)?.size}`}</span>
 			</Content>
 		</Item>
 

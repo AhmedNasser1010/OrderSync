@@ -29,6 +29,7 @@ const MenuNestedCard = ({ item }) => {
 		opacity: hovered ? '100%' : '0',
 		transition: '0.3s',
 		padding: '5px',
+		fontSize: '30px',
 	};
 
 	const handleDialogOpen = () => {
@@ -77,7 +78,7 @@ const MenuNestedCard = ({ item }) => {
 			<Stack direction='row' alignItems="center" justifyContent="space-between">
 
 				<Stack direction='row' spacing={1} alignItems="center" justifyContent="space-between">
-					<DragIndicatorIcon sx={{ color: '#454545', opacity: hovered ? '100%' : '0', transition: '0.3s', fontSize: '16px' }} />
+					<DragIndicatorIcon sx={{ color: '#454545', opacity: hovered ? '100%' : '0', transition: '0.3s', fontSize: '24px' }} />
 					<MenuNestedCardInfoBox item={item} hovered={hovered} />
 				</Stack>
 
@@ -92,7 +93,7 @@ const MenuNestedCard = ({ item }) => {
 						categoryOrItem='item'
 					/>
 
-					<ModeIcon sx={{...buttonStyles, transform: hovered ? 'translateY(0)' : 'translateY(5px)', fontSize: '16px'}} onMouseUp={handleDialogOpen} />
+					<ModeIcon sx={{...buttonStyles, transform: hovered ? 'translateY(0)' : 'translateY(5px)', fontSize: '30px'}} onMouseUp={handleDialogOpen} />
 					<AddNewItemDialog
 						dialogVisibility={dialogVisibility}
 						handleDialogClose={handleDialogClose}

@@ -17,6 +17,20 @@ export const menuSlice = createSlice({
         items: [],
         categories: []
       }
+    },
+    selectItemSize: (state, { payload }) => {
+      return {
+        ...state,
+        items: state.items.map((item) => {
+          if (item.id === payload.id) {
+            return {
+              ...item,
+              selectedSize: payload.selectedSize
+            }
+          }
+          return item
+        })
+      }
     }
   },
 })
@@ -24,7 +38,8 @@ export const menuSlice = createSlice({
 
 export const {
   initMenu,
-  clearMenu
+  clearMenu,
+  selectItemSize
 } = menuSlice.actions;
 
 export default menuSlice.reducer;

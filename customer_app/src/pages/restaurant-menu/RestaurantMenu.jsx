@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useMemo, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
@@ -8,8 +8,11 @@ import useRestaurantMenu from '../../hooks/useRestaurantMenu'
 import RestaurantCategory from './RestaurantCategory'
 import RestaurantInfo from './RestaurantInfo'
 import ShimmerMenu from '../../components/Shimmer/ShimmerMenu'
+import MenuPopups from './MenuPopups'
+import { resetPopupStates } from '../../rtk/slices/toggleSlice'
 
 const RestaurantMenu = () => {
+  const dispatch = useDispatch()
   const { t } = useTranslation()
   const { i18n } = useTranslation()
   const lang = i18n?.language || 'ar'
@@ -21,29 +24,24 @@ const RestaurantMenu = () => {
   const res = useMemo(() => {
     return restaurants.filter((res) => res.business.name === resId.split('-').join(' '))[0]
   }, [resId, restaurants])
+  const resName = lang === 'ar' ? res?.business?.nameInAr : res?.business?.name
 
   useEffect(() => {
     res?.accessToken && resMenu(res.accessToken)
   }, [res])
 
-  const ResInfoData = {
-    name: lang === 'ar' ? res?.business?.nameInAr : res?.business?.name,
-    id: resId,
-    img: res?.business?.cover,
-    place: t('El-Ayat'),
-    description: res?.business?.description
-  }
+  useEffect(() => {
+    dispatch(resetPopupStates())
+  }, [])
 
   const resMainInfo = {
     city: t('El-Ayat'),
     name: lang === 'ar' ? res?.business?.nameInAr : res?.business?.name,
-    cuisines: ['Pizza', 'Krib', 'Shawrma'],
+    cuisines: res?.business?.cuisines,
     areaName: t('El-Ayat'),
-    sla: '30-45 ' + t('min'),
+    sla: `${res?.services?.cookTime[0] / 60000}-${res?.services?.cookTime[1] / 60000} ${t('min')}`,
     avgRating: '4.5',
-    totalRatingsString: t('500+ ratings'),
-    feeDetails: 'fee fee',
-    description: res?.business?.description
+    totalRatingsString: t('500+ ratings')
   }
 
   if ((menu && !menu.categories.length) || res.accessToken !== menu.accessToken) {
@@ -57,8 +55,8 @@ const RestaurantMenu = () => {
   return (
     <div className="mx-auto mt-24 mb-10 2xl:w-1/2 md:w-4/5 sm:px-7 px-2">
       <SEO
-        title={` زاجل ايتس | ${ResInfoData.name}`}
-        description={`${ResInfoData.name} - نفسك في أكل من مطعم معين؟ اطلب أكلك المفضل من أقرب مطعم ليك في مصر مع زاجل إيتس. جعان اطلب أكلك دلوقتي واستمتع!`}
+        title={` زاجل ايتس | ${resName}`}
+        description={`${resName} - نفسك في أكل من مطعم معين؟ اطلب أكلك المفضل من أقرب مطعم ليك في مصر مع زاجل إيتس. جعان اطلب أكلك دلوقتي واستمتع!`}
       />
       <RestaurantInfo resMainInfo={resMainInfo} />
       <hr className="border-1 border-dashed border-b-[#d3d3d3] my-4"></hr>
@@ -90,10 +88,9 @@ const RestaurantMenu = () => {
               className="cursor-pointer"
               id={`category-${i + 1} ${category.id}`}>
               <RestaurantCategory
-                id={category?.id}
-                resId={res?.accessToken}
-                title={category?.title}
-                ResInfoData={ResInfoData}
+                categoryID={category?.id}
+                categoryTitle={category?.title}
+                resID={res?.accessToken}
                 resAvailability={{
                   availability: res?.settings?.siteControl?.availability,
                   temporaryPause: res?.settings?.siteControl?.temporaryPause,
@@ -110,6 +107,8 @@ const RestaurantMenu = () => {
           )}
         </h2>
       )}
+
+      <MenuPopups />
     </div>
   )
 }

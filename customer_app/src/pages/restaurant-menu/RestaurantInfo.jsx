@@ -11,8 +11,7 @@ const RestaurantInfo = ({ resMainInfo }) => {
     areaName,
     sla,
     avgRating,
-    totalRatingsString,
-    feeDetails,
+    totalRatingsString
   } = resMainInfo
 
   return (
@@ -44,7 +43,7 @@ const RestaurantInfo = ({ resMainInfo }) => {
                   d="m1 9 4-4-4-4"
                 />
               </svg>
-              <span className="ms-1 text-xs font-medium">{t(city)}</span>
+              <Link to='/' className="ms-1 text-xs font-medium">{city}</Link>
             </div>
           </li>
           <li aria-current="page">
@@ -82,7 +81,7 @@ const RestaurantInfo = ({ resMainInfo }) => {
               {cuisines?.join(", ")}
             </p>
             <p className="text-color-8 text-xs font-ProximaNovaThin">
-              {areaName}, {sla?.lastMileTravelString}
+              {areaName}, {sla}
             </p>
           </div>
           {avgRating && (
@@ -101,19 +100,6 @@ const RestaurantInfo = ({ resMainInfo }) => {
             </div>
           )}
         </div>
-
-        {feeDetails?.message && (
-          <div className="flex justify-start items-center gap-2 text-color-8 mt-3 mb-5">
-            <img
-              src={`https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_18,h_18/${feeDetails?.icon}`}
-              alt="icon"
-            />
-            <p
-              className="2xl:flex-1 text-sm font-ProximaNovaThin sm:w-1/2"
-              dangerouslySetInnerHTML={{ __html: feeDetails?.message }}
-            />
-          </div>
-        )}
       </div>
     </>
   );

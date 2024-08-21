@@ -10,7 +10,7 @@
 
 	/* Start Side Bar	*/
 	.side-bar {
-		width: calc(100% - 80px);
+		width: 100%;
 	  height: auto;
 	  padding: 15px 40px;
 	  display: flex;

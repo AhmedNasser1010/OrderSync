@@ -58,7 +58,7 @@ function Order() {
 					const filteredMenu = order.cart.map(cartItem => {
 						const menuItem = menus.find(menuItem => menuItem.id === cartItem.id)
 						if (menuItem) {
-							return { ...menuItem, quantity: cartItem.quantity }
+							return { ...menuItem, ...cartItem }
 						}
 						return null;
 					}).filter(item => item !== null)
