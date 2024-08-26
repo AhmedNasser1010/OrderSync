@@ -1,6 +1,6 @@
 {
-  "name": "Zajil Eats",
-  "short_name": "Zajil Eats",
+  "name": "Zajil Manager",
+  "short_name": "Zajil Manager",
   "description": "Food Delivery Online From Your Favorit Local Restaurants",
   "start_url": "/",
   "display": "standalone",
