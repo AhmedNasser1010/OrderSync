@@ -24,7 +24,7 @@ function SideBar() {
 	return (
 
 		<div className="side-bar">
-			<Link to="/" className="logo">Merro<br/>Restaurant</Link>
+			<Link to="/" className="logo">Zajil<br/>Manager</Link>
 			<IoIosClose
 				className='exit-menu'
 				onMouseUp={handleCloseMenu}
