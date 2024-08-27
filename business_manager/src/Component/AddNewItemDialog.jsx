@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { object, string, array, boolean, number } from "yup";
 import { Formik, Form, Field } from "formik";
 import fromKebabToTitle from "../functions/fromKebabToTitle";
@@ -35,6 +35,12 @@ const validationSchema = object({
   visibility: boolean(),
 });
 
+const initialSizesValues = [
+  { size: "S", price: "" },
+  { size: "M", price: "" },
+  { size: "L", price: "" },
+];
+
 const AddNewItemDialog = ({
   dialogVisibility,
   handleDialogClose,
@@ -44,15 +50,22 @@ const AddNewItemDialog = ({
   const categories = useSelector((state) => state.menu.categories);
   const [enabledSized, setEnabledSized] = useState(false);
 
+  useEffect(() => {
+    initialValues?.sizes?.length ? setEnabledSized(true) : setEnabledSized(false);
+  }, [initialValues])
+
   const handleEnableSizes = () => {
     setEnabledSized((enabledSized) => !enabledSized);
   };
 
   const handleSubmit = (values) => {
+    const { sizes, ...valuesWithoutSizes } = values;
+    const valuesAfterSizes = enabledSized ? values : valuesWithoutSizes;
+
     // Update or new item
-    initialValues.title === ""
-      ? dispatch(addItem(values))
-      : dispatch(updateItem({ initialValues, values }));
+    initialValues.title
+      ? dispatch(updateItem(valuesAfterSizes))
+      : dispatch(addItem(valuesAfterSizes));
 
     // After save
     dispatch(setSaveToCloudBtnStatus("ON_CHANGES"));
@@ -75,7 +88,12 @@ const AddNewItemDialog = ({
       </DialogTitle>
 
       <Formik
-        initialValues={initialValues}
+        initialValues={{
+          ...initialValues,
+          sizes: initialValues?.sizes?.length
+            ? initialValues?.sizes
+            : initialSizesValues,
+        }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
@@ -135,7 +153,7 @@ const AddNewItemDialog = ({
                 fullWidth
               />
 
-              {enabledSized && values.sizes.length && (
+              {enabledSized && (
                 <Stack
                   direction="row"
                   spacing={1}

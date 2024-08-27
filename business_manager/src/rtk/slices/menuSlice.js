@@ -62,11 +62,10 @@ export const menuSlice = createSlice({
         ...state,
         items: [
           ...state.items.map(item => {
-            if (item.title !== payload.initialValues.title) {
-              return item;
-            } else {
-              return payload.values;
+            if (item.id === payload.id) {
+              return payload;
             }
+            return item
           }),
         ],
       }
