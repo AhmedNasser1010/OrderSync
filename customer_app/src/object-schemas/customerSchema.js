@@ -1,6 +1,6 @@
-const customerSchema = ({ uid, name, email, phone, referredBy, avatar, provider, partnerUid }) => {
+const customerSchema = ({ uid, name, email, phone, referredBy, avatar, provider }) => {
 	return {
-		partnerUid: partnerUid || null,
+		partnerUid: import.meta.env.VITE_PARTNER_ID || null,
 		uid: uid,
 		restaurants: [],
 		locations: {

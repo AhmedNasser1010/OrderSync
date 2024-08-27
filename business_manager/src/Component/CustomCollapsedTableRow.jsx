@@ -141,7 +141,7 @@ const CustomCollapsedTableRow = ({ isOpen, row }) => {
 			  		<span>Phone: </span><span>{fullOrderDetails?.user?.phone}</span>
 			  	</MoreDetailsItem>
 			  	<MoreDetailsItem>
-			  		<span>Comment: </span><span>{fullOrderDetails?.user?.comment}</span>
+			  		<span>Comment: </span><span>{fullOrderDetails?.comment}</span>
 			  	</MoreDetailsItem>
 			  	<MoreDetailsItem>
 			  		<span>Payment: </span><span>{fullOrderDetails?.payment?.method}</span>

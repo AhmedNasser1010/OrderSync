@@ -226,3 +226,11 @@ body[dir="ltr"] {
     left: 0;
     right: auto;
 }
+
+.error-placeholder::placeholder {
+    color: #EF4444;
+}
+
+.warning-placeholder::placeholder {
+    color: #F59E0B;
+}

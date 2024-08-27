@@ -30,6 +30,48 @@ const userSlice = createSlice({
 						address: payload
 					}
 				}
+			},
+			updateUserName: (state, { payload }) => {
+				return {
+					...state,
+					userInfo: {
+						...state.userInfo,
+						name: payload
+					}
+				}
+			},
+			updateUserPhone: (state, { payload }) => {
+				return {
+					...state,
+					userInfo: {
+						...state.userInfo,
+						phone: payload
+					}
+				}
+			},
+			updateUserAddress: (state, { payload }) => {
+				return {
+					...state,
+					locations: {
+						...state.locations,
+						home: {
+							...state.locations.home,
+							address: payload
+						}
+					}
+				}
+			},
+			updateUserLocation: (state, { payload }) => {
+				return {
+					...state,
+					locations: {
+						...state.locations,
+						home: {
+							...state.locations.home,
+							latlng: payload
+						}
+					}
+				}
 			}
 		}
 })
@@ -39,5 +81,9 @@ export const {
 	initUser,
 	clearUser,
 	addUserHomeLocation,
-	addUserAddress
+	addUserAddress,
+	updateUserName,
+	updateUserPhone,
+	updateUserAddress,
+	updateUserLocation
 } = userSlice.actions

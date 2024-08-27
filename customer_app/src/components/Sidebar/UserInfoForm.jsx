@@ -79,8 +79,6 @@ function UserInfoForm({ setExpandUserInfo }) {
 					<FormContainer>
 						<Field className={`w-full p-5 border border-gray-300 ${errors.name && 'text-red-500'}`} {...InputWrapperProps('name', t('Name'), errors, touched)} />
 						<Field className={`w-full p-5 border border-gray-300 border-t-0 ${errors.phone && 'text-red-500'}`} {...InputWrapperProps('phone', t('Primary Phone Number'), errors, touched)} />
-						<Field className={`w-full p-5 border border-gray-300 border-t-0 mb-5 ${errors.secondPhone && 'text-red-500'}`} {...InputWrapperProps('secondPhone', t('Second Phone Number'), errors, touched)} />
-						<button type='submit' className='w-full bg-color-2 py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer'>{t('Save')}</button>
 					</FormContainer>
 				)}
 			</Formik>

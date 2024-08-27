@@ -44,8 +44,9 @@ const PlaceItemBtn = ({ item, resAvailability, resID }) => {
     const isItemInCart = cartItems.some(
       (cartItem) =>
         cartItem?.id === menuItem?.id &&
-        cartItem?.selectedSize === menuItem?.selectedSize?.size
+        (cartItem?.selectedSize === null || cartItem?.selectedSize === menuItem?.selectedSize?.size)
     )
+
     const isSameRes = currentResId === '' ? true : resID === currentResId
 
     if (isItemInCart) {

@@ -48,10 +48,12 @@ const validationSchema = Yup.object().shape({
       latlng: Yup.array()
         .of(Yup.number().required())
         .length(2, 'User location is required')
+        .test('is-not-zero', 'User location is required', (location) => location[0] !== 0 || location[1] !== 0)
         .required('User location is required'),
       address: Yup.string().required('Address is required')
     })
     .required('Location information is required'),
+
   payment: Yup.object()
     .shape({
       method: Yup.string()
@@ -387,7 +389,8 @@ const Cart = () => {
 
         if (
           err.errors.includes('location.latlng[0] is a required field') ||
-          err.errors.includes('location.latlng[1] is a required field')
+          err.errors.includes('location.latlng[1] is a required field') ||
+          err.errors.includes('User location is required')
         ) {
           toast.error(t('Location is required'))
           dispatch(toggleLoginSidebar())
