@@ -7,7 +7,7 @@ const useItemInfo = (item, resID) => {
   const dispatch = useDispatch()
   const user = useSelector((state) => state.user)
   const [selectedSize, setSelectedSize] = useState(item?.selectedSize?.size || null)
-  const [itemPrice, setItemPrice] = useState(item.sizes.find((s) => s.size === selectedSize)?.price || item.price)
+  const [itemPrice, setItemPrice] = useState(item?.sizes?.find((s) => s.size === selectedSize)?.price || item.price)
   const [afterDiscount, setAfterDiscount] = useState(item?.discount?.code
     ? priceAfterDiscount(itemPrice, item.discount, user, resID)
     : { finalPrice: itemPrice, isAvailableForUser: false })

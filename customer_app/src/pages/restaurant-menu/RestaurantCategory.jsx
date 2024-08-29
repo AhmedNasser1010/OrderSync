@@ -12,7 +12,7 @@ const RestaurantCategory = ({ categoryID, resID, categoryTitle, resAvailability 
     const menu = menuItems.filter((item) => item.category === categoryID)
     return menu.map(item => ({
       ...item,
-      selectedSize: item?.sizes?.length && item?.sizes[1]?.price && item?.sizes[1] || item?.sizes[0]?.price && item?.sizes[0] || item?.sizes[2]?.price && item?.sizes[2] || null
+      selectedSize: item?.sizes?.length && item?.sizes?.[0]?.price && item?.sizes?.[0] || null
     }))
   }, [menuItems])
 

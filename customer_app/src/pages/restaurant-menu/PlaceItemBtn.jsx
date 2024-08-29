@@ -35,9 +35,9 @@ const PlaceItemBtn = ({ item, resAvailability, resID }) => {
       ...itemFromCart,
       selectedSize:
         itemFromCart?.selectedSize ||
-        (item?.sizes?.length && item?.sizes[1]?.price && item?.sizes[1]) ||
-        (item?.sizes[0]?.price && item?.sizes[0]) ||
-        (item?.sizes[2]?.price && item?.sizes[2]) ||
+        (item?.sizes?.length > 0 && item?.sizes[1]?.price && item?.sizes[1]) ||
+        (item?.sizes?.length > 0 && item?.sizes[0]?.price && item?.sizes[0]) ||
+        (item?.sizes?.length > 0 && item?.sizes[2]?.price && item?.sizes[2]) ||
         null
     }
 
