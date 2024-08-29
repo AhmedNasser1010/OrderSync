@@ -9,6 +9,7 @@ import userSlice from './slices/userSlice.js'
 import restaurantsSlice from './slices/restaurantsSlice.js'
 import trackingSlice from './slices/trackingSlice.js'
 import servicesSlice from './slices/servicesSlice.js'
+import filterSlice from './slices/filterSlice.js'
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ export const store = configureStore({
     user: userSlice,
     restaurants: restaurantsSlice,
     tracking: trackingSlice,
-    services: servicesSlice
+    services: servicesSlice,
+    filter: filterSlice
   }
 })

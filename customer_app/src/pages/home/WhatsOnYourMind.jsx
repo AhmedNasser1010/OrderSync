@@ -1,28 +1,33 @@
 import useLanguageDirection from "../../hooks/useLanguageDirection"
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from "react-redux"
+import { addFilter, clearAll } from '../../rtk/slices/filterSlice'
 
 const categories = [
-	{ id: 'q', img: 'https://i.imgur.com/Ypbkc4l.jpg' },
-	{ id: 'w', img: 'https://i.imgur.com/Xd34D3D.jpg' },
-	{ id: 'e', img: 'https://i.imgur.com/1ZxFxkX.jpg' },
-	{ id: 'r', img: 'https://i.imgur.com/avMww3r.jpg' },
-	{ id: 't', img: 'https://i.imgur.com/jh2GEIS.jpg' },
-	{ id: 'y', img: 'https://i.imgur.com/33wsV9i.jpg' },
-	{ id: 'u', img: 'https://i.imgur.com/PkR4mjh.jpg' },
-	{ id: 'i', img: 'https://i.imgur.com/veh9zMN.jpg' },
-	{ id: 'o', img: 'https://i.imgur.com/Q8Qajm5.jpg' },
-	{ id: 'p', img: 'https://i.imgur.com/y44eLlr.jpg' },
-	{ id: 'a', img: 'https://i.imgur.com/GAGkIbU.jpg' },
-	{ id: 's', img: 'https://i.imgur.com/Ocs6A7S.jpg' },
-	{ id: 'd', img: 'https://i.imgur.com/bepcz3w.jpg' },
-	{ id: 'f', img: 'https://i.imgur.com/zdkh5F2.jpg' },
-	{ id: 'g', img: 'https://i.imgur.com/TqUnqXs.jpg' },
-	{ id: 'h', img: 'https://i.imgur.com/RGGte8i.jpg' },
-	{ id: 'j', img: 'https://i.imgur.com/n3BkHzP.jpg' },
-	{ id: 'k', img: 'https://i.imgur.com/EQRWaeS.jpg' },
+	// { id: 'q', img: 'https://i.imgur.com/Ypbkc4l.jpg' },
+	// { id: 'w', img: 'https://i.imgur.com/Xd34D3D.jpg' },
+	// { id: 'e', img: 'https://i.imgur.com/1ZxFxkX.jpg' },
+	{ id: 'italian-pizza', img: 'https://i.imgur.com/avMww3r.jpg' },
+	{ id: 'sandwiches', img: 'https://i.imgur.com/jh2GEIS.jpg' },
+	// { id: 'y', img: 'https://i.imgur.com/33wsV9i.jpg' },
+	// { id: 'u', img: 'https://i.imgur.com/PkR4mjh.jpg' },
+	// { id: 'i', img: 'https://i.imgur.com/veh9zMN.jpg' },
+	// { id: 'o', img: 'https://i.imgur.com/Q8Qajm5.jpg' },
+	{ id: 'pasta', img: 'https://i.imgur.com/y44eLlr.jpg' },
+	// { id: 'a', img: 'https://i.imgur.com/GAGkIbU.jpg' },
+	// { id: 's', img: 'https://i.imgur.com/Ocs6A7S.jpg' },
+	// { id: 'd', img: 'https://i.imgur.com/bepcz3w.jpg' },
+	// { id: 'f', img: 'https://i.imgur.com/zdkh5F2.jpg' },
+	// { id: 'g', img: 'https://i.imgur.com/TqUnqXs.jpg' },
+	// { id: 'shawarma', img: 'https://i.imgur.com/RGGte8i.jpg' },
+	// { id: 'burger', img: 'https://i.imgur.com/n3BkHzP.jpg' },
+	// { id: 'k', img: 'https://i.imgur.com/EQRWaeS.jpg' },
 ]
 
+const allTags = ['italian-pizza', 'sandwiches', 'pasta']
+
 function WhatsOnYourMind() {
+	const dispatch = useDispatch()
 	const direction = useLanguageDirection()
 	const { t } = useTranslation()
 
@@ -34,6 +39,12 @@ function WhatsOnYourMind() {
 	const handleFoodScrollRight = () => {
 		const foodCategory = document.querySelector(".food-category");
 		foodCategory.scrollLeft = foodCategory.scrollLeft + 250;
+	}
+
+	const handleTriggerFilter = (tag) => {
+		dispatch(clearAll())
+		dispatch(addFilter(tag))
+		document.getElementById('restaurants')?.scrollIntoView({ behavior: 'smooth' })
 	}
 
 	return (
@@ -52,7 +63,7 @@ function WhatsOnYourMind() {
 				<div className="flex gap-6">
 					{
 						categories?.map((category) => (
-							<div className='cursor-pointer' key={category?.id}>
+							<div className='cursor-pointer' key={category?.id} onMouseUp={() => handleTriggerFilter(category.id)}>
 								<div className='w-36'>
 									<img src={category?.img} alt='category' />
 								</div>
