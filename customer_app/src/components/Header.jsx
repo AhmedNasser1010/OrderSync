@@ -105,7 +105,7 @@ const Header = () => {
               <img
                 src={LOGO_URL}
                 alt="logo"
-                className="md:h-14 h-12 rounded-full border border-black"
+                className="md:h-14 h-12"
               />
             </Link>
             <Link to=".">
