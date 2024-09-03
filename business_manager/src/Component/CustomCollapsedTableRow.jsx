@@ -82,7 +82,7 @@ const CustomCollapsedTableRow = ({ isOpen, row }) => {
 	}, [])
 
 	const itemPrice = (item) => {
-		return item.sizes.find(s => s.size === item.selectedSize)?.price ?? item.price
+		return item?.sizes?.find(s => s.size === item.selectedSize)?.price ?? item.price
 	}
 
 	return (
