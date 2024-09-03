@@ -26,6 +26,7 @@ self.addEventListener('install', (event) => {
 				'/index.html', 
 				'/main.js', 
 				'/styles.css', 
+				'/icon.png',
 				// Add more files as needed 
 			]); 
 		}) 

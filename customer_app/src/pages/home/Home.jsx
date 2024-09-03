@@ -14,8 +14,8 @@ const Home = () => {
 	return (
 		<div className="container mx-auto mt-24 mb-10 px-2 sm:px-10 overflow-x-hidden">
 			<SEO
-				title='زاجل ايتس'
-				description='اطلب أكل لذيذ أونلاين من مطاعمك المحلية المفضلة مع زاجل إيتس. توصيل أكل سريع وموثوق لحد بابك.'
+				title='زاكس ايتس'
+				description='اطلب أكل لذيذ أونلاين من مطاعمك المحلية المفضلة مع زاكس إيتس. توصيل أكل سريع وموثوق لحد بابك.'
 			/>
 				
 			<WhatsOnYourMind />

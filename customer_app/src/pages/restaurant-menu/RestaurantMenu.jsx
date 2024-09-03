@@ -55,7 +55,7 @@ const RestaurantMenu = () => {
   return (
     <div className="mx-auto mt-24 mb-10 2xl:w-1/2 md:w-4/5 sm:px-7 px-2">
       <SEO
-        title={` زاجل ايتس | ${resName}`}
+        title={` زاكس ايتس | ${resName}`}
         description={`${resName} - نفسك في أكل من مطعم معين؟ اطلب أكلك المفضل من أقرب مطعم ليك في مصر مع زاجل إيتس. جعان اطلب أكلك دلوقتي واستمتع!`}
       />
       <RestaurantInfo resMainInfo={resMainInfo} />
