@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import styled from 'styled-components'
-import { HiOutlineDotsVertical } from "react-icons/hi";
+import { HiOutlineDotsVertical } from "react-icons/hi"
 import { GoDotFill, GoDot } from "react-icons/go"
 import Typography from '@mui/material/Typography'
 import useOnlineStatus from './hooks/useOnlineStatus'
 import Menu from './Components/Menu'
+import { MdOutlineLocationOff } from "react-icons/md"
 
 const StyledHeader = styled.div`
 	padding: 15px 20px;
@@ -29,6 +30,7 @@ function Header() {
 	const navigate = useNavigate()
 	const isOnline = useOnlineStatus()
 	const user = useSelector(state => state.user)
+	const geoLocationErr = useSelector(state => state.conditionalValues.geoLocationErr)
 	const [pageTitle, setPageTitle] = useState("Home")
 	const [onClickPath, setOnClickPath] = useState(null)
 	const [enableOptionsMenu, setEnableOptionsMenu] = useState(false)
@@ -94,6 +96,9 @@ function Header() {
         { pageTitle }
       </Typography>
 			<Icons>
+				{geoLocationErr &&
+					<MdOutlineLocationOff style={{ fontSize: 'large', fill: '#F59E0B' }} />
+				}
 				{
 					isOnline ?
 					<GoDotFill style={{ fill: user.online.byUser && user.online.byManager && isOnline ? '#4caf50' : '#ff5722' }} />
