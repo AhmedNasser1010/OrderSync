@@ -114,7 +114,7 @@ function App() {
 		if (user?.accessToken) {
 			const docRef = doc(db, 'orders', accessToken)
 	
-			unsub = onSnapshot(docRef, doc => {
+			onSnapshot(docRef, doc => {
 				window.read += 1
 				console.log('Read: ', window.read)
 				if (doc.exists()) {
