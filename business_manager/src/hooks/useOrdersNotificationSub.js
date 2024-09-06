@@ -8,12 +8,12 @@ const useOrdersNotificationSub = () => {
 
   useEffect(() => {
     orders?.map((order) => {
-      if (order?.status === "RECEIVED") {
+      if (order?.status === "RECEIVED" && menuItems.length && orders.length) {
         const menuItem = order.cart.map((cart) =>
           menuItems.find((item) => item.id === cart.id)
         );
 
-        const cartItems = menuItem.map((item) => item.title);
+        const cartItems = menuItem.map((item) => item?.title);
 
         const nMsg = `*
 رقم الاوردر: ${order?.id.split("-")[0]}
