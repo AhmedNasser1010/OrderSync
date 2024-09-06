@@ -5,6 +5,7 @@ const useAskForPwa = () => {
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
+      console.log('Trigger handleBeforeInstallPrompt')
       e.preventDefault();
       setDeferredPrompt(e);
     };
@@ -17,6 +18,7 @@ const useAskForPwa = () => {
   }, []);
 
   const askForPwa = () => {
+    console.log('deferredPrompt, ', deferredPrompt)
     if (deferredPrompt) {
       console.log('Install PWA Prompt')
       deferredPrompt.prompt();
