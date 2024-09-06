@@ -111,8 +111,6 @@ function App() {
 	}, [])
 
 	useEffect(() => {
-		let unsub = null
-
 		if (user?.accessToken) {
 			const docRef = doc(db, 'orders', accessToken)
 	
@@ -123,10 +121,6 @@ function App() {
 					dispatch(setOpenedOrders(doc.data().open || []))
 				}
 			})
-		}
-
-		return () => {
-			unsub && unsub()
 		}
 	}, [user])
 
