@@ -31,3 +31,5 @@ root.render(
 
 window.read = 0
 window.write = 0
+
+navigator.serviceWorker.register('sw.js')

@@ -9,12 +9,18 @@ function askNotificationPermission() {
 const pushNotification = (data) => {
 	Notification.permission !== "granted" && askNotificationPermission();
 
-	const n = new Notification(data?.title, {
-		...data,
-		body: data?.body ?? "",
-		icon: data?.icon ?? "../../public/assets/icon-144.png",
-		vibrate: data?.vibrate ?? true,
-	});
+	if ("Notification" in window && Notification.permission === "granted") {
+		navigator.serviceWorker.ready.then(registration => {
+
+			registration.showNotification(data?.title, {
+				...data,
+				body: data?.body ?? "",
+				icon: data?.icon ?? "../../public/assets/icon-144.png",
+				vibrate: [200, 100, 200, 100, 200, 100, 200],
+			});
+
+		})
+	}
 
 	navigator.setAppBadge(1)
 };
