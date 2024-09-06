@@ -1,39 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 
 const useAskForPwa = () => {
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [deferredPrompt, setDeferredPrompt] = useState(null)
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
-      console.log('Trigger handleBeforeInstallPrompt')
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
+      e.preventDefault()
+      setDeferredPrompt(e)
+    }
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    };
-  }, []);
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
+    }
+  }, [])
 
   const askForPwa = () => {
-    console.log('deferredPrompt, ', deferredPrompt)
     if (deferredPrompt) {
-      console.log('Install PWA Prompt')
-      deferredPrompt.prompt();
+      deferredPrompt.prompt()
       deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted the A2HS prompt');
+          console.log('User accepted the A2HS prompt')
         } else {
-          console.log('User dismissed the A2HS prompt');
+          console.log('User dismissed the A2HS prompt')
         }
-        setDeferredPrompt(null);
-      });
+        setDeferredPrompt(null)
+      })
     }
-  };
+  }
 
-  return { askForPwa };
-};
+  return { askForPwa }
+}
 
-export default useAskForPwa;
+export default useAskForPwa
