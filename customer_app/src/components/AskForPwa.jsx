@@ -9,11 +9,13 @@ const AskForPwa = () => {
   const { t } = useTranslation()
 
   useEffect(() => {
+    console.log(window.matchMedia('(display-mode: standalone)'))
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setIsOpen(false)
     } else {
       setIsOpen(true)
     }
+    console.log(isOpen)
   }, [])
 
   const handleClick = () => {
