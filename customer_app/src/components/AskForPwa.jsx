@@ -4,13 +4,13 @@ import { useTranslation } from "react-i18next"
 import { MdInstallMobile } from "react-icons/md";
 
 const AskForPwa = () => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
   const { askForPwa } = useAskForPwa()
   const { t } = useTranslation()
 
   useEffect(() => {
     console.log(window.matchMedia('(display-mode: standalone)'))
-    window.matchMedia('(display-mode: standalone)').matches ? setIsOpen(true) : setIsOpen(false)
+    window.matchMedia('(display-mode: standalone)').matches && setIsOpen(false)
     console.log(isOpen)
   }, [])
 
