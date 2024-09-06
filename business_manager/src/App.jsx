@@ -17,6 +17,7 @@ import fetchStaff from './functions/fetchStaff'
 import DB_GET_DOC from './functions/DB_GET_DOC'
 import AUTH_ON_CHANGE from './functions/AUTH_ON_CHANGE'
 import AUTH_signout from './functions/AUTH_signout'
+import useOrdersNotificationSub from './hooks/useOrdersNotificationSub'
 
 // Components
 import SideBar from "./Component/SideBar.jsx"
@@ -34,6 +35,7 @@ import Signup from './Signup';
 import NoBusinessFound from './Component/NoBusinessFound';
 
 function App() {
+	useOrdersNotificationSub()
 	const dispatch = useDispatch()
 	const navigate = useNavigate()
 	const saveToCloudBtnStatus = useSelector(state => state.conditionalValues.saveToCloudBtnStatus);
