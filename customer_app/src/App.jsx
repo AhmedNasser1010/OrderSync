@@ -7,14 +7,16 @@ import OrderSidebar from './components/Sidebar/OrderSidebar'
 import ScrollToTop from "./components/ScrollToTop"
 import LoginSidebar from "./components/Sidebar/LoginSidebar"
 import useRestaurants from './hooks/useRestaurants'
+import useAskForPwa from './hooks/useAskForPwa'
 import { Toaster } from "react-hot-toast"
 import { HelmetProvider } from 'react-helmet-async'
 
 import { trackingReset } from './rtk/slices/trackingSlice'
 
 const App = () => {
-  const dispatch = useDispatch()
   useRestaurants()
+  const { askForPwa } = useAskForPwa()
+  const dispatch = useDispatch()
   const restaurants = useSelector(state => state.restaurants)
   const user = useSelector(state => state.user)
   const helmetContext = {}
@@ -25,6 +27,10 @@ const App = () => {
       document.body.classList.remove("overflow-hidden")
     }
   }, [user?.trackedOrder?.id])
+
+  useEffect(() => {
+    askForPwa()
+  }, [])
   
   return (
     <HelmetProvider context={helmetContext}>
