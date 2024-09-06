@@ -10,11 +10,7 @@ const AskForPwa = () => {
 
   useEffect(() => {
     console.log(window.matchMedia('(display-mode: standalone)'))
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsOpen(false)
-    } else {
-      setIsOpen(true)
-    }
+    window.matchMedia('(display-mode: standalone)').matches ? setIsOpen(true) : setIsOpen(false)
     console.log(isOpen)
   }, [])
 
