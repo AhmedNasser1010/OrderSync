@@ -2,6 +2,7 @@ import {
   useSetOrderStatusMutation,
   useFetchOpenOrdersDataQuery,
   useFetchUserDataQuery,
+  useSetDeleteOrderStatusMutation
 } from '@/lib/rtk/api/firestoreApi'
 import { userUid } from "@/lib/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/lib/rtk/hooks";
@@ -9,7 +10,11 @@ import { useAppSelector } from "@/lib/rtk/hooks";
 type OrderHandler = {
   handlePrintInvoice: () => void;
   handleChangeStatus: (orderId: string, direction: "forward" | "backward") => void;
-  handleDeleteOrder: () => void;
+  deleteOrder: {
+    handleDeleteOrder: (orderId: string | null, cancellationReason: string | null) => void;
+    isLoading: boolean;
+    error: any;
+  }
   handleAcceptOrder: () => void;
   handleRejectOrder: () => void;
 }
@@ -19,6 +24,7 @@ const useOrderHandler = (): OrderHandler => {
   const { data: userData } = useFetchUserDataQuery(uid, { skip: !uid });
   const { data: orders } = useFetchOpenOrdersDataQuery(userData?.accessToken, { skip: !userData?.accessToken });
   const [setOrderStatus] = useSetOrderStatusMutation();
+  const [setOrderCancellation, { isLoading: orderCancellationIsLoading, error: orderCancellationError }] = useSetDeleteOrderStatusMutation();
 
   const handlePrintInvoice = () => {};
 
@@ -28,7 +34,18 @@ const useOrderHandler = (): OrderHandler => {
     }
   };
 
-  const handleDeleteOrder = () => {};
+  const handleDeleteOrder = (orderId: string | null, cancellationReason: string | null) => {
+    if (!orderId) {
+      console.log('Order Id Not Found')
+      return
+    }
+    setOrderCancellation({
+      orders,
+      orderId,
+      resId: userData?.accessToken,
+      cancellationReason
+    })
+  };
 
   const handleAcceptOrder = () => {};
 
@@ -37,7 +54,11 @@ const useOrderHandler = (): OrderHandler => {
   return {
     handlePrintInvoice,
     handleChangeStatus,
-    handleDeleteOrder,
+    deleteOrder: {
+      handleDeleteOrder,
+      isLoading: orderCancellationIsLoading,
+      error: orderCancellationError,
+    },
     handleAcceptOrder,
     handleRejectOrder,
   };

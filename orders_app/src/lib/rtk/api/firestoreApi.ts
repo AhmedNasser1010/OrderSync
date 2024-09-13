@@ -163,20 +163,55 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ["Orders"],
     }),
-    // setOrderStatus: builder.mutation({
-    //   async queryFn({ orderId, resId, direction }, { getState }) {
-    //     try {
-    //       const state = getState() as RootState;
-    //       const openOrders = ordersApi.endpoints.fetchOpenOrdersData.select()(state);
-    //       console.log('openOrders', openOrders) // { "status": "uninitialized", "isUninitialized": true, "isLoading": false, "isSuccess": false, "isError": false }
-    //       return { data: null };
-    //     } catch (error: any) {
-    //       console.error(error.message);
-    //       return { error: error.message };
-    //     }
-    //   },
-    //   invalidatesTags: ['Orders'],
-    // }),
+    setDeleteOrderStatus: builder.mutation({
+      async queryFn({ orders, orderId, resId, cancellationReason }) {
+        try {
+          // Validate input data
+          if (!orders || orders.length === 0) {
+            throw new Error("Orders array is empty");
+          }
+          if (!orderId) {
+            throw new Error("Order ID is required.");
+          }
+          if (!resId) {
+            throw new Error("Restaurant ID is required.");
+          }
+
+          // Find the specific order that needs status change
+          const orderToUpdate = orders.find(
+            (order: Order) => order.id === orderId
+          );
+          if (!orderToUpdate) {
+            throw new Error(`Cannot find order with id "${orderId}"`);
+          }
+
+          // Simulate an update
+          const updatedOrders = orders.map((order: Order) =>
+            order.id === orderId
+              ? {
+                  ...order,
+                  status: "CANCELED",
+                  statusUpdatedSince: Date.now(),
+                  cancellationReason
+                }
+              : order
+          );
+
+          // Perform Firestore update logic here
+          const docRef = doc(db, "orders", resId);
+
+          await updateDoc(docRef, {
+            open: updatedOrders,
+          });
+
+          return { data: null };
+        } catch (error: any) {
+          console.error("Error while order cancellation:", error.message);
+          return { error: error.message };
+        }
+      },
+      invalidatesTags: ["Orders"],
+    }),
   }),
 });
 
@@ -185,4 +220,5 @@ export const {
   useFetchOpenOrdersDataQuery,
   useFetchMenuDataQuery,
   useSetOrderStatusMutation,
+  useSetDeleteOrderStatusMutation
 } = firestoreApi;

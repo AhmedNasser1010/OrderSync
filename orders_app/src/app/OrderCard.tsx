@@ -30,6 +30,8 @@ import Link from "next/link";
 import { Order, OrderStatus, FormattedOrder } from "@/types/order";
 import useOrderHandler from "@/hooks/useOrderHandler";
 import { useRouter } from "next/navigation";
+import { setDeletePopup } from "@/lib/rtk/slices/toggleSlice";
+import { useAppDispatch } from "@/lib/rtk/hooks";
 
 const getStatusIcon = (status: OrderStatus) => {
   switch (status) {
@@ -46,11 +48,11 @@ const OrderCard = ({ order }: { order: FormattedOrder }) => {
   const {
     handlePrintInvoice,
     handleChangeStatus,
-    handleDeleteOrder,
     handleAcceptOrder,
     handleRejectOrder,
   } = useOrderHandler();
   const router = useRouter()
+  const dispatch = useAppDispatch()
 
   const handleNavigate = (e: React.MouseEvent<HTMLDivElement>) => {
     const preventedElement = (e.target as HTMLElement).closest('.disabled-click-1')
@@ -152,7 +154,7 @@ const OrderCard = ({ order }: { order: FormattedOrder }) => {
                   <span>Move Backward</span>
                 </DropdownMenuItem>
               )}
-              <DropdownMenuItem onClick={handleDeleteOrder}>
+              <DropdownMenuItem onClick={() => dispatch(setDeletePopup({ orderId: order.id, isOpen: true }))}>
                 <Trash2 className="mr-2 h-4 w-4" />
                 <span>Delete Order</span>
               </DropdownMenuItem>

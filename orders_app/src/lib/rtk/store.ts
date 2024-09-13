@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
-import constantsSlice from './slices/constantsSlice';
 import { firestoreApi } from './api/firestoreApi';
+import constantsSlice from './slices/constantsSlice';
+import toggleSlice from './slices/toggleSlice';
 
 export const makeStore = () => {
   return configureStore({
     devTools: true,
     reducer: {
       constants: constantsSlice,
+      toggle: toggleSlice,
       [firestoreApi.reducerPath]: firestoreApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>

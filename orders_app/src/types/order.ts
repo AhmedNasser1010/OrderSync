@@ -1,4 +1,4 @@
-export type OrderStatus = "RECEIVED" | "ON_GOING" | "COMPLETED";
+export type OrderStatus = "RECEIVED" | "ON_GOING" | "COMPLETED" | "CANCELED";
 
 export type FormattedOrder = {
   id: string;
