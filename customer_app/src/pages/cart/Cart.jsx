@@ -332,6 +332,7 @@ const Cart = () => {
             accessToken,
             id: randomOrderId(),
             status: 'RECEIVED',
+            accepted: false,
             timestamp: Number(Date.now()),
             statusUpdatedSince: Number(Date.now()),
             deliveryFees,
