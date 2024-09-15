@@ -12,7 +12,7 @@ type Toggle = {
     error: string | null;
   };
   activeTab: OrderStatus;
-  resStatus: UserStatus;
+  optionsMenuView: boolean;
 };
 
 const initialState: Toggle = {
@@ -23,7 +23,7 @@ const initialState: Toggle = {
     error: null,
   },
   activeTab: "RECEIVED",
-  resStatus: "inactive",
+  optionsMenuView: false
 };
 
 export const toggleSlice = createSlice({
@@ -36,17 +36,17 @@ export const toggleSlice = createSlice({
     setActiveTab(state, { payload }) {
       state.activeTab = payload;
     },
-    setResStatus(state, { payload }) {
-      state.resStatus = payload;
+    setOptionsMenuView(state, { payload }) {
+      state.optionsMenuView = payload;
     },
   },
 });
 
-export const { setDeletePopup, setActiveTab, setResStatus } =
+export const { setDeletePopup, setActiveTab, setOptionsMenuView } =
   toggleSlice.actions;
 
 export const deletePopup = (state: RootState) => state.toggle.deletePopup;
 export const activeTab = (state: RootState) => state.toggle.activeTab;
-export const resStatus = (state: RootState) => state.toggle.resStatus;
+export const optionMenuView = (state: RootState) => state.toggle.optionsMenuView;
 
 export default toggleSlice.reducer;

@@ -20,11 +20,12 @@ import {
   MoreVertical,
   Trash2,
   CheckCircle,
-  Package,
-  Truck,
+  SquareArrowDown,
+  CookingPot,
   Printer,
   Check,
   X,
+  Bike
 } from "lucide-react";
 import Link from "next/link";
 import { Order, OrderStatus, FormattedOrder } from "@/types/order";
@@ -36,15 +37,17 @@ import { useAppDispatch } from "@/lib/rtk/hooks";
 const getStatusIcon = (status: OrderStatus) => {
   switch (status) {
     case "RECEIVED":
-      return <Package className="h-4 w-4" />;
+      return <SquareArrowDown className="h-4 w-4" />;
     case "ON_GOING":
-      return <Truck className="h-4 w-4" />;
+      return <CookingPot className="h-4 w-4" />;
+    case "IN_DELIVERY":
+      return <Bike className="h-4 w-4" />;
     case "COMPLETED":
       return <CheckCircle className="h-4 w-4" />;
   }
 };
 
-const OrderCard = ({ order }: { order: FormattedOrder }) => {
+const OrderCard = ({ order, activeTabValue }: { order: FormattedOrder, activeTabValue: string }) => {
   const {
     handlePrintInvoice,
     handleChangeStatus,
@@ -95,7 +98,18 @@ const OrderCard = ({ order }: { order: FormattedOrder }) => {
           <p className="text-sm mt-2 line-clamp-2">{order.items}</p>
         </CardContent>
         <CardFooter className="flex justify-between">
-          {order.accepted ? (
+          {activeTabValue !== "RECEIVED" &&
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handlePrintInvoice}
+              className="disabled-click-1 flex items-center"
+            >
+              <Printer className="mr-2 h-4 w-4" />
+              Print Invoice
+            </Button>
+          }
+          {/* {order.accepted ? (
             <Button
               variant="outline"
               size="sm"
@@ -126,10 +140,11 @@ const OrderCard = ({ order }: { order: FormattedOrder }) => {
                 Reject
               </Button>
             </div>
-          )}
+          )} */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
+                className={activeTabValue === "RECEIVED" ? 'ml-auto' : undefined}
                 variant="ghost"
                 size="sm"
                 onClick={(e) => e.preventDefault()}

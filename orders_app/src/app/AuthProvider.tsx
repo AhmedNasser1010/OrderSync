@@ -1,5 +1,6 @@
 "use client";
 import useAuth from "@/hooks/useAuth";
+import AutoLoginLoadingScreen from '@/components/AutoLoginLoadingScreen'
 
 export default function AuthProvider({
   children,
@@ -9,7 +10,7 @@ export default function AuthProvider({
   const { user, isAuthLoading } = useAuth(false);
 
   if (!user?.uid && isAuthLoading) {
-    return <div>Logging in...</div>;
+    return <AutoLoginLoadingScreen />;
   }
 
   return children;

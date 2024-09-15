@@ -1,20 +1,52 @@
-import { useAppSelector, useAppDispatch } from "@/lib/rtk/hooks";
-import { resStatus, setResStatus } from "@/lib/rtk/slices/toggleSlice";
+import { useAppSelector } from "@/lib/rtk/hooks";
+import {
+  useFetchRestaurantDataQuery,
+  useFetchUserDataQuery,
+} from "@/lib/rtk/api/firestoreApi";
+import { userUid } from "@/lib/rtk/slices/constantsSlice";
+import { useSetRestaurantStatusMutation } from "@/lib/rtk/api/firestoreApi";
+import { RestaurantStatusTypes } from "@/types/restaurant";
 
-type UserStatus = "active" | "inactive" | "busy";
+type UseResStatus = {
+  toggleResStatus: () => void;
+  isLoading: boolean;
+  error: any;
+  currentStatus: RestaurantStatusTypes;
+  isAvailableFeature: boolean;
+};
 
-const useResStatus = () => {
-  const dispatch = useAppDispatch();
-  const resStatusValue = useAppSelector(resStatus);
+const useResStatus = (): UseResStatus => {
+  const uid = useAppSelector(userUid);
+  const { data: userData } = useFetchUserDataQuery(uid, { skip: !uid });
+  const { data: resData } = useFetchRestaurantDataQuery(userData?.accessToken, {
+    skip: !userData?.accessToken,
+  });
+  const currentStatus = resData?.settings?.siteControl?.status || "inactive";
+  const isAvailableFeature =
+    !resData?.settings?.siteControl?.autoAvailability || false;
+  const [setRestaurantStatus, { isLoading, error }] =
+    useSetRestaurantStatusMutation();
 
   const toggleResStatus = () => {
-    const statusOrder: UserStatus[] = ["active", "inactive", "busy"];
-    const currentIndex = statusOrder.indexOf(resStatusValue);
+    const statusOrder: RestaurantStatusTypes[] = [
+      "active",
+      "inactive",
+      "busy",
+      "pause",
+    ];
+    const currentIndex = statusOrder.indexOf(currentStatus);
     const newIndex = (currentIndex + 1) % statusOrder.length;
-    dispatch(setResStatus(statusOrder[newIndex]));
+    const newStatus = statusOrder[newIndex];
+    setRestaurantStatus({ resId: userData?.accessToken, status: newStatus });
   };
 
-  return toggleResStatus;
+  return {
+    toggleResStatus,
+    isLoading,
+    error,
+    currentStatus,
+    isAvailableFeature,
+  };
 };
 
 export default useResStatus;

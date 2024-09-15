@@ -11,7 +11,7 @@ import { userUid } from '@/lib/rtk/slices/constantsSlice'
 
 type UseOrders = {
   orders: Order[] | null;
-  formattedOrders: FormattedOrder[];
+  formattedOrders: FormattedOrder[] | null;
   getOrderMenu: (orderCart: CartItemType[]) => any[];
   getOrder: (id: string) => Order | undefined;
   isLoading: boolean;
@@ -54,7 +54,7 @@ const useOrders = (): UseOrders => {
     });
   };
 
-  const formattedOrders = useMemo<FormattedOrder[]>(() => {
+  const formattedOrders = useMemo<FormattedOrder[] | null>(() => {
     if (openOrdersData) {
       return openOrdersData.map((order) => ({
         id: order.id,
@@ -67,7 +67,7 @@ const useOrders = (): UseOrders => {
           .join(", "),
       }));
     }
-    return [];
+    return null;
   }, [openOrdersData, menuData]);
 
 

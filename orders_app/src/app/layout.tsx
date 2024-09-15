@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "@/globals.css";
-import StoreProvider from './StoreProvider'
-import AuthProvider from './AuthProvider'
-import PopupProvider from './PopupProvider'
+import StoreProvider from "./StoreProvider";
+import AuthProvider from "./AuthProvider";
+import PopupProvider from "./PopupProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,18 +27,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <StoreProvider>
-      <AuthProvider>
-        <PopupProvider>
-          <html lang="en">
-            <body
-              className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-            >
-              {children}
-            </body>
-          </html>
-        </PopupProvider>
-      </AuthProvider>
-    </StoreProvider>
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <StoreProvider>
+          <AuthProvider>
+            <PopupProvider>{children}</PopupProvider>
+          </AuthProvider>
+        </StoreProvider>
+      </body>
+    </html>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Truck, CheckCircle } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SquareArrowDown, Bike, CookingPot } from "lucide-react";
 import { OrderStatus } from "@/types/order";
 import { useAppSelector, useAppDispatch } from "@/lib/rtk/hooks";
 import { activeTab, setActiveTab } from "@/lib/rtk/slices/toggleSlice";
@@ -20,17 +20,17 @@ export default function OrdersTabs() {
       onValueChange={(value) => handleTabChange(value as OrderStatus)}
     >
       <TabsList className="grid w-full grid-cols-3 mb-4">
-        <TabsTrigger value="RECEIVED" className="data-[state=active]:bg-white">
-          <Package className="w-4 h-4 mr-2" />
+        <TabsTrigger value="RECEIVED">
+          <SquareArrowDown className="w-4 h-4 mr-2" />
           Received
         </TabsTrigger>
-        <TabsTrigger value="ON_GOING" className="data-[state=active]:bg-white">
-          <Truck className="w-4 h-4 mr-2" />
-          Ongoing
+        <TabsTrigger value="ON_GOING">
+          <CookingPot className="w-4 h-4 mr-2" />
+          Cooking
         </TabsTrigger>
-        <TabsTrigger value="COMPLETED" className="data-[state=active]:bg-white">
-          <CheckCircle className="w-4 h-4 mr-2" />
-          Done
+        <TabsTrigger value="IN_DELIVERY">
+          <Bike className="w-4 h-4 mr-2" />
+          Delivery
         </TabsTrigger>
       </TabsList>
     </Tabs>

@@ -10,38 +10,33 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { ordersApi } from "./ordersApi";
-import { RootState } from "@/lib/rtk/store";
 import { Order } from "@/types/order";
+import { RestaurantStatusTypes } from "@/types/restaurant";
 
-// data,
-// isLoading,
-// isSuccess,
-// isError,
-// error,
-
-type StatusForward = { RECEIVED: "ON_GOING"; ON_GOING: "COMPLETED" };
-type StatusBackward = { ON_GOING: "RECEIVED"; COMPLETED: "ON_GOING" };
-
-const statusForward: StatusForward = {
+const statusForward = {
   RECEIVED: "ON_GOING",
-  ON_GOING: "COMPLETED",
+  ON_GOING: "IN_DELIVERY",
+  IN_DELIVERY: "COMPLETED",
 };
 
-const statusBackward: StatusBackward = {
+const statusBackward = {
   ON_GOING: "RECEIVED",
-  COMPLETED: "ON_GOING",
+  IN_DELIVERY: "ON_GOING",
+  COMPLETED: "IN_DELIVERY",
 };
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["User", "Orders", "Menu"],
+  tagTypes: ["User", "Orders", "Menu", "Restaurant"],
   endpoints: (builder) => ({
+
+    // Query Endpoints
     fetchUserData: builder.query({
       async queryFn(userUid) {
         try {
           const ref = doc(db, "users", userUid);
           const docSnapshot = await getDoc(ref);
-          console.log("Read Operation userApi.ts 22:37");
+          console.log("Read Operation [fetchUserData]")
           if (!docSnapshot.exists()) {
             return { error: "User not found" };
           }
@@ -76,7 +71,7 @@ export const firestoreApi = createApi({
                 )
               );
 
-              console.log("Real-time update operation ordersApi.ts");
+              console.log("Real-time update operation [fetchOpenOrdersData]");
             }
           );
 
@@ -104,6 +99,23 @@ export const firestoreApi = createApi({
       },
       providesTags: ["Menu"],
     }),
+    fetchRestaurantData: builder.query({
+      async queryFn(resId) {
+        try {
+          const resRef = doc(db, "businesses", resId);
+          const resSnapshot = await getDoc(resRef);
+          const restaurant = resSnapshot.data();
+          console.log("Read Operation [fetchRestaurantData]");
+          return { data: restaurant };
+        } catch (error: any) {
+          console.error(error?.message);
+          return { error: error?.message };
+        }
+      },
+      providesTags: ["Restaurant"],
+    }),
+
+    // Mutation Endpoints
     setOrderStatus: builder.mutation({
       async queryFn({ orders, orderId, resId, direction }) {
         try {
@@ -155,6 +167,7 @@ export const firestoreApi = createApi({
             open: updatedOrders,
           });
 
+          console.log("Write Operation [setOrderStatus]")
           return { data: null };
         } catch (error: any) {
           console.error("Error updating order status:", error.message);
@@ -204,6 +217,7 @@ export const firestoreApi = createApi({
             open: updatedOrders,
           });
 
+          console.log("Write Operation [setDeleteOrderStatus]")
           return { data: null };
         } catch (error: any) {
           console.error("Error while order cancellation:", error.message);
@@ -212,6 +226,34 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ["Orders"],
     }),
+    setRestaurantStatus: builder.mutation({
+      async queryFn({ resId, status }: { resId: string, status: RestaurantStatusTypes }) {
+        try {
+          // Validate input data
+          if (!status) {
+            throw new Error("Order ID is required.");
+          }
+          if (!resId) {
+            throw new Error("Restaurant ID is required.");
+          }
+
+          // Perform Firestore update logic here
+          const docRef = doc(db, "businesses", resId);
+
+          await updateDoc(docRef, {
+            ['settings.siteControl.status']: status,
+          });
+
+          console.log("Write Operation [setRestaurantStatus]")
+          return { data: null };
+        } catch (error: any) {
+          console.error("Error updating restaurant status:", error.message);
+          return { error: error.message };
+        }
+      },
+      invalidatesTags: ["Restaurant"],
+    }),
+
   }),
 });
 
@@ -219,6 +261,8 @@ export const {
   useFetchUserDataQuery,
   useFetchOpenOrdersDataQuery,
   useFetchMenuDataQuery,
+  useFetchRestaurantDataQuery,
   useSetOrderStatusMutation,
-  useSetDeleteOrderStatusMutation
+  useSetDeleteOrderStatusMutation,
+  useSetRestaurantStatusMutation,
 } = firestoreApi;

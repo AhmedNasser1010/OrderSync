@@ -4,17 +4,21 @@ import OrdersView from "./OrdersView";
 import PageTitle from "./PageTitle";
 import OrdersTopBar from "./OrdersTopBar";
 import OrdersTopBarBtns from "./OrdersTopBarBtns";
-import UserStatusIndicator from "./UserStatusIndicator";
+import ResStatusBtn from "./ResStatusBtn";
+import ResStatus from "./ResStatus";
+import SettingsMenu from "./SettingsMenu";
 
 export default function OrdersPage() {
   return (
     <Page>
       <OrdersTopBar>
-        <PageTitle>Orders</PageTitle>
+        <div className="flex items-center space-x-4">
+          <PageTitle>Orders</PageTitle>
+          <ResStatus />
+        </div>
         <OrdersTopBarBtns>
-          <UserStatusIndicator />
-          {/* Disabled buttons here */}
-          {/* <SettingsMenu closeDay={closeDay} generateReport={generateReport} /> */}
+          <ResStatusBtn />
+          <SettingsMenu />
           {/* <ThemeToggle /> */}
         </OrdersTopBarBtns>
       </OrdersTopBar>
