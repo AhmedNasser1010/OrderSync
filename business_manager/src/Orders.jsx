@@ -144,10 +144,10 @@ const Orders = () => {
 						<RecievedOrders headCells={headCellsForReceived} tableData={orderFilter('RECEIVED')} tableStatus='RECEIVED' />
 					</CustomTabPanel>
 					<CustomTabPanel tabValue={tabValue} index={1}>
-						<OnGoingOrders headCells={business?.settings?.orderManagement?.assign?.forCooks ? headCells : headCellsNoAssign} tableData={orderFilter('IN_PROGRESS')} tableStatus='IN_PROGRESS' />
+						<OnGoingOrders headCells={business?.settings?.orderManagement?.assign?.forCooks ? headCells : headCellsNoAssign} tableData={orderFilter('PREPARING')} tableStatus='PREPARING' />
 					</CustomTabPanel>
 					<CustomTabPanel tabValue={tabValue} index={2}>
-						<InDeliveryOrders headCells={business?.settings?.orderManagement?.assign?.forDeliveryWorkers ? headCells : headCellsNoAssign} tableData={orderFilter('IN_DELIVERY')} tableStatus='IN_DELIVERY' />
+						<InDeliveryOrders headCells={business?.settings?.orderManagement?.assign?.forDeliveryWorkers ? headCells : headCellsNoAssign} tableData={orderFilter('DELIVERY')} tableStatus='DELIVERY' />
 					</CustomTabPanel>
 					<CustomTabPanel tabValue={tabValue} index={3}>
 						<CompletedOrders headCells={business?.settings?.orderManagement?.assign?.forDeliveryWorkers ? headCells : headCellsNoAssign} tableData={orderFilter('COMPLETED')} tableStatus='COMPLETED' />

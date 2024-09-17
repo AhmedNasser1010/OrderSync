@@ -26,16 +26,16 @@ function Queue() {
 	// const queueOrders = useMemo(() => {
 	// 	return orders.filter(order => {
 	// 		if (user.userInfo.role === 'ORDER_CAPTAIN') {
-	// 			return order.status === 'IN_PROGRESS' && order.assign.to === user.userInfo.uid && order.assign.status === 'on-going'
+	// 			return order.status === 'PREPARING' && order.assign.to === user.userInfo.uid && order.assign.status === 'on-going'
 	// 		} else if (user.userInfo.role === 'DELIVERY_CAPTAIN') {
-	// 			return order.status === 'IN_DELIVERY' && order.assign.to === user.userInfo.uid && order.assign.status === 'on-delivery'
+	// 			return order.status === 'DELIVERY' && order.assign.to === user.userInfo.uid && order.assign.status === 'on-delivery'
 	// 		}
 	// 	})
 	// }, [orders])
 
 	useEffect(() => {
 		const finalOrders = queue.map(qu => {
-			const order = orders.find(order => order.id === qu.id && order.status === 'IN_DELIVERY')
+			const order = orders.find(order => order.id === qu.id && order.status === 'DELIVERY')
 			if (order) {
 				return order
 			}

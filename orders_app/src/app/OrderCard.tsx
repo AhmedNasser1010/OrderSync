@@ -38,9 +38,9 @@ const getStatusIcon = (status: OrderStatus) => {
   switch (status) {
     case "RECEIVED":
       return <SquareArrowDown className="h-4 w-4" />;
-    case "ON_GOING":
+    case "PREPARING":
       return <CookingPot className="h-4 w-4" />;
-    case "IN_DELIVERY":
+    case "DELIVERY":
       return <Bike className="h-4 w-4" />;
     case "COMPLETED":
       return <CheckCircle className="h-4 w-4" />;
@@ -80,7 +80,7 @@ const OrderCard = ({ order, activeTabValue }: { order: FormattedOrder, activeTab
             variant={
               order.status === "RECEIVED"
                 ? "default"
-                : order.status === "ON_GOING"
+                : order.status === "PREPARING"
                 ? "secondary"
                 : "success"
             }

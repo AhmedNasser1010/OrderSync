@@ -92,7 +92,7 @@ function OrderQRScan() {
 					if (orderIsAddedBefore) {
 						toast.error('This order has been added before!')
 					} else {
-						if (order?.status !== 'IN_DELIVERY') {
+						if (order?.status !== 'DELIVERY') {
 							toast.success(
 								`This order is not ready yet.`
 								, {

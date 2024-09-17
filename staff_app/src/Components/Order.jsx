@@ -116,7 +116,7 @@ function Order() {
 					</InfoBox>
 				</Section>
 
-				<ButtonBox order={orderData.order} id={orderData.order && orderData.order.id} status={user.userInfo.role === 'ORDER_CAPTAIN' ? 'IN_DELIVERY' : 'COMPLETED'} />
+				<ButtonBox order={orderData.order} id={orderData.order && orderData.order.id} status={user.userInfo.role === 'ORDER_CAPTAIN' ? 'DELIVERY' : 'COMPLETED'} />
 			</Sections>
 		</Container>
 

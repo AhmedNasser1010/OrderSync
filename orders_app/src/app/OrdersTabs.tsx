@@ -24,11 +24,11 @@ export default function OrdersTabs() {
           <SquareArrowDown className="w-4 h-4 mr-2" />
           Received
         </TabsTrigger>
-        <TabsTrigger value="ON_GOING">
+        <TabsTrigger value="PREPARING">
           <CookingPot className="w-4 h-4 mr-2" />
           Cooking
         </TabsTrigger>
-        <TabsTrigger value="IN_DELIVERY">
+        <TabsTrigger value="DELIVERY">
           <Bike className="w-4 h-4 mr-2" />
           Delivery
         </TabsTrigger>

@@ -4,7 +4,7 @@ const { debuggingMode } = require('../constants.js')
 function getInProgressOrders (orders) {
 	const start = performance.now()
 	
-	const filteredOrders = orders.filter(order => order.status === 'IN_PROGRESS' && order.assign.driver === null)
+	const filteredOrders = orders.filter(order => order.status === 'PREPARING' && order.assign.driver === null)
 
 	if (filteredOrders.length) {
 		const end = performance.now()

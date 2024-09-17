@@ -63,16 +63,16 @@ function AssignDialog({ isOpen, handleOpenClose, currentOrder }) {
 
 	const readyToAssignStaff = useMemo(() => {
 		return staff.filter(member => {
-			if (currentOrder.status === 'RECEIVED' || currentOrder.status === 'IN_PROGRESS') {
+			if (currentOrder.status === 'RECEIVED' || currentOrder.status === 'PREPARING') {
 				return member.userInfo.role === 'ORDER_CAPTAIN'
-			} else if (currentOrder.status === 'IN_DELIVERY' || currentOrder.status === 'COMPLETED') {
+			} else if (currentOrder.status === 'DELIVERY' || currentOrder.status === 'COMPLETED') {
 				return member.userInfo.role === 'DRIVER'
 			}
 		})
 	}, [staff, currentOrder])
 
 	const handleAssignStaffMember = (member) => {
-		if (currentOrder.status === 'IN_DELIVERY') {
+		if (currentOrder.status === 'DELIVERY') {
 			DB_GET_DOC('drivers', member.uid)
 			.then(driver => {
 				dispatch(updateStaff(driver))

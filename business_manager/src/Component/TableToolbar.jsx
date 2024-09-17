@@ -55,14 +55,14 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 	}, [menu, selected])
 
 	const nextTableStatusMap = {
-		RECEIVED: 'IN_PROGRESS',
-		IN_PROGRESS: 'IN_DELIVERY',
-		IN_DELIVERY: 'COMPLETED'
+		RECEIVED: 'PREPARING',
+		PREPARING: 'DELIVERY',
+		DELIVERY: 'COMPLETED'
 	}
 	const prevTableStatusMap = {
-		COMPLETED: 'IN_DELIVERY',
-		IN_DELIVERY: 'IN_PROGRESS',
-		IN_PROGRESS: 'RECEIVED'
+		COMPLETED: 'DELIVERY',
+		DELIVERY: 'PREPARING',
+		PREPARING: 'RECEIVED'
 	}
 
 	const nextTableStatus = nextTableStatusMap[tableStatus] || 'RECEIVED'
@@ -185,17 +185,17 @@ const TableToolbar = ({ selected, handleSetSelected, tableStatus }) => {
 							<ReceiptLongRoundedIcon onMouseUp={handlePrint} />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title="To Back" sx={{ display: tableStatus === 'RECEIVED' || (tableStatus === 'IN_DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>
+					<Tooltip title="To Back" sx={{ display: tableStatus === 'RECEIVED' || (tableStatus === 'DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>
 						<IconButton>
 							<ArrowLeftIcon onMouseUp={() => handleOrderStage('BACKWARD')} />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title="To Next" sx={{ display: tableStatus === 'COMPLETED' || (tableStatus === 'IN_DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>
+					<Tooltip title="To Next" sx={{ display: tableStatus === 'COMPLETED' || (tableStatus === 'DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>
 						<IconButton>
 							<NextPlanIcon onMouseUp={() => handleOrderStage('FORWARD')} />
 						</IconButton>
 					</Tooltip>
-					<Tooltip title="Delete" sx={{ display: tableStatus === 'COMPLETED' || (tableStatus === 'IN_DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>
+					<Tooltip title="Delete" sx={{ display: tableStatus === 'COMPLETED' || (tableStatus === 'DELIVERY' && !business.settings.orderManagement.assign.forDeliveryWorkers) && 'none' }}>
 						<IconButton>
 							<DeleteIcon onMouseUp={handleDelete} />
 						</IconButton>

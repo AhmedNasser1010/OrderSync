@@ -197,7 +197,19 @@ const order = {
     estimatedTime: 1725985936945,
     driverLocation: [29.619568, 31.255799]
   },
-  cart: [{}, {}, {}],
+  cart: [
+    {
+      id: "fa046103-953d-4f50-bc5e-421a82472e28",
+      quantity: 1,
+      selectedSize: "M",
+      note: "",
+      discountCode: "FIXED-200",
+      toppings: [
+        { type: "extraCheese", enabled: true },
+        { type: "removeOnions", enabled: false }
+      ],
+    }
+  ],
   cartTotalPrice: {
     total: 225,
     discount: 30,
@@ -226,10 +238,6 @@ const order = {
     rating: 4.5,
     comment: "The food was good, but delivery was a bit late."
   },
-  discountCodeUsage: {
-    "FIXED-200": 1,
-    "SUMMER25": 1
-  },
   orderSource: "mobile_app"
 };
 
@@ -239,14 +247,12 @@ const order = {
  // Missed 6
 const cartItem = {
   id: "fa046103-953d-4f50-bc5e-421a82472e28",
-  name: "Burger", // Missed
-  sku: "BUR-M", // Missed
   quantity: 1,
   selectedSize: "M",
-  note: "", // Missed
-  customizations: { // Missed
-    extraCheese: true, // Missed
-    removeOnions: false // Missed
-  },
-  discountCode: "FIXED-200"
+  note: "",
+  discountCode: "FIXED-200",
+  toppings: [
+    { type: "extraCheese", enabled: true },
+    { type: "removeOnions", enabled: false }
+  ],
 }

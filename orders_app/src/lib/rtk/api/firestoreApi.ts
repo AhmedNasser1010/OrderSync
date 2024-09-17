@@ -14,15 +14,15 @@ import { Order } from "@/types/order";
 import { RestaurantStatusTypes } from "@/types/restaurant";
 
 const statusForward = {
-  RECEIVED: "ON_GOING",
-  ON_GOING: "IN_DELIVERY",
-  IN_DELIVERY: "COMPLETED",
+  RECEIVED: "PREPARING",
+  PREPARING: "DELIVERY",
+  DELIVERY: "COMPLETED",
 };
 
 const statusBackward = {
-  ON_GOING: "RECEIVED",
-  IN_DELIVERY: "ON_GOING",
-  COMPLETED: "IN_DELIVERY",
+  PREPARING: "RECEIVED",
+  DELIVERY: "PREPARING",
+  COMPLETED: "DELIVERY",
 };
 
 export const firestoreApi = createApi({

@@ -355,7 +355,8 @@ const Cart = () => {
             delivery: {
               uid: null,
               name: null,
-              phone: null
+              phone: null,
+              status: "PENDING"
             },
             cart: filteredCart,
             cartTotalPrice,

@@ -10,7 +10,7 @@ const Order = styled.div`
 	cursor: pointer;
 	box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 	border-radius: 8px;
-	opacity: ${({ $status }) => $status === 'IN_DELIVERY' ? '1' : '0.5'};
+	opacity: ${({ $status }) => $status === 'DELIVERY' ? '1' : '0.5'};
 `
 const Title = styled.h3`
 	font-size: 1.5rem;

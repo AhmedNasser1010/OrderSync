@@ -63,7 +63,7 @@ export default function OrderDetails({
     switch (status) {
       case "RECEIVED":
         return "bg-blue-500";
-      case "ON_GOING":
+      case "PREPARING":
         return "bg-yellow-500";
       case "COMPLETED":
         return "bg-green-500";

@@ -191,7 +191,7 @@ function OrderSidebar() {
 						<TimelineItem>
 							<TimelineSeparator>
 								<TimelineConnector />
-								<TimelineDot color={ tracking?.order?.status === 'IN_PROGRESS' || tracking?.order?.status === 'IN_DELIVERY' ? 'primary' : 'grey'}>
+								<TimelineDot color={ tracking?.order?.status === 'PREPARING' || tracking?.order?.status === 'DELIVERY' ? 'primary' : 'grey'}>
 									<GiCook />
 								</TimelineDot>
 								<TimelineConnector />
@@ -206,7 +206,7 @@ function OrderSidebar() {
 						<TimelineItem>
 							<TimelineSeparator>
 								<TimelineConnector />
-								<TimelineDot color={tracking?.order?.status === 'IN_DELIVERY' ? 'primary' : 'grey'}>
+								<TimelineDot color={tracking?.order?.status === 'DELIVERY' ? 'primary' : 'grey'}>
 									<MdDeliveryDining />
 								</TimelineDot>
 								<TimelineConnector />

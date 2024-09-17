@@ -139,8 +139,8 @@ const CustomTableRow = ({ row = [], selected, index, handleSetSelected, tableSta
 				    </TableCell>
 				}
 				{
-				  (tableStatus === 'IN_PROGRESS' && business?.settings?.orderManagement?.assign?.forCooks) || 
-				  (tableStatus === 'IN_DELIVERY' && business?.settings?.orderManagement?.assign?.forDeliveryWorkers) ||
+				  (tableStatus === 'PREPARING' && business?.settings?.orderManagement?.assign?.forCooks) || 
+				  (tableStatus === 'DELIVERY' && business?.settings?.orderManagement?.assign?.forDeliveryWorkers) ||
 				  (tableStatus === 'COMPLETED') ? (
 				    <TableCell onMouseUp={handleOpenClose}>
 				      <AssignBadge status={currentOrder?.orderData?.assign?.status} />
