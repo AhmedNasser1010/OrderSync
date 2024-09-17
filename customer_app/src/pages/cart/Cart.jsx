@@ -26,6 +26,8 @@ import DiscountMsg from '../restaurant-menu/DiscountMsg'
 import ItemPrice from '../restaurant-menu/ItemPrice'
 import ItemDescription from '../restaurant-menu/ItemDescription'
 import ItemSizesBar from '../restaurant-menu/ItemSizesBar'
+import getUserSource from '../../utils/getUserSource'
+import filterObject from '../../utils/filterObject'
 
 
 import OrderInfo from './OrderInfo'
@@ -327,16 +329,55 @@ const Cart = () => {
             })
             return false
           }
+
+          const timestamp = Date.now()
+          const currentResLoyaltyData = user?.restaurants?.find(res => res.accessToken === accessToken)
+          const orderSource = getUserSource()
+          const filteredCart = valid.cart.map(obj => filterObject(obj, [], true))
+
           const final = {
-            ...valid,
-            accessToken,
             id: randomOrderId(),
-            status: 'RECEIVED',
-            timestamp: Number(Date.now()),
-            statusUpdatedSince: Number(Date.now()),
+            timestamp,
+            accessToken,
+            cancelAutoAssign: false,
+            status: {
+              current: 'RECEIVED',
+              history: [
+                { status: 'RECEIVED', timestamp }
+              ]
+            },
+            orderTimestamps: {
+              placedAt: timestamp,
+              preparedAt: null,
+              pickedUpAt: null,
+              deliveredAt: null
+            },
+            delivery: {
+              uid: null,
+              name: null,
+              phone: null
+            },
+            cart: filteredCart,
+            cartTotalPrice,
             deliveryFees,
-            cartTotalPrice
+            payment: {
+              method: 'CASH',
+              status: 'COMPLETED',
+            },
+            location: valid.location,
+            customer: {
+              ...valid.user,
+              firstOrderDate: currentResLoyaltyData?.firstOrderTime || timestamp,
+              totalOrders: currentResLoyaltyData?.totalOrders || 1,
+              totalOrdersValue: currentResLoyaltyData?.totalAmount || cartTotalPrice.discount
+            },
+            customerFeedback: {
+              rating: null,
+              comment: null
+            },
+            orderSource
           }
+
 
           toast.promise(
             handleOrderSubmission(final),

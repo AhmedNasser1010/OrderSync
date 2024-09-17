@@ -46,7 +46,7 @@ function OrderSidebar() {
 
 	useEffect(() => {
 		if (tracking.order) {
-			setDriverId(tracking.order.assign.driver)
+			setDriverId(tracking?.order?.assign?.driver)
 			if (tracking.order.status !== 'RECEIVED') {
 				setIsAvailableToEdit(false)
 			} else {
@@ -75,7 +75,7 @@ function OrderSidebar() {
 				if (doc.exists()) {
 					const orders = doc.data()?.open || []
 
-					const order = orders.find(order => order.user.uid === user.userInfo.uid && order.id === user.trackedOrder.id)
+					const order = orders.find(order => order.customer.uid === user.userInfo.uid && order.id === user.trackedOrder.id)
 
 					if (!order) {
 						handleOrderIsCanceledByRes()
