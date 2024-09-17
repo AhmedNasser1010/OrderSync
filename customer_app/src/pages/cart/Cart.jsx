@@ -337,6 +337,7 @@ const Cart = () => {
 
           const final = {
             id: randomOrderId(),
+<<<<<<< HEAD
             timestamp,
             accessToken,
             cancelAutoAssign: false,
@@ -359,6 +360,12 @@ const Cart = () => {
             },
             cart: filteredCart,
             cartTotalPrice,
+=======
+            status: 'RECEIVED',
+            accepted: false,
+            timestamp: Number(Date.now()),
+            statusUpdatedSince: Number(Date.now()),
+>>>>>>> start-orders-app
             deliveryFees,
             payment: {
               method: 'CASH',
