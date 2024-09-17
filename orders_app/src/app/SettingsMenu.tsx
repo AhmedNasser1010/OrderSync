@@ -8,23 +8,20 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Settings, FileText, Calendar, BarChart3 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/lib/rtk/hooks";
-import { setActiveTab, optionMenuView, setOptionsMenuView } from "@/lib/rtk/slices/toggleSlice";
+import { setActiveTab, optionMenuView, setOptionsMenuView, setCloseDayPopup } from "@/lib/rtk/slices/toggleSlice";
 import MenuCard from './MenuCard'
 
 function SettingsMenu() {
   const dispatch = useAppDispatch();
   const optionMenuViewValue = useAppSelector(optionMenuView)
 
-  const closeDay = () => {}
-  const generateReport = () => {}
-  const viewClosedOrders = () => {
-    dispatch(setActiveTab("COMPLETED"));
-    dispatch(setOptionsMenuView(false))
-  };
+  const afterTriggerAction = (callback: () => void) => {
+    callback();
+    // dispatch(setOptionsMenuView(false));
+  }
 
   return (
     <Sheet open={optionMenuViewValue} onOpenChange={(value) => dispatch(setOptionsMenuView(value))}>
@@ -40,21 +37,14 @@ function SettingsMenu() {
         </SheetHeader>
         <div className="grid grid-cols-2 gap-4 py-4">
           <MenuCard
-            callback={viewClosedOrders}
+            callback={() => afterTriggerAction(() => dispatch(setActiveTab("COMPLETED")))}
             title="View Closed Orders"
             icon={<FileText className="h-8 w-8 mb-2" />}
           />
           <MenuCard
-            callback={closeDay}
+            callback={() => afterTriggerAction(() => dispatch(setCloseDayPopup({ isOpen: true })))}
             title="Close the Day"
             icon={<Calendar className="h-8 w-8 mb-2" />}
-            disabled={true}
-          />
-          <MenuCard
-            callback={generateReport}
-            title="Generate Report"
-            icon={<BarChart3 className="h-8 w-8 mb-2" />}
-            disabled={true}
           />
         </div>
       </SheetContent>

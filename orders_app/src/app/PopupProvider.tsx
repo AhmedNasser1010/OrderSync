@@ -1,6 +1,7 @@
 "use client";
 
-import DeleteOrderPopup from "./DeleteOrderPopup";
+import DeleteOrderPopup from "../components/popups/DeleteOrderPopup";
+import CloseDayPopup from "../components/popups/CloseDayPopup";
 
 const PopupProvider = ({
   children
@@ -11,6 +12,7 @@ const PopupProvider = ({
   return (
     <>
       <DeleteOrderPopup />
+      <CloseDayPopup />
       {children}
     </>
   );
