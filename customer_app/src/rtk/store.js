@@ -11,6 +11,9 @@ import trackingSlice from './slices/trackingSlice.js'
 import servicesSlice from './slices/servicesSlice.js'
 import filterSlice from './slices/filterSlice.js'
 
+// Api
+import { firestoreApi } from './api/firestoreApi.js'
+
 export const store = configureStore({
   reducer: {
     cart: cartSlice,
@@ -21,6 +24,9 @@ export const store = configureStore({
     restaurants: restaurantsSlice,
     tracking: trackingSlice,
     services: servicesSlice,
-    filter: filterSlice
-  }
+    filter: filterSlice,
+    [firestoreApi.reducerPath]: firestoreApi.reducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(firestoreApi.middleware)
 })

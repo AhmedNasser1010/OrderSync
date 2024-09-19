@@ -29,6 +29,8 @@ import ItemSizesBar from '../restaurant-menu/ItemSizesBar'
 import getUserSource from '../../utils/getUserSource'
 import filterObject from '../../utils/filterObject'
 
+import usePlace from '../../hooks/usePlace'
+
 
 import OrderInfo from './OrderInfo'
 
@@ -118,6 +120,8 @@ const Cart = () => {
   const updateUserOnSendOrder = useUpdateUserOnSendOrder()
   const services = useSelector((state) => state.services)
   const [deliveryFees, setDeliveryFees] = useState(0)
+
+  const { placeOrder } = usePlace()
 
   useEffect(() => {
     dispatch(
@@ -342,6 +346,7 @@ const Cart = () => {
             cancelAutoAssign: false,
             status: {
               current: 'RECEIVED',
+              accepted: false,
               history: [
                 { status: 'RECEIVED', timestamp }
               ]
@@ -529,7 +534,7 @@ const Cart = () => {
                           />
                         </button>
                       )}
-                      <div className="absolute flex justify-around items-center text-x1 -bottom-2 left-1/2 -translate-x-1/2 z-[1] w-24 h-9 shadow-md shadow-color-7 bg-color-11 text-white text-center inline-block rounded text-sm font-ProximaNovaSemiBold uppercase">
+                      <div className="absolute flex justify-around items-center text-x1 -bottom-2 left-1/2 -translate-x-1/2 z-[1] w-24 h-9 shadow-md shadow-color-7 bg-color-11 text-white text-center rounded text-sm font-ProximaNovaSemiBold uppercase">
                         <button className="w-1/3 h-full" onMouseUp={() => handleIncreaseQty(item)}>
                           +
                         </button>
@@ -555,7 +560,7 @@ const Cart = () => {
                   </div>
                   <div className="flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
                     <div>
-                      <h3 className="font-ProximaNovaSemiBold">{t('Total Price Dsicounted')}</h3>
+                      <h3 className="font-ProximaNovaSemiBold">{t('Total Price Discounted')}</h3>
                     </div>
                     <div>
                       <span className="egp font-ProximaNovaSemiBold">
@@ -585,7 +590,7 @@ const Cart = () => {
               />
               <div className="flex items-center justify-center gap-2 mt-2 checkout-btns">
                 <button
-                  onClick={() => !disableSubmit && handlePayment()}
+                  onClick={() => !disableSubmit && placeOrder(comment)}
                   className="bg-color-11 border border-color-11 text-white hover:bg-white hover:text-color-11">
                   {t('Place Order')}
                 </button>

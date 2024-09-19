@@ -7,6 +7,7 @@ import { addToCart, setRestaurant } from '../../rtk/slices/cartSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
+import filterObject from '../../utils/filterObject'
 
 const PlaceItemBtn = ({ item, resAvailability, resID }) => {
   const { t } = useTranslation()
@@ -33,13 +34,8 @@ const PlaceItemBtn = ({ item, resAvailability, resID }) => {
 
     const menuItem = {
       ...itemFromCart,
-      selectedSize:
-        itemFromCart?.selectedSize ||
-        (item?.sizes?.length > 0 && item?.sizes[1]?.price && item?.sizes[1]) ||
-        (item?.sizes?.length > 0 && item?.sizes[0]?.price && item?.sizes[0]) ||
-        (item?.sizes?.length > 0 && item?.sizes[2]?.price && item?.sizes[2]) ||
-        null
-    }
+      selectedSize: itemFromCart?.selectedSize || item?.selectedSize
+    };
 
     const isItemInCart = cartItems.some(
       (cartItem) =>
