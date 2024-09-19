@@ -1,37 +1,43 @@
-export type OrderStatusType = "RECEIVED" | "PREPARING" | "DELIVERY" | "COMPLETED" | "CANCELED" | "REJECTED";
+export type OrderStatusType =
+  | "RECEIVED"
+  | "PREPARING"
+  | "DELIVERY"
+  | "COMPLETED"
+  | "CANCELED"
+  | "REJECTED"
+  | "VOIDED";
 
-// Type for status history entry
 export type StatusHistoryEntryType = {
   status: OrderStatusType;
   timestamp: number;
-}
+};
 
-// Type for status object
 export type StatusType = {
   current: OrderStatusType;
+  accepted: boolean;
+  cancellationReason?: string;
   history: StatusHistoryEntryType[];
-}
+};
 
-// Type for order timestamps
 export type OrderTimestampsType = {
   placedAt: number;
-  cookedAt: number;
-  pickedUpAt: number;
-  deliveredAt: number;
-}
+  preparedAt: number;
+  deliveryAt: number;
+  completedAt: number;
+  canceledAt: number;
+  rejectedAt: number;
+};
 
-export type DeliveryStatusType = "DELIVERED" | "PENDING" | "PREPARING"
+export type DeliveryStatusType = "DELIVERED" | "PENDING" | "PREPARING";
 
-// Type for delivery object
 export type DeliveryType = {
   driver: string;
   status: DeliveryStatusType;
   estimatedTime: number;
-}
+};
 
-export type ItemSizesType = "S" | "M" | "L"
+export type ItemSizesType = "S" | "M" | "L";
 
-// Type for cart item
 export type CartItemType = {
   id: string;
   quantity: number;
@@ -42,44 +48,38 @@ export type CartItemType = {
     type: string;
     enabled: boolean;
   }[];
-}
+};
 
-// Type for cart total price
 export type CartTotalPriceType = {
   total: number;
   discount: number;
   orderLevelDiscount?: string;
-}
+};
 
-// Type for payment object
 export type PaymentType = {
   method: "CASH";
   status: "COMPLETED";
-}
+};
 
-// Type for location object
 export type LocationType = {
   latlng: [number, number];
   address: string;
-}
+};
 
-// Type for customer object
 export type CustomerType = {
   uid: string;
   name: string;
   phone: string;
   firstOrderDate: number;
   totalOrders: number;
-  loyaltyPoints: number;
-}
+  totalOrdersValue: number;
+};
 
-// Type for customer feedback object
 export type CustomerFeedbackType = {
   rating: number;
   comment: string;
-}
+};
 
-// Type for the main order object
 export type OrderType = {
   id: string;
   timestamp: number;
@@ -91,8 +91,17 @@ export type OrderType = {
   cartTotalPrice: CartTotalPriceType;
   deliveryFees: number;
   payment: PaymentType;
-  location: Location;
+  location: LocationType;
   customer: CustomerType;
   customerFeedback: CustomerFeedbackType;
   orderSource: string;
-}
+};
+
+export type FormattedOrderType = {
+  id: string;
+  customer: string;
+  items: string;
+  total: string;
+  status: OrderStatusType;
+  accepted: boolean;
+};

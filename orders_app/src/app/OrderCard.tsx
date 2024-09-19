@@ -25,16 +25,18 @@ import {
   Printer,
   Check,
   X,
-  Bike
+  Bike,
+  Ban,
+  CircleX
 } from "lucide-react";
 import Link from "next/link";
-import { Order, OrderStatus, FormattedOrder } from "@/types/order";
+import { OrderType, OrderStatusType, FormattedOrderType } from "@/types/order";
 import useOrderHandler from "@/hooks/useOrderHandler";
 import { useRouter } from "next/navigation";
 import { setDeletePopup } from "@/lib/rtk/slices/toggleSlice";
 import { useAppDispatch } from "@/lib/rtk/hooks";
 
-const getStatusIcon = (status: OrderStatus) => {
+const getStatusIcon = (status: OrderStatusType) => {
   switch (status) {
     case "RECEIVED":
       return <SquareArrowDown className="h-4 w-4" />;
@@ -44,10 +46,14 @@ const getStatusIcon = (status: OrderStatus) => {
       return <Bike className="h-4 w-4" />;
     case "COMPLETED":
       return <CheckCircle className="h-4 w-4" />;
+    case "REJECTED":
+      return <Ban className="h-4 w-4" />;
+    case "CANCELED":
+      return <CircleX className="h-4 w-4" />;
   }
 };
 
-const OrderCard = ({ order, activeTabValue }: { order: FormattedOrder, activeTabValue: string }) => {
+const OrderCard = ({ order, activeTabValue }: { order: FormattedOrderType, activeTabValue: string }) => {
   const {
     handlePrintInvoice,
     handleChangeStatus,
@@ -82,6 +88,8 @@ const OrderCard = ({ order, activeTabValue }: { order: FormattedOrder, activeTab
                 ? "default"
                 : order.status === "PREPARING"
                 ? "secondary"
+                : order.status === "REJECTED" || order.status === "CANCELED"
+                ? "destructive"
                 : "success"
             }
             className="flex items-center"

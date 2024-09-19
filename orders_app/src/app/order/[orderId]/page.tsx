@@ -20,7 +20,7 @@ import { Separator } from "@/components/ui/separator";
 import { TypographyH3 } from "@/components/ui/typography";
 import Link from "next/link";
 import Page from "@/components/Page";
-import { Order, OrderStatus } from "@/types/order";
+import { OrderType, OrderStatusType } from "@/types/order";
 import { ItemType } from "@/types/menu";
 import useOrders from "@/hooks/useOrders";
 import { Beef } from "lucide-react";
@@ -44,7 +44,7 @@ export default function OrderDetails({
 }) {
   const router = useRouter();
   const { getOrder, getOrderMenu, isLoading } = useOrders();
-  const [order, setOrder] = useState<Order | null>(null);
+  const [order, setOrder] = useState<OrderType | null>(null);
   const [orderCart, setOrderCart] = useState<ItemType[] | null>(null);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export default function OrderDetails({
     }
   }, [order, isLoading]);
 
-  const getStatusColor = (status: OrderStatus) => {
+  const getStatusColor = (status: OrderStatusType) => {
     switch (status) {
       case "RECEIVED":
         return "bg-blue-500";
@@ -80,7 +80,7 @@ export default function OrderDetails({
   };
 
   const openCaller = () => {
-    window.open(`tel:${order?.user?.phone}`);
+    window.open(`tel:${order?.customer?.phone}`);
   };
 
   const printOrder = () => {};
@@ -102,9 +102,9 @@ export default function OrderDetails({
         <div className="flex items-center space-x-2">
           <Badge
             variant="outline"
-            className={`${getStatusColor(order.status)} text-white`}
+            className={`${getStatusColor(order.status.current)} text-white`}
           >
-            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+            {order.status.current.charAt(0).toUpperCase() + order.status.current.slice(1)}
           </Badge>
           <Badge variant="outline">CASH</Badge>
           <Button variant="outline" size="sm" onClick={printOrder}>
@@ -141,7 +141,7 @@ export default function OrderDetails({
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <Phone className="mr-2 h-4 w-4" />
-                  <span>{order.user.phone}</span>
+                  <span>{order.customer.phone}</span>
                 </div>
                 <Button
                   variant="outline"

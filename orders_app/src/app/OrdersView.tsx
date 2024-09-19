@@ -8,15 +8,24 @@ import OrderCardSkeleton from "@/components/shimmer/OrderCardSkeleton";
 import NoOrders from "@/components/NoOrders";
 
 export default function OrdersView() {
-  const { formattedOrders } = useOrders();
+  const { formattedOrders, isLoading } = useOrders();
   const activeTabValue = useAppSelector(activeTab);
 
   const filteredOrders =
-    formattedOrders?.filter((order) => order.status === activeTabValue) || [];
+    activeTabValue === "VOIDED"
+      ? formattedOrders?.filter((order) =>
+          ["CANCELED", "REJECTED"].includes(order.status)
+        )
+      : formattedOrders?.filter((order) => order.status === activeTabValue) ||
+        [];
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {filteredOrders?.length > 0 ? (
+      {isLoading && <OrderCardSkeleton />}
+      {isLoading && <OrderCardSkeleton />}
+      {isLoading && <OrderCardSkeleton />}
+
+      {filteredOrders && filteredOrders?.length ? (
         filteredOrders.map((order) => (
           <OrderCard
             key={order.id}
@@ -24,11 +33,7 @@ export default function OrdersView() {
             activeTabValue={activeTabValue}
           />
         ))
-      ) : formattedOrders?.length !== filteredOrders?.length ? (
-        <NoOrders />
-      ) : (
-        <OrderCardSkeleton />
-      )}
+      ) : <NoOrders />}
     </div>
   );
 }

@@ -6,10 +6,11 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Settings, FileText, Calendar, BarChart3 } from "lucide-react";
+import { Settings, TicketX, TicketCheck, KeyRound, BarChart3 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/lib/rtk/hooks";
 import { setActiveTab, optionMenuView, setOptionsMenuView, setCloseDayPopup } from "@/lib/rtk/slices/toggleSlice";
 import MenuCard from './MenuCard'
@@ -34,17 +35,23 @@ function SettingsMenu() {
       <SheetContent side="bottom" className="rounded-t-lg min-h-[50vh]">
         <SheetHeader>
           <SheetTitle>More</SheetTitle>
+          <SheetDescription>More Settings</SheetDescription>
         </SheetHeader>
         <div className="grid grid-cols-2 gap-4 py-4">
           <MenuCard
             callback={() => afterTriggerAction(() => dispatch(setActiveTab("COMPLETED")))}
-            title="View Closed Orders"
-            icon={<FileText className="h-8 w-8 mb-2" />}
+            title="Completed Orders"
+            icon={<TicketCheck className="h-8 w-8 mb-2" />}
+          />
+          <MenuCard
+            callback={() => afterTriggerAction(() => dispatch(setActiveTab("VOIDED")))}
+            title="Rejected Orders"
+            icon={<TicketX className="h-8 w-8 mb-2" />}
           />
           <MenuCard
             callback={() => afterTriggerAction(() => dispatch(setCloseDayPopup({ isOpen: true })))}
             title="Close the Day"
-            icon={<Calendar className="h-8 w-8 mb-2" />}
+            icon={<KeyRound className="h-8 w-8 mb-2" />}
           />
         </div>
       </SheetContent>

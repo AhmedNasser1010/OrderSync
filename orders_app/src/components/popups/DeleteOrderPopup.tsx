@@ -90,6 +90,7 @@ export default function DeleteOrderPopup() {
             type="button"
             variant="outline"
             onClick={handleClose}
+            className="mb-2.5"
           >
             Cancel
           </Button>
