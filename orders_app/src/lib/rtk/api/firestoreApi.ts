@@ -437,6 +437,13 @@ export const firestoreApi = createApi({
     setCloseDay: builder.mutation({
       async queryFn({ resId, orders, summaryData }) {
         try {
+          // Actions
+          // 1- Delete voided orders docs
+          // 2- Delete completed orders docs
+          // 3- Add current orders to history
+          // 4- Add daily summarization
+          // 5- Set restaurant status to inactive
+
           const date = summaryData.date;
           const historyRef = collection(db, "orders", resId, "history");
           const dailySummarizationRef = collection(db, "orders", resId, "dailySummarization");
@@ -458,12 +465,17 @@ export const firestoreApi = createApi({
           await deleteCollectionDocs(completedOrdersRef);
     
           orders.forEach((order: OrderType, index: number) => {
-            const orderDocRef = doc(historyRef, `${date}-${index}`);
+            const orderDocRef = doc(historyRef, `${date}_${index}`);
             batch.set(orderDocRef, order);
           });
     
           const dailySummarizationDocRef = doc(dailySummarizationRef, date);
           batch.set(dailySummarizationDocRef, summaryData);
+
+          const docRef = doc(db, "businesses", resId);
+          batch.update(docRef, {
+            ["settings.siteControl.status"]: "inactive",
+          });
     
           await batch.commit();
     
