@@ -3,7 +3,7 @@
   "Select": "Select",
   "What's on your mind?": "What's on your mind?",
   "Top restaurant chains in El-Ayat": "Top restaurant chains in El-Ayat",
-  "Restaurants with online food delivery to El Ayat": "Restaurants with online food delivery to El Ayat",
+  "Restaurants with online food delivery in El Ayat": "Restaurants with online food delivery in El Ayat",
   "Fast Delivery": "Fast Delivery",
   "Rating 4.0+": "Rating 4.0+",
   "Pure Veg": "Pure Veg",
@@ -100,10 +100,10 @@
   "YES, START AFRESH": "YES, START AFRESH",
   "Location": "Location",
   "Zack's Eats": "Zack's Eats",
-  "Online": "Online",
-  "Offline": "Offline",
-  "Busy": "Busy",
-  "Paused": "Paused",
+  "active": "Online",
+  "inactive": "Offline",
+  "busy": "Busy",
+  "pause": "Paused",
   "This restaurant is currently busy, so your order may take longer than usual.": "This restaurant is currently busy, so your order may take longer than usual.",
   "This restaurant is temporarily paused, so we can't take any orders at the moment. We apologize for the inconvenience.": "This restaurant is temporarily paused, so we can't take any orders at the moment. We apologize for the inconvenience.",
   "This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding.": "This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding.",
@@ -123,5 +123,7 @@
   "Crepes": "Crepes",
   "Italian Pizza": "Italian Pizza",
   "Pasta": "Pasta",
-  "Add to Home Screen!": "Add to Home Screen!"
+  "Add to Home Screen!": "Add to Home Screen!",
+  "Order Track": "Order Track",
+  "Invoice No": "Invoice No"
 }

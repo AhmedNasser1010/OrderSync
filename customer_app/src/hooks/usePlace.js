@@ -154,6 +154,7 @@ const usePlace = () => {
         uid: null,
         name: null,
         phone: null,
+        liveLocation: [0, 0],
         status: 'PENDING'
       },
       cart: filteredCart,

@@ -11,6 +11,10 @@ import ShimmerMenu from '../../components/Shimmer/ShimmerMenu'
 import MenuPopups from './MenuPopups'
 import { resetPopupStates } from '../../rtk/slices/toggleSlice'
 
+const inactiveMsg = 'This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding.'
+const busyMsg = 'This restaurant is currently busy, so your order may take longer than usual.'
+const pauseMsg = "This restaurant is temporarily paused, so we can't take any orders at the moment. We apologize for the inconvenience."
+
 const RestaurantMenu = () => {
   const dispatch = useDispatch()
   const { t } = useTranslation()
@@ -24,7 +28,9 @@ const RestaurantMenu = () => {
   const res = useMemo(() => {
     return restaurants.filter((res) => res.business.name === resId.split('-').join(' '))[0]
   }, [resId, restaurants])
+
   const resName = lang === 'ar' ? res?.business?.nameInAr : res?.business?.name
+  const status = res?.settings?.siteControl?.status || 'pause'
 
   useEffect(() => {
     res?.accessToken && resMenu(res.accessToken)
@@ -60,25 +66,12 @@ const RestaurantMenu = () => {
       />
       <RestaurantInfo resMainInfo={resMainInfo} />
       <hr className="border-1 border-dashed border-b-[#d3d3d3] my-4"></hr>
-      {(!res?.settings?.siteControl?.availability && (
-        <p className="w-fit mx-auto px-3 py-1 rounded-full text-base font-medium bg-red-100 text-red-800">
-          {t(
-            'This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding.'
-          )}
+
+      {status !== 'active' &&
+        <p className={`w-fit mx-auto px-3 py-1 rounded-full text-base font-medium ${status === 'inactive' ? 'bg-red-100 text-red-800' : status === 'busy' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>
+          {t(status === 'inactive' ? inactiveMsg : status === 'busy' ? busyMsg : pauseMsg)}
         </p>
-      )) ||
-        (res?.settings?.siteControl?.isBusy && (
-          <p className="w-fit mx-auto px-3 py-1 rounded-full text-base font-medium bg-yellow-100 text-yellow-800">
-            {t('This restaurant is currently busy, so your order may take longer than usual.')}
-          </p>
-        )) ||
-        (res?.settings?.siteControl?.temporaryPause && (
-          <p className="w-fit mx-auto px-3 py-1 rounded-full text-base font-medium bg-gray-100 text-gray-800">
-            {t(
-              "This restaurant is temporarily paused, so we can't take any orders at the moment. We apologize for the inconvenience."
-            )}
-          </p>
-        ))}
+      }
 
       {true ? (
         <ul className="main-menu-container">
@@ -91,11 +84,7 @@ const RestaurantMenu = () => {
                 categoryID={category?.id}
                 categoryTitle={category?.title}
                 resID={res?.accessToken}
-                resAvailability={{
-                  availability: res?.settings?.siteControl?.availability,
-                  temporaryPause: res?.settings?.siteControl?.temporaryPause,
-                  isBusy: res?.settings?.siteControl?.isBusy
-                }}
+                status={status}
               />
             </li>
           ))}

@@ -23,7 +23,7 @@ function Restaurants() {
   return (
     <section id="restaurants">
       <h2 className="font-GrotBlack text-2xl pb-5 pt-5 2xl:text-start text-center sm:px-0 px-2">
-        {t('Restaurants with online food delivery to El Ayat')}
+        {t('Restaurants with online food delivery in El Ayat')}
       </h2>
 
       <RestaurantsFilter />
@@ -46,10 +46,7 @@ function Restaurants() {
                     'min'
                   )}`,
                   cuisines: res?.business?.cuisines,
-                  availability: res?.settings?.siteControl?.availability,
-                  isBusy: res?.settings?.siteControl?.isBusy,
-                  temporaryPause: res?.settings?.siteControl?.temporaryPause,
-                  closeMsg: res?.settings?.siteControl?.closeMsg,
+                  status: res?.settings?.siteControl?.status,
                   promotionalSubtitle: res?.business?.promotionalSubtitle
                 }}
               />

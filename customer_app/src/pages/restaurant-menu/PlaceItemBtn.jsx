@@ -9,7 +9,7 @@ import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import filterObject from '../../utils/filterObject'
 
-const PlaceItemBtn = ({ item, resAvailability, resID }) => {
+const PlaceItemBtn = ({ item, status, resID }) => {
   const { t } = useTranslation()
   const { i18n } = useTranslation()
   const lang = i18n?.language || 'ar'
@@ -20,13 +20,8 @@ const PlaceItemBtn = ({ item, resAvailability, resID }) => {
   const menuItems = useSelector((state) => state.menu.items)
 
   const handleAddItem = (item) => {
-    if (!resAvailability?.availability) {
+    if (status === 'inactive' || status === 'pause') {
       dispatch(setShowResClosedPopup(true))
-      return
-    }
-
-    if (resAvailability?.temporaryPause) {
-      dispatch(setShowResPausedPopup(true))
       return
     }
 

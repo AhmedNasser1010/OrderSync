@@ -10,6 +10,8 @@ const toggleSlice = createSlice({
     showItemsAlreadyInCartPopup: false,
     showResClosedPopup: false,
     showResPausedPopup: false,
+    rateIsOpen: false,
+    hasOrder: true
   },
   reducers: {
     toggleLocationSidebar: (state) => {
@@ -38,6 +40,12 @@ const toggleSlice = createSlice({
       state.showResClosedPopup = false
       state.showResPausedPopup = false
     },
+    setRateIsOpen: (state, { payload }) => {
+      state.rateIsOpen = payload === undefined ? !state.rateIsOpen : payload
+    },
+    setHasOrder: (state, { payload }) => {
+      state.hasOrder = payload === undefined ? !state.hasOrder : payload
+    },
   },
 })
 
@@ -49,6 +57,8 @@ export const {
   setShowItemsAlreadyInCartPopup,
   setShowResClosedPopup,
   setShowResPausedPopup,
-  resetPopupStates
+  resetPopupStates,
+  setRateIsOpen,
+  setHasOrder
 } = toggleSlice.actions
 export default toggleSlice.reducer

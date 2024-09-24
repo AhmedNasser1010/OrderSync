@@ -89,10 +89,7 @@ function TopRestaurant() {
                         cloudinaryImageId: res?.business?.cover,
                         sla: `${res.services.cookTime[0] / 60000}-${res.services.cookTime[1] / 60000} ${t('min')}`,
                         cuisines: res?.business?.cuisines,
-                        availability: res?.settings?.siteControl?.availability,
-                        isBusy: res?.settings?.siteControl?.isBusy,
-                        temporaryPause: res?.settings?.siteControl?.temporaryPause,
-                        closeMsg: res?.settings?.siteControl?.closeMsg,
+                        status: res?.settings?.siteControl?.status,
                         promotionalSubtitle: res?.business?.promotionalSubtitle
                       }}
                     />

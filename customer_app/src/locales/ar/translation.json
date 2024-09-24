@@ -3,7 +3,7 @@
   "Select": "اختار",
   "What's on your mind?": "ايه اللي في دماغك؟",
   "Top restaurant chains in El-Ayat": "افضل سلاسل المطاعم في العياط",
-  "Restaurants with online food delivery to El Ayat": "مطاعم توصيل الأكل اونلاين الى العياط",
+  "Restaurants with online food delivery in El Ayat": "مطاعم توصيل الأكل اونلاين في العياط",
   "Fast Delivery": "توصيل سريع",
   "Rating 4.0+": "تقييم 4.0+",
   "Pure Veg": "نباتي تمام",
@@ -99,10 +99,10 @@
   "YES, START AFRESH": "أيوة، نبدأ من جديد",
   "Location": "الموقع",
   "Zack's Eats": "زاكس ايتس",
-  "Online": "متاح",
-  "Offline": "مغلق",
-  "Busy": "مشغول",
-  "Paused": "مغلق مؤقت",
+  "active": "متاح",
+  "inactive": "مغلق",
+  "busy": "مشغول",
+  "pause": "مغلق مؤقت",
   "This restaurant is currently busy, so your order may take longer than usual.": "المطعم مشغول دلوقتي، فممكن الطلب بتاعك ياخد وقت أطول من المعتاد.",
   "This restaurant is temporarily paused, so we can't take any orders at the moment. We apologize for the inconvenience.": "المطعم موقوف مؤقتاً، فمش قادرين نستقبل طلبات دلوقتي. نعتذر عن الإزعاج.",
   "This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding.": "المطعم ده مغلق حالياً أو خارج أوقات العمل. من فضلك شوفنا تاني في أوقات العمل العادية. شكراً لتفهمك.",
@@ -123,5 +123,7 @@
   "Hawawshi": "حواوشي",
   "Italian Pizza": "بيتزا ايطالي",
   "Pasta": "معكرونة",
-  "Add to Home Screen!": "إضافة الى الشاشة الرئيسية!"
+  "Add to Home Screen!": "إضافة الى الشاشة الرئيسية!",
+  "Order Track": "تتبع الطلب",
+  "Invoice No": "رقم الفاتورة"
 }

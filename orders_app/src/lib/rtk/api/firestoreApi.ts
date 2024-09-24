@@ -297,15 +297,15 @@ export const firestoreApi = createApi({
 
           if (updatedStatus === "COMPLETED") {
             // Remove the completed order from `openQueue`
-            const openOrderDocRef = doc(openQueueRef, orderId);
+            const openOrderDocRef = doc(openQueueRef, `${orderId}_${orderToUpdate.customer.uid}`);
             batch.delete(openOrderDocRef);
 
             // Add the completed order to `completedOrders`
-            const completedOrderDocRef = doc(completedOrdersRef, orderId);
+            const completedOrderDocRef = doc(completedOrdersRef, `${orderId}_${orderToUpdate.customer.uid}`);
             batch.set(completedOrderDocRef, updatedOrder);
           } else {
             // If status is not completed, just update the open queue
-            const openOrderDocRef = doc(openQueueRef, orderId);
+            const openOrderDocRef = doc(openQueueRef, `${orderId}_${orderToUpdate.customer.uid}`);
             batch.set(openOrderDocRef, updatedOrder);
           }
 
@@ -382,11 +382,11 @@ export const firestoreApi = createApi({
           const batch = writeBatch(db);
 
           // Remove the canceled order from `openQueue`
-          const openOrderDocRef = doc(openQueueRef, orderId);
+          const openOrderDocRef = doc(openQueueRef, `${orderId}_${orderToUpdate.customer.uid}`);
           batch.delete(openOrderDocRef);
 
           // Add the canceled order to `voidedOrders`
-          const voidedOrderDocRef = doc(voidedOrdersRef, orderId);
+          const voidedOrderDocRef = doc(voidedOrdersRef, `${orderId}_${orderToUpdate.customer.uid}`);
           batch.set(voidedOrderDocRef, canceledOrder);
 
           // Commit the batch operation
@@ -486,7 +486,7 @@ export const firestoreApi = createApi({
           return { error: error.message };
         }
       },
-      invalidatesTags: ["HistoryOrders", "DailySummarizationOrders"],
+      invalidatesTags: ["HistoryOrders", "DailySummarizationOrders", "Restaurant"],
     }),
   }),
 });

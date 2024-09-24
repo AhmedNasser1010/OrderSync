@@ -28,7 +28,7 @@ import ItemDescription from '../restaurant-menu/ItemDescription'
 import ItemSizesBar from '../restaurant-menu/ItemSizesBar'
 import getUserSource from '../../utils/getUserSource'
 import filterObject from '../../utils/filterObject'
-
+import useRestaurantMenu from '../../hooks/useRestaurantMenu'
 import usePlace from '../../hooks/usePlace'
 
 
@@ -108,6 +108,7 @@ const Cart = () => {
   const { t } = useTranslation()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const cart = useSelector((state) => state.cart)
   const cartItems = useSelector((state) => state.cart.items)
   const cartRestaurantID = useSelector((state) => state.cart.restaurant)
   const menuItems = useSelector((state) => state.menu.items)
@@ -115,13 +116,20 @@ const Cart = () => {
   const checkout = useSelector((state) => state.checkout)
   const accessToken = useSelector((state) => state.cart.restaurant)
   const user = useSelector((state) => state.user)
+  const trackedOrder = user.trackedOrder || { id: null, restaurant: null, driverId: null }
   const [comment, setComment] = useState('')
   const [disableSubmit, setDisableSubmit] = useState(false)
   const updateUserOnSendOrder = useUpdateUserOnSendOrder()
   const services = useSelector((state) => state.services)
   const [deliveryFees, setDeliveryFees] = useState(0)
-
   const { placeOrder } = usePlace()
+  const resMenu = useRestaurantMenu()
+
+  useEffect(() => {
+    if (cart.restaurant) {
+      resMenu(cart.restaurant)
+    }
+  }, [cart.restaurant])
 
   useEffect(() => {
     dispatch(
@@ -153,6 +161,18 @@ const Cart = () => {
     return restaurants?.filter((restaurant) => restaurant.accessToken === cartRestaurantID)[0]
   }, [restaurants, cartRestaurantID])
 
+  const selectedItems = useMemo(() => {
+    return cartItems
+      ?.map((cartItem) => {
+        const menuItem = menuItems?.find((menuItem) => menuItem.id === cartItem.id)
+        if (menuItem) {
+          return { ...menuItem, quantity: cartItem.quantity, selectedSize: cartItem?.selectedSize || null }
+        }
+        return null
+      })
+      .filter((item) => item !== null)
+  }, [cartItems, menuItems])
+
   useEffect(() => {
     if (!user?.locations?.selected) return setDeliveryFees(0)
     if (
@@ -168,19 +188,7 @@ const Cart = () => {
       const fees = getDeliveryFees(userDistanceFromRes, services.deliveryFees)
       setDeliveryFees(fees)
     }
-  }, [resInfo, user])
-
-  const selectedItems = useMemo(() => {
-    return cartItems
-      ?.map((cartItem) => {
-        const menuItem = menuItems?.find((menuItem) => menuItem.id === cartItem.id)
-        if (menuItem) {
-          return { ...menuItem, quantity: cartItem.quantity, selectedSize: cartItem?.selectedSize || null }
-        }
-        return null
-      })
-      .filter((item) => item !== null)
-  }, [cartItems, menuItems])
+  }, [resInfo, user, services.deliveryFees])
 
   const cartTotalPrice = useMemo(() => {
     return selectedItems?.reduce(
@@ -207,7 +215,7 @@ const Cart = () => {
       },
       { total: deliveryFees, discount: deliveryFees }
     )
-  }, [cartItems, deliveryFees])
+  }, [cartItems, deliveryFees, selectedItems])
 
   useEffect(() => {
     if (selectedItems.length) {
@@ -235,29 +243,37 @@ const Cart = () => {
   }, [])
 
   const handleIncreaseQty = (item) => {
-    dispatch(quantityHandle({ id: item.id, quantity: '+', selectedSize: item?.selectedSize }))
+    if (!trackedOrder.id) {
+      dispatch(quantityHandle({ id: item.id, quantity: '+', selectedSize: item?.selectedSize }))
+    }
   }
 
   const handleDecreaseQty = (item) => {
-    dispatch(quantityHandle({ id: item.id, quantity: '-', selectedSize: item?.selectedSize }))
+    if (!trackedOrder.id) {
+      dispatch(quantityHandle({ id: item.id, quantity: '-', selectedSize: item?.selectedSize }))
+    }
   }
 
   const handleClearAll = () => {
-    dispatch(clearCart())
-    toast.success(t('Cart is cleared Successfully'), {
-      className: 'font-ProximaNovaSemiBold',
-      position: 'top-center',
-      duration: 1500
-    })
+    if (!trackedOrder.id) {
+      dispatch(clearCart())
+      toast.success(t('Cart is cleared Successfully'), {
+        className: 'font-ProximaNovaSemiBold',
+        position: 'top-center',
+        duration: 1500
+      })
+    }
   }
 
   const handleComment = (e) => {
-    setComment(e.target.value)
-    dispatch(
-      addCheckout({
-        comment: e.target.value
-      })
-    )
+    if (!trackedOrder.id) {
+      setComment(e.target.value)
+      dispatch(
+        addCheckout({
+          comment: e.target.value
+        })
+      )
+    }
   }
 
   const handleOrderSubmission = async (final) => {
@@ -547,7 +563,7 @@ const Cart = () => {
                   </div>
                 )
               })}
-              <OrderInfo deliveryFees={deliveryFees} />
+              <OrderInfo deliveryFees={deliveryFees} orderId={user?.trackedOrder?.id} />
               {cartTotalPrice.total !== cartTotalPrice.discount && (
                 <>
                   <div className="discount flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
@@ -580,25 +596,39 @@ const Cart = () => {
                   </div>
                 </div>
               )}
-              <input
-                className="w-full p-3 border border-gray-300"
-                id="comment"
-                type="text"
-                placeholder={t('Comment, extras')}
-                value={comment}
-                onChange={handleComment}
-              />
+              {!trackedOrder.id && 
+                <input
+                  className="w-full p-3 border border-gray-300"
+                  id="comment"
+                  type="text"
+                  placeholder={t('Comment, extras')}
+                  value={comment}
+                  onChange={handleComment}
+                />
+              }
               <div className="flex items-center justify-center gap-2 mt-2 checkout-btns">
-                <button
-                  onClick={() => !disableSubmit && placeOrder(comment)}
-                  className="bg-color-11 border border-color-11 text-white hover:bg-white hover:text-color-11">
-                  {t('Place Order')}
-                </button>
-                <button
-                  onClick={handleClearAll}
-                  className="border border-red-500 bg-red-500 text-white hover:bg-white hover:text-red-500">
-                  {t('Clear All')}
-                </button>
+                {trackedOrder.id &&
+                  <button
+                    onClick={() => dispatch(toggleOrderSidebar())}
+                    className="bg-color-11 border border-color-11 text-white hover:bg-white hover:text-color-11">
+                    {t('Order Track')}
+                  </button>
+                }
+                
+                {!trackedOrder.id && 
+                  <>
+                    <button
+                      onClick={handleClearAll}
+                      className="border border-red-500 bg-red-500 text-white hover:bg-white hover:text-red-500">
+                      {t('Clear All')}
+                    </button>
+                    <button
+                      onClick={() => !disableSubmit && placeOrder(comment)}
+                      className="bg-color-11 border border-color-11 text-white hover:bg-white hover:text-color-11">
+                      {t('Place Order')}
+                    </button>
+                  </>
+                }
               </div>
             </div>
           </div>

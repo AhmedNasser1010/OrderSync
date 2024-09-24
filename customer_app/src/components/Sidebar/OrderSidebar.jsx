@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from "react-redux"
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import styled from 'styled-components'
-import { doc, onSnapshot } from "firebase/firestore"
+import { doc, onSnapshot, collection, query, where } from "firebase/firestore"
 import { IoIosCloseCircleOutline } from "react-icons/io"
 import { IoSend } from "react-icons/io5"
 import { GiCook } from "react-icons/gi"
@@ -26,6 +26,7 @@ import { restaurantMapIcon, driverMapIcon, personMapIcon } from './mapCustomMark
 import DB_GET_DOC from '../../utils/DB_GET_DOC'
 import DB_UPDATE_NESTED_VALUE from '../../utils/DB_UPDATE_NESTED_VALUE'
 import DB_DELETE_NESTED_VALUE from '../../utils/DB_DELETE_NESTED_VALUE'
+import useOrder from '../../hooks/useOrder'
 
 const MapContainerStyled = styled(MapContainer)`
 	width: 100%;
@@ -39,122 +40,13 @@ function OrderSidebar() {
 	const { t } = useTranslation()
 	const user = useSelector(state => state.user)
 	const isOrderSidebarOpen = useSelector(state => state.toggle.isOrderSidebarOpen)
-	const tracking = useSelector(state => state.tracking)
 	const restaurants = useSelector(state => state.restaurants)
-	const [driverId, setDriverId] = useState(tracking?.order?.assign?.driver || null)
-	const [isAvailableToEdit, setIsAvailableToEdit] = useState(true)
-
-	useEffect(() => {
-		if (tracking.order) {
-			setDriverId(tracking?.order?.assign?.driver)
-			if (tracking.order.status !== 'RECEIVED') {
-				setIsAvailableToEdit(false)
-			} else {
-				setIsAvailableToEdit(true)
-			}
-		}
-	}, [tracking])
+	const currentRes = restaurants?.find(res => res.accessToken === user.trackedOrder.restaurant)
+	const { cancelOrder, trackedOrderData } = useOrder()
 
 	const handleCloseSidebar = () => {
 		dispatch(toggleOrderSidebar())
 		document.body.classList.remove("overflow-hidden")
-	}
-
-	useEffect(() => {
-		let unsubOrder = null
-		let unsubDriver = null
-
-		if (user?.trackedOrder?.id) {
-
-			const orderRef = doc(db, 'orders', user?.trackedOrder?.restaurant)
-
-			unsubOrder = onSnapshot(orderRef, doc => {
-				window.read += 1
-				console.log('Read: ', window.read)
-
-				if (doc.exists()) {
-					const orders = doc.data()?.open || []
-
-					const order = orders.find(order => order.customer.uid === user.userInfo.uid && order.id === user.trackedOrder.id)
-
-					if (!order) {
-						handleOrderIsCanceledByRes()
-						unsubOrder()
-						return
-					}
-
-					if (order && order.status === 'COMPLETED') {
-						dispatch(initOrder(order))
-						handleOrderIsCompleted()
-						unsubOrder()
-						return
-					}
-
-					if (order) {
-						dispatch(initOrder(order))
-						handleOrderIsNotCompletedYet()
-						return
-					}
-				}
-			})
-
-			if (driverId) {
-				const driverRef = doc(db, 'drivers', driverId)
-
-				unsubDriver = onSnapshot(driverRef, doc => {
-					window.read += 1
-					console.log('Read: ', window.read)
-
-					if (doc.exists()) {
-						const liveLocation = doc.data().liveLocation
-						const name = doc.data().userInfo.name
-						const phone = doc.data().userInfo.phone
-
-						dispatch(initDriver({ liveLocation, name, phone }))
-					}
-				})
-			}
-
-		}
-
-
-		return () => {
-			unsubDriver && unsubDriver()
-		}
-	}, [isOrderSidebarOpen, driverId])
-
-	const handleOrderCancel = async () => {
-		try {
-			const currentResOrders = await DB_GET_DOC('orders', tracking.res.accessToken)
-			const ordersAfter = currentResOrders.open.filter(order => order.id !== tracking.order.id)
-
-			DB_UPDATE_NESTED_VALUE('orders', tracking.res.accessToken, 'open', ordersAfter)
-			.then(res => {
-				if (res) {
-					DB_DELETE_NESTED_VALUE('customers', user.userInfo.uid, 'trackedOrder')
-				}
-			})
-		} catch(e) {
-			console.log('Encountered error while order delete', e)
-		}
-	}
-
-	const handleOrderIsNotCompletedYet = () => {
-		// Update the related res to the order to get order res data if needed
-		restaurants.map(res => {
-			if (res?.accessToken === user?.trackedOrder?.restaurant) {
-				dispatch(initRes(res))
-				return
-			}
-		})
-	}
-
-	const handleOrderIsCompleted = () => {
-		DB_DELETE_NESTED_VALUE('customers', user.userInfo.uid, 'trackedOrder')
-	}
-
-	const handleOrderIsCanceledByRes = () => {
-		DB_DELETE_NESTED_VALUE('customers', user.userInfo.uid, 'trackedOrder')
 	}
 
 	return (
@@ -191,7 +83,7 @@ function OrderSidebar() {
 						<TimelineItem>
 							<TimelineSeparator>
 								<TimelineConnector />
-								<TimelineDot color={ tracking?.order?.status === 'PREPARING' || tracking?.order?.status === 'DELIVERY' ? 'primary' : 'grey'}>
+								<TimelineDot color={ trackedOrderData?.status?.current === 'PREPARING' || trackedOrderData?.status?.current === 'DELIVERY' ? 'primary' : 'grey'}>
 									<GiCook />
 								</TimelineDot>
 								<TimelineConnector />
@@ -206,7 +98,7 @@ function OrderSidebar() {
 						<TimelineItem>
 							<TimelineSeparator>
 								<TimelineConnector />
-								<TimelineDot color={tracking?.order?.status === 'DELIVERY' ? 'primary' : 'grey'}>
+								<TimelineDot color={trackedOrderData?.status?.current === 'DELIVERY' ? 'primary' : 'grey'}>
 									<MdDeliveryDining />
 								</TimelineDot>
 								<TimelineConnector />
@@ -230,74 +122,74 @@ function OrderSidebar() {
 							attribution='&copy; <a href="https://ahmed-nasser.netlify.app/" target="_blank">Ahmed Nasser</a> OrderSync Systems'
 						/>
 						{
-							tracking?.res?.business?.latlng &&
-							<Marker position={tracking?.res?.business?.latlng} icon={restaurantMapIcon}>
+							currentRes?.business?.latlng &&
+							<Marker position={currentRes?.business?.latlng} icon={restaurantMapIcon}>
 								<Popup>
-									{ tracking?.res?.business?.name || t('Restaurant') }
+									{ currentRes?.business?.name || t('Restaurant') }
 								</Popup>
 							</Marker>
 						}
 						{
-							tracking?.order?.location?.latlng &&
-							<Marker position={tracking?.order?.location?.latlng} icon={personMapIcon}>
+							trackedOrderData?.location?.latlng &&
+							<Marker position={trackedOrderData?.location?.latlng} icon={personMapIcon}>
 								<Popup>
-									{ user?.userInfo?.name || t('You') }
+									{t('You')}
 								</Popup>
 							</Marker>
 						}
 						{
-							tracking?.driver?.liveLocation && tracking?.driver?.liveLocation[0] && tracking?.driver?.liveLocation[1] &&
-							<Marker position={tracking?.driver?.liveLocation} icon={driverMapIcon}>
+							trackedOrderData?.delivery?.liveLocation && trackedOrderData?.delivery?.liveLocation[0] && trackedOrderData?.delivery?.liveLocation[1] &&
+							<Marker position={trackedOrderData?.delivery?.liveLocation} icon={driverMapIcon}>
 								<Popup>
 									<div className='flex'>
 										<span>{t('Driver')}:</span>
-										<span>{t('Name')}: {tracking?.driver?.name}</span>
-										<span>{t('Phone')}: {tracking?.driver?.phone}</span>
+										<span>{t('Name')}: {trackedOrderData?.delivery?.name}</span>
+										<span>{t('Phone')}: {trackedOrderData?.delivery?.phone}</span>
 									</div>
 								</Popup>
 							</Marker>
 						}
 						{
-							tracking?.res && !tracking?.driver &&
-							<Marker position={[tracking?.res?.business?.latlng[0] + 0.0008, tracking?.res?.business?.latlng[1] + 0.0008]} icon={driverMapIcon}>
+							currentRes && !trackedOrderData?.delivery &&
+							<Marker position={[currentRes?.business?.latlng[0] + 0.0008, currentRes?.business?.latlng[1] + 0.0008]} icon={driverMapIcon}>
 								<Popup>
 									<div className='flex'>
 										<span>{t('Driver')}:</span>
-										<span>{t('Name')}: {tracking?.driver?.name}</span>
-										<span>{t('Phone')}: {tracking?.driver?.phone}</span>
+										<span>{t('Name')}: {trackedOrderData?.delivery?.name}</span>
+										<span>{t('Phone')}: {trackedOrderData?.delivery?.phone}</span>
 									</div>
 								</Popup>
 							</Marker>
 						}
 						{
-							tracking?.res?.business?.latlng && tracking?.driver?.liveLocation && tracking?.driver?.liveLocation[0] && tracking?.driver?.liveLocation[1] &&
-							<Polyline pathOptions={{ color: 'grey' }} positions={[tracking?.res?.business?.latlng, tracking?.driver?.liveLocation]} />
+							currentRes?.business?.latlng && trackedOrderData?.delivery?.liveLocation && trackedOrderData?.delivery?.liveLocation[0] && trackedOrderData?.delivery?.liveLocation[1] &&
+							<Polyline pathOptions={{ color: 'grey' }} positions={[currentRes?.business?.latlng, trackedOrderData?.delivery?.liveLocation]} />
 						}
 						{
-							tracking?.res?.business?.latlng && !tracking?.driver &&
-							<Polyline positions={[tracking?.res?.business?.latlng, [tracking?.res?.business?.latlng[0] + 0.0008, tracking?.res?.business?.latlng[1] + 0.0008]]} />
+							currentRes?.business?.latlng && !trackedOrderData?.delivery &&
+							<Polyline positions={[currentRes?.business?.latlng, [currentRes?.business?.latlng[0] + 0.0008, currentRes?.business?.latlng[1] + 0.0008]]} />
 						}
 						{
-							tracking?.order?.location?.latlng && tracking?.driver?.liveLocation && tracking?.driver?.liveLocation[0] && tracking?.driver?.liveLocation[1] &&
-							<Polyline positions={[tracking?.order?.location?.latlng, tracking?.driver?.liveLocation]} />
+							trackedOrderData?.location?.latlng && trackedOrderData?.delivery?.liveLocation && trackedOrderData?.delivery?.liveLocation[0] && trackedOrderData?.delivery?.liveLocation[1] &&
+							<Polyline positions={[trackedOrderData?.location?.latlng, trackedOrderData?.delivery?.liveLocation]} />
 						}
 						{
-							tracking?.order?.location?.latlng && !tracking?.driver &&
-							<Polyline positions={[tracking?.order?.location?.latlng, [tracking?.res?.business?.latlng[0] + 0.0008, tracking?.res?.business?.latlng[1] + 0.0008]]} />
+							trackedOrderData?.location?.latlng && !trackedOrderData?.delivery &&
+							<Polyline positions={[trackedOrderData?.location?.latlng, [currentRes?.business?.latlng[0] + 0.0008, currentRes?.business?.latlng[1] + 0.0008]]} />
 						}
 					</MapContainerStyled>
 
 					<div className="flex relative mt-10 mb-10">
 						{
-							isAvailableToEdit ?
+							trackedOrderData?.status?.current === "RECEIVED" ?
 							<>
 								{/*<button onMouseUp={handleOrderEdit} className='w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-color-11'>{t('Edit Items')}</button>*/}
-								<button onMouseUp={handleOrderCancel} className='w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-red-500'>{t('Order Cancel')}</button>	
+								<button onMouseUp={cancelOrder} className='w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-red-500'>{t('Order Cancel')}</button>	
 							</>
 							:
 							<button className='w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-gray-500'>
 								{t('Cancellations and modifications')}<br/>
-								{ tracking?.res?.business?.contactNumbers && tracking.res.business.contactNumbers[0].slice(2) }
+								{ currentRes?.business?.contactNumbers && currentRes?.business?.contactNumbers[0].slice(2) }
 							</button>
 						}
 					</div>

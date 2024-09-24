@@ -12,11 +12,8 @@ const RestaurantCard = ({ info }) => {
     cloudinaryImageId,
     sla,
     cuisines,
-    availability,
-    isBusy,
-    temporaryPause,
-    closeMsg,
-    promotionalSubtitle
+    promotionalSubtitle,
+    status
   } = info
   const [resName, setResName] = useState(nameInAr)
 
@@ -52,13 +49,13 @@ const RestaurantCard = ({ info }) => {
           src={cloudinaryImageId}
           alt="res-img"
           className="rounded-xl w-full h-full object-cover"
-          style={{ filter: availability ? 'grayscale(0)' : 'grayscale(1)' }}
+          style={{ filter: status === 'inactive' ? 'grayscale(1)' : 'grayscale(0)' }}
         />
       </div>
       <div className="ml-3">
         <h2 className="font-GrotBold text-lg tracking-tighter text-color-3">
           {truncateResName(resName)}
-          <StatusBadge availability={availability} isBusy={isBusy} temporaryPause={temporaryPause} />
+          <StatusBadge status={status} />
         </h2>
         <div className="font-GrotBold flex gap-1 text-color-3">
           <svg

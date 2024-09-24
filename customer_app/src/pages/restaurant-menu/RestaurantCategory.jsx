@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import AccordionHeader from './AccordionHeader'
 import AccordionBody from './AccordionBody'
 
-const RestaurantCategory = ({ categoryID, resID, categoryTitle, resAvailability }) => {
+const RestaurantCategory = ({ categoryID, resID, categoryTitle, status }) => {
   const menuItems = useSelector((state) => state.menu.items)
   const cartItems = useSelector((state) => state.cart.items)
   const [showCategory, setShowCategory] = useState(true)
@@ -33,7 +33,7 @@ const RestaurantCategory = ({ categoryID, resID, categoryTitle, resAvailability 
         <AccordionBody
           filteredMenuItems={filteredMenuItems}
           resID={resID}
-          resAvailability={resAvailability}
+          status={status}
           cartItems={cartItems}
         />
       )}
