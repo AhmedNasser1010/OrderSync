@@ -1,11 +1,11 @@
 import FeedbackPopup from "./components/popup_components/FeedbackPopup"
-import OrderCanceledNotice from "./components/popup_components/OrderCanceledNotice"
+import OrderCancellationNotice from "./components/popup_components/OrderCancellationNotice"
 
 function PopupProvider({ children })  {
   return (
     <>
       <FeedbackPopup />
-      <OrderCanceledNotice />
+      <OrderCancellationNotice />
       {children}
     </>
   )

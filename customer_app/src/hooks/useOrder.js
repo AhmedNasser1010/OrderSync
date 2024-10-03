@@ -6,7 +6,7 @@ import {
   useSetOrderFeedbackMutation,
   useSetUserOrderIdToNullMutation
 } from '../rtk/api/firestoreApi'
-import { setRateIsOpen } from '../rtk/slices/toggleSlice'
+import { setRateIsOpen, setCancellationNoticeIsOpen } from '../rtk/slices/toggleSlice'
 
 const useOrder = () => {
   const dispatch = useDispatch()
@@ -21,32 +21,27 @@ const useOrder = () => {
   const [setOrderFeedbackMutation] = useSetOrderFeedbackMutation()
   const [setUserOrderIdToNull] = useSetUserOrderIdToNullMutation()
 
-  // On Completed Scenario ""DONE""
+  // On Completed Scenario
   useEffect(() => {
-    if (trackedOrderData && trackedOrderData?.status?.current === "COMPLETED") {
-      console.log("On Completed Scenario")
+    if (trackedOrderData && trackedOrderData?.status?.current === 'COMPLETED') {
       dispatch(setRateIsOpen(true))
     }
   }, [trackedOrderData])
 
-  // On Cancellation Scenario ""ON PROGRESS""
+  // On Cancellation Scenario
   useEffect(() => {
-    if (trackedOrderData && trackedOrderData?.status?.current === "CANCELED") {
-      console.log("On Cancellation Scenario")
+    if (trackedOrderData && trackedOrderData?.status?.current === 'CANCELED') {
+      dispatch(setCancellationNoticeIsOpen(true))
+      setUserOrderIdToNull(user?.uid)
     }
   }, [trackedOrderData])
 
-  // On No Order Data Scenario ""DONE""
+  // On No Order Data Scenario
   useEffect(() => {
-    if (
-      hasOrder === false &&
-      user.trackedOrder?.id
-    ) {
-      console.log("On No Order Data Scenario")
+    if (hasOrder === false && user.trackedOrder?.id) {
       setUserOrderIdToNull(user?.uid)
     }
   }, [trackedOrderData, hasOrder])
-
 
   const cancelOrder = () => {
     if (trackedOrderData?.status?.current === 'RECEIVED') {

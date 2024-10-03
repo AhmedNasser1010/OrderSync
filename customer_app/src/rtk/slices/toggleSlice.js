@@ -11,6 +11,7 @@ const toggleSlice = createSlice({
     showResClosedPopup: false,
     showResPausedPopup: false,
     rateIsOpen: false,
+    cancellationNoticeIsOpen: false,
     hasOrder: true
   },
   reducers: {
@@ -46,6 +47,9 @@ const toggleSlice = createSlice({
     setHasOrder: (state, { payload }) => {
       state.hasOrder = payload === undefined ? !state.hasOrder : payload
     },
+    setCancellationNoticeIsOpen: (state, { payload }) => {
+      state.cancellationNoticeIsOpen = payload === undefined ? !state.cancellationNoticeIsOpen : payload
+    }
   },
 })
 
@@ -59,6 +63,7 @@ export const {
   setShowResPausedPopup,
   resetPopupStates,
   setRateIsOpen,
-  setHasOrder
+  setHasOrder,
+  setCancellationNoticeIsOpen
 } = toggleSlice.actions
 export default toggleSlice.reducer

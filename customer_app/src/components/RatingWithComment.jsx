@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { FaStar } from 'react-icons/fa'
+import { useTranslation } from 'react-i18next'
 
 function RatingWithComment({ rating, setRating, comment, setComment }) {
   const [hover, setHover] = useState(0)
+  const { t } = useTranslation()
   return (
     <>
       <div className="flex space-x-1 justify-center mb-4">
@@ -28,7 +30,7 @@ function RatingWithComment({ rating, setRating, comment, setComment }) {
 
       <textarea
         className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-        placeholder="Leave a comment..."
+        placeholder={t("Leave a comment")}
         rows="4"
         value={comment}
         onChange={(e) => setComment(e.target.value)}

@@ -125,5 +125,12 @@
   "Pasta": "Pasta",
   "Add to Home Screen!": "Add to Home Screen!",
   "Order Track": "Order Track",
-  "Invoice No": "Invoice No"
+  "Invoice No": "Invoice No",
+  "Your Order Has Been Canceled!": "Your Order Has Been Canceled!",
+  "Sorry, your order was canceled due to an issue in the kitchen. We apologize for the inconvenience.": "Sorry, your order was canceled due to an issue in the kitchen. We apologize for the inconvenience.",
+  "Browse Other Restaurants": "Browse Other Restaurants",
+  "Rate this Restaurant!": "Rate this Restaurant!",
+  "We appreciate your feedback and will use it to improve our services.": "We appreciate your feedback and will use it to improve our services.",
+  "Submit Feedback": "Submit Feedback",
+  "Leave a comment": "Leave a comment"
 }

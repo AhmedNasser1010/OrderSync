@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setRateIsOpen } from '../../rtk/slices/toggleSlice'
 import RatingWithComment from '../RatingWithComment'
 import useOrder from '../../hooks/useOrder'
+import { useTranslation } from 'react-i18next'
 
 function FeedbackPopup() {
   const dispatch = useDispatch()
@@ -18,6 +19,7 @@ function FeedbackPopup() {
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
   const { setOrderFeedback } = useOrder()
+  const { t } = useTranslation()
 
   const handleSubmit = () => {
     setOrderFeedback({ rating, comment })
@@ -29,9 +31,9 @@ function FeedbackPopup() {
       <Popup>
         <PopupContent>
           <PopupHeader closePopupCallback={() => dispatch(setRateIsOpen(false))}>
-            <PopupTitle>Rate this Restaurant!</PopupTitle>
+            <PopupTitle>{t('Rate this Restaurant!')}</PopupTitle>
             <PopupDescription>
-              We appreciate your feedback and will use it to improve our services.
+              {t('We appreciate your feedback and will use it to improve our services.')}
             </PopupDescription>
           </PopupHeader>
 
@@ -44,7 +46,7 @@ function FeedbackPopup() {
 
           <PopupFooter>
             <button className="px-4 py-2 bg-color-2 text-white" onClick={handleSubmit}>
-              Submit Feedback
+              {t('Submit Feedback')}
             </button>
           </PopupFooter>
         </PopupContent>

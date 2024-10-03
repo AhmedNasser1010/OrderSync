@@ -125,5 +125,12 @@
   "Pasta": "معكرونة",
   "Add to Home Screen!": "إضافة الى الشاشة الرئيسية!",
   "Order Track": "تتبع الطلب",
-  "Invoice No": "رقم الفاتورة"
+  "Invoice No": "رقم الفاتورة",
+  "Your Order Has Been Canceled!": "تم إلغاء طلبك!",
+  "Sorry, your order was canceled due to an issue in the kitchen. We apologize for the inconvenience.": "آسفين، طلبك اّتلغى بسبب مشكلة في المطبخ. بنعتذر على الإزعاج.",
+  "Browse Other Restaurants": "تصفح مطاعم تانية",
+  "Rate this Restaurant!": "قيّم المطعم ده!",
+  "We appreciate your feedback and will use it to improve our services.": "بنقدّر رأيك وهنستخدمه عشان نحسّن خدماتنا.",
+  "Submit Feedback": "أرسل تقييمك",
+  "Leave a comment": "سيب تعليق"
 }
