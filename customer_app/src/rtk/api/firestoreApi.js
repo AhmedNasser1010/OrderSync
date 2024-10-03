@@ -193,31 +193,45 @@ export const firestoreApi = createApi({
             'history',
             `${orderData.id}_${uid}`
           )
+          const userRef = doc(db, 'customers', uid)
 
-          if (
-            orderData &&
-            (
-              orderData?.customerFeedback?.rating === 0 ||
-              orderData?.customerFeedback?.comment?.length === 0
-            )
-          ) {
+          const batch = writeBatch(db)
+
+          const rating = orderData?.customerFeedback?.rating
+          const comment = orderData?.customerFeedback?.comment
+
+          if (orderData && (rating === null || comment === null)) {
             const currentStatus = orderData.status.current
             if (currentStatus === "DELIVERY") {
-              updateDoc(openQueueRef, {
-                'customerFeedback.rating': feedback.rating === 0 ? null : feedback.rating,
-                'customerFeedback.comment': feedback.comment.length === 0 ? null : feedback.comment,
-                'status.current': 'COMPLETED',
-                'status.history': arrayUnion({ status: 'COMPLETED', timestamp: Date.now() })
-              })
+              const updatedOrder = {
+                ...orderData,
+                customerFeedback: {
+                  rating: feedback.rating === 0 ? null : feedback.rating,
+                  comment: feedback.comment.length === 0 ? null : feedback.comment
+                },
+                status: {
+                  ...orderData.status,
+                  current: 'COMPLETED',
+                  history: arrayUnion({ status: 'COMPLETED', timestamp: Date.now() })
+                }
+              }
+
+              batch.set(completedOrderRef, updatedOrder)
+              batch.delete(openQueueRef)
             } else if (currentStatus === "COMPLETED") {
-              updateDoc(completedOrderRef, {
+              batch.update(completedOrderRef, {
                 'customerFeedback.rating': feedback.rating === 0 ? null : feedback.rating,
                 'customerFeedback.comment': feedback.comment.length === 0 ? null : feedback.comment
               })
             }
           }
 
+          await updateDoc(userRef, {
+            'trackedOrder.id': null
+          })
+
           console.log('Feedback updated')
+          await batch.commit()
           return { data: null }
         } catch (error) {
           console.error('Error while order feedback:', error.message)

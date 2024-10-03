@@ -21,7 +21,7 @@ const useOrder = () => {
   const [setOrderFeedbackMutation] = useSetOrderFeedbackMutation()
   const [setUserOrderIdToNull] = useSetUserOrderIdToNullMutation()
 
-  // On Completed Scenario
+  // On Completed Scenario ""DONE""
   useEffect(() => {
     if (trackedOrderData && trackedOrderData?.status?.current === "COMPLETED") {
       console.log("On Completed Scenario")
@@ -29,14 +29,14 @@ const useOrder = () => {
     }
   }, [trackedOrderData])
 
-  // On Cancellation Scenario
+  // On Cancellation Scenario ""ON PROGRESS""
   useEffect(() => {
     if (trackedOrderData && trackedOrderData?.status?.current === "CANCELED") {
       console.log("On Cancellation Scenario")
     }
   }, [trackedOrderData])
 
-  // On No Order Data Scenario
+  // On No Order Data Scenario ""DONE""
   useEffect(() => {
     if (
       hasOrder === false &&
