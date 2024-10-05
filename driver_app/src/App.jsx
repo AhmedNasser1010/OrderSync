@@ -68,7 +68,7 @@ function App() {
   useEffect(() => {
     if (user?.uid) {
 
-      DB_GET_DOC('users', user?.partnerId)
+      DB_GET_DOC('users', user?.partnerUid)
       .then(partner => {
         dispatch(initPartnerServices(partner.services))
       })

@@ -56,11 +56,11 @@ function OrderCard({ order }) {
 
 	return (
 
-		<Order onMouseUp={() => navigate(`/queue/${order.id}`)} $status={order.status}>
+		<Order onMouseUp={() => navigate(`/queue/${order.id}`)} $status={order.status.current}>
 			<Title>ORDER / {order.id.split('-')[0]}</Title>
 			<Content>
-				<span>Name: { order.user.name }</span>
-				<span>Phone: { order.user.phone }</span>
+				<span>Name: { order.customer.name }</span>
+				<span>Phone: { order.customer.phone }</span>
 				<a target='_blank' href={`https://www.google.com/maps?q=${order.location.latlng[0]},${order.location.latlng[1]}`}>Location: Maps</a>
 				{ order.location.address !== '' && <span>Address: { order.location.address }</span> }
 				<span>Total: { order?.cartTotalPrice?.discount || '???' }LE</span>

@@ -28,7 +28,7 @@ function useMenus() {
 			}
 
 			// Get current accessToken's
-			const accessTokens = await getCurrentAccessTokens()
+			const accessTokens = getCurrentAccessTokens()
 
 			// Get menus data based on current accessTokens
 			const q = query(collection(db, "menus"), where("accessToken", "in", accessTokens))

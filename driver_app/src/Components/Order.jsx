@@ -92,9 +92,8 @@ function Order() {
 						{ 
 							orderData.order &&
 								<>
-									<span>Name: { orderData.order.user.name }</span>
-									<span>Phone: { orderData.order.user.phone }</span>
-									{ orderData.order.user.secondPhone && <span>Second Phone: { orderData.order.user.secondPhone }</span> }
+									<span>Name: { orderData.order.customer.name }</span>
+									<span>Phone: { orderData.order.customer.phone }</span>
 								</>
 						}
 					</InfoBox>
