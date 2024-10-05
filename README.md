@@ -1,6 +1,6 @@
 <img src="images/cover.png" alt="cover" />
 
-# MeRRo
+# Order Sync
 
 ## Table of Contents
 1. [Demo Online Links](#demo-online-links)
@@ -14,15 +14,15 @@
 9. [Frequently Asked Questions (FAQs)](#frequently-asked-questions-faqs)
 
 ## Demo Online Links
-Store Website: https://merro-dev.vercel.app<br/>
-Manager Website: https://merro-restaurant-dev.vercel.app<br/>
-Rider Website: https://merro-rider-dev.vercel.app<br/>
+Store Website: https://ordersync.vercel.app<br/>
+Orders Website: https://ordersync-orders.vercel.app<br/>
+Rider Website: https://ordersync-rider.vercel.app<br/>
 Partner Website: <br/>
 
 ## Introduction
 
 ### Brief Overview of the App
-MeRRo is a cutting-edge ordering system meticulously crafted for restaurants. Seamlessly integrating into applications, it boasts a robust back-end powered by Google Firebase, ensuring secure authentication. The MeRRo app delivers a streamlined and efficient online ordering experience.
+Order Sync is a cutting-edge ordering system meticulously crafted for restaurants. Seamlessly integrating into applications, it boasts a robust back-end powered by Google Firebase, ensuring secure authentication. The Order Sync app delivers a streamlined and efficient online ordering experience.
 
 ## Diagrams
 ![applications](images/applications.jpg)
@@ -112,7 +112,7 @@ Individuals looking to work as Order Captains or Delivery Captains in this busin
 ### Who would use the Customer Shop App?
 Customers looking to browse menus, place orders, and manage their accounts.
 
-### Why use MeRRo as a business owner?
+### Why use Order Sync as a business owner?
 
 1. **Increased Customer Base Network Effect:**
    - The Customer Shop app features multiple restaurants in the same city, increasing visibility and potential customer base.
