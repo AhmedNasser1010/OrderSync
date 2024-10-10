@@ -70,20 +70,20 @@ function extractDaySummary(
   let totalDiscounts = 0;
   let totalDeliveryFees = 0;
 
-  let preparationTimes: number[] = [];
-  let deliveryTimes: number[] = [];
-  let completionTimes: number[] = [];
+  const preparationTimes: number[] = [];
+  const deliveryTimes: number[] = [];
+  const completionTimes: number[] = [];
 
-  let uniqueCustomers = new Set<string>();
+  const uniqueCustomers = new Set<string>();
   let newCustomers = 0;
   let returningCustomers = 0;
   let totalRatings = 0;
   let feedbackCount = 0;
 
-  let paymentMethods: Record<string, number> = {};
-  let orderSources: Record<string, number> = {};
+  const paymentMethods: Record<string, number> = {};
+  const orderSources: Record<string, number> = {};
 
-  let locationCounts: Record<
+  const locationCounts: Record<
     string,
     { address: string; latlng: [number, number]; ordersCount: number }
   > = {};

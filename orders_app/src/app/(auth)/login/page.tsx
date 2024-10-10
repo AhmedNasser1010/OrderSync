@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,7 +22,8 @@ export default function AuthPage() {
     login,
     authErrorMsg
   } = useAuth()
-  const [isLogin, setIsLogin] = useState<boolean>(true);
+  // const [isLogin, setIsLogin] = useState<boolean>(true);
+  const isLogin = true
   // const [isConfirmPassword, setIsConfirmPassword] = useState<boolean>(false);
   // const [isTermsAccepted, setIsTermsAccepted] = useState<boolean>(false);
   const [isRememberMe, setIsRememberMe] = useState<boolean>(false);

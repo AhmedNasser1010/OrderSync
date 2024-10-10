@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "@/lib/rtk/hooks";
 import { auth } from "@/lib/firebase";
@@ -30,7 +30,7 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
   const uid = useAppSelector(userUid);
   useFetchUserDataQuery(uid, { skip: !uid });
   
-  const onSuccessLogin = (userData?: FirebaseUser | null) => {
+  const onSuccessLogin = useCallback((userData?: FirebaseUser | null) => {
     if (userData) {
       const uid = userData.uid;
       
@@ -39,9 +39,9 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
       setIsAuthLoading(false);
       autoNavigate && router.push('/');
     }
-  }
+  }, [])
 
-  const onFailedLogin = (error: any) => {
+  const onFailedLogin = useCallback((error: any) => {
     setIsAuthLoading(false);
     setAuthError(error);
 
@@ -59,7 +59,7 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
           break;
       }
     }
-  }
+  }, [])
 
   const login = async (email: string, password: string): Promise<void> => {
     setIsAuthLoading(true);
@@ -114,7 +114,7 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
         router.push('./login')
         onFailedLogin(error)
       });
-  }, []);
+  }, [onFailedLogin, onSuccessLogin, router]);
 
   return {
     user,

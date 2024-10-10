@@ -1,6 +1,5 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
-  arrayUnion,
   collection,
   doc,
   updateDoc,
@@ -363,11 +362,6 @@ export const firestoreApi = createApi({
               canceledAt: Date.now(),
             },
           };
-
-          // Remove the canceled order from `openQueue`
-          const updatedOrders = orders.filter(
-            (order: OrderType) => order.id !== orderId
-          );
 
           // References to Firestore collections
           const openQueueRef = collection(db, "orders", resId, "openQueue");

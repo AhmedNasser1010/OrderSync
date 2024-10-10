@@ -23,14 +23,11 @@ import {
   SquareArrowDown,
   CookingPot,
   Printer,
-  Check,
-  X,
   Bike,
   Ban,
   CircleX
 } from "lucide-react";
-import Link from "next/link";
-import { OrderType, OrderStatusType, FormattedOrderType } from "@/types/order";
+import { OrderStatusType, FormattedOrderType } from "@/types/order";
 import useOrderHandler from "@/hooks/useOrderHandler";
 import { useRouter } from "next/navigation";
 import { setDeletePopup } from "@/lib/rtk/slices/toggleSlice";
@@ -57,8 +54,6 @@ const OrderCard = ({ order, activeTabValue }: { order: FormattedOrderType, activ
   const {
     handlePrintInvoice,
     handleChangeStatus,
-    handleAcceptOrder,
-    handleRejectOrder,
   } = useOrderHandler();
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -163,7 +158,7 @@ const OrderCard = ({ order, activeTabValue }: { order: FormattedOrderType, activ
             <DropdownMenuContent align="end" className='disabled-click-1'>
               {order.status !== "COMPLETED" && (
                 <DropdownMenuItem
-                  onClick={(e) => handleChangeStatus(order.id, "forward")}
+                  onClick={() => handleChangeStatus(order.id, "forward")}
                 >
                   <ArrowUpCircle className="mr-2 h-4 w-4" />
                   <span>Move Forward</span>
@@ -171,7 +166,7 @@ const OrderCard = ({ order, activeTabValue }: { order: FormattedOrderType, activ
               )}
               {order.status !== "RECEIVED" && (
                 <DropdownMenuItem
-                  onClick={(e) => handleChangeStatus(order.id, "backward")}
+                  onClick={() => handleChangeStatus(order.id, "backward")}
                 >
                   <ArrowDownCircle className="mr-2 h-4 w-4" />
                   <span>Move Backward</span>

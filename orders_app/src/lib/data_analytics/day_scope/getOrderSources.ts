@@ -2,7 +2,7 @@ import { OrderType } from "@/types/order";
 import { OrderSourcesType } from "@/lib/data_analytics/types";
 
 export default function getOrderSources(order: OrderType) {
-  let orderSources: OrderSourcesType = {};
+  const orderSources: OrderSourcesType = {};
   
   // Order Sources
   if (!orderSources[order.orderSource]) {

@@ -1,14 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import {
   ArrowLeft,
   MapPin,
   Phone,
-  Mail,
-  Clock,
   Printer,
   ExternalLink,
   PhoneOutgoing,
@@ -23,7 +19,7 @@ import Page from "@/components/Page";
 import { OrderType, OrderStatusType } from "@/types/order";
 import { ItemType } from "@/types/menu";
 import useOrders from "@/hooks/useOrders";
-import { Beef } from "lucide-react";
+import Image from "next/image";
 
 const getSizeName: { [key: string]: string } = {
   S: "Small",
@@ -31,18 +27,11 @@ const getSizeName: { [key: string]: string } = {
   L: "Large",
 };
 
-const getSizeIcon: { [key: string]: any } = {
-  S: <Beef />,
-  M: <Beef />,
-  L: <Beef />,
-};
-
 export default function OrderDetails({
   params,
 }: {
   params: { orderId: string };
 }) {
-  const router = useRouter();
   const { getOrder, getOrderMenu, isLoading } = useOrders();
   const [order, setOrder] = useState<OrderType | null>(null);
   const [orderCart, setOrderCart] = useState<ItemType[] | null>(null);
@@ -51,13 +40,13 @@ export default function OrderDetails({
     if (isLoading === false) {
       setOrder(getOrder(params.orderId) || null);
     }
-  }, [isLoading]);
+  }, [isLoading, getOrder, params.orderId]);
 
   useEffect(() => {
     if (order && isLoading === false) {
       setOrderCart(getOrderMenu(order.cart));
     }
-  }, [order, isLoading]);
+  }, [order, isLoading, getOrderMenu]);
 
   const getStatusColor = (status: OrderStatusType) => {
     switch (status) {
@@ -186,7 +175,7 @@ export default function OrderDetails({
           <div className="space-y-4">
             {orderCart?.map((item, index) => (
               <div key={index} className="flex items-center space-x-4">
-                <img
+                <Image
                   src={item.backgrounds[0]}
                   alt={item.title}
                   width={100}

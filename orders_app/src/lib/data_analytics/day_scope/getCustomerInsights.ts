@@ -4,7 +4,7 @@ import { CustomerInsightsType } from "@/lib/data_analytics/types";
 export default function getCustomerInsights(
   order: OrderType
 ): CustomerInsightsType {
-  let uniqueCustomers = new Set<string>();
+  const uniqueCustomers = new Set<string>();
   let newCustomers = 0;
   let returningCustomers = 0;
   let totalRatings = 0;

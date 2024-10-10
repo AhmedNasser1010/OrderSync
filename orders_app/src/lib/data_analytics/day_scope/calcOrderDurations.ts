@@ -5,9 +5,9 @@ import getAverage from "@/lib/getAverage";
 export default function calcOrderDurations(
   order: OrderType
 ): OrderDurationsType {
-  let preparationTimes: number[] = [];
-  let deliveryTimes: number[] = [];
-  let completionTimes: number[] = [];
+  const preparationTimes: number[] = [];
+  const deliveryTimes: number[] = [];
+  const completionTimes: number[] = [];
 
   // Calculate order durations
   if (order.orderTimestamps.preparedAt && order.orderTimestamps.placedAt) {

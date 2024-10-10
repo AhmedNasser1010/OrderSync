@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -28,7 +28,7 @@ export default function DeleteOrderPopup() {
         dispatch(setDeletePopup({ error: 'Order Id Not Found' }))
       }
     }
-  }, [deletePopupValue.orderId, deletePopupValue.isOpen])
+  }, [dispatch, deletePopupValue.orderId, deletePopupValue.isOpen])
 
   const handleClose = () => {
     dispatch(setDeletePopup({

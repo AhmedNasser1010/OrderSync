@@ -10,7 +10,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Settings, TicketX, TicketCheck, KeyRound, BarChart3 } from "lucide-react";
+import { Settings, TicketX, TicketCheck, KeyRound } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/lib/rtk/hooks";
 import { setActiveTab, optionMenuView, setOptionsMenuView, setCloseDayPopup } from "@/lib/rtk/slices/toggleSlice";
 import MenuCard from './MenuCard'

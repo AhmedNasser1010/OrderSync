@@ -43,28 +43,24 @@ const useCloseDay = (): UseCloseDay => {
   const { data: userData } = useFetchUserDataQuery(uid, { skip: !uid });
   const [setCloseDay, { isLoading: isSaving }] = useSetCloseDayMutation();
 
-  const { data: openOrdersData, isLoading: openOrdersIsLoading } =
+  const { data: openOrdersData } =
     useFetchOpenOrdersDataQuery(userData?.accessToken, {
       skip: !userData?.accessToken,
     }) as FetchOrdersType;
 
     const {
       data: completedOrdersData,
-      isLoading: completedOrdersIsLoading,
-      refetch: refetchCompletedOrders,
     } = useFetchCompletedOrdersDataQuery(userData?.accessToken, {
       skip: !userData?.accessToken,
     }) as FetchOrdersType;
   
     const {
       data: voidedOrdersData,
-      isLoading: voidedOrdersIsLoading,
-      refetch: refetchVoidedOrders,
     } = useFetchVoidedOrdersDataQuery(userData?.accessToken, {
       skip: !userData?.accessToken,
     }) as FetchOrdersType;
 
-    const { data: menuData, isLoading: menuIsLoading } = useFetchMenuDataQuery(
+    const { data: menuData } = useFetchMenuDataQuery(
       userData?.accessToken,
       { skip: !userData?.accessToken }
     ) as FetchMenuType;
@@ -101,7 +97,7 @@ const useCloseDay = (): UseCloseDay => {
         })
       );
     }
-  }, [openOrdersData, completedOrdersData, closeDayPopupValues.isOpen]);
+  }, [openOrdersData, completedOrdersData, closeDayPopupValues.isOpen, closeDayPopupValues.errors, dispatch]);
 
   const isPassed = () => {
     const errors = closeDayPopupValues?.errors;

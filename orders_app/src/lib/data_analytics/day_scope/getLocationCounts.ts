@@ -2,7 +2,7 @@ import { OrderType } from "@/types/order";
 import { LocationCountsType } from '@/lib/data_analytics/types'
 
 export default function getLocationCounts(order: OrderType) {
-  let locationCounts: LocationCountsType = {};
+  const locationCounts: LocationCountsType = {};
 
   // Location Counts
   const locationKey = `${order.location.address}:${order.location.latlng.join(
