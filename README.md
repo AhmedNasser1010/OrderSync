@@ -11,15 +11,15 @@
 9. [Frequently Asked Questions (FAQs)](#frequently-asked-questions-faqs)
 
 ## Demo Online Links
-[🔗 Customer App](https://ordersync-customer.vercel.app)
+[🔗 Customer App](https://ordersync-customer.vercel.app) | Auth with any
 
-[🔗 Orders App](https://ordersync-orders.vercel.app)
+[🔗 Orders App](https://ordersync-orders.vercel.app) | Email: manager@gmail.com Pass: 123456
 
-[🔗 Manager App](#) **Still Under Development**
+[🔗 Manager App](#) **Still Under Development** | Email: manager@gmail.com Pass: 123456
 
-[🔗 Rider App](https://ordersync-rider.vercel.app) **Order Assign Is Disabled**
+[🔗 Rider App](https://ordersync-rider.vercel.app) **Order Assign Is Disabled** | Email: driver@gmail.com Pass: 123456
 
-[🔗 Partner App](https://ordersync-partner.vercel.app)
+[🔗 Partner App](https://ordersync-partner.netlify.app) | Email:  Pass: 
 
 [**⬇️ Read More About Ower System Apps Down Below ⬇️**](#applications)
 
