@@ -19,7 +19,7 @@
 
 [🔗 Rider App](https://ordersync-rider.vercel.app) **Order Assign Is Disabled** | Email: driver@gmail.com Pass: 123456
 
-[🔗 Partner App](https://ordersync-partner.netlify.app) | Email:  Pass: 
+[🔗 Partner App](https://ordersync-partner.netlify.app) | Email: testBusinessCreator@gmail.com Pass: 123456
 
 [**⬇️ Read More About Ower System Apps Down Below ⬇️**](#applications)
 
