@@ -21,7 +21,7 @@ function SettingsMenu() {
 
   const afterTriggerAction = (callback: () => void) => {
     callback();
-    // dispatch(setOptionsMenuView(false));
+    dispatch(setOptionsMenuView(false));
   }
 
   return (

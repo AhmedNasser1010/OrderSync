@@ -97,7 +97,7 @@ const useCloseDay = (): UseCloseDay => {
         })
       );
     }
-  }, [openOrdersData, completedOrdersData, closeDayPopupValues.isOpen, closeDayPopupValues.errors, dispatch]);
+  }, [openOrdersData, completedOrdersData, closeDayPopupValues.isOpen, dispatch]);
 
   const isPassed = () => {
     const errors = closeDayPopupValues?.errors;
