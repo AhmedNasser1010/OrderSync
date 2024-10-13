@@ -22,8 +22,8 @@ export default function AuthPage() {
     login,
     authErrorMsg
   } = useAuth()
-  // const [isLogin, setIsLogin] = useState<boolean>(true);
   const isLogin = true
+  // const [isLogin, setIsLogin] = useState<boolean>(true);
   // const [isConfirmPassword, setIsConfirmPassword] = useState<boolean>(false);
   // const [isTermsAccepted, setIsTermsAccepted] = useState<boolean>(false);
   const [isRememberMe, setIsRememberMe] = useState<boolean>(false);

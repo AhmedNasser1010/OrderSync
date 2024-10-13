@@ -482,6 +482,60 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ["HistoryOrders", "DailySummarizationOrders", "Restaurant"],
     }),
+    setDisplaySettings: builder.mutation({
+      async queryFn({resId, settingName, value}: {resId: string, settingName: string, value: string}) {
+        try {
+          if (!value) {
+            return { data: null }
+          }
+
+          const docRef = doc(db, "businesses", resId);
+
+          if (
+            settingName === 'promotionalSubtitle' ||
+            settingName === 'cover' ||
+            settingName === 'icon'
+          ) {
+            await updateDoc(docRef, {
+              [`business.${settingName}`]: value,
+            });
+          } else if (settingName === 'closeMsg') {
+            await updateDoc(docRef, {
+              ['settings.siteControl.closeMsg']: value,
+            });
+          }
+
+          console.log("Write Operation [setDisplaySettings]");
+          return { data: null };
+        } catch (error: any) {
+          console.error("Error updating restaurant display settings:", error.message);
+          return { error: error.message };
+        }
+      },
+      invalidatesTags: ["Restaurant"],
+    }),
+    setOrderWorkflowSettings: builder.mutation({
+      async queryFn({resId, settingName, value}: {resId: string, settingName: string, value: string | boolean}) {
+        try {
+          if (typeof value !== 'boolean') {
+            return { data: null }
+          }
+
+          const docRef = doc(db, "businesses", resId);
+
+          await updateDoc(docRef, {
+            [`settings.orderManagement.${settingName}`]: value,
+          });
+
+          console.log("Write Operation [setOrderWorkflowSettings]");
+          return { data: null };
+        } catch (error: any) {
+          console.error("Error updating restaurant order work flow settings:", error.message);
+          return { error: error.message };
+        }
+      },
+      invalidatesTags: ["Restaurant"],
+    }),
   }),
 });
 
@@ -498,4 +552,6 @@ export const {
   useSetDeleteOrderStatusMutation,
   useSetRestaurantStatusMutation,
   useSetCloseDayMutation,
+  useSetDisplaySettingsMutation,
+  useSetOrderWorkflowSettingsMutation,
 } = firestoreApi;

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { useRouter } from "next/navigation";
 import {
   Sheet,
   SheetContent,
@@ -10,12 +11,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Settings, TicketX, TicketCheck, KeyRound } from "lucide-react";
+import { Settings, TicketX, TicketCheck, KeyRound, Wrench } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/lib/rtk/hooks";
 import { setActiveTab, optionMenuView, setOptionsMenuView, setCloseDayPopup } from "@/lib/rtk/slices/toggleSlice";
 import MenuCard from './MenuCard'
 
 function SettingsMenu() {
+  const router = useRouter()
   const dispatch = useAppDispatch();
   const optionMenuViewValue = useAppSelector(optionMenuView)
 
@@ -52,6 +54,11 @@ function SettingsMenu() {
             callback={() => afterTriggerAction(() => dispatch(setCloseDayPopup({ isOpen: true })))}
             title="Close the Day"
             icon={<KeyRound className="h-8 w-8 mb-2" />}
+          />
+          <MenuCard
+            callback={() => afterTriggerAction(() => router.push("/settings"))}
+            title="Settings"
+            icon={<Wrench className="h-8 w-8 mb-2" />}
           />
         </div>
       </SheetContent>
