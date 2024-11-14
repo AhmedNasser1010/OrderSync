@@ -6,12 +6,12 @@ import {
   useFetchCompletedOrdersDataQuery,
   useFetchVoidedOrdersDataQuery,
   useSetCloseDayMutation
-} from "@/lib/rtk/api/firestoreApi";
-import { userUid } from "@/lib/rtk/slices/constantsSlice";
-import { useAppSelector, useAppDispatch } from "@/lib/rtk/hooks";
-import { closeDayPopup, setCloseDayPopup } from "@/lib/rtk/slices/toggleSlice";
+} from "@/rtk/api/firestoreApi";
+import { userUid } from "@/rtk/slices/constantsSlice";
+import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
+import { closeDayPopup, setCloseDayPopup } from "@/rtk/slices/toggleSlice";
 import { OrderType } from "@/types/order";
-import extractDaySummary from "@/lib/data_analytics/day_scope/extractDaySummary";
+import extractDaySummary from "@/analytics/day_scope/extractDaySummary";
 import { MainMenuType } from "@/types/menu";
 
 type UseCloseDay = {

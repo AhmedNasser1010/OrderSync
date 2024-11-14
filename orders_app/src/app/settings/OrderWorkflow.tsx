@@ -7,9 +7,9 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { useSetOrderWorkflowSettingsMutation, useFetchUserDataQuery, useFetchRestaurantDataQuery } from '@/lib/rtk/api/firestoreApi'
-import { useAppSelector } from "@/lib/rtk/hooks";
-import { userUid } from '@/lib/rtk/slices/constantsSlice'
+import { useSetOrderWorkflowSettingsMutation, useFetchUserDataQuery, useFetchRestaurantDataQuery } from '@/rtk/api/firestoreApi'
+import { useAppSelector } from "@/rtk/hooks";
+import { userUid } from '@/rtk/slices/constantsSlice'
 import React from "react";
 
 export default function OrderWorkflow() {

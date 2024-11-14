@@ -23,7 +23,7 @@ const useOrder = () => {
 
   // On Completed Scenario
   useEffect(() => {
-    if (trackedOrderData && trackedOrderData?.status?.current === 'COMPLETED') {
+    if (trackedOrderData && trackedOrderData?.status?.current === 'DELIVERED') {
       dispatch(setRateIsOpen(true))
     }
   }, [trackedOrderData])

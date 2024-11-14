@@ -10,9 +10,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { AlertCircle } from "lucide-react"
-import { useAppSelector, useAppDispatch } from "@/lib/rtk/hooks";
-import { deletePopup } from "@/lib/rtk/slices/toggleSlice";
-import { setDeletePopup } from "@/lib/rtk/slices/toggleSlice";
+import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
+import { deletePopup } from "@/rtk/slices/toggleSlice";
+import { setDeletePopup } from "@/rtk/slices/toggleSlice";
 import useOrderHandler from '@/hooks/useOrderHandler'
 
 export default function DeleteOrderPopup() {

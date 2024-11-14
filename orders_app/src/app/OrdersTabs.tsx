@@ -3,8 +3,8 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SquareArrowDown, Bike, CookingPot } from "lucide-react";
 import { OrderStatusType } from "@/types/order";
-import { useAppSelector, useAppDispatch } from "@/lib/rtk/hooks";
-import { activeTab, setActiveTab } from "@/lib/rtk/slices/toggleSlice";
+import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
+import { activeTab, setActiveTab } from "@/rtk/slices/toggleSlice";
 
 export default function OrdersTabs() {
   const dispatch = useAppDispatch();

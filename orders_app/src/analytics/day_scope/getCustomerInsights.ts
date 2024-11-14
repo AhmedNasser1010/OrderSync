@@ -1,5 +1,5 @@
 import { OrderType } from "@/types/order";
-import { CustomerInsightsType } from "@/lib/data_analytics/types";
+import { CustomerInsightsType } from "@/analytics/types";
 
 export default function getCustomerInsights(
   order: OrderType

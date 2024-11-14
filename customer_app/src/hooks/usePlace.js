@@ -146,9 +146,6 @@ const usePlace = () => {
       },
       orderTimestamps: {
         placedAt: timestamp,
-        preparedAt: null,
-        pickedUpAt: null,
-        deliveredAt: null
       },
       delivery: {
         uid: null,

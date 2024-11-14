@@ -1,8 +1,10 @@
 export type OrderStatusType =
   | "RECEIVED"
   | "PREPARING"
-  | "DELIVERY"
-  | "COMPLETED"
+  | "PICK_UP"
+  | "ON_ROUTE"
+  | "DELIVERED"
+  | "GIVEN_FEEDBACK"
   | "CANCELED"
   | "REJECTED"
   | "VOIDED";
@@ -22,18 +24,19 @@ export type StatusType = {
 export type OrderTimestampsType = {
   placedAt: number;
   preparedAt: number;
-  deliveryAt: number;
-  completedAt: number;
+  pickUpAt: number;
+  onRouteAt: number;
+  deliveredAt: number;
+  feedbackAt: number;
   canceledAt: number;
   rejectedAt: number;
 };
 
-export type DeliveryStatusType = "DELIVERED" | "PENDING" | "PREPARING";
-
 export type DeliveryType = {
-  driver: string;
-  status: DeliveryStatusType;
-  estimatedTime: number;
+  liveLocation: [number, number];
+  uid: string;
+  name: string;
+  phone: string;
 };
 
 export type ItemSizesType = "S" | "M" | "L";

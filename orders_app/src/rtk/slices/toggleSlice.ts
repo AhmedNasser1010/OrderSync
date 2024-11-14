@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-import { OrderStatusType } from "@/types/order";
+import { MainTabTypes } from "@/types/components";
 
 type Toggle = {
   deletePopup: {
@@ -23,7 +23,7 @@ type Toggle = {
       };
     };
   };
-  activeTab: OrderStatusType;
+  activeTab: MainTabTypes;
   optionsMenuView: boolean;
   isAuthLoading: boolean;
 };

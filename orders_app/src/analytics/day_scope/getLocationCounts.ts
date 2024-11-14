@@ -1,5 +1,5 @@
 import { OrderType } from "@/types/order";
-import { LocationCountsType } from '@/lib/data_analytics/types'
+import { LocationCountsType } from '@/analytics/types'
 
 export default function getLocationCounts(order: OrderType) {
   const locationCounts: LocationCountsType = {};

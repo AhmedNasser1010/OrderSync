@@ -1,9 +1,9 @@
 "use client";
 
-import OrderCard from "./OrderCard";
+import OrderCard from "../components/order-card/OrderCard";
 import useOrders from "@/hooks/useOrders";
-import { useAppSelector } from "@/lib/rtk/hooks";
-import { activeTab } from "@/lib/rtk/slices/toggleSlice";
+import { useAppSelector } from "@/rtk/hooks";
+import { activeTab } from "@/rtk/slices/toggleSlice";
 import OrderCardSkeleton from "@/components/shimmer/OrderCardSkeleton";
 import NoOrders from "@/components/NoOrders";
 
@@ -15,6 +15,14 @@ export default function OrdersView() {
     activeTabValue === "VOIDED"
       ? formattedOrders?.filter((order) =>
           ["CANCELED", "REJECTED"].includes(order.status)
+        )
+      : activeTabValue === "DELIVERY"
+      ? formattedOrders?.filter((order) =>
+          ["PICK_UP", "ON_ROUTE"].includes(order.status)
+        )
+      : activeTabValue === "COMPLETED"
+      ? formattedOrders?.filter((order) =>
+          ["COMPLETED", "DELIVERED"].includes(order.status)
         )
       : formattedOrders?.filter((order) => order.status === activeTabValue) ||
         [];

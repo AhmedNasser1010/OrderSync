@@ -4,12 +4,8 @@ import {
   collection,
   doc,
   updateDoc,
-  getDocs,
-  getDoc,
   onSnapshot,
-  writeBatch,
-  query,
-  where
+  writeBatch
 } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 
@@ -190,7 +186,7 @@ export const firestoreApi = createApi({
             db,
             'orders',
             orderData.accessToken,
-            'history',
+            'openQueue',
             `${orderData.id}_${uid}`
           )
           const userRef = doc(db, 'customers', uid)
@@ -201,28 +197,16 @@ export const firestoreApi = createApi({
           const comment = orderData?.customerFeedback?.comment
 
           if (orderData && (rating === null || comment === null)) {
-            const currentStatus = orderData.status.current
-            if (currentStatus === "DELIVERY") {
-              const updatedOrder = {
-                ...orderData,
-                customerFeedback: {
-                  rating: feedback.rating === 0 ? null : feedback.rating,
-                  comment: feedback.comment.length === 0 ? null : feedback.comment
-                },
-                status: {
-                  ...orderData.status,
-                  current: 'COMPLETED',
-                  history: arrayUnion({ status: 'COMPLETED', timestamp: Date.now() })
-                }
-              }
-
-              batch.set(completedOrderRef, updatedOrder)
-              batch.delete(openQueueRef)
-            } else if (currentStatus === "COMPLETED") {
+            if (orderData.status.current === "DELIVERED") {
+              const timestamp = Date.now()
               batch.update(completedOrderRef, {
-                'customerFeedback.rating': feedback.rating === 0 ? null : feedback.rating,
-                'customerFeedback.comment': feedback.comment.length === 0 ? null : feedback.comment
+                ["customerFeedback.rating"]: feedback.rating === 0 ? null : feedback.rating,
+                ["customerFeedback.comment"]: feedback.comment.length === 0 ? null : feedback.comment,
+                ["status.current"]: "GIVEN_FEEDBACK",
+                ["status.history"]: arrayUnion({ status: 'GIVEN_FEEDBACK', timestamp }),
+                ["orderTimestamps.feedbackAt"]: timestamp
               })
+              batch.delete(openQueueRef)
             }
           }
 

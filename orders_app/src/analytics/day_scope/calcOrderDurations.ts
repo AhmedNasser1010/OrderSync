@@ -1,5 +1,5 @@
 import { OrderType } from "@/types/order";
-import { OrderDurationsType } from "@/lib/data_analytics/types";
+import { OrderDurationsType } from "@/analytics/types";
 import getAverage from "@/lib/getAverage";
 
 export default function calcOrderDurations(
@@ -15,14 +15,14 @@ export default function calcOrderDurations(
       order.orderTimestamps.preparedAt - order.orderTimestamps.placedAt
     );
   }
-  if (order.orderTimestamps.completedAt && order.orderTimestamps.preparedAt) {
+  if (order.orderTimestamps.deliveredAt && order.orderTimestamps.preparedAt) {
     completionTimes.push(
-      order.orderTimestamps.completedAt - order.orderTimestamps.preparedAt
+      order.orderTimestamps.deliveredAt - order.orderTimestamps.preparedAt
     );
   }
-  if (order.orderTimestamps.completedAt && order.orderTimestamps.placedAt) {
+  if (order.orderTimestamps.deliveredAt && order.orderTimestamps.placedAt) {
     deliveryTimes.push(
-      order.orderTimestamps.completedAt - order.orderTimestamps.placedAt
+      order.orderTimestamps.deliveredAt - order.orderTimestamps.placedAt
     );
   }
 

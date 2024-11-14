@@ -3,9 +3,9 @@ import {
   useFetchOpenOrdersDataQuery,
   useFetchUserDataQuery,
   useSetDeleteOrderStatusMutation
-} from '@/lib/rtk/api/firestoreApi'
-import { userUid } from "@/lib/rtk/slices/constantsSlice";
-import { useAppSelector } from "@/lib/rtk/hooks";
+} from '@/rtk/api/firestoreApi'
+import { userUid } from "@/rtk/slices/constantsSlice";
+import { useAppSelector } from "@/rtk/hooks";
 
 type OrderHandler = {
   handlePrintInvoice: () => void;

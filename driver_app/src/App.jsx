@@ -9,7 +9,7 @@ import { initQueue } from './rtk/slices/queueSlice'
 import { initPartnerServices } from './rtk/slices/partnerServicesSlice'
 import { initBusiness } from './rtk/slices/businessSlice'
 import styled from 'styled-components'
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, collection, query, where } from "firebase/firestore";
 import { db } from "./firebase.js";
 import { Toaster } from 'react-hot-toast'
 
@@ -75,17 +75,42 @@ function App() {
 
       const docRef = doc(db, 'drivers', user.uid)
 
-      const unsub = onSnapshot(docRef, doc => {
+      onSnapshot(docRef, doc => {
         window.read += 1
-        console.log('Read: ', window.read)
+        console.log('User document Read: ', window.read)
         if (doc.exists()) {
           dispatch(addUser(doc.data()))
-          dispatch(initQueue(doc.data().queue))
         }
       })
     }
   }, [userIsFounded])
 
+  // Orders document subscribe
+  useEffect(() => {
+    if (user?.accessToken) {
+
+      const docRef = collection(db, "orders", user.accessToken, "openQueue");
+
+      const q = query(docRef, where("delivery.uid", "==", user.uid));
+
+      onSnapshot(q, (querySnapshot) => {
+        window.read += querySnapshot.size;
+        console.log("Orders documents read: ", window.read);
+
+        if (!querySnapshot.empty) {
+          const ordersQueue = [];
+          querySnapshot.forEach((doc) => {
+            ordersQueue.push(doc.data());
+          });
+          dispatch(initQueue(ordersQueue));
+          return
+        }
+
+        dispatch(initQueue([]));
+      });
+    }
+  }, [userIsFounded, user?.accessToken])
+  
   // Trigger user location tracking update
   useEffect(() => {
     clearTracking()

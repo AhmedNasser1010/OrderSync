@@ -8,22 +8,25 @@ import {
   onSnapshot,
   writeBatch,
   query,
+  where,
   CollectionReference
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { OrderType, OrderStatusType } from "@/types/order";
+import { Driver } from "@/types/driver";
 import { RestaurantStatusTypes } from "@/types/restaurant";
 
 const statusForward = {
   RECEIVED: "PREPARING",
-  PREPARING: "DELIVERY",
-  DELIVERY: "COMPLETED",
+  PREPARING: "PICK_UP",
+  PICK_UP: "DELIVERED",
+  ON_ROUTE: "DELIVERED",
 };
 
 const statusBackward = {
   PREPARING: "RECEIVED",
-  DELIVERY: "PREPARING",
-  COMPLETED: "DELIVERY",
+  PICK_UP: "PREPARING",
+  ON_ROUTE: "PREPARING",
 };
 
 export const firestoreApi = createApi({
@@ -37,7 +40,8 @@ export const firestoreApi = createApi({
     "VoidedOrders",
     "OpenQueue",
     "HistoryOrders",
-    "DailySummarizationOrders"
+    "DailySummarizationOrders",
+    "Drivers",
   ],
   endpoints: (builder) => ({
     // Query Endpoints
@@ -100,7 +104,7 @@ export const firestoreApi = createApi({
           );
           const completedOrdersSnapshot = await getDocs(completedOrdersRef);
           const completedOrders = completedOrdersSnapshot.docs.map((doc) =>
-            doc.data()
+            doc.data() as OrderType
           );
           console.log("Read Operation [completedOrders]");
           return { data: completedOrders };
@@ -140,15 +144,17 @@ export const firestoreApi = createApi({
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
       ) {
         const openQueueRef = collection(db, "orders", resId, "openQueue");
-  
+
         await cacheDataLoaded;
-    
+
         const unsubscribe = onSnapshot(
           openQueueRef,
           (snapshot) => {
             updateCachedData((draft: OrderType[]) => {
               draft.length = 0;
-              snapshot.docs.forEach((doc) => draft.push(doc.data() as OrderType));
+              snapshot.docs.forEach((doc) =>
+                draft.push(doc.data() as OrderType)
+              );
             });
             console.log("Real-time Update [openQueue]");
           },
@@ -156,7 +162,7 @@ export const firestoreApi = createApi({
             console.error("Error in real-time listener:", error?.message);
           }
         );
-    
+
         await cacheEntryRemoved;
         unsubscribe();
       },
@@ -165,12 +171,7 @@ export const firestoreApi = createApi({
     fetchHistoryOrdersData: builder.query({
       async queryFn(resId) {
         try {
-          const historyOrdersRef = collection(
-            db,
-            "orders",
-            resId,
-            "history"
-          );
+          const historyOrdersRef = collection(db, "orders", resId, "history");
           const historyOrdersSnapshot = await getDocs(historyOrdersRef);
           const historyOrders = historyOrdersSnapshot.docs.map((doc) =>
             doc.data()
@@ -193,9 +194,11 @@ export const firestoreApi = createApi({
             resId,
             "dailySummarization"
           );
-          const dailySummarizationSnapshot = await getDocs(dailySummarizationRef);
-          const dailySummarization = dailySummarizationSnapshot.docs.map((doc) =>
-            doc.data()
+          const dailySummarizationSnapshot = await getDocs(
+            dailySummarizationRef
+          );
+          const dailySummarization = dailySummarizationSnapshot.docs.map(
+            (doc) => doc.data()
           );
           console.log("Read Operation [dailySummarizationOrders]");
           return { data: dailySummarization };
@@ -206,8 +209,44 @@ export const firestoreApi = createApi({
       },
       providesTags: ["DailySummarizationOrders"],
     }),
-    
-    
+    fetchDriversData: builder.query({
+      queryFn: () => ({ data: [] }),
+      async onCacheEntryAdded(
+        accessToken,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
+      ) {
+        const driversRef = collection(db, "drivers");
+
+        const q = query(
+          driversRef,
+          where("accessToken", "==", accessToken),
+          where("sync", "==", "LOCAL")
+        );
+
+        await cacheDataLoaded;
+
+        const unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            updateCachedData((draft: Driver[]) => {
+              draft.length = 0;
+              snapshot.docs.forEach((doc) =>
+                draft.push(doc.data() as Driver)
+              );
+            });
+            console.log("Real-time Update [fetchDriversData]");
+          },
+          (error) => {
+            console.error("Error in real-time listener [fetchDriversData]:", error?.message);
+          }
+        );
+
+        await cacheEntryRemoved;
+        unsubscribe();
+      },
+      providesTags: ["Drivers"],
+    }),
+
     // Mutation Endpoints
     setOrderStatus: builder.mutation({
       async queryFn({ orders, orderId, resId, direction }) {
@@ -241,16 +280,18 @@ export const firestoreApi = createApi({
                   orderToUpdate.status.current as keyof typeof statusBackward
                 ];
 
+          console.log('updatedStatus', updatedStatus)
+
           const getStatusTimestampKey = (status: OrderStatusType) => {
             switch (status) {
               case "RECEIVED":
                 return "placedAt";
               case "PREPARING":
                 return "preparedAt";
-              case "DELIVERY":
-                return "deliveryAt";
-              case "COMPLETED":
-                return "completedAt";
+              case "PICK_UP":
+                return "pickUpAt";
+              case "DELIVERED":
+                return "deliveredAt";
               case "CANCELED":
                 return "canceledAt";
               case "REJECTED":
@@ -280,6 +321,10 @@ export const firestoreApi = createApi({
               ...orderToUpdate.orderTimestamps,
               [timestampKeyName]: Date.now(),
             },
+            delivery: {
+              ...orderToUpdate.delivery,
+              uid: direction === "backward" && (orderToUpdate.status.current === 'PICK_UP' || orderToUpdate.status.current === 'ON_ROUTE') ? null : orderToUpdate.delivery.uid
+            }
           };
 
           // Firestore references for batch operation
@@ -296,15 +341,24 @@ export const firestoreApi = createApi({
 
           if (updatedStatus === "COMPLETED") {
             // Remove the completed order from `openQueue`
-            const openOrderDocRef = doc(openQueueRef, `${orderId}_${orderToUpdate.customer.uid}`);
+            const openOrderDocRef = doc(
+              openQueueRef,
+              `${orderId}_${orderToUpdate.customer.uid}`
+            );
             batch.delete(openOrderDocRef);
 
             // Add the completed order to `completedOrders`
-            const completedOrderDocRef = doc(completedOrdersRef, `${orderId}_${orderToUpdate.customer.uid}`);
+            const completedOrderDocRef = doc(
+              completedOrdersRef,
+              `${orderId}_${orderToUpdate.customer.uid}`
+            );
             batch.set(completedOrderDocRef, updatedOrder);
           } else {
             // If status is not completed, just update the open queue
-            const openOrderDocRef = doc(openQueueRef, `${orderId}_${orderToUpdate.customer.uid}`);
+            const openOrderDocRef = doc(
+              openQueueRef,
+              `${orderId}_${orderToUpdate.customer.uid}`
+            );
             batch.set(openOrderDocRef, updatedOrder);
           }
 
@@ -376,11 +430,17 @@ export const firestoreApi = createApi({
           const batch = writeBatch(db);
 
           // Remove the canceled order from `openQueue`
-          const openOrderDocRef = doc(openQueueRef, `${orderId}_${orderToUpdate.customer.uid}`);
+          const openOrderDocRef = doc(
+            openQueueRef,
+            `${orderId}_${orderToUpdate.customer.uid}`
+          );
           batch.delete(openOrderDocRef);
 
           // Add the canceled order to `voidedOrders`
-          const voidedOrderDocRef = doc(voidedOrdersRef, `${orderId}_${orderToUpdate.customer.uid}`);
+          const voidedOrderDocRef = doc(
+            voidedOrdersRef,
+            `${orderId}_${orderToUpdate.customer.uid}`
+          );
           batch.set(voidedOrderDocRef, canceledOrder);
 
           // Commit the batch operation
@@ -440,29 +500,46 @@ export const firestoreApi = createApi({
 
           const date = summaryData.date;
           const historyRef = collection(db, "orders", resId, "history");
-          const dailySummarizationRef = collection(db, "orders", resId, "dailySummarization");
-    
+          const dailySummarizationRef = collection(
+            db,
+            "orders",
+            resId,
+            "dailySummarization"
+          );
+
           const batch = writeBatch(db);
-    
-          const voidedOrdersRef = collection(db, "orders", resId, "voidedOrders");
-          const completedOrdersRef = collection(db, "orders", resId, "completedOrders");
-    
-          const deleteCollectionDocs = async (collectionRef: CollectionReference) => {
+
+          const voidedOrdersRef = collection(
+            db,
+            "orders",
+            resId,
+            "voidedOrders"
+          );
+          const completedOrdersRef = collection(
+            db,
+            "orders",
+            resId,
+            "completedOrders"
+          );
+
+          const deleteCollectionDocs = async (
+            collectionRef: CollectionReference
+          ) => {
             const q = query(collectionRef);
             const querySnapshot = await getDocs(q);
             querySnapshot.forEach((doc) => {
               batch.delete(doc.ref);
             });
           };
-    
+
           await deleteCollectionDocs(voidedOrdersRef);
           await deleteCollectionDocs(completedOrdersRef);
-    
+
           orders.forEach((order: OrderType, index: number) => {
             const orderDocRef = doc(historyRef, `${date}_${index}`);
             batch.set(orderDocRef, order);
           });
-    
+
           const dailySummarizationDocRef = doc(dailySummarizationRef, date);
           batch.set(dailySummarizationDocRef, summaryData);
 
@@ -470,55 +547,80 @@ export const firestoreApi = createApi({
           batch.update(docRef, {
             ["settings.siteControl.status"]: "inactive",
           });
-    
+
           await batch.commit();
-    
-          console.log("Close day data saved and old orders deleted successfully");
+
+          console.log(
+            "Close day data saved and old orders deleted successfully"
+          );
           return { data: null };
         } catch (error: any) {
           console.error("Error while close the day:", error.message);
           return { error: error.message };
         }
       },
-      invalidatesTags: ["HistoryOrders", "DailySummarizationOrders", "Restaurant"],
+      invalidatesTags: [
+        "HistoryOrders",
+        "DailySummarizationOrders",
+        "Restaurant",
+      ],
     }),
     setDisplaySettings: builder.mutation({
-      async queryFn({resId, settingName, value}: {resId: string, settingName: string, value: string}) {
+      async queryFn({
+        resId,
+        settingName,
+        value,
+      }: {
+        resId: string;
+        settingName: string;
+        value: string;
+      }) {
         try {
           if (!value) {
-            return { data: null }
+            return { data: null };
           }
 
           const docRef = doc(db, "businesses", resId);
 
           if (
-            settingName === 'promotionalSubtitle' ||
-            settingName === 'cover' ||
-            settingName === 'icon'
+            settingName === "promotionalSubtitle" ||
+            settingName === "cover" ||
+            settingName === "icon"
           ) {
             await updateDoc(docRef, {
               [`business.${settingName}`]: value,
             });
-          } else if (settingName === 'closeMsg') {
+          } else if (settingName === "closeMsg") {
             await updateDoc(docRef, {
-              ['settings.siteControl.closeMsg']: value,
+              ["settings.siteControl.closeMsg"]: value,
             });
           }
 
           console.log("Write Operation [setDisplaySettings]");
           return { data: null };
         } catch (error: any) {
-          console.error("Error updating restaurant display settings:", error.message);
+          console.error(
+            "Error updating restaurant display settings:",
+            error.message
+          );
           return { error: error.message };
         }
       },
       invalidatesTags: ["Restaurant"],
     }),
     setOrderWorkflowSettings: builder.mutation({
-      async queryFn({resId, settingName, value}: {resId: string, settingName: string, value: string | boolean}) {
+      async queryFn({
+        resId,
+        settingName,
+        value,
+      }: {
+        resId: string;
+        settingName: string;
+        value: string | boolean;
+      }) {
         try {
-          if (typeof value !== 'boolean') {
-            return { data: null }
+          if (typeof value !== "boolean") {
+            return { data: null };
           }
 
           const docRef = doc(db, "businesses", resId);
@@ -530,12 +632,87 @@ export const firestoreApi = createApi({
           console.log("Write Operation [setOrderWorkflowSettings]");
           return { data: null };
         } catch (error: any) {
-          console.error("Error updating restaurant order work flow settings:", error.message);
+          console.error(
+            "Error updating restaurant order work flow settings:",
+            error.message
+          );
           return { error: error.message };
         }
       },
       invalidatesTags: ["Restaurant"],
     }),
+    assignOrderToDriver: builder.mutation({
+      async queryFn({ orders, orderId, resId, driverData }: { orders: OrderType[]; orderId: string; resId: string; driverData: Driver; }) {
+        try {
+          // Validate input data
+          if (!orders || orders.length === 0) {
+            throw new Error("Orders array is empty");
+          }
+          if (!orderId) {
+            throw new Error("Order ID is required.");
+          }
+          if (!resId) {
+            throw new Error("Restaurant ID is required.");
+          }
+          if (!driverData) {
+            throw new Error("Driver ID is required.");
+          }
+    
+          // Find the specific order to update
+          const orderToUpdate = orders.find(
+            (order: OrderType) => order.id === orderId
+          );
+          if (!orderToUpdate) {
+            throw new Error(`Cannot find order with id "${orderId}"`);
+          }
+    
+          // Update the order fields
+          const updatedOrder = {
+            ...orderToUpdate,
+            delivery: {
+              ...orderToUpdate.delivery,
+              uid: driverData.uid,
+              name: driverData.userInfo.name,
+              phone: driverData.userInfo.phone,
+            },
+            status: {
+              ...orderToUpdate.status,
+              current: "ON_ROUTE",
+              history: [
+                ...orderToUpdate.status.history,
+                { status: "ON_ROUTE", timestamp: Date.now() },
+              ],
+            },
+            orderTimestamps: {
+              ...orderToUpdate.orderTimestamps,
+              onRouteAt: Date.now(),
+            },
+          };
+    
+          // Firestore references for updating the order
+          const openQueueRef = collection(db, "orders", resId, "openQueue");
+          const openOrderDocRef = doc(
+            openQueueRef,
+            `${orderId}_${orderToUpdate.customer.uid}`
+          );
+    
+          // Update the order in Firestore
+          const batch = writeBatch(db);
+          batch.set(openOrderDocRef, updatedOrder);
+    
+          // Commit the batch
+          await batch.commit();
+    
+          console.log("Order assigned to driver and status updated.");
+          return { data: null };
+        } catch (error: any) {
+          console.error("Error assigning order to driver:", error.message);
+          return { error: error.message };
+        }
+      },
+      invalidatesTags: ["Orders"],
+    }),
+    
   }),
 });
 
@@ -548,10 +725,13 @@ export const {
   useFetchVoidedOrdersDataQuery,
   useFetchHistoryOrdersDataQuery,
   useFetchOrdersDailySummarizationDataQuery,
+  useFetchDriversDataQuery,
+
   useSetOrderStatusMutation,
   useSetDeleteOrderStatusMutation,
   useSetRestaurantStatusMutation,
   useSetCloseDayMutation,
   useSetDisplaySettingsMutation,
   useSetOrderWorkflowSettingsMutation,
+  useAssignOrderToDriverMutation,
 } = firestoreApi;

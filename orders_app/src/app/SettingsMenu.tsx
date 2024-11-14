@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Settings, TicketX, TicketCheck, KeyRound, Wrench } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "@/lib/rtk/hooks";
-import { setActiveTab, optionMenuView, setOptionsMenuView, setCloseDayPopup } from "@/lib/rtk/slices/toggleSlice";
+import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
+import { setActiveTab, optionMenuView, setOptionsMenuView, setCloseDayPopup } from "@/rtk/slices/toggleSlice";
 import MenuCard from './MenuCard'
 
 function SettingsMenu() {

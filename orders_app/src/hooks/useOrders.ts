@@ -7,10 +7,10 @@ import {
   useFetchMenuDataQuery,
   useFetchCompletedOrdersDataQuery,
   useFetchVoidedOrdersDataQuery
-} from "@/lib/rtk/api/firestoreApi";
-import { useAppSelector } from "@/lib/rtk/hooks";
-import { userUid } from "@/lib/rtk/slices/constantsSlice";
-import { activeTab } from "@/lib/rtk/slices/toggleSlice";
+} from "@/rtk/api/firestoreApi";
+import { useAppSelector } from "@/rtk/hooks";
+import { userUid } from "@/rtk/slices/constantsSlice";
+import { activeTab } from "@/rtk/slices/toggleSlice";
 
 type UseOrders = {
   orders: OrderType[] | null;

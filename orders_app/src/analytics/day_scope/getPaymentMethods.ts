@@ -1,5 +1,5 @@
 import { OrderType } from "@/types/order";
-import { PaymentMethodsType } from "@/lib/data_analytics/types";
+import { PaymentMethodsType } from "@/analytics/types";
 
 export default function getPaymentMethods(order: OrderType) {
   const paymentMethods: PaymentMethodsType = {};

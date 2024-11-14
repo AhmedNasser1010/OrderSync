@@ -1,13 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useSelector, useDispatch } from 'react-redux'
+import useCloseOrder from "../hooks/useCloseOrder"
 import styled from 'styled-components'
-import { initOrders, changeOrderState } from '../rtk/slices/ordersSlice'
-
-import DB_GET_DOC from '../utils/DB_GET_DOC'
-import DB_UPDATE_NESTED_VALUE from '../utils/DB_UPDATE_NESTED_VALUE'
-import DB_DELETE_NESTED_VALUE from '../utils/DB_DELETE_NESTED_VALUE'
-
 import Button from '@mui/material/Button'
 
 const Buttons = styled.div`
@@ -20,65 +13,15 @@ const Buttons = styled.div`
 	}
 `
 
-function ButtonBox({ order, id }) {
+function ButtonBox({ id }) {
 	const navigate = useNavigate()
-	const dispatch = useDispatch()
-	const user = useSelector(state => state.user)
-
-	const updateOrder = () => {
-		return {
-			...order,
-			status: 'COMPLETED',
-			statusUpdatedSince: Number(Date.now()),
-			assign: {
-				...order.assign,
-				status: 'completed'
-			}
-		}
-	}
-
-	const updateAllOrders = (orders) => {
-		const updatedOrder = updateOrder()
-		return [
-			...orders.map(order => {
-				if (id === order.id) {
-					return updatedOrder
-				}
-				return order
-			})
-		]
-	}
-
-	const updateQueue = () => {
-		return user.queue.filter(qu => qu.id !== id)
-	}
+	const closeOrder = useCloseOrder()
 
 	const handleToNext = async () => {
-		const confirmation = window.confirm("Are you sure you want to close this order?")
+		const confirmation = window.confirm("Are you sure you want to check this order as delivered?")
 
 		if (confirmation) {
-			const orders = await DB_GET_DOC('orders', order.accessToken)
-			const openOrders = orders.open
-
-			const updatedOrders = updateAllOrders(openOrders)
-			const updatedQueue = updateQueue()
-
-			DB_UPDATE_NESTED_VALUE(
-				'orders',
-				order.accessToken,
-				'open',
-				updatedOrders
-			)
-			.then(res => {
-				if (res) {
-					DB_DELETE_NESTED_VALUE('customers', order.user.uid, 'trackedOrder')
-					DB_UPDATE_NESTED_VALUE('drivers', user.uid, 'queue', updatedQueue)
-					DB_UPDATE_NESTED_VALUE('drivers', user.uid, 'ordersDues', user.ordersDues + (order?.cartTotalPrice?.discount || 1000))
-
-				}
-			})
-
-			navigate('/queue')
+			closeOrder(id, () => navigate('/queue'))
 		}
 	}
 

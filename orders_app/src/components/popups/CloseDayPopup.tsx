@@ -9,8 +9,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { AlertCircle, ShieldCheck, Loader2 } from "lucide-react"
-import { useAppSelector, useAppDispatch } from "@/lib/rtk/hooks";
-import { closeDayPopup, setCloseDayPopup } from "@/lib/rtk/slices/toggleSlice";
+import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
+import { closeDayPopup, setCloseDayPopup } from "@/rtk/slices/toggleSlice";
 import useCloseDay from '@/hooks/useCloseDay'
 
 export default function CloseDayPopup() {

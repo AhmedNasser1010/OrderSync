@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAppSelector, useAppDispatch } from "@/lib/rtk/hooks";
+import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
 import { auth } from "@/lib/firebase";
 import {
   User as FirebaseUser,
@@ -8,9 +8,9 @@ import {
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
-import { useFetchUserDataQuery } from "@/lib/rtk/api/firestoreApi";
-import { userUid, setUserUid } from "@/lib/rtk/slices/constantsSlice";
-import { isAuthLoadingStatus, setIsAuthLoading } from "@/lib/rtk/slices/toggleSlice";
+import { useFetchUserDataQuery } from "@/rtk/api/firestoreApi";
+import { userUid, setUserUid, setAccessToken } from "@/rtk/slices/constantsSlice";
+import { isAuthLoadingStatus, setIsAuthLoading } from "@/rtk/slices/toggleSlice";
 
 interface UseAuthReturn {
   user: FirebaseUser | null;
@@ -30,18 +30,23 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
   const [authError, setAuthError] = useState<any>(null);
   const [authErrorMsg, setAuthErrorMsg] = useState<string | null>(null);
   const uid = useAppSelector(userUid);
-  useFetchUserDataQuery(uid, { skip: !uid });
+  const { data: userFetchData } = useFetchUserDataQuery(uid, { skip: !uid });
 
   const onSuccessLogin = useCallback((userData?: FirebaseUser | null) => {
     if (userData) {
-      const uid = userData.uid;
 
+      const uid = userData.uid;
       dispatch(setUserUid(uid));
       setUser(userData);
-      dispatch(setIsAuthLoading(false));
-      autoNavigate && router.push("/");
+
+      if (userFetchData) {
+        dispatch(setAccessToken(userFetchData.accessToken));
+        dispatch(setIsAuthLoading(false));
+        autoNavigate && router.push("/");
+      }
+
     }
-  }, []);
+  }, [userFetchData]);
 
   const onFailedLogin = useCallback((error: any) => {
     dispatch(setIsAuthLoading(false));

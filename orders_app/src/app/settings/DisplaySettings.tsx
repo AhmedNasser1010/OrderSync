@@ -8,9 +8,9 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useSetDisplaySettingsMutation, useFetchUserDataQuery, useFetchRestaurantDataQuery } from '@/lib/rtk/api/firestoreApi'
-import { useAppSelector } from "@/lib/rtk/hooks";
-import { userUid } from '@/lib/rtk/slices/constantsSlice'
+import { useSetDisplaySettingsMutation, useFetchUserDataQuery, useFetchRestaurantDataQuery } from '@/rtk/api/firestoreApi'
+import { useAppSelector } from "@/rtk/hooks";
+import { userUid } from '@/rtk/slices/constantsSlice'
 
 export default function DisplaySettings() {
   const uid = useAppSelector(userUid)

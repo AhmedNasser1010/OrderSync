@@ -1,10 +1,10 @@
-import { useAppSelector } from "@/lib/rtk/hooks";
+import { useAppSelector } from "@/rtk/hooks";
 import {
   useFetchRestaurantDataQuery,
   useFetchUserDataQuery,
-} from "@/lib/rtk/api/firestoreApi";
-import { userUid } from "@/lib/rtk/slices/constantsSlice";
-import { useSetRestaurantStatusMutation } from "@/lib/rtk/api/firestoreApi";
+} from "@/rtk/api/firestoreApi";
+import { userUid } from "@/rtk/slices/constantsSlice";
+import { useSetRestaurantStatusMutation } from "@/rtk/api/firestoreApi";
 import { RestaurantStatusTypes } from "@/types/restaurant";
 
 type UseResStatus = {

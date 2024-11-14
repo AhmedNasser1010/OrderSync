@@ -1,5 +1,5 @@
 import { OrderType } from "@/types/order";
-import { OrderSourcesType } from "@/lib/data_analytics/types";
+import { OrderSourcesType } from "@/analytics/types";
 
 export default function getOrderSources(order: OrderType) {
   const orderSources: OrderSourcesType = {};

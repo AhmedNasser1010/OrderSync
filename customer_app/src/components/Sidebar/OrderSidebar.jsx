@@ -83,7 +83,7 @@ function OrderSidebar() {
 						<TimelineItem>
 							<TimelineSeparator>
 								<TimelineConnector />
-								<TimelineDot color={ trackedOrderData?.status?.current === 'PREPARING' || trackedOrderData?.status?.current === 'DELIVERY' ? 'primary' : 'grey'}>
+								<TimelineDot color={ trackedOrderData?.status?.current === 'PREPARING' || trackedOrderData?.status?.current === 'PICK_UP' || trackedOrderData?.status?.current === 'ON_ROUTE' ? 'primary' : 'grey'}>
 									<GiCook />
 								</TimelineDot>
 								<TimelineConnector />
@@ -98,7 +98,7 @@ function OrderSidebar() {
 						<TimelineItem>
 							<TimelineSeparator>
 								<TimelineConnector />
-								<TimelineDot color={trackedOrderData?.status?.current === 'DELIVERY' ? 'primary' : 'grey'}>
+								<TimelineDot color={trackedOrderData?.status?.current === 'PICK_UP' || trackedOrderData?.status?.current === 'ON_ROUTE' ? 'primary' : 'grey'}>
 									<MdDeliveryDining />
 								</TimelineDot>
 								<TimelineConnector />

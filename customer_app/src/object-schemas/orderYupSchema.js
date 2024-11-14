@@ -18,9 +18,6 @@ const orderYupSchema = yup.object().shape({
   
   orderTimestamps: yup.object().shape({
     placedAt: yup.number().required(),
-    preparedAt: yup.number().nullable(),
-    pickedUpAt: yup.number().nullable(),
-    deliveredAt: yup.number().nullable()
   }).required(),
 
   delivery: yup.object().shape({
