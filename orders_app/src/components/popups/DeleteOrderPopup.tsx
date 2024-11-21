@@ -13,7 +13,7 @@ import { AlertCircle } from "lucide-react"
 import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
 import { deletePopup } from "@/rtk/slices/toggleSlice";
 import { setDeletePopup } from "@/rtk/slices/toggleSlice";
-import useOrderHandler from '@/hooks/useOrderHandler'
+import useOrderHandler from '@/hooks/order-handlers/useOrderHandlers'
 
 export default function DeleteOrderPopup() {
   const dispatch = useAppDispatch()

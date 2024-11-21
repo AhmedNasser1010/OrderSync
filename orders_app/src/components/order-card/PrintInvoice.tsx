@@ -1,4 +1,4 @@
-import useOrderHandler from "@/hooks/useOrderHandler";
+import useOrderHandler from "@/hooks/order-handlers/useOrderHandlers";
 import { Button } from "@/components/ui/button";
 import { Printer } from 'lucide-react'
 import { MainTabTypes } from "@/types/components";

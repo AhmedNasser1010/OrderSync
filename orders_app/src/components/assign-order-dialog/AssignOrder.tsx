@@ -9,7 +9,7 @@ import { accessToken } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
 import { Driver } from "@/types/driver";
 import { FormattedDriverForAssignCard } from "@/types/components";
-import useAssign from "@/hooks/order-actions-hook/useAssign";
+import useAssign from "@/hooks/order-handlers/useAssign";
 import { OrderType } from "@/types/order";
 
 import AssignDialogTrigger from "@/components/assign-order-dialog/AssignDialogTrigger";

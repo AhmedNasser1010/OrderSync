@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
+import DriverDuesDialog from "../set-driver-dues-dialog/DriverDues";
 
 type Props = {
   driverId: string;
@@ -26,9 +27,9 @@ export default function DriverCardDuesAndActions({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="disabled-click-1">
-          <DropdownMenuItem>View Profile</DropdownMenuItem>
-          <DropdownMenuItem>Message</DropdownMenuItem>
-          <DropdownMenuItem>Block</DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <DriverDuesDialog driverId={driverId} />
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

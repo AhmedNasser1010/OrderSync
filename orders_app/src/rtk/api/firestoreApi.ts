@@ -9,7 +9,8 @@ import {
   writeBatch,
   query,
   where,
-  CollectionReference
+  CollectionReference,
+  increment
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { OrderType, OrderStatusType } from "@/types/order";
@@ -137,7 +138,7 @@ export const firestoreApi = createApi({
       },
       providesTags: ["VoidedOrders"],
     }),
-    fetchOpenOrdersData: builder.query({
+    fetchOpenOrdersData: builder.query<OrderType[], string>({
       queryFn: () => ({ data: [] }),
       async onCacheEntryAdded(
         resId,
@@ -249,11 +250,11 @@ export const firestoreApi = createApi({
 
     // Mutation Endpoints
     setOrderStatus: builder.mutation({
-      async queryFn({ orders, orderId, resId, direction }) {
+      async queryFn({ orderToUpdate, orderId, resId, updatedStatus }) {
         try {
           // Validate input data
-          if (!orders || orders.length === 0) {
-            throw new Error("Orders array is empty");
+          if (!orderToUpdate) {
+            throw new Error("Order to update not found");
           }
           if (!orderId) {
             throw new Error("Order ID is required.");
@@ -261,26 +262,6 @@ export const firestoreApi = createApi({
           if (!resId) {
             throw new Error("Restaurant ID is required.");
           }
-
-          // Find the specific order that needs status change
-          const orderToUpdate = orders.find(
-            (order: OrderType) => order.id === orderId
-          );
-          if (!orderToUpdate) {
-            throw new Error(`Cannot find order with id "${orderId}"`);
-          }
-
-          // Determine the updated status based on the direction
-          const updatedStatus =
-            direction === "forward"
-              ? statusForward[
-                  orderToUpdate.status.current as keyof typeof statusForward
-                ]
-              : statusBackward[
-                  orderToUpdate.status.current as keyof typeof statusBackward
-                ];
-
-          console.log('updatedStatus', updatedStatus)
 
           const getStatusTimestampKey = (status: OrderStatusType) => {
             switch (status) {
@@ -323,7 +304,7 @@ export const firestoreApi = createApi({
             },
             delivery: {
               ...orderToUpdate.delivery,
-              uid: direction === "backward" && (orderToUpdate.status.current === 'PICK_UP' || orderToUpdate.status.current === 'ON_ROUTE') ? null : orderToUpdate.delivery.uid
+              uid: updatedStatus === "PREPARING" && (orderToUpdate.status.current === 'PICK_UP' || orderToUpdate.status.current === 'ON_ROUTE') ? null : orderToUpdate.delivery.uid
             }
           };
 
@@ -339,7 +320,7 @@ export const firestoreApi = createApi({
           // Batch to perform both update and move operations atomically
           const batch = writeBatch(db);
 
-          if (updatedStatus === "COMPLETED") {
+          if (updatedStatus === "DELIVERED") {
             // Remove the completed order from `openQueue`
             const openOrderDocRef = doc(
               openQueueRef,
@@ -712,6 +693,32 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ["Orders"],
     }),
+    setDriverDues: builder.mutation({
+      async queryFn({ driverId, duesValue }: { driverId: string; duesValue: number; }) {
+        try {
+          if (!driverId) {
+            throw new Error("Driver ID is required.");
+          }
+    
+          const driverRef = doc(db, "drivers", driverId);
+    
+          const batch = writeBatch(db);
+
+          batch.update(driverRef, {
+            ["ordersDues"]: duesValue ? increment(-duesValue) : 0
+          });
+          
+          await batch.commit();
+    
+          console.log("Driver dues has been rested");
+          return { data: null };
+        } catch (error: any) {
+          console.error("Error assigning order to driver:", error.message);
+          return { error: error.message };
+        }
+      },
+      invalidatesTags: ["Drivers"],
+    }),
     
   }),
 });
@@ -734,4 +741,5 @@ export const {
   useSetDisplaySettingsMutation,
   useSetOrderWorkflowSettingsMutation,
   useAssignOrderToDriverMutation,
+  useSetDriverDuesMutation
 } = firestoreApi;

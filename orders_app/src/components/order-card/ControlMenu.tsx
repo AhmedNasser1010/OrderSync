@@ -12,7 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import useOrderHandler from "@/hooks/useOrderHandler";
+import useOrderHandler from "@/hooks/order-handlers/useOrderHandlers";
 import { useAppDispatch } from "@/rtk/hooks";
 import { setDeletePopup } from "@/rtk/slices/toggleSlice";
 import { MainTabTypes } from "@/types/components";

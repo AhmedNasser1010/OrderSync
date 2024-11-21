@@ -16,11 +16,16 @@ export default function OrderWorkflow() {
   const uid = useAppSelector(userUid)
   const { data: userData } = useFetchUserDataQuery(uid)
   const { data: resData } = useFetchRestaurantDataQuery(userData?.accessToken)
-  const driverAssignFeatureValue = resData?.settings?.orderManagement?.assign?.forDeliveryWorkers || false
+  const driverAssignment = resData?.settings?.orderManagement?.driverAssignment ?? false;
+  const printInvoice = resData?.settings?.orderManagement?.printInvoice ?? false;
   const [setOrderWorkflowSettings] = useSetOrderWorkflowSettingsMutation()
 
-  const handleDriverAssignFeature = (checked: boolean) => {
-    setOrderWorkflowSettings({ resId: userData?.accessToken, settingName: "assign.forDeliveryWorkers", value: checked })
+  const handleDriverAssignment = (checked: boolean) => {
+    setOrderWorkflowSettings({ resId: userData?.accessToken, settingName: "driverAssignment", value: checked })
+  }
+
+  const handlePrintInvoice = (checked: boolean) => {
+    setOrderWorkflowSettings({ resId: userData?.accessToken, settingName: "printInvoice", value: checked })
   }
 
   return (
@@ -31,11 +36,11 @@ export default function OrderWorkflow() {
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <Label htmlFor="rider-tracking">Driver Assign Feature</Label>
-          <Switch id="rider-tracking" defaultChecked={driverAssignFeatureValue} onCheckedChange={handleDriverAssignFeature} />
+          <Switch id="rider-tracking" defaultChecked={driverAssignment} onCheckedChange={handleDriverAssignment} />
         </div>
         <div className="flex items-center justify-between">
-          <Label htmlFor="hold-resume">Hold/Resume Orders</Label>
-          <Switch id="hold-resume" defaultChecked={false} disabled={true} />
+          <Label htmlFor="print-invoice">Print Invoice</Label>
+          <Switch id="print-invoice" defaultChecked={printInvoice} onCheckedChange={handlePrintInvoice} />
         </div>
       </CardContent>
     </Card>
