@@ -1,0 +1,11 @@
+Discount:
+FIXED-10 || Fixed discount number $10
+P-50     || Percentage discount %50
+
+Condistions:
+P-20_IF{FIRST}
+|| Percentage discount %20 if first buy
+
+P-20_SWITCH{CASE:FIRST-0;CASE:SPENT-500}
+|| Percentage discount %20 if first buy if else spent $500
+
