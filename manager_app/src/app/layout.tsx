@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Nav from "../components/nav/Nav";
 
 import StoreProvider from "./StoreProvider";
 import AuthProvider from "./AuthProvider";
@@ -34,7 +35,12 @@ export default function RootLayout({
       >
         <StoreProvider>
           <AuthProvider>
-            <PopupProvider>{children}</PopupProvider>
+            <PopupProvider>
+              <div className="flex flex-col space-y-4 p-4 md:p-6 bg-background">
+                <Nav />
+                {children}
+              </div>
+            </PopupProvider>
           </AuthProvider>
         </StoreProvider>
       </body>
