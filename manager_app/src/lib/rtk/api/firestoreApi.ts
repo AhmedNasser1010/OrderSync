@@ -8,6 +8,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { OrderType } from "@/../../types/order";
+import { AnalyticsEntry } from "@/types/AnalyticsEntry";
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
@@ -163,8 +164,8 @@ export const firestoreApi = createApi({
       },
       providesTags: ["HistoryOrders"],
     }),
-    fetchOrdersDailySummarizationData: builder.query({
-      async queryFn(resId) {
+    fetchOrdersDailySummarizationData: builder.query<AnalyticsEntry[], string>({
+      async queryFn(resId): Promise<{ data: AnalyticsEntry[] } | { error: string }> {
         try {
           const dailySummarizationRef = collection(
             db,
