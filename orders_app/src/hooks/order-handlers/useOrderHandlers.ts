@@ -7,10 +7,9 @@ import {
 } from '@/rtk/api/firestoreApi'
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
-import { OrderType, OrderStatusType } from "@/types/order";
+import { OrderType } from "@/types/order";
 
 type OrderHandler = {
-  handlePrintInvoice: () => void;
   handleChangeStatus: (orderId: string, direction: "forward" | "backward") => void;
   deleteOrder: {
     handleDeleteOrder: (orderId: string | null, cancellationReason: string | null) => void;
@@ -28,8 +27,6 @@ const useOrderHandler = (): OrderHandler => {
   const { data: restaurant } = useFetchRestaurantDataQuery(userData?.accessToken, { skip: !userData?.accessToken });
   const [setOrderStatus] = useSetOrderStatusMutation();
   const [setOrderCancellation, { isLoading: orderCancellationIsLoading, error: orderCancellationError }] = useSetDeleteOrderStatusMutation();
-
-  const handlePrintInvoice = () => {};
 
   const handleChangeStatus = (orderId: string, direction: "forward" | "backward") => {
     if (orders?.length && orderId && direction && userData?.accessToken) {
@@ -100,7 +97,6 @@ const useOrderHandler = (): OrderHandler => {
   const handleRejectOrder = () => {};
 
   return {
-    handlePrintInvoice,
     handleChangeStatus,
     deleteOrder: {
       handleDeleteOrder,

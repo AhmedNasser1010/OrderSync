@@ -1,16 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  useFetchDriversDataQuery,
-  useFetchOpenOrdersDataQuery,
-} from "@/rtk/api/firestoreApi";
+import { useFetchDriversDataQuery } from "@/rtk/api/firestoreApi";
 import { accessToken } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
 import { Driver } from "@/types/driver";
 import { FormattedDriverForAssignCard } from "@/types/components";
 import useAssign from "@/hooks/order-handlers/useAssign";
-import { OrderType } from "@/types/order";
+import useOrders from "@/hooks/useOrders";
 
 import AssignDialogTrigger from "@/components/assign-order-dialog/AssignDialogTrigger";
 import AssignDialogHeader from "@/components/assign-order-dialog/AssignDialogHeader";
@@ -23,9 +20,9 @@ export default function AssignOrder({ orderId }: { orderId: string }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDriver, setSelectedDriver] = useState<string | null>(null);
   const resAccessToken = useAppSelector(accessToken);
-  const { data: ordersData } = useFetchOpenOrdersDataQuery(resAccessToken);
   const { data: driversData } = useFetchDriversDataQuery(resAccessToken);
   const assign = useAssign();
+  const { getOrder, isLoading } = useOrders();
 
   const drivers = useMemo(() => {
     return driversData && driversData.length
@@ -45,17 +42,17 @@ export default function AssignOrder({ orderId }: { orderId: string }) {
   }, [driversData]);
 
   const filteredDrivers = drivers.filter((driver) =>
-    driver.name.toLowerCase().includes(searchTerm.toLowerCase())
+    driver.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   useEffect(() => {
-    if (ordersData) {
-      const currentOrder: OrderType = ordersData.filter(
-        (order: OrderType) => order.id === orderId
-      )[0];
-      setSelectedDriver(currentOrder.delivery.uid);
+    if (isLoading === false) {
+      const order = getOrder(orderId) || null;
+      if (order) {
+        setSelectedDriver(order.delivery.uid);
+      }
     }
-  }, [ordersData]);
+  }, [getOrder, isLoading, orderId]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
