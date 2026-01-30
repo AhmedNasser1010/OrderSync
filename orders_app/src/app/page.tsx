@@ -6,7 +6,7 @@ import OrdersTopBar from "./OrdersTopBar";
 import OrdersTopBarBtns from "./OrdersTopBarBtns";
 import ResStatusBtn from "./ResStatusBtn";
 import ResStatus from "./ResStatus";
-import SettingsMenu from "./SettingsMenu";
+import SettingsMenu from "@/components/more-menu/SettingsMenu";
 
 export default function OrdersPage() {
   return (

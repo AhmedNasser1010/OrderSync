@@ -28,7 +28,9 @@ export default function DriverCardDuesAndActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="disabled-click-1">
           <DropdownMenuItem asChild>
-            <DriverDuesDialog driverId={driverId} />
+            <DriverDuesDialog driverId={driverId}>
+              <Button variant="ghost">Set Driver Dues</Button>
+            </DriverDuesDialog>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
