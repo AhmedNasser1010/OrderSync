@@ -43,7 +43,7 @@ function SettingsMenu() {
           <span className="sr-only">Open settings menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="bottom" className="rounded-t-lg min-h-[50vh]">
+      <SheetContent side="bottom" className="rounded-t-lg min-h-[50vh] border border-border">
         <SheetHeader>
           <SheetTitle>More</SheetTitle>
           <SheetDescription>More Settings</SheetDescription>

@@ -3,7 +3,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -29,7 +28,7 @@ export default function OrderWorkflow() {
   }
 
   return (
-    <Card>
+    <Card className="border border-border">
       <CardHeader>
         <CardTitle>Order Workflow Customization</CardTitle>
       </CardHeader>

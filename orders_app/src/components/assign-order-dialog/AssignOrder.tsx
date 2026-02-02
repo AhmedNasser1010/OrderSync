@@ -66,7 +66,7 @@ export default function AssignOrder({ orderId }: { orderId: string }) {
             setSelectedDriver={setSelectedDriver}
             drivers={drivers}
           />
-          <ScrollArea className="h-[300px] rounded-md border p-4">
+          <ScrollArea className="h-[300px] rounded-md border border-border p-4">
             {filteredDrivers.map((driver: FormattedDriverForAssignCard) => (
               <AssignDriverCard
                 key={driver.id}

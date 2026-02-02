@@ -53,7 +53,7 @@ export default function PrintInvoiceDialog({
         <DialogHeader>
           <DialogTitle>Print Invoice</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-[500px] rounded-md border">
+        <ScrollArea className="h-[500px] rounded-md border border-border">
           <Invoice
             contentRef={contentRef}
             restaurant={restaurant}

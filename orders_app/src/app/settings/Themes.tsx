@@ -1,30 +1,22 @@
-import { useState } from "react";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { ModeToggle } from "@/components/ui/ModeToggle";
 
 export default function Themes() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
   return (
-    <Card>
+    <Card className="border border-border">
       <CardHeader>
         <CardTitle>Appearance and Themes</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <Label htmlFor="dark-mode">Dark Mode</Label>
-          <Switch
-            id="dark-mode"
-            checked={isDarkMode}
-            onCheckedChange={setIsDarkMode}
-            disabled={true}
-          />
+          <ModeToggle />
         </div>
       </CardContent>
     </Card>

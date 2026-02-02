@@ -39,7 +39,7 @@ export default function ControlMenu({ id, activeTabValue, status }: Props) {
           <MoreVertical className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="disabled-click-1">
+      <DropdownMenuContent align="end" className="disabled-click-1 border border-border">
         {status !== "DELIVERED" && (
           <DropdownMenuItem onClick={() => handleChangeStatus(id, "forward")}>
             <ArrowUpCircle className="mr-2 h-4 w-4" />

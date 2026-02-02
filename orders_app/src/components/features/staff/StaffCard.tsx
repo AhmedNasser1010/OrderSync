@@ -47,7 +47,7 @@ export function StaffCard({ member }: { member: Driver }) {
                 <span className="sr-only">Open menu</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="border border-border">
               <DeleteMemberDialog member={member}>
                 <DropdownMenuItem
                   onSelect={(e) => e.preventDefault()}

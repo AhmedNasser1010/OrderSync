@@ -15,7 +15,7 @@ function MenuCard({
 }) {
   return (
     <Card
-      className={`cursor-pointer transition-colors ${
+      className={`cursor-pointer transition-colors border border-border ${
         !disabled ? "hover:bg-gray-100" : "opacity-50 cursor-not-allowed"
       } ${className}`}
       onClick={!disabled ? callback : undefined}

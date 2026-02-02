@@ -26,7 +26,7 @@ export default function DriverCardDuesAndActions({
             <MoreVertical className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="disabled-click-1">
+        <DropdownMenuContent align="end" className="disabled-click-1 border border-border">
           <DropdownMenuItem asChild>
             <DriverDuesDialog driverId={driverId}>
               <Button variant="ghost">Set Driver Dues</Button>

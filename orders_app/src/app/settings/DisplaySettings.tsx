@@ -27,7 +27,7 @@ export default function DisplaySettings() {
   }
 
   return (
-    <Card>
+    <Card className="border border-border">
       <CardHeader>
         <CardTitle>Display Settings</CardTitle>
         <CardDescription>

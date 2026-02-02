@@ -27,7 +27,7 @@ const OrderCard = ({
 
   return (
     <Card
-      className={`cursor-pointer transition-shadow hover:shadow-md ${
+      className={`cursor-pointer transition-shadow hover:shadow-md border-border ${
         order.accepted ? "" : "bg-green-100 dark:bg-green-900"
       }`}
       onClick={handleNavigate}

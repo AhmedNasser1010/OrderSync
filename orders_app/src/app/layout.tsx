@@ -5,6 +5,7 @@ import StoreProvider from "./StoreProvider";
 import AuthProvider from "./AuthProvider";
 import PopupProvider from "./PopupProvider";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,10 +34,17 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <StoreProvider>
-          <AuthProvider>
-            <PopupProvider>{children}</PopupProvider>
-            <Toaster />
-          </AuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <AuthProvider>
+              <PopupProvider>{children}</PopupProvider>
+              <Toaster />
+            </AuthProvider>
+          </ThemeProvider>
         </StoreProvider>
       </body>
     </html>

@@ -16,7 +16,7 @@ import {
 
 export default function ProfileAndLang() {
   return (
-    <Card>
+    <Card className="border border-border">
       <CardHeader>
         <CardTitle>Profile and Language</CardTitle>
         <CardDescription>
