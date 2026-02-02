@@ -4,6 +4,7 @@ import "@/globals.css";
 import StoreProvider from "./StoreProvider";
 import AuthProvider from "./AuthProvider";
 import PopupProvider from "./PopupProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,6 +35,7 @@ export default function RootLayout({
         <StoreProvider>
           <AuthProvider>
             <PopupProvider>{children}</PopupProvider>
+            <Toaster />
           </AuthProvider>
         </StoreProvider>
       </body>

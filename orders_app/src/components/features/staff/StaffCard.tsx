@@ -1,5 +1,4 @@
 import { User, RotateCcw, Trash2, MoreVertical, Phone } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -11,12 +10,9 @@ import {
 import { type Driver } from "@/types/driver";
 import DriverDuesDialog from "@/components/set-driver-dues-dialog/DriverDues";
 import { DeleteMemberDialog } from "./DeleteMemberDialog";
+import StatusToggle from "./StatusToggle";
 
 export function StaffCard({ member }: { member: Driver }) {
-  const onToggleActive = (uid: string) => {
-    console.log("Toggling active status for UID:", uid);
-  };
-
   return (
     <div className="bg-card rounded-xl border border-border p-4 space-y-4">
       <div className="flex items-start justify-between">
@@ -94,13 +90,7 @@ export function StaffCard({ member }: { member: Driver }) {
       <div className="border-t border-border" />
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Status</span>
-          <Switch
-            checked={member.online.byManager}
-            onCheckedChange={() => onToggleActive(member.uid)}
-          />
-        </div>
+        <StatusToggle driverId={member.uid} status={member.online.byManager} />
 
         <DriverDuesDialog driverId={member.uid}>
           <Button variant="secondary" size="sm" className="gap-1.5">

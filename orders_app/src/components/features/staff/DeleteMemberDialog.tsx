@@ -9,7 +9,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import useStaff from "@/hooks/useStaff";
 import { type Driver } from "@/types/driver";
+import { toast } from "sonner";
 
 export function DeleteMemberDialog({
   children,
@@ -18,8 +20,15 @@ export function DeleteMemberDialog({
   children: React.ReactNode;
   member: Driver;
 }) {
-  const onDelete = (uid: string) => {
-    console.log("Deleting member with UID:", uid);
+  const { deleteMember } = useStaff();
+
+  const onDelete = async (uid: string) => {
+    try {
+      await deleteMember.trigger(uid);
+      toast.success("Member deleted successfully");
+    } catch (err) {
+      toast.error("Failed to delete member. Please try again.");
+    }
   };
 
   return (
@@ -35,7 +44,10 @@ export function DeleteMemberDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => onDelete(member.uid)}>
+          <AlertDialogAction
+            onClick={() => onDelete(member.uid)}
+            disabled={deleteMember.isLoading}
+          >
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

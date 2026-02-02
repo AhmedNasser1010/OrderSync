@@ -1,8 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
-import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,51 +17,45 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-interface AddMemberSheetProps {
-  onAddMember: (member: {
-    name: string;
-    role: string;
-    email: string;
-    phone: string;
-    duesAmount: number;
-  }) => void;
-}
+import useStaff from "@/hooks/useStaff";
+import { toast } from "sonner";
 
-const ROLES = [
-  "Manager",
-  "Developer",
-  "Designer",
-  "Sales",
-  "Support",
-  "Marketing",
-];
+const addMemberSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  phone: z.string().min(6, "Phone is required"),
+  uid: z.string().min(1, "User ID is required"),
+});
 
-export function AddMemberSheet({ onAddMember }: AddMemberSheetProps) {
+type AddMemberForm = z.infer<typeof addMemberSchema>;
+
+export function AddMemberSheet() {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    role: "",
-    email: "",
-    phone: "",
-    duesAmount: "",
+  const { addNewDriver } = useStaff();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<AddMemberForm>({
+    resolver: zodResolver(addMemberSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      uid: "",
+    },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onAddMember({
-      ...formData,
-      duesAmount: parseFloat(formData.duesAmount) || 0,
-    });
-    setFormData({ name: "", role: "", email: "", phone: "", duesAmount: "" });
-    setOpen(false);
+  const onSubmit = async (data: AddMemberForm) => {
+    try {
+      await addNewDriver.trigger(data);
+      setOpen(false);
+      toast.success("New member added successfully");
+    } catch (err) {
+      toast.error("Failed to add new member. Please try again.");
+    }
   };
 
   return (
@@ -70,6 +66,7 @@ export function AddMemberSheet({ onAddMember }: AddMemberSheetProps) {
           Add New Member
         </Button>
       </SheetTrigger>
+
       <SheetContent side="bottom" className="h-[85vh] rounded-t-2xl">
         <SheetHeader className="text-left">
           <SheetTitle>Add New Staff Member</SheetTitle>
@@ -78,87 +75,57 @@ export function AddMemberSheet({ onAddMember }: AddMemberSheetProps) {
           </SheetDescription>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5 mt-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 mt-6">
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
             <Input
               id="name"
+              {...register("name")}
               placeholder="Enter full name"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
-              required
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
-            <Select
-              value={formData.role}
-              onValueChange={(value) =>
-                setFormData({ ...formData, role: value })
-              }
-              required
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent>
-                {ROLES.map((role) => (
-                  <SelectItem key={role} value={role}>
-                    {role}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
-              type="email"
+              {...register("email")}
               placeholder="email@example.com"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              required
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="phone">Phone</Label>
             <Input
               id="phone"
-              type="tel"
-              placeholder="+1 (555) 000-0000"
-              value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
-              required
+              {...register("phone")}
+              placeholder="01123456789"
             />
+            {errors.phone && (
+              <p className="text-red-500 text-sm">{errors.phone.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dues">Initial Dues Amount</Label>
+            <Label htmlFor="uid">User ID</Label>
             <Input
-              id="dues"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              value={formData.duesAmount}
-              onChange={(e) =>
-                setFormData({ ...formData, duesAmount: e.target.value })
-              }
+              id="uid"
+              {...register("uid")}
+              placeholder="Enter user ID of this member"
             />
+            {errors.uid && (
+              <p className="text-red-500 text-sm">{errors.uid.message}</p>
+            )}
           </div>
 
           <div className="pt-4">
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
               Add Member
             </Button>
           </div>
