@@ -13,6 +13,7 @@ import { closeDayPopup, setCloseDayPopup } from "@/rtk/slices/toggleSlice";
 import { OrderType } from "@/types/order";
 import extractDaySummary from "@/analytics/day_scope/extractDaySummary";
 import { MainMenuType } from "@/types/menu";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 type UseCloseDay = {
   closeDay: () => void;
@@ -40,7 +41,7 @@ const useCloseDay = (): UseCloseDay => {
   const dispatch = useAppDispatch();
   const uid = useAppSelector(userUid);
   const closeDayPopupValues = useAppSelector(closeDayPopup);
-  const { data: userData } = useFetchUserDataQuery(uid, { skip: !uid });
+  const { data: userData } = useFetchUserDataQuery(uid ?? skipToken);
   const [setCloseDay, { isLoading: isSaving }] = useSetCloseDayMutation();
 
   const { data: openOrdersData } =

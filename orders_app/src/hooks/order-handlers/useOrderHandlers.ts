@@ -8,6 +8,7 @@ import {
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
 import { OrderType } from "@/types/order";
+import { skipToken } from '@reduxjs/toolkit/query';
 
 type OrderHandler = {
   handleChangeStatus: (orderId: string, direction: "forward" | "backward") => void;
@@ -22,9 +23,9 @@ type OrderHandler = {
 
 const useOrderHandler = (): OrderHandler => {
   const uid = useAppSelector(userUid);
-  const { data: userData } = useFetchUserDataQuery(uid, { skip: !uid });
-  const { data: orders } = useFetchOpenOrdersDataQuery(userData?.accessToken, { skip: !userData?.accessToken });
-  const { data: restaurant } = useFetchRestaurantDataQuery(userData?.accessToken, { skip: !userData?.accessToken });
+  const { data: userData } = useFetchUserDataQuery(uid ?? skipToken);
+  const { data: orders } = useFetchOpenOrdersDataQuery(userData?.accessToken ?? skipToken);
+  const { data: restaurant } = useFetchRestaurantDataQuery(userData?.accessToken ?? skipToken);
   const [setOrderStatus] = useSetOrderStatusMutation();
   const [setOrderCancellation, { isLoading: orderCancellationIsLoading, error: orderCancellationError }] = useSetDeleteOrderStatusMutation();
 

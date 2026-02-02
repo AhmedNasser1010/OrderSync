@@ -6,6 +6,7 @@ import {
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { useSetRestaurantStatusMutation } from "@/rtk/api/firestoreApi";
 import { RestaurantStatusTypes } from "@/types/restaurant";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 type UseResStatus = {
   toggleResStatus: () => void;
@@ -17,10 +18,8 @@ type UseResStatus = {
 
 const useResStatus = (): UseResStatus => {
   const uid = useAppSelector(userUid);
-  const { data: userData } = useFetchUserDataQuery(uid, { skip: !uid });
-  const { data: resData } = useFetchRestaurantDataQuery(userData?.accessToken, {
-    skip: !userData?.accessToken,
-  });
+  const { data: userData } = useFetchUserDataQuery(uid ?? skipToken);
+  const { data: resData } = useFetchRestaurantDataQuery(userData?.accessToken ?? skipToken);
   const currentStatus = resData?.settings?.siteControl?.status || "inactive";
   const isAvailableFeature =
     !resData?.settings?.siteControl?.autoAvailability || false;

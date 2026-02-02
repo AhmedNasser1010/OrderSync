@@ -11,6 +11,7 @@ import {
 import { useAppSelector } from "@/rtk/hooks";
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { activeTab } from "@/rtk/slices/toggleSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 type UseOrders = {
   orders: OrderType[] | null;
@@ -32,7 +33,7 @@ const useOrders = (): UseOrders => {
   const uid = useAppSelector(userUid);
   const activeTabValue = useAppSelector(activeTab);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { data: userData } = useFetchUserDataQuery(uid, { skip: !uid });
+  const { data: userData } = useFetchUserDataQuery(uid ?? skipToken);
 
   const { data: openOrdersData, isLoading: openOrdersIsLoading } =
     useFetchOpenOrdersDataQuery(userData?.accessToken, {

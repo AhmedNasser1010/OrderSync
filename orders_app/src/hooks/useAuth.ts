@@ -11,6 +11,7 @@ import {
 import { useFetchUserDataQuery } from "@/rtk/api/firestoreApi";
 import { userUid, setUserUid, setAccessToken } from "@/rtk/slices/constantsSlice";
 import { isAuthLoadingStatus, setIsAuthLoading } from "@/rtk/slices/toggleSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 interface UseAuthReturn {
   user: FirebaseUser | null;
@@ -30,7 +31,7 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
   const [authError, setAuthError] = useState<any>(null);
   const [authErrorMsg, setAuthErrorMsg] = useState<string | null>(null);
   const uid = useAppSelector(userUid);
-  const { data: userFetchData } = useFetchUserDataQuery(uid, { skip: !uid });
+  const { data: userFetchData } = useFetchUserDataQuery(uid ?? skipToken);
 
   const onSuccessLogin = useCallback((userData?: FirebaseUser | null) => {
     if (userData) {

@@ -31,7 +31,7 @@ export default function DisplaySettings() {
       <CardHeader>
         <CardTitle>Display Settings</CardTitle>
         <CardDescription>
-          Manage your restaurant's icon, cover, and promotional subtitles.
+          Manage your restaurant&apos;s icon, cover, and promotional subtitles.
         </CardDescription>
       </CardHeader>
       <CardContent>
