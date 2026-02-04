@@ -166,8 +166,7 @@ export const firestoreApi = createApi({
 
         await cacheEntryRemoved;
         unsubscribe();
-      },
-      providesTags: ["OpenQueue"],
+      }
     }),
     fetchHistoryOrdersData: builder.query({
       async queryFn(resId) {
@@ -245,8 +244,7 @@ export const firestoreApi = createApi({
 
         await cacheEntryRemoved;
         unsubscribe();
-      },
-      providesTags: ["Drivers"],
+      }
     }),
 
     // Mutation Endpoints
