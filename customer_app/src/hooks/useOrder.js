@@ -7,6 +7,7 @@ import {
   useSetUserOrderIdToNullMutation
 } from '../rtk/api/firestoreApi'
 import { setRateIsOpen, setCancellationNoticeIsOpen } from '../rtk/slices/toggleSlice'
+import { clearCart } from '../rtk/slices/cartSlice'
 
 const useOrder = () => {
   const dispatch = useDispatch()
@@ -24,6 +25,8 @@ const useOrder = () => {
   // On Completed Scenario
   useEffect(() => {
     if (trackedOrderData && trackedOrderData?.status?.current === 'DELIVERED') {
+      console.log('Order Delivered')
+      dispatch(clearCart())
       dispatch(setRateIsOpen(true))
     }
   }, [trackedOrderData])
@@ -31,6 +34,8 @@ const useOrder = () => {
   // On Cancellation Scenario
   useEffect(() => {
     if (trackedOrderData && trackedOrderData?.status?.current === 'CANCELED') {
+      console.log('Order Canceled')
+      dispatch(clearCart())
       dispatch(setCancellationNoticeIsOpen(true))
       setUserOrderIdToNull(user?.uid)
     }
