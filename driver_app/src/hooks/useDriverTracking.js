@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import findMyLocation from "../utils/findMyLocation";
@@ -6,52 +6,70 @@ import getDistanceFromLatlngInKm from "../utils/getDistanceFromLatlngInKm";
 import DB_UPDATE_GPS from "../utils/DB_UPDATE_GPS";
 import { setGeoLocationErr } from "../rtk/slices/conditionalValuesSlice";
 
-// This hook tracks the driver's location and updates it in the database.
-// It also handles geolocation errors and updates the state accordingly.
 const useDriverTracking = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-  const updateTime = 10000;
+  const queue = useSelector((state) => state.queue);
+
+  const updateTime = 3000;
+
   const locationInterval = useRef(null);
-	const queue = useSelector(state => state.queue)
-  let lastLocation = useRef([null, null]);
+  const lastLocation = useRef([null, null]);
+  const queueRef = useRef(queue);
 
-  const driverTracking = () => {
-    if (user.uid) {
-      locationInterval.current = setInterval(async () => {
-        let newLocation = [null, null];
+  useEffect(() => {
+    queueRef.current = queue;
+  }, [queue]);
 
-        try {
-          const location = await findMyLocation();
-          !location[0] && !location[1]
-            ? dispatch(setGeoLocationErr(true))
-            : dispatch(setGeoLocationErr(false));
-          newLocation = location;
-        } catch (error) {
-          console.error("Error finding location:", error);
-        }
+  useEffect(() => {
+    if (!user?.uid) return;
 
-				// Check if the user is online,
-				// the new location is valid,
-				// and the distance from the last location is greater than or equal to 50 meters.
-        const isOnline = user?.online?.byUser && user?.online?.byManager;
-        const notNull = newLocation[0] !== null && newLocation[1] !== null;
-        const isFarther50Meter =
-          getDistanceFromLatlngInKm(lastLocation.current, newLocation) >= 0.05;
-
-        if (isOnline && notNull && isFarther50Meter) {
-          lastLocation.current = newLocation;
-          DB_UPDATE_GPS(newLocation, user, queue);
-        }
-      }, updateTime);
+    if (locationInterval.current) {
+      clearInterval(locationInterval.current);
     }
-  };
 
-  const clearTracking = () => {
-    clearInterval(locationInterval.current);
-  };
+    locationInterval.current = setInterval(async () => {
+      let newLocation = [null, null];
 
-  return { driverTracking, clearTracking };
+      try {
+        const location = await findMyLocation();
+
+        if (!location[0] && !location[1]) {
+          dispatch(setGeoLocationErr(true));
+        } else {
+          dispatch(setGeoLocationErr(false));
+          newLocation = location;
+        }
+      } catch (error) {
+        console.error("Error finding location:", error);
+      }
+
+      const isOnline = user?.online?.byUser && user?.online?.byManager;
+      const notNull = newLocation[0] !== null && newLocation[1] !== null;
+
+      const hasZeroLiveLocation = queueRef.current?.some(
+        (order) =>
+          order?.delivery?.liveLocation?.[0] === 0 &&
+          order?.delivery?.liveLocation?.[1] === 0,
+      );
+
+      const isFarther50Meter =
+        hasZeroLiveLocation ||
+        (lastLocation.current[0] !== null &&
+          getDistanceFromLatlngInKm(lastLocation.current, newLocation) >= 0.05);
+
+      if (isOnline && notNull && isFarther50Meter) {
+        lastLocation.current = newLocation;
+        DB_UPDATE_GPS(newLocation, user, queueRef.current);
+      }
+    }, updateTime);
+
+    return () => {
+      clearInterval(locationInterval.current);
+    };
+  }, [dispatch, user, user?.uid]);
+
+  return null;
 };
 
 export default useDriverTracking;
