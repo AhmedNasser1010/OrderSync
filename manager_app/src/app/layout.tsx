@@ -6,6 +6,10 @@ import Nav from "../components/nav/Nav";
 import StoreProvider from "./StoreProvider";
 import AuthProvider from "./AuthProvider";
 import PopupProvider from "./PopupProvider";
+import { Inter } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn("font-sans", inter.variable)}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

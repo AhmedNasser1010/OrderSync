@@ -8,13 +8,14 @@ import { useEffect, useState } from "react";
 import { AnalyticsEntry } from "@/types/AnalyticsEntry";
 import { timeRange } from "@/lib/rtk/slices/toggleSlice";
 import filterDataByDateRange from "@/utilities/filterDataByDateRange";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 const useAnalytics = () => {
   const uid = useAppSelector(userUid);
-  const { data: user } = useFetchUserDataQuery(uid);
+  const { data: user } = useFetchUserDataQuery(uid ?? skipToken);
   const resId = user?.accessToken;
   const { data: dailySummarizationData } =
-    useFetchOrdersDailySummarizationDataQuery(resId);
+    useFetchOrdersDailySummarizationDataQuery(resId ?? skipToken);
   const timeRangeValue = useAppSelector(timeRange);
   const [data, setData] = useState<AnalyticsEntry[]>([]);
 

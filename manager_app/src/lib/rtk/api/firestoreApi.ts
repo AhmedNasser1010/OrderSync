@@ -79,11 +79,11 @@ export const firestoreApi = createApi({
             db,
             "orders",
             resId,
-            "completedOrders"
+            "completedOrders",
           );
           const completedOrdersSnapshot = await getDocs(completedOrdersRef);
           const completedOrders = completedOrdersSnapshot.docs.map((doc) =>
-            doc.data()
+            doc.data(),
           );
           console.log("Read Operation [completedOrders]");
           return { data: completedOrders };
@@ -101,11 +101,11 @@ export const firestoreApi = createApi({
             db,
             "orders",
             resId,
-            "voidedOrders"
+            "voidedOrders",
           );
           const voidedOrdersSnapshot = await getDocs(voidedOrdersRef);
           const voidedOrders = voidedOrdersSnapshot.docs.map((doc) =>
-            doc.data()
+            doc.data(),
           );
           console.log("Read Operation [voidedOrders]");
           return { data: voidedOrders };
@@ -120,7 +120,7 @@ export const firestoreApi = createApi({
       queryFn: () => ({ data: [] }),
       async onCacheEntryAdded(
         resId,
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
       ) {
         const openQueueRef = collection(db, "orders", resId, "openQueue");
 
@@ -132,14 +132,14 @@ export const firestoreApi = createApi({
             updateCachedData((draft: OrderType[]) => {
               draft.length = 0;
               snapshot.docs.forEach((doc) =>
-                draft.push(doc.data() as OrderType)
+                draft.push(doc.data() as OrderType),
               );
             });
             console.log("Real-time Update [openQueue]");
           },
           (error) => {
             console.error("Error in real-time listener:", error?.message);
-          }
+          },
         );
 
         await cacheEntryRemoved;
@@ -153,7 +153,7 @@ export const firestoreApi = createApi({
           const historyOrdersRef = collection(db, "orders", resId, "history");
           const historyOrdersSnapshot = await getDocs(historyOrdersRef);
           const historyOrders = historyOrdersSnapshot.docs.map((doc) =>
-            doc.data()
+            doc.data(),
           );
           console.log("Read Operation [historyOrders]");
           return { data: historyOrders };
@@ -165,24 +165,27 @@ export const firestoreApi = createApi({
       providesTags: ["HistoryOrders"],
     }),
     fetchOrdersDailySummarizationData: builder.query<AnalyticsEntry[], string>({
-      async queryFn(resId): Promise<{ data: AnalyticsEntry[] } | { error: string }> {
+      async queryFn(
+        resId,
+      ): Promise<{ data: AnalyticsEntry[] } | { error: string }> {
         try {
           const dailySummarizationRef = collection(
             db,
             "orders",
             resId,
-            "dailySummarization"
+            "dailySummarization",
           );
           const dailySummarizationSnapshot = await getDocs(
-            dailySummarizationRef
+            dailySummarizationRef,
           );
           const dailySummarization = dailySummarizationSnapshot.docs.map(
-            (doc) => doc.data()
+            (d) => d.data() as AnalyticsEntry,
           );
           console.log("Read Operation [dailySummarizationOrders]");
           return { data: dailySummarization };
         } catch (error: any) {
-          console.error(error?.message);
+          console.error(error);
+          console.error(error?.stack);
           return { error: error?.message };
         }
       },
