@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Nav from "../components/nav/Nav";
 
 import StoreProvider from "./StoreProvider";
 import AuthProvider from "./AuthProvider";
 import PopupProvider from "./PopupProvider";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { BottomNav } from "@/components/dashboard/bottom-nav";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -41,8 +41,8 @@ export default function RootLayout({
           <AuthProvider>
             <PopupProvider>
               <div className="flex flex-col space-y-4 p-4 md:p-6 bg-background">
-                <Nav />
                 {children}
+                <BottomNav />
               </div>
             </PopupProvider>
           </AuthProvider>

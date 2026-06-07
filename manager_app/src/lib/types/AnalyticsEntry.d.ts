@@ -28,6 +28,7 @@ export type RevenuePerCustomer = {
   highestValueCustomer: {
     name: string;
     totalOrdersValue: number;
+    totalOrderCount: number;
   };
 };
 

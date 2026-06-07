@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { OrderType } from "@/../../types/order";
-import { AnalyticsEntry } from "@/types/AnalyticsEntry";
+import { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
