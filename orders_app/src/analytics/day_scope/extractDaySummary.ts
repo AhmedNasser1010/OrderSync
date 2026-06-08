@@ -1,7 +1,7 @@
 import { OrderType } from "@/types/order";
 import { MainMenuType } from "@/types/menu";
-import getMenuItemsAnalytics from './getMenuItemsAnalytics'
-import getCategoryLevelAnalytics from './getCategoryLevelAnalytics'
+import getMenuItemsAnalytics from "./getMenuItemsAnalytics";
+import getCategoryLevelAnalytics from "./getCategoryLevelAnalytics";
 
 // Helper function to calculate average
 function calculateAverage(values: number[]): number {
@@ -13,7 +13,7 @@ type MenuItemAnalytics = {
   category: string;
   totalQuantitySold: number;
   totalRevenue: number;
-  totalDiscountsSave: number
+  totalDiscountsSave: number;
 };
 
 type CategoryAnalytics = {
@@ -21,7 +21,7 @@ type CategoryAnalytics = {
   totalQuantitySold: number;
   totalRevenue: number;
   totalDiscountsSave: number;
-}
+};
 
 type DaySummary = {
   date: string;
@@ -55,7 +55,11 @@ type DaySummary = {
     cancellationRate: number;
   };
   revenuePerCustomer: {
-    highestValueCustomer: { name: string; totalOrdersValue: number };
+    highestValueCustomer: {
+      name: string;
+      totalOrdersValue: number;
+      totalOrderCount: number;
+    };
     averageOrderValue: number;
   };
 };
@@ -63,7 +67,7 @@ type DaySummary = {
 function extractDaySummary(
   orders: OrderType[],
   menuData: MainMenuType,
-  date: string
+  date: string,
 ): DaySummary {
   let totalOrders = 0;
   let totalRevenue = 0;
@@ -88,7 +92,11 @@ function extractDaySummary(
     { address: string; latlng: [number, number]; ordersCount: number }
   > = {};
   let totalCancelled = 0;
-  let highestValueCustomer = { name: "", totalOrdersValue: 0 };
+  let highestValueCustomer = {
+    name: "",
+    totalOrdersValue: 0,
+    totalOrderCount: 0,
+  };
   let totalOrderValue = 0;
 
   for (const order of orders) {
@@ -100,17 +108,17 @@ function extractDaySummary(
     // Calculate order durations
     if (order.orderTimestamps.preparedAt && order.orderTimestamps.placedAt) {
       preparationTimes.push(
-        order.orderTimestamps.preparedAt - order.orderTimestamps.placedAt
+        order.orderTimestamps.preparedAt - order.orderTimestamps.placedAt,
       );
     }
     if (order.orderTimestamps.deliveredAt && order.orderTimestamps.preparedAt) {
       completionTimes.push(
-        order.orderTimestamps.deliveredAt - order.orderTimestamps.preparedAt
+        order.orderTimestamps.deliveredAt - order.orderTimestamps.preparedAt,
       );
     }
     if (order.orderTimestamps.deliveredAt && order.orderTimestamps.placedAt) {
       deliveryTimes.push(
-        order.orderTimestamps.deliveredAt - order.orderTimestamps.placedAt
+        order.orderTimestamps.deliveredAt - order.orderTimestamps.placedAt,
       );
     }
 
@@ -142,7 +150,7 @@ function extractDaySummary(
 
     // Location Counts
     const locationKey = `${order.location.address}:${order.location.latlng.join(
-      ","
+      ",",
     )}`;
     if (!locationCounts[locationKey]) {
       locationCounts[locationKey] = {
@@ -165,6 +173,7 @@ function extractDaySummary(
       highestValueCustomer = {
         name: order.customer.name,
         totalOrdersValue: order.customer.totalOrdersValue,
+        totalOrderCount: order.customer.totalOrders,
       };
     }
 
@@ -178,11 +187,15 @@ function extractDaySummary(
 
   // Convert locationCounts to an array and sort by ordersCount
   const topLocations = Object.values(locationCounts).sort(
-    (a, b) => b.ordersCount - a.ordersCount
+    (a, b) => b.ordersCount - a.ordersCount,
   );
 
-  const itemsAnalytics = getMenuItemsAnalytics(orders, menuData.items)
-  const categoriesAnalytics = getCategoryLevelAnalytics(orders, menuData.items, menuData.categories)
+  const itemsAnalytics = getMenuItemsAnalytics(orders, menuData.items);
+  const categoriesAnalytics = getCategoryLevelAnalytics(
+    orders,
+    menuData.items,
+    menuData.categories,
+  );
 
   return {
     date,
@@ -219,14 +232,6 @@ function extractDaySummary(
 }
 
 export default extractDaySummary;
-
-
-
-
-
-
-
-
 
 // import { OrderType } from "@/types/order";
 // import { MainMenuType } from "@/types/menu";
