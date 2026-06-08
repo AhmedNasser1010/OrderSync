@@ -5,8 +5,10 @@ import {
   getDocs,
   getDoc,
   onSnapshot,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import type { User, MenuData, MenuDocument } from "@/lib/types/types";
 import { OrderType } from "@/../../types/order";
 import { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
 
@@ -24,7 +26,7 @@ export const firestoreApi = createApi({
   ],
   endpoints: (builder) => ({
     // Query Endpoints
-    fetchUserData: builder.query({
+    fetchUserData: builder.query<User, string>({
       async queryFn(userUid) {
         try {
           const ref = doc(db, "users", userUid);
@@ -33,7 +35,7 @@ export const firestoreApi = createApi({
           if (!docSnapshot.exists()) {
             return { error: "User not found" };
           }
-          const userData = docSnapshot.data();
+          const userData = docSnapshot.data() as User;
           return { data: userData };
         } catch (error: any) {
           console.error(error.message);
@@ -191,6 +193,26 @@ export const firestoreApi = createApi({
       },
       providesTags: ["DailySummarizationOrders"],
     }),
+
+    syncMenuData: builder.mutation<
+      { synced: true },
+      { resId: string; menu: MenuDocument }
+    >({
+      async queryFn({ resId, menu }) {
+        try {
+          const batch = writeBatch(db);
+          const menuRef = doc(db, "menus", resId);
+          batch.set(menuRef, menu);
+          await batch.commit();
+          console.log("Write Operation [syncMenuData]");
+          return { data: { synced: true } };
+        } catch (error: any) {
+          console.error(error?.message);
+          return { error: error?.message };
+        }
+      },
+      invalidatesTags: ["Menu"],
+    }),
   }),
 });
 
@@ -203,4 +225,5 @@ export const {
   useFetchVoidedOrdersDataQuery,
   useFetchHistoryOrdersDataQuery,
   useFetchOrdersDailySummarizationDataQuery,
+  useSyncMenuDataMutation,
 } = firestoreApi;

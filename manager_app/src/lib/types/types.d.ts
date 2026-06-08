@@ -1,4 +1,4 @@
-export type StatusType = "good" | "warning" | "alert"
+export type StatusType = "good" | "warning" | "alert";
 
 export interface KPIData {
   label: string;
@@ -87,4 +87,70 @@ export interface DashboardData {
   paymentMethods: PaymentMethod[];
   orderSources: OrderSource[];
   businessHealth: BusinessHealthData;
+}
+
+export interface MenuItem {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  sizes?: { size: string; price: string | number }[];
+  category: string;
+  visible: boolean;
+  featured: boolean;
+  timestamp: number;
+  discount?: {
+    type: "percentage" | "fixed";
+    value: number;
+    active: boolean;
+  };
+  backgrounds?: string[];
+  promotionRules?: PromotionRule[];
+}
+
+export interface PromotionRule {
+  id: string;
+  name: string;
+  type: "total_spent" | "first_purchase" | "quantity" | "order_count";
+  threshold: number;
+  active: boolean;
+}
+
+export interface MenuCategory {
+  id: string;
+  title: string;
+  description: string;
+  visible: boolean;
+  featured: boolean;
+  timestamp: number;
+  items: MenuItem[];
+  position: number;
+  backgrounds?: string[];
+}
+
+export interface MenuData {
+  categories: MenuCategory[];
+  lastSynced: string;
+}
+
+export interface MenuDocument {
+  categories: Omit<MenuCategory, "items">[];
+  items: MenuItem[];
+  lastSynced: string;
+  accessToken?: string;
+}
+
+export interface UserInfo {
+  email: string;
+  role: "BUSINESS_MANAGER";
+  uid: string;
+  name: string;
+  phone: string;
+}
+
+export interface User {
+  joinDate: number;
+  userInfo: UserInfo;
+  accessToken: string;
+  partnerUid: string;
 }

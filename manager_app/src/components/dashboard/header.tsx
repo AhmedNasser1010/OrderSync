@@ -15,6 +15,7 @@ import {
   setTimeRange,
   timeRange,
 } from "@/lib/rtk/slices/toggleSlice";
+import { UserAvatar } from "@/components/user-avatar";
 
 const timeRangeOptions = [
   { value: "all", label: "All time" },
@@ -41,9 +42,7 @@ export function DashboardHeader() {
             Welcome back to OrderSync
           </p>
         </div>
-        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-          <span className="text-sm font-semibold text-card-foreground">M</span>
-        </div>
+        <UserAvatar />
       </div>
 
       <div className="relative w-full max-w-xs">
