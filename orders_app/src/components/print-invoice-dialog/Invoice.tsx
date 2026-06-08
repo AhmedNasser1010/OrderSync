@@ -69,7 +69,7 @@ export default function Invoice({
   order,
   orderMenu,
 }: {
-  contentRef: React.RefObject<HTMLDivElement>;
+  contentRef: React.RefObject<HTMLDivElement | null>;
   restaurant: any;
   order: any;
   orderMenu: any;
