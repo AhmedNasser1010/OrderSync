@@ -320,7 +320,6 @@ export const firestoreApi = createApi({
             resId,
             "completedOrders",
           );
-
           // Batch to perform both update and move operations atomically
           const batch = writeBatch(db);
 

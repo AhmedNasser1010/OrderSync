@@ -1,10 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   useFetchOrderTrackingDataQuery,
   useCancelOrderMutation,
   useSetOrderFeedbackMutation,
-  useSetUserOrderIdToNullMutation
+  useSetUserOrderIdToNullMutation,
+  useFinalizePendingLoyaltyMutation
 } from '../rtk/api/firestoreApi'
 import { setRateIsOpen, setCancellationNoticeIsOpen } from '../rtk/slices/toggleSlice'
 import { clearCart } from '../rtk/slices/cartSlice'
@@ -21,15 +22,30 @@ const useOrder = () => {
   const [cancelOrderMutation] = useCancelOrderMutation()
   const [setOrderFeedbackMutation] = useSetOrderFeedbackMutation()
   const [setUserOrderIdToNull] = useSetUserOrderIdToNullMutation()
+  const [finalizePendingLoyalty] = useFinalizePendingLoyaltyMutation()
+  const loyaltyMarkAttemptRef = useRef(null)
 
   // On Completed Scenario
   useEffect(() => {
     if (trackedOrderData && trackedOrderData?.status?.current === 'DELIVERED') {
-      console.log('Order Delivered')
+      const orderId = user?.trackedOrder?.id
       dispatch(clearCart())
+
+      if (orderId && loyaltyMarkAttemptRef.current !== orderId) {
+        loyaltyMarkAttemptRef.current = orderId
+        finalizePendingLoyalty({
+          uid: user?.uid,
+          orderId
+        }).then(() => {
+          loyaltyMarkAttemptRef.current = null
+        })
+      }
+
       dispatch(setRateIsOpen(true))
+    } else {
+      loyaltyMarkAttemptRef.current = null
     }
-  }, [trackedOrderData])
+  }, [trackedOrderData, user])
 
   // On Cancellation Scenario
   useEffect(() => {
@@ -43,10 +59,27 @@ const useOrder = () => {
 
   // On No Order Data Scenario
   useEffect(() => {
-    if (hasOrder === false && user.trackedOrder?.id) {
+    const pendingLoyalty = user?.trackedOrder?.pendingLoyalty
+    const orderId = pendingLoyalty?.orderId
+
+    if (hasOrder === false && orderId) {
+      if (loyaltyMarkAttemptRef.current !== orderId) {
+        loyaltyMarkAttemptRef.current = orderId
+        dispatch(clearCart())
+        finalizePendingLoyalty({
+          uid: user?.uid,
+          orderId
+        }).finally(() => {
+          loyaltyMarkAttemptRef.current = null
+        })
+      }
+      return
+    }
+
+    if (hasOrder === false && user.trackedOrder?.id && !pendingLoyalty) {
       setUserOrderIdToNull(user?.uid)
     }
-  }, [trackedOrderData, hasOrder])
+  }, [dispatch, finalizePendingLoyalty, hasOrder, user])
 
   const cancelOrder = () => {
     if (trackedOrderData?.status?.current === 'RECEIVED') {

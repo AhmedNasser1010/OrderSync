@@ -11,7 +11,7 @@ const useUpdateUserOnSendOrder = () => {
 	const cart = useSelector(state => state.cart.items)
 
 	const userDataToTheCloud = (uid, data) => {
-		DB_ADD_DOC('customers', uid, data)
+		return DB_ADD_DOC('customers', uid, data)
 		.then(res => {
 			if (res) {
 				dispatch(initUser(data))
@@ -31,9 +31,19 @@ const useUpdateUserOnSendOrder = () => {
 			})
 
 			const myMenu = menu(menuItems, cart, selectedMenuItems)
+			const loyaltyAmount = myMenu.price?.discount ?? 0
 			const totalItemsNum = myMenu.items.reduce((acc, item) => {
 				return acc + item.quantity
 			}, 0)
+			const pendingLoyalty = {
+				orderId: placedOrder.id,
+				restaurant: accessToken,
+				amount: loyaltyAmount,
+				items: totalItemsNum,
+				totalOrders: 1,
+				firstOrderTime: Date.now(),
+				counted: false
+			}
 
 			let isFirstTime = true
 			user.restaurants.map(res => {
@@ -53,7 +63,7 @@ const useUpdateUserOnSendOrder = () => {
 				  restaurants: [
 				    {
 				      accessToken,
-				      totalAmount: myMenu.price?.discount ?? null,
+				      totalAmount: loyaltyAmount,
 				      totalItems: totalItemsNum,
 				      totalOrders: 1,
 				      lastOrderTime: Date.now(),
@@ -62,11 +72,12 @@ const useUpdateUserOnSendOrder = () => {
 				  ],
 				  trackedOrder: {
 					  id: placedOrder.id,
-				    restaurant: accessToken
+				    restaurant: accessToken,
+						pendingLoyalty
 					}
 				}
 
-				userDataToTheCloud(user.userInfo.uid, userCopy)
+				return userDataToTheCloud(user.userInfo.uid, userCopy)
 			} else {
 				if (isFirstTime) {
 
@@ -76,7 +87,7 @@ const useUpdateUserOnSendOrder = () => {
 					  	...user.restaurants,
 					    {
 					      accessToken,
-					      totalAmount: myMenu.price?.discount ?? null,
+					      totalAmount: loyaltyAmount,
 					      totalItems: totalItemsNum,
 					      totalOrders: 1,
 					      lastOrderTime: Date.now(),
@@ -85,11 +96,12 @@ const useUpdateUserOnSendOrder = () => {
 					  ],
 					  trackedOrder: {
 					  	id: placedOrder.id,
-				    	restaurant: accessToken
+				    	restaurant: accessToken,
+							pendingLoyalty
 					  }
 					}
 
-					userDataToTheCloud(user.userInfo.uid, userCopy)
+					return userDataToTheCloud(user.userInfo.uid, userCopy)
 				} else {
 
 					const userCopy = {
@@ -97,7 +109,7 @@ const useUpdateUserOnSendOrder = () => {
 						restaurants: user.restaurants.map(res => {
 							// the issue here is this condition return one restaurant event if there is more in the prev
 							if (res?.accessToken === accessToken) {
-								const totalAmount = res?.totalAmount + (myMenu?.price?.discount ?? 0)
+								const totalAmount = res?.totalAmount + loyaltyAmount
 								const totalItems = res?.totalItems + totalItemsNum
 								const totalOrders = res?.totalOrders + 1
 								return {
@@ -112,11 +124,12 @@ const useUpdateUserOnSendOrder = () => {
 						}),
 						trackedOrder: {
 					  	id: placedOrder.id,
-				    	restaurant: accessToken
+				    	restaurant: accessToken,
+							pendingLoyalty
 					  }
 					}
 
-					userDataToTheCloud(user.userInfo.uid, userCopy)
+					return userDataToTheCloud(user.userInfo.uid, userCopy)
 				}
 			}
 			return true

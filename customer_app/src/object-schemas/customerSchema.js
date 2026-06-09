@@ -26,6 +26,12 @@ const customerSchema = ({ uid, name, email, phone, referredBy, avatar, provider 
 			referredBy: referredBy || '',
 			isFirstOrder: true,
 		},
+		trackedOrder: {
+			id: null,
+			restaurant: null,
+			loyaltyCountedForOrderId: null,
+			pendingLoyalty: null
+		},
 	}
 }
 

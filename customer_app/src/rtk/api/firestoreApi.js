@@ -3,6 +3,7 @@ import {
   arrayUnion,
   collection,
   doc,
+  getDoc,
   updateDoc,
   onSnapshot,
   writeBatch
@@ -107,6 +108,17 @@ export const firestoreApi = createApi({
           // References to Firestore collection
           const openQueueRef = collection(db, 'orders', orderData.accessToken, 'openQueue')
           const customerRef = doc(db, 'customers', orderData.customer.uid)
+          const pendingLoyalty = {
+            orderId: orderData.id,
+            restaurant: orderData.accessToken,
+            amount: orderData?.cartTotalPrice?.discount ?? orderData?.cartTotalPrice?.total ?? 0,
+            items: Array.isArray(orderData?.cart)
+              ? orderData.cart.reduce((sum, item) => sum + (item?.quantity || 0), 0)
+              : 0,
+            totalOrders: 1,
+            firstOrderTime: orderData?.customer?.firstOrderDate ?? orderData?.timestamp ?? Date.now(),
+            counted: false
+          }
 
           // Add new order to the open queue
           const batch = writeBatch(db)
@@ -117,7 +129,8 @@ export const firestoreApi = createApi({
           batch.update(customerRef, {
             trackedOrder: {
               id: orderData.id,
-              restaurant: orderData.accessToken
+              restaurant: orderData.accessToken,
+              pendingLoyalty
             }
           })
 
@@ -241,6 +254,83 @@ export const firestoreApi = createApi({
         }
       },
       invalidatesTags: ['User']
+    }),
+    finalizePendingLoyalty: builder.mutation({
+      async queryFn({ uid, orderId }) {
+        try {
+          if (!uid || !orderId) {
+            throw new Error('Missing loyalty update parameters')
+          }
+
+          const customerRef = doc(db, 'customers', uid)
+          const customerSnap = await getDoc(customerRef)
+
+          if (!customerSnap.exists()) {
+            throw new Error('Customer document not found')
+          }
+
+          const customerData = customerSnap.data()
+          const restaurants = Array.isArray(customerData?.restaurants)
+            ? customerData.restaurants
+            : []
+          const pendingLoyalty = customerData?.trackedOrder?.pendingLoyalty
+          const alreadyCounted = customerData?.trackedOrder?.loyaltyCountedForOrderId === orderId
+
+          if (!pendingLoyalty || pendingLoyalty.orderId !== orderId) {
+            return { data: { skipped: true } }
+          }
+
+          const restaurantIndex = restaurants.findIndex(
+            (restaurant) => restaurant?.accessToken === pendingLoyalty.restaurant
+          )
+
+          if (!alreadyCounted) {
+            const updatedRestaurants =
+              restaurantIndex >= 0
+                ? restaurants.map((restaurant, index) =>
+                    index === restaurantIndex
+                      ? {
+                          ...restaurant,
+                          totalAmount:
+                            (restaurant.totalAmount || 0) + (pendingLoyalty.amount || 0),
+                          totalItems:
+                            (restaurant.totalItems || 0) + (pendingLoyalty.items || 0),
+                          totalOrders:
+                            (restaurant.totalOrders || 0) + (pendingLoyalty.totalOrders || 1),
+                          lastOrderTime: Date.now(),
+                          firstOrderTime:
+                            restaurant.firstOrderTime ||
+                            pendingLoyalty.firstOrderTime ||
+                            Date.now()
+                        }
+                      : restaurant
+                  )
+                : [
+                    ...restaurants,
+                    {
+                      accessToken: pendingLoyalty.restaurant,
+                      totalAmount: pendingLoyalty.amount || 0,
+                      totalItems: pendingLoyalty.items || 0,
+                      totalOrders: pendingLoyalty.totalOrders || 1,
+                      lastOrderTime: Date.now(),
+                      firstOrderTime: pendingLoyalty.firstOrderTime || Date.now()
+                    }
+                  ]
+
+            await updateDoc(customerRef, {
+              restaurants: updatedRestaurants,
+              'trackedOrder.loyaltyCountedForOrderId': orderId,
+              'trackedOrder.pendingLoyalty': null
+            })
+          }
+
+          return { data: { alreadyCounted } }
+        } catch (error) {
+          console.error('Error finalizing pending loyalty:', error.message)
+          return { error: error.message }
+        }
+      },
+      invalidatesTags: ['User']
     })
   })
 })
@@ -251,5 +341,6 @@ export const {
   useSetPlaceOrderMutation,
   useCancelOrderMutation,
   useSetOrderFeedbackMutation,
-  useSetUserOrderIdToNullMutation
+  useSetUserOrderIdToNullMutation,
+  useFinalizePendingLoyaltyMutation
 } = firestoreApi
