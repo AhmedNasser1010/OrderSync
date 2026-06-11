@@ -24,6 +24,7 @@ const useOrder = () => {
   const [setUserOrderIdToNull] = useSetUserOrderIdToNullMutation()
   const [finalizePendingLoyalty] = useFinalizePendingLoyaltyMutation()
   const loyaltyMarkAttemptRef = useRef(null)
+  const feedbackDismissedOrderIdRef = useRef(null)
 
   // On Completed Scenario
   useEffect(() => {
@@ -41,7 +42,9 @@ const useOrder = () => {
         })
       }
 
-      dispatch(setRateIsOpen(true))
+      if (orderId && feedbackDismissedOrderIdRef.current !== orderId) {
+        dispatch(setRateIsOpen(true))
+      }
     } else {
       loyaltyMarkAttemptRef.current = null
     }
@@ -101,10 +104,23 @@ const useOrder = () => {
     }
   }
 
+  const dismissFeedback = async (orderId) => {
+    if (orderId) {
+      feedbackDismissedOrderIdRef.current = orderId
+    }
+
+    if (user?.uid) {
+      await setUserOrderIdToNull(user.uid)
+    }
+
+    dispatch(setRateIsOpen(false))
+  }
+
   return {
     cancelOrder,
     trackedOrderData,
-    setOrderFeedback
+    setOrderFeedback,
+    dismissFeedback
   }
 }
 

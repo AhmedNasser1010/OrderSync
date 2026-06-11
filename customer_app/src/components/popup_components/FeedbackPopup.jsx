@@ -7,30 +7,29 @@ import {
   PopupDescription
 } from '../popup/Popup.jsx'
 import { useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { setRateIsOpen } from '../../rtk/slices/toggleSlice'
+import { useSelector } from 'react-redux'
 import RatingWithComment from '../RatingWithComment'
 import useOrder from '../../hooks/useOrder'
 import { useTranslation } from 'react-i18next'
 
 function FeedbackPopup() {
-  const dispatch = useDispatch()
   const isOpen = useSelector((state) => state.toggle.rateIsOpen)
+  const currentOrderId = useSelector((state) => state.user?.trackedOrder?.id)
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
-  const { setOrderFeedback } = useOrder()
+  const { setOrderFeedback, dismissFeedback } = useOrder()
   const { t } = useTranslation()
 
   const handleSubmit = () => {
     setOrderFeedback({ rating, comment })
-    dispatch(setRateIsOpen(false))
+    dismissFeedback(currentOrderId)
   }
 
   return (
     isOpen && (
       <Popup>
         <PopupContent>
-          <PopupHeader closePopupCallback={() => dispatch(setRateIsOpen(false))}>
+          <PopupHeader closePopupCallback={() => dismissFeedback(currentOrderId)}>
             <PopupTitle>{t('Rate this Restaurant!')}</PopupTitle>
             <PopupDescription>
               {t('We appreciate your feedback and will use it to improve our services.')}
