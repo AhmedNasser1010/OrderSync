@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
   MapPin,
@@ -20,6 +20,12 @@ import { OrderType, OrderStatusType } from "@/types/order";
 import { ItemType } from "@/types/menu";
 import useOrders from "@/hooks/useOrders";
 import Image from "next/image";
+import { useAppSelector } from "@/rtk/hooks";
+import { accessToken } from "@/rtk/slices/constantsSlice";
+import { useFetchRestaurantDataQuery } from "@/rtk/api/firestoreApi";
+import Invoice from "@/components/print-invoice-dialog/Invoice";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useReactToPrint } from "react-to-print";
 
 const getSizeName: { [key: string]: string } = {
   S: "Small",
@@ -34,8 +40,14 @@ export default function OrderDetails({
 }) {
   const { orderId } = use(params);
   const { getOrder, getOrderMenu, isLoading } = useOrders();
+  const resAccessToken = useAppSelector(accessToken);
+  const { data: restaurant } = useFetchRestaurantDataQuery(resAccessToken ?? "", {
+    skip: !resAccessToken,
+  });
   const [order, setOrder] = useState<OrderType | null>(null);
   const [orderCart, setOrderCart] = useState<ItemType[] | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const printInvoice = useReactToPrint({ contentRef });
 
   useEffect(() => {
     if (isLoading === false) {
@@ -73,7 +85,9 @@ export default function OrderDetails({
     window.open(`tel:${order?.customer?.phone}`);
   };
 
-  const printOrder = () => {};
+  const printOrder = () => {
+    printInvoice?.();
+  };
 
   if (!order) {
     return <h3>Loading...</h3>;
@@ -97,7 +111,12 @@ export default function OrderDetails({
             {order.status.current.charAt(0).toUpperCase() + order.status.current.slice(1)}
           </Badge>
           <Badge variant="outline">CASH</Badge>
-          <Button variant="outline" size="sm" onClick={printOrder}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={printOrder}
+            disabled={!orderCart || !restaurant}
+          >
             <Printer className="mr-2 h-4 w-4" />
             Print
           </Button>
@@ -230,6 +249,18 @@ export default function OrderDetails({
           </div>
         </CardContent>
       </Card>
+      <div className="absolute left-[-9999px] top-0 opacity-0 pointer-events-none">
+        {order && orderCart && restaurant && (
+          <ScrollArea className="h-[500px] rounded-md border border-border">
+            <Invoice
+              contentRef={contentRef}
+              restaurant={restaurant}
+              order={order}
+              orderMenu={orderCart}
+            />
+          </ScrollArea>
+        )}
+      </div>
     </Page>
   );
 }

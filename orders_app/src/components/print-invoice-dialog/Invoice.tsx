@@ -123,7 +123,7 @@ export default function Invoice({
           </tr>
         </thead>
         <tbody style={{ padding: "10px" }}>
-          {orderMenu.map((item: ItemType) => (
+          {(orderMenu || []).map((item: ItemType) => (
             <tr
               key={item.id}
               style={{ boxShadow: "rgba(27, 31, 35, 0.15) 0px 1.8px 0px 0px" }}
