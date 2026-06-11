@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import toast from 'react-hot-toast'
-import { setShowItemsAlreadyInCartPopup, setShowResClosedPopup, setShowResPausedPopup } from '../../rtk/slices/toggleSlice'
+import {
+  setShowItemsAlreadyInCartPopup,
+  setShowTrackedOrderLockPopup,
+  setShowResClosedPopup,
+  setShowResPausedPopup
+} from '../../rtk/slices/toggleSlice'
 import { clearCart } from '../../rtk/slices/cartSlice'
 
 const MenuPopups = () => {
@@ -11,12 +16,14 @@ const MenuPopups = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const showItemsAlreadyInCartPopup = useSelector(state => state.toggle.showItemsAlreadyInCartPopup)
+  const showTrackedOrderLockPopup = useSelector(state => state.toggle.showTrackedOrderLockPopup)
   const showResClosedPopup = useSelector(state => state.toggle.showResClosedPopup)
   const showResPausedPopup = useSelector(state => state.toggle.showResPausedPopup)
 
   const handleClearCart = () => {
     dispatch(clearCart())
     dispatch(setShowItemsAlreadyInCartPopup(false))
+    dispatch(setShowTrackedOrderLockPopup(false))
     toast.success(t('Cart is cleared Successfully'), {
       className: 'font-ProximaNovaSemiBold',
       position: 'top-center',
@@ -37,6 +44,19 @@ const MenuPopups = () => {
           callbackFunc={handleClearCart}
           noLabel={t('NO')}
           yesLabel={t('YES, START AFRESH')}
+        />
+      )}
+
+      {showTrackedOrderLockPopup && (
+        <Popup
+          title={t('Order already in delivery')}
+          description={t(
+            'You cannot clear these items because your order from this restaurant is already placed and being delivered to you.'
+          )}
+          visibility={showTrackedOrderLockPopup}
+          closeCallback={() => dispatch(setShowTrackedOrderLockPopup(false))}
+          noLabel={t('Close')}
+          yesLabel={null}
         />
       )}
 

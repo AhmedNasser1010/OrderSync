@@ -8,6 +8,7 @@ const toggleSlice = createSlice({
     isOrderSidebarOpen: false,
     lng: 'ar',
     showItemsAlreadyInCartPopup: false,
+    showTrackedOrderLockPopup: false,
     showResClosedPopup: false,
     showResPausedPopup: false,
     rateIsOpen: false,
@@ -30,6 +31,10 @@ const toggleSlice = createSlice({
     setShowItemsAlreadyInCartPopup: (state, { payload }) => {
       state.showItemsAlreadyInCartPopup = payload === undefined ? !state.showItemsAlreadyInCartPopup : payload
     },
+    setShowTrackedOrderLockPopup: (state, { payload }) => {
+      state.showTrackedOrderLockPopup =
+        payload === undefined ? !state.showTrackedOrderLockPopup : payload
+    },
     setShowResClosedPopup: (state, { payload }) => {
       state.showResClosedPopup = payload === undefined ? !state.showResClosedPopup : payload
     },
@@ -38,6 +43,7 @@ const toggleSlice = createSlice({
     },
     resetPopupStates: (state) => {
       state.showItemsAlreadyInCartPopup = false
+      state.showTrackedOrderLockPopup = false
       state.showResClosedPopup = false
       state.showResPausedPopup = false
     },
@@ -59,6 +65,7 @@ export const {
   toggleOrderSidebar,
   toggleLng,
   setShowItemsAlreadyInCartPopup,
+  setShowTrackedOrderLockPopup,
   setShowResClosedPopup,
   setShowResPausedPopup,
   resetPopupStates,

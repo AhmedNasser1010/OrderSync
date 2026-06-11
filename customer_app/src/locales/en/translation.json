@@ -96,6 +96,8 @@
   "Delivery Fees": "Delivery Fees",
   "Items already in cart": "Items already in cart",
   "Your cart contains items from other restaurant. Would you like to reset your cart for adding items from this restaurant?": "Your cart contains items from other restaurant. Would you like to reset your cart for adding items from this restaurant?",
+  "Order already in delivery": "Order already in delivery",
+  "You cannot clear these items because your order from this restaurant is already placed and being delivered to you.": "You cannot clear these items because your order from this restaurant is already placed and being delivered to you.",
   "NO": "NO",
   "YES, START AFRESH": "YES, START AFRESH",
   "Location": "Location",

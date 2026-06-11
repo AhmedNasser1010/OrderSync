@@ -1,5 +1,6 @@
 import {
   setShowItemsAlreadyInCartPopup,
+  setShowTrackedOrderLockPopup,
   setShowResClosedPopup,
   setShowResPausedPopup
 } from '../../rtk/slices/toggleSlice'
@@ -16,6 +17,7 @@ const PlaceItemBtn = ({ item, status, resID }) => {
   const dispatch = useDispatch()
   const cartItems = useSelector((state) => state.cart.items)
   const currentResId = useSelector((state) => state.cart.restaurant)
+  const trackedOrder = useSelector((state) => state.user?.trackedOrder)
 
   const menuItems = useSelector((state) => state.menu.items)
 
@@ -39,6 +41,7 @@ const PlaceItemBtn = ({ item, status, resID }) => {
     )
 
     const isSameRes = currentResId === '' ? true : resID === currentResId
+    const hasActiveTrackedOrder = Boolean(trackedOrder?.id)
 
     if (isItemInCart) {
       toast.error(t('Already added to the Cart'))
@@ -50,8 +53,13 @@ const PlaceItemBtn = ({ item, status, resID }) => {
         )
         dispatch(setRestaurant(resID))
         dispatch(setShowItemsAlreadyInCartPopup(false))
+        dispatch(setShowTrackedOrderLockPopup(false))
       } else {
-        dispatch(setShowItemsAlreadyInCartPopup(true))
+        if (hasActiveTrackedOrder) {
+          dispatch(setShowTrackedOrderLockPopup(true))
+        } else {
+          dispatch(setShowItemsAlreadyInCartPopup(true))
+        }
       }
     }
   }

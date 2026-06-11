@@ -95,6 +95,8 @@
   "Delivery Fees": "رسوم التوصيل",
   "Items already in cart": "طلبات من مطعم اخر موجودة في السلة بالفعل",
   "Your cart contains items from other restaurant. Would you like to reset your cart for adding items from this restaurant?": "سلتك فيها طلبات من مطعم تاني. تحب تفضي السلة عشان تضيف طلبات من المطعم ده؟",
+  "Order already in delivery": "الطلب بالفعل قيد التوصيل",
+  "You cannot clear these items because your order from this restaurant is already placed and being delivered to you.": "لا يمكنك مسح هذه الطلبات لأن طلبك من هذا المطعم تم تأكيده بالفعل وهو في الطريق إليك.",
   "NO": "لا",
   "YES, START AFRESH": "أيوة، نبدأ من جديد",
   "Location": "الموقع",
