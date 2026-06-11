@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { use, useState, useEffect } from "react";
 import {
   ArrowLeft,
   MapPin,
@@ -30,17 +30,18 @@ const getSizeName: { [key: string]: string } = {
 export default function OrderDetails({
   params,
 }: {
-  params: { orderId: string };
+  params: Promise<{ orderId: string }>;
 }) {
+  const { orderId } = use(params);
   const { getOrder, getOrderMenu, isLoading } = useOrders();
   const [order, setOrder] = useState<OrderType | null>(null);
   const [orderCart, setOrderCart] = useState<ItemType[] | null>(null);
 
   useEffect(() => {
     if (isLoading === false) {
-      setOrder(getOrder(params.orderId) || null);
+      setOrder(getOrder(orderId) || null);
     }
-  }, [isLoading, getOrder, params.orderId]);
+  }, [isLoading, getOrder, orderId]);
 
   useEffect(() => {
     if (order && isLoading === false) {
