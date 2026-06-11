@@ -6,7 +6,7 @@ import {
   PopupTitle,
   PopupDescription
 } from '../popup/Popup.jsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import RatingWithComment from '../RatingWithComment'
 import useOrder from '../../hooks/useOrder'
@@ -20,16 +20,33 @@ function FeedbackPopup() {
   const { setOrderFeedback, dismissFeedback } = useOrder()
   const { t } = useTranslation()
 
+  const resetFeedbackForm = () => {
+    setRating(0)
+    setComment('')
+  }
+
   const handleSubmit = () => {
     setOrderFeedback({ rating, comment })
     dismissFeedback(currentOrderId)
+    resetFeedbackForm()
   }
+
+  const handleClose = () => {
+    dismissFeedback(currentOrderId)
+    resetFeedbackForm()
+  }
+
+  useEffect(() => {
+    if (!isOpen) {
+      resetFeedbackForm()
+    }
+  }, [isOpen])
 
   return (
     isOpen && (
       <Popup>
         <PopupContent>
-          <PopupHeader closePopupCallback={() => dismissFeedback(currentOrderId)}>
+          <PopupHeader closePopupCallback={handleClose}>
             <PopupTitle>{t('Rate this Restaurant!')}</PopupTitle>
             <PopupDescription>
               {t('We appreciate your feedback and will use it to improve our services.')}
