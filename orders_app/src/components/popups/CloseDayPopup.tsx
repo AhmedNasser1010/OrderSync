@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -19,9 +19,24 @@ export default function CloseDayPopup() {
   const { closeDay, isPassed, isLoading } = useCloseDay()
   const ordersIsPassed = isPassed()
 
+  useEffect(() => {
+    if (closeDayPopupValues.result.type === "success") {
+      const timer = setTimeout(() => {
+        handleClose();
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [closeDayPopupValues.result.type]);
+
   const handleClose = () => {
     dispatch(setCloseDayPopup({
       isOpen: false,
+      isLoading: true,
+      result: {
+        type: null,
+        text: ""
+      },
       errors: {
         noQueue: {
           isPassed: false,
@@ -70,13 +85,25 @@ export default function CloseDayPopup() {
                 Everything is passed, you can confirm now!
               </div>
             }
+            {closeDayPopupValues.result.type === "success" &&
+              <div className="flex items-center text-green-500 text-sm md-2.5">
+                <ShieldCheck className="w-4 h-4 mr-2" />
+                {closeDayPopupValues.result.text}
+              </div>
+            }
+            {closeDayPopupValues.result.type === "error" &&
+              <div className="flex items-center text-red-500 text-sm md-2.5">
+                <AlertCircle className="w-4 h-4 mr-2" />
+                {closeDayPopupValues.result.text}
+              </div>
+            }
           </div>
         <DialogFooter>
           <Button
             type="button"
             variant={ordersIsPassed ? "success" : "destructive"}
             onClick={closeDay}
-            disabled={!ordersIsPassed}
+            disabled={!ordersIsPassed || isLoading || closeDayPopupValues.result.type === "success"}
           >
             Confirm
           </Button>

@@ -12,6 +12,10 @@ type Toggle = {
   closeDayPopup: {
     isOpen: boolean;
     isLoading: boolean;
+    result: {
+      type: "success" | "error" | null;
+      text: string;
+    };
     errors: {
       noQueue: {
         isPassed: boolean;
@@ -38,6 +42,10 @@ const initialState: Toggle = {
   closeDayPopup: {
     isOpen: false,
     isLoading: true,
+    result: {
+      type: null,
+      text: ""
+    },
     errors: {
       noQueue: {
         isPassed: false,
