@@ -97,10 +97,9 @@ const useOrder = () => {
   const setOrderFeedback = (feedback) => {
     if ((feedback.rating <= 5 && feedback.rating >= 0) || feedback.comment) {
       const uid = user.uid
+      const resId = user?.trackedOrder?.restaurant
       const orderData = trackedOrderData
-      console.log('const orderData = trackedOrderData')
-      console.log(trackedOrderData)
-      setOrderFeedbackMutation({ orderData, uid, feedback })
+      setOrderFeedbackMutation({ orderData, uid, feedback, resId })
     }
   }
 

@@ -6,7 +6,8 @@ import {
   getDoc,
   updateDoc,
   onSnapshot,
-  writeBatch
+  writeBatch,
+  runTransaction
 } from 'firebase/firestore'
 import { db } from '../../config/firebase'
 
@@ -116,7 +117,8 @@ export const firestoreApi = createApi({
               ? orderData.cart.reduce((sum, item) => sum + (item?.quantity || 0), 0)
               : 0,
             totalOrders: 1,
-            firstOrderTime: orderData?.customer?.firstOrderDate ?? orderData?.timestamp ?? Date.now(),
+            firstOrderTime:
+              orderData?.customer?.firstOrderDate ?? orderData?.timestamp ?? Date.now(),
             counted: false
           }
 
@@ -186,8 +188,15 @@ export const firestoreApi = createApi({
       invalidatesTags: ['OpenQueue']
     }),
     setOrderFeedback: builder.mutation({
-      async queryFn({ orderData, uid, feedback }) {
+      async queryFn({ orderData, uid, feedback, resId }) {
         try {
+          console.log('[setOrderFeedback] Starting feedback submission', {
+            orderId: orderData.id,
+            uid,
+            resId,
+            feedback
+          })
+
           const completedOrderRef = doc(
             db,
             'orders',
@@ -195,6 +204,7 @@ export const firestoreApi = createApi({
             'completedOrders',
             `${orderData.id}_${uid}`
           )
+
           const openQueueRef = doc(
             db,
             'orders',
@@ -202,37 +212,106 @@ export const firestoreApi = createApi({
             'openQueue',
             `${orderData.id}_${uid}`
           )
+
           const userRef = doc(db, 'customers', uid)
 
-          const batch = writeBatch(db)
+          const reviewRef = doc(db, 'reviews', orderData.id)
 
-          const rating = orderData?.customerFeedback?.rating
-          const comment = orderData?.customerFeedback?.comment
+          const businessRef = doc(db, 'businesses', resId)
 
-          if (orderData && (rating === null || comment === null)) {
-            if (orderData.status.current === "DELIVERED") {
-              const timestamp = Date.now()
-              batch.update(completedOrderRef, {
-                ["customerFeedback.rating"]: feedback.rating === 0 ? null : feedback.rating,
-                ["customerFeedback.comment"]: feedback.comment.length === 0 ? null : feedback.comment,
-                ["status.current"]: "GIVEN_FEEDBACK",
-                ["status.history"]: arrayUnion({ status: 'GIVEN_FEEDBACK', timestamp }),
-                ["orderTimestamps.feedbackAt"]: timestamp
-              })
-              batch.delete(openQueueRef)
-            }
+          const rating = feedback.rating === 0 ? null : feedback.rating
+          const comment = feedback.comment.length === 0 ? null : feedback.comment
+
+          if (!rating && !comment) {
+            return { data: null }
           }
+
+          const businessDoc = await getDoc(businessRef)
+
+          if (!businessDoc.exists()) {
+            throw new Error(`Business document not found: ${resId}`)
+          }
+
+          await runTransaction(db, async (transaction) => {
+            const reviewSnap = await transaction.get(reviewRef)
+            const businessSnap = await transaction.get(businessRef)
+
+            if (reviewSnap.exists()) {
+              throw new Error('Review already exists for this order')
+            }
+
+            const timestamp = Date.now()
+
+            transaction.set(reviewRef, {
+              orderId: orderData.id,
+              restaurantId: resId,
+              customerId: uid,
+              rating,
+              comment,
+              createdAt: timestamp
+            })
+
+            transaction.update(completedOrderRef, {
+              'customerFeedback.rating': rating,
+              'customerFeedback.comment': comment,
+              'orderTimestamps.feedbackAt': timestamp
+            })
+
+            transaction.delete(openQueueRef)
+
+            const businessData = businessSnap.data()
+
+            const existingSummary = businessData?.reviewSummary
+
+            const reviewSummary = existingSummary || {
+              averageRating: 0,
+              totalReviews: 0,
+              totalRatingPoints: 0,
+              stars: {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0
+              }
+            }
+
+            const newTotalReviews = reviewSummary.totalReviews + 1
+            const newTotalRatingPoints = reviewSummary.totalRatingPoints + rating
+
+            const newSummary = {
+              averageRating: (newTotalRatingPoints / newTotalReviews).toFixed(1),
+              totalReviews: newTotalReviews,
+              totalRatingPoints: newTotalRatingPoints,
+              stars: {
+                ...reviewSummary.stars,
+                [rating]: (reviewSummary.stars?.[rating] || 0) + 1
+              }
+            }
+
+            transaction.set(
+              businessRef,
+              {
+                reviewSummary: newSummary
+              },
+              { merge: true }
+            )
+          })
 
           await updateDoc(userRef, {
             'trackedOrder.id': null
           })
 
-          console.log('Feedback updated')
-          await batch.commit()
           return { data: null }
         } catch (error) {
-          console.error('Error while order feedback:', error.message)
-          return { error: error.message }
+          console.error('[setOrderFeedback] ERROR:', error)
+
+          return {
+            error: {
+              code: error?.code,
+              message: error?.message
+            }
+          }
         }
       },
       invalidatesTags: ['OpenQueue']
@@ -291,17 +370,13 @@ export const firestoreApi = createApi({
                     index === restaurantIndex
                       ? {
                           ...restaurant,
-                          totalAmount:
-                            (restaurant.totalAmount || 0) + (pendingLoyalty.amount || 0),
-                          totalItems:
-                            (restaurant.totalItems || 0) + (pendingLoyalty.items || 0),
+                          totalAmount: (restaurant.totalAmount || 0) + (pendingLoyalty.amount || 0),
+                          totalItems: (restaurant.totalItems || 0) + (pendingLoyalty.items || 0),
                           totalOrders:
                             (restaurant.totalOrders || 0) + (pendingLoyalty.totalOrders || 1),
                           lastOrderTime: Date.now(),
                           firstOrderTime:
-                            restaurant.firstOrderTime ||
-                            pendingLoyalty.firstOrderTime ||
-                            Date.now()
+                            restaurant.firstOrderTime || pendingLoyalty.firstOrderTime || Date.now()
                         }
                       : restaurant
                   )
