@@ -110,6 +110,8 @@
   "This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding.": "المطعم ده مغلق حالياً أو خارج أوقات العمل. من فضلك شوفنا تاني في أوقات العمل العادية. شكراً لتفهمك.",
   "Restaurant Is Closed": "المطعم مغلق حاليا",
   "Restaurant Is Paused": "المطعم مغلق مؤقت",
+  "This restaurant is closed or paused right now. Please remove the items from your cart and return to the main page.": "المطعم ده مغلق أو موقوف دلوقتي. من فضلك احذف المنتجات من السلة وارجع للصفحة الرئيسية.",
+  "Remove Cart Items and Go Home": "احذف منتجات السلة وارجع للرئيسية",
   "All Restaurants": "جميع المطاعم",
   "Close": "أغلاق",
   "Add": "أضف",

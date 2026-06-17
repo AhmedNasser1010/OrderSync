@@ -101,6 +101,26 @@ export const firestoreApi = createApi({
             throw new Error('Order data is required.')
           }
 
+          const restaurantRef = doc(db, 'businesses', orderData.accessToken)
+          const restaurantSnap = await getDoc(restaurantRef)
+
+          if (!restaurantSnap.exists()) {
+            throw new Error('Restaurant not found.')
+          }
+
+          const restaurantData = restaurantSnap.data()
+          const restaurantStatus = restaurantData?.settings?.siteControl?.status || 'pause'
+
+          if (restaurantStatus === 'inactive' || restaurantStatus === 'pause') {
+            return {
+              error: {
+                code: 'RESTAURANT_NOT_ACCEPTING_ORDERS',
+                status: restaurantStatus,
+                message: 'This restaurant is currently closed or paused right now.'
+              }
+            }
+          }
+
           dispatch({
             type: 'toggle/setHasOrder',
             payload: true

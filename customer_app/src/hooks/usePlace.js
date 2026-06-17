@@ -10,6 +10,7 @@ import getDeliveryFees from '../utils/getDeliveryFees'
 import getDistanceFromLatlngInKm from '../utils/getDistanceFromLatlngInKm'
 import orderYupSchema from '../object-schemas/orderYupSchema'
 import { clearCart } from '../rtk/slices/cartSlice'
+import { setShowRestaurantUnavailablePopup } from '../rtk/slices/toggleSlice'
 import { useSetPlaceOrderMutation } from '../rtk/api/firestoreApi'
 
 const usePlace = () => {
@@ -197,6 +198,14 @@ const usePlace = () => {
   }
 
   const handleOrderPlacementError = (err) => {
+    if (
+      err?.code === 'RESTAURANT_NOT_ACCEPTING_ORDERS' ||
+      err?.data?.code === 'RESTAURANT_NOT_ACCEPTING_ORDERS'
+    ) {
+      dispatch(setShowRestaurantUnavailablePopup(true))
+      return
+    }
+
     toast.error(t('Error placing order'), {
       className: 'font-ProximaNovaSemiBold',
       position: 'top-center',

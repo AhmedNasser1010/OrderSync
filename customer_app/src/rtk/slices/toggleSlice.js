@@ -11,6 +11,7 @@ const toggleSlice = createSlice({
     showTrackedOrderLockPopup: false,
     showResClosedPopup: false,
     showResPausedPopup: false,
+    showRestaurantUnavailablePopup: false,
     rateIsOpen: false,
     cancellationNoticeIsOpen: false,
     hasOrder: true
@@ -41,11 +42,16 @@ const toggleSlice = createSlice({
     setShowResPausedPopup: (state, { payload }) => {
       state.showResPausedPopup = payload === undefined ? !state.showResPausedPopup : payload
     },
+    setShowRestaurantUnavailablePopup: (state, { payload }) => {
+      state.showRestaurantUnavailablePopup =
+        payload === undefined ? !state.showRestaurantUnavailablePopup : payload
+    },
     resetPopupStates: (state) => {
       state.showItemsAlreadyInCartPopup = false
       state.showTrackedOrderLockPopup = false
       state.showResClosedPopup = false
       state.showResPausedPopup = false
+      state.showRestaurantUnavailablePopup = false
     },
     setRateIsOpen: (state, { payload }) => {
       state.rateIsOpen = payload === undefined ? !state.rateIsOpen : payload
@@ -68,6 +74,7 @@ export const {
   setShowTrackedOrderLockPopup,
   setShowResClosedPopup,
   setShowResPausedPopup,
+  setShowRestaurantUnavailablePopup,
   resetPopupStates,
   setRateIsOpen,
   setHasOrder,
