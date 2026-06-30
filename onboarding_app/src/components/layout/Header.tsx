@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Search, Moon, Sun, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,9 +74,11 @@ export function Header({ sidebarOpen }: { sidebarOpen: boolean }) {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-9 gap-2 pl-2 pr-3">
               {user?.photoURL ? (
-                <img
+                <Image
                   src={user.photoURL}
                   alt="Profile"
+                  width={24}
+                  height={24}
                   className="w-6 h-6 rounded-full object-cover"
                 />
               ) : (
