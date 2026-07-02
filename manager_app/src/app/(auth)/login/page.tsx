@@ -21,7 +21,7 @@ export default function AuthPage() {
     isAuthLoading,
     login,
     authErrorMsg
-  } = useAuth()
+  } = useAuth(false)
   // const [isLogin, setIsLogin] = useState<boolean>(true);
   const isLogin = true
   // const [isConfirmPassword, setIsConfirmPassword] = useState<boolean>(false);
@@ -90,15 +90,15 @@ export default function AuthPage() {
         <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">
           {isLogin ? "Log in to your account" : "Create a new account"}
         </h2>
-        {/* <p className="mt-2 text-center text-sm text-muted-foreground">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-          <button
-            onClick={toggleAuthMode}
+        <p className="mt-2 text-center text-sm text-muted-foreground">
+          Don't have an account?{" "}
+          <Link
+            href="/signup"
             className="font-medium text-primary hover:text-primary/90"
           >
-            {isLogin ? "Sign up" : "Log in"}
-          </button>
-        </p> */}
+            Sign up
+          </Link>
+        </p>
         <p className="mt-2 text-center text-sm text-muted-foreground text-red-500">{authErrorMsg}</p>
       </div>
 

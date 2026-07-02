@@ -7,7 +7,6 @@ import AuthProvider from "./AuthProvider";
 import PopupProvider from "./PopupProvider";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
-import { BottomNav } from "@/components/dashboard/bottom-nav";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -44,10 +43,7 @@ export default function RootLayout({
         <StoreProvider>
           <AuthProvider>
             <PopupProvider>
-              <div className="flex flex-col space-y-4 p-4 md:p-6 bg-background">
-                {children}
-                <BottomNav />
-              </div>
+              {children}
             </PopupProvider>
           </AuthProvider>
         </StoreProvider>
