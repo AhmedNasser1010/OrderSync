@@ -1,6 +1,14 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import {
+  useCreateBusinessMutation,
+  useUpdateBusinessMutation,
+  type BusinessDocument,
+} from "@/rtk/api/firestoreApi";
+import { useAppSelector } from "@/rtk/hooks";
+import { selectUser } from "@/rtk/slices/authSlice";
 import { Restaurant } from "@/lib/mock-data";
 
 export interface ValidationError {
@@ -8,6 +16,10 @@ export interface ValidationError {
 }
 
 export function useRestaurantForm(initialData?: Restaurant) {
+  const router = useRouter();
+  const currentUser = useAppSelector(selectUser);
+  const [createBusiness] = useCreateBusinessMutation();
+  const [updateBusiness] = useUpdateBusinessMutation();
   const [formData, setFormData] = useState<Restaurant>(
     initialData || createEmptyRestaurant(),
   );
@@ -92,10 +104,39 @@ export function useRestaurantForm(initialData?: Restaurant) {
 
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+    const payload = toBusinessDocument(formData, currentUser?.uid);
+
+    if (!payload.accessToken) {
+      throw new Error("Business access token is missing.");
+    }
+
+    if (initialData?.id) {
+      await updateBusiness({
+        accessToken: payload.accessToken,
+        updates: payload,
+      }).unwrap();
+    } else {
+      if (!currentUser?.uid || !currentUser.email) {
+        throw new Error("You must be signed in to create a business.");
+      }
+
+      await createBusiness({
+        business: payload,
+        user: {
+          uid: currentUser.uid,
+          email: formData.owner.email,
+          name: formData.owner.name,
+          phone: formData.owner.phone,
+          secondPhone: formData.contact.phoneNumbers[1] ?? "",
+          displayName: currentUser.displayName,
+          phoneNumber: currentUser.phoneNumber,
+        },
+      }).unwrap();
+    }
+
       console.log("Form submitted successfully:", formData);
       setErrors({});
+      router.push("/restaurants");
       return true;
     } catch (error) {
       console.error("Form submission error:", error);
@@ -103,7 +144,7 @@ export function useRestaurantForm(initialData?: Restaurant) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, validate]);
+  }, [formData, validate, createBusiness, updateBusiness, currentUser, initialData, router]);
 
   const clearErrors = useCallback(() => {
     setErrors({});
@@ -139,7 +180,7 @@ export function useRestaurantForm(initialData?: Restaurant) {
 
 function createEmptyRestaurant(): Restaurant {
   return {
-    id: "",
+    id: crypto.randomUUID(),
     owner: {
       name: "",
       email: "",
@@ -186,8 +227,58 @@ function createEmptyRestaurant(): Restaurant {
       promotionalSubtitle: "",
       closeMessage: "",
     },
-    status: "open",
+    status: "active",
     lastUpdated: new Date().toISOString(),
+  };
+}
+
+function toBusinessDocument(formData: Restaurant, userId?: string): BusinessDocument {
+  return {
+    accessToken: formData.id || "",
+    partnerUid: userId,
+    owner: {
+      uid: formData.owner.userId,
+    },
+    business: {
+      name: formData.info.name,
+      nameInAr: formData.info.arabicName,
+      industry: formData.info.industry,
+      address: `${formData.info.address.latitude},${formData.info.address.longitude}`,
+      latlng: [formData.info.address.latitude, formData.info.address.longitude],
+      cover: formData.info.coverUrl,
+      icon: formData.info.iconUrl,
+      promotionalSubtitle: formData.additional.promotionalSubtitle,
+      cuisines: formData.info.cuisines,
+    },
+    services: {
+      openingHours: Object.fromEntries(
+        formData.hours.map((day) => [
+          day.day.toLowerCase(),
+          { start: day.openTime, end: day.closeTime, closed: day.closed },
+        ]),
+      ),
+      cookTime: [formData.cookTime.min, formData.cookTime.max],
+      paymentMethods: {},
+    },
+    settings: {
+      siteControl: {
+        closeMsg: formData.additional.closeMessage,
+        availability: formData.status === "active",
+        autoAvailability: true,
+        isBusy: false,
+        temporaryPause: false,
+      },
+      orderManagement: {
+        assign: {
+          forCooks: formData.settings.assignOrdersToCook,
+          forDeliveryWorkers: formData.settings.assignOrdersToDelivery,
+        },
+        driverAssignment: formData.settings.automaticDeliveryAssignment,
+        printInvoice: formData.settings.printInvoice,
+      },
+    },
+    status: formData.status === "active" ? "active" : "inactive",
+    createdOn: formData.lastUpdated,
   };
 }
 

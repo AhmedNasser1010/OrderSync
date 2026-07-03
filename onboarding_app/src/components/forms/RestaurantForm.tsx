@@ -1,6 +1,6 @@
 "use client";
 
-import { Restaurant, DayHours } from "@/lib/mock-data";
+import { Restaurant } from "@/lib/mock-data";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { OwnerSection } from "./OwnerSection";

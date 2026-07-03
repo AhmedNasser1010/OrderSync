@@ -21,18 +21,22 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { Restaurant } from "@/lib/mock-data";
+import type { Restaurant } from "@/lib/mock-data";
 import { DeleteDialog } from "./DeleteDialog";
 import { format } from "date-fns";
 
 interface RestaurantsTableProps {
   restaurants: Restaurant[];
-  onDelete: (id: string) => void;
+  onDelete: (id: string) => void | Promise<void>;
+  isLoading?: boolean;
+  isError?: boolean;
 }
 
 export function RestaurantsTable({
   restaurants,
   onDelete,
+  isLoading = false,
+  isError = false,
 }: RestaurantsTableProps) {
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
@@ -48,6 +52,22 @@ export function RestaurantsTable({
       setDeleteDialog({ open: false, id: null });
     }
   };
+
+  if (isLoading) {
+    return (
+      <Card className="p-12 bg-card border-border text-center">
+        <p className="text-muted-foreground">Loading restaurants...</p>
+      </Card>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card className="p-12 bg-card border-border text-center">
+        <p className="text-destructive">Failed to load restaurants.</p>
+      </Card>
+    );
+  }
 
   if (restaurants.length === 0) {
     return (
@@ -128,11 +148,28 @@ export function RestaurantsTable({
                 </TableCell>
                 <TableCell className="py-4">
                   <Badge
-                    className="capitalize"
-                    variant={
-                      restaurant.status === "open" ? "default" : "secondary"
-                    }
+                    variant="outline"
+                    className={`gap-1.5 px-2.5 py-1 capitalize ${
+                      restaurant.status === "active"
+                        ? "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/50 dark:text-green-400"
+                        : restaurant.status === "inactive"
+                        ? "border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-400"
+                        : restaurant.status === "busy"
+                        ? "border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-800 dark:bg-yellow-950/50 dark:text-yellow-400"
+                        : "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-400"
+                    }`}
                   >
+                    <span
+                      className={`inline-block h-1.5 w-1.5 rounded-full ${
+                        restaurant.status === "active"
+                          ? "bg-green-500"
+                          : restaurant.status === "inactive"
+                          ? "bg-gray-400"
+                          : restaurant.status === "busy"
+                          ? "bg-yellow-500"
+                          : "bg-red-500"
+                      }`}
+                    />
                     {restaurant.status}
                   </Badge>
                 </TableCell>

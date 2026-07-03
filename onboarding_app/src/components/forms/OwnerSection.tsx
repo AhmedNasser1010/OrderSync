@@ -1,8 +1,12 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Loader2, UserCheck, AlertCircle } from "lucide-react";
+import { getUserUid } from "@/app/actions/getUserUid";
 
 interface OwnerSectionProps {
   data: {
@@ -11,13 +15,50 @@ interface OwnerSectionProps {
     phone: string;
     userId: string;
   };
-  onChange: (data: any) => void;
+  onChange: (data: { name: string; email: string; phone: string; userId: string }) => void;
+}
+
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
 }
 
 export function OwnerSection({ data, onChange }: OwnerSectionProps) {
+  const [isFetchingUid, setIsFetchingUid] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
   const handleChange = (field: string, value: string) => {
     onChange({ ...data, [field]: value });
+    // Clear fetch error when user types
+    if (field === "email") {
+      setFetchError(null);
+    }
   };
+
+  const handleGetUserUid = useCallback(async () => {
+    if (!isValidEmail(data.email)) return;
+
+    setIsFetchingUid(true);
+    setFetchError(null);
+
+    try {
+      const result = await getUserUid(data.email);
+
+      if (result.uid) {
+        onChange({ ...data, userId: result.uid });
+      } else {
+        setFetchError(
+          result.error || "No user found with this email address"
+        );
+      }
+    } catch {
+      setFetchError("Failed to fetch user UID. Please try again.");
+    } finally {
+      setIsFetchingUid(false);
+    }
+  }, [data, onChange]);
+
+  const showGetUidButton = isValidEmail(data.email) && data.email.length > 0;
 
   return (
     <Card className="p-6 bg-card border-border">
@@ -41,14 +82,39 @@ export function OwnerSection({ data, onChange }: OwnerSectionProps) {
           <Label htmlFor="owner-email" className="text-foreground">
             Email Address
           </Label>
-          <Input
-            id="owner-email"
-            type="email"
-            value={data.email}
-            onChange={(e) => handleChange("email", e.target.value)}
-            placeholder="e.g. ahmed@example.com"
-            className="mt-1.5"
-          />
+          <div className="relative mt-1.5">
+            <Input
+              id="owner-email"
+              type="email"
+              value={data.email}
+              onChange={(e) => handleChange("email", e.target.value)}
+              placeholder="e.g. ahmed@example.com"
+              className="pr-36"
+            />
+            {showGetUidButton && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGetUserUid}
+                disabled={isFetchingUid}
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-6 gap-1 text-xs"
+              >
+                {isFetchingUid ? (
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                ) : (
+                  <UserCheck className="h-3 w-3" />
+                )}
+                {isFetchingUid ? "Searching..." : "Get User UID"}
+              </Button>
+            )}
+          </div>
+          {fetchError && (
+            <p className="flex items-center gap-1 text-sm text-destructive mt-1.5">
+              <AlertCircle className="h-3 w-3" />
+              {fetchError}
+            </p>
+          )}
         </div>
         <div>
           <Label htmlFor="owner-phone" className="text-foreground">
@@ -73,6 +139,9 @@ export function OwnerSection({ data, onChange }: OwnerSectionProps) {
             placeholder="e.g. user_1"
             className="mt-1.5"
           />
+          <p className="text-sm text-muted-foreground mt-1.5">
+            The User ID is the manager's Firebase Authentication uid
+          </p>
         </div>
       </div>
     </Card>

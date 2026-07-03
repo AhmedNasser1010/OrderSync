@@ -40,8 +40,10 @@ export function RestaurantFilters({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="">All Status</SelectItem>
-            <SelectItem value="open">Open</SelectItem>
-            <SelectItem value="closed">Closed</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="busy">Busy</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="pause">Pause</SelectItem>
           </SelectContent>
         </Select>
       </div>

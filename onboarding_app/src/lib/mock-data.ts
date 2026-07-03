@@ -50,7 +50,7 @@ export interface Restaurant {
     promotionalSubtitle: string;
     closeMessage: string;
   };
-  status: "open" | "closed";
+  status: "active" | "inactive" | "busy" | "pause";
   lastUpdated: string;
 }
 
@@ -101,7 +101,7 @@ export const mockRestaurants: Restaurant[] = [
       promotionalSubtitle: "Authentic spices from the East",
       closeMessage: "Thank you for visiting. We are closed now.",
     },
-    status: "open",
+    status: "active",
     lastUpdated: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -153,7 +153,7 @@ export const mockRestaurants: Restaurant[] = [
       promotionalSubtitle: "Premium coffee experience",
       closeMessage: "See you tomorrow!",
     },
-    status: "open",
+    status: "busy",
     lastUpdated: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
   },
   {
@@ -192,7 +192,7 @@ export const mockRestaurants: Restaurant[] = [
       promotionalSubtitle: "Best burgers in town",
       closeMessage: "We are closed. Please try again later.",
     },
-    status: "closed",
+    status: "inactive",
     lastUpdated: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
   },
 ];
