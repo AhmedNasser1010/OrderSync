@@ -10,8 +10,8 @@ import {
 } from "@/rtk/api/firestoreApi";
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { type Driver } from "@/types/driver";
-import { FormSchemaToggle } from "@/components/features/staff/StatusToggle";
+import type { Driver } from '@ordersync/types';
+import type { FormSchemaToggle } from "@/components/features/staff/StatusToggle";
 
 type UseStaff = {
   drivers: {
@@ -27,17 +27,17 @@ type UseStaff = {
       name: string;
       phone: string;
       uid: string;
-    }) => Promise<unknown>;
+    }) => void;
     isLoading: boolean;
     isError: boolean;
   };
   toggleMemberStatus: {
-    trigger: (data: FormSchemaToggle) => Promise<unknown>;
+    trigger: (data: FormSchemaToggle) => void;
     isLoading: boolean;
     isError: boolean;
   };
   deleteMember: {
-    trigger: (driverId: string) => Promise<unknown>;
+    trigger: (driverId: string) => void;
     isLoading: boolean;
     isError: boolean;
   };

@@ -3,11 +3,11 @@ import { useFetchUserDataQuery } from "@/lib/rtk/api/firestoreApi";
 import { useAppSelector } from "@/lib/rtk/hooks";
 import { userUid } from "@/lib/rtk/slices/constantsSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { User } from "@/lib/types/types";
+import type { ManagerUser } from "@ordersync/types";
 
 type UseUserResult = {
   name: string;
-  user?: User;
+  user?: ManagerUser;
   isLoading: boolean;
   isError: boolean;
   refetch?: () => void;

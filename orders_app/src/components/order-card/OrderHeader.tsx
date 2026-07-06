@@ -12,7 +12,7 @@ import {
   CircleX,
   Hand
 } from "lucide-react";
-import { OrderStatusType } from "@/types/order";
+import type { OrderStatusType } from '@ordersync/types';
 
 const getStatusIcon = (status: OrderStatusType) => {
   switch (status) {

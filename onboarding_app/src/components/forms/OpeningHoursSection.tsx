@@ -6,11 +6,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { DayHours } from "@/lib/mock-data";
+
+const DAY_LABELS: Record<string, string> = {
+  sunday: "Sunday",
+  monday: "Monday",
+  tuesday: "Tuesday",
+  wednesday: "Wednesday",
+  thursday: "Thursday",
+  friday: "Friday",
+  saturday: "Saturday",
+};
+
+const DAY_KEYS = Object.keys(DAY_LABELS);
 
 interface OpeningHoursSectionProps {
-  hours: DayHours[];
-  onChange: (hours: DayHours[]) => void;
+  hours: Record<
+    string,
+    { start: string; end: string; closed: boolean }
+  >;
+  onChange: (
+    hours: Record<string, { start: string; end: string; closed: boolean }>,
+  ) => void;
 }
 
 export function OpeningHoursSection({
@@ -21,23 +37,22 @@ export function OpeningHoursSection({
   const [applyAllClose, setApplyAllClose] = useState("");
 
   const handleHourChange = (
-    index: number,
-    field: keyof DayHours,
+    day: string,
+    field: "start" | "end" | "closed",
     value: string | boolean,
   ) => {
-    const newHours = [...hours];
-    newHours[index] = { ...newHours[index], [field]: value };
-    onChange(newHours);
+    onChange({
+      ...hours,
+      [day]: { ...hours[day], [field]: value },
+    });
   };
 
   const handleApplyToAll = () => {
     if (!applyAllOpen || !applyAllClose) return;
-    const newHours = hours.map((day) => ({
-      ...day,
-      openTime: applyAllOpen,
-      closeTime: applyAllClose,
-      closed: false,
-    }));
+    const newHours: Record<string, { start: string; end: string; closed: boolean }> = {};
+    for (const day of DAY_KEYS) {
+      newHours[day] = { start: applyAllOpen, end: applyAllClose, closed: false };
+    }
     onChange(newHours);
   };
 
@@ -76,58 +91,61 @@ export function OpeningHoursSection({
           </Button>
         </div>
 
-        {hours.map((day, index) => (
-          <div
-            key={day.day}
-            className="flex items-center gap-4 p-3 bg-secondary/30 rounded-lg"
-          >
-            <div className="w-24 font-medium text-foreground text-sm">
-              {day.day}
-            </div>
-
-            {!day.closed ? (
-              <>
-                <Input
-                  type="time"
-                  value={day.openTime}
-                  onChange={(e) =>
-                    handleHourChange(index, "openTime", e.target.value)
-                  }
-                  className="h-8 w-32 text-xs"
-                />
-                <span className="text-muted-foreground">to</span>
-                <Input
-                  type="time"
-                  value={day.closeTime}
-                  onChange={(e) =>
-                    handleHourChange(index, "closeTime", e.target.value)
-                  }
-                  className="h-8 w-32 text-xs"
-                />
-              </>
-            ) : (
-              <div className="text-sm text-muted-foreground font-medium">
-                Closed
+        {DAY_KEYS.map((dayKey) => {
+          const dayData = hours[dayKey] ?? { start: "", end: "", closed: false };
+          return (
+            <div
+              key={dayKey}
+              className="flex items-center gap-4 p-3 bg-secondary/30 rounded-lg"
+            >
+              <div className="w-24 font-medium text-foreground text-sm">
+                {DAY_LABELS[dayKey]}
               </div>
-            )}
 
-            <div className="flex items-center gap-2 ml-auto">
-              <Checkbox
-                id={`closed-${day.day}`}
-                checked={day.closed}
-                onCheckedChange={(checked) =>
-                  handleHourChange(index, "closed", checked)
-                }
-              />
-              <Label
-                htmlFor={`closed-${day.day}`}
-                className="text-xs font-normal cursor-pointer text-foreground"
-              >
-                Closed
-              </Label>
+              {!dayData.closed ? (
+                <>
+                  <Input
+                    type="time"
+                    value={dayData.start}
+                    onChange={(e) =>
+                      handleHourChange(dayKey, "start", e.target.value)
+                    }
+                    className="h-8 w-32 text-xs"
+                  />
+                  <span className="text-muted-foreground">to</span>
+                  <Input
+                    type="time"
+                    value={dayData.end}
+                    onChange={(e) =>
+                      handleHourChange(dayKey, "end", e.target.value)
+                    }
+                    className="h-8 w-32 text-xs"
+                  />
+                </>
+              ) : (
+                <div className="text-sm text-muted-foreground font-medium">
+                  Closed
+                </div>
+              )}
+
+              <div className="flex items-center gap-2 ml-auto">
+                <Checkbox
+                  id={`closed-${dayKey}`}
+                  checked={dayData.closed}
+                  onCheckedChange={(checked) =>
+                    handleHourChange(dayKey, "closed", checked)
+                  }
+                />
+                <Label
+                  htmlFor={`closed-${dayKey}`}
+                  className="text-xs font-normal cursor-pointer text-foreground"
+                >
+                  Closed
+                </Label>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </Card>
   );

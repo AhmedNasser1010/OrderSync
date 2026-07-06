@@ -4,8 +4,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useFetchDriversDataQuery } from "@/rtk/api/firestoreApi";
 import { accessToken } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
-import { Driver } from "@/types/driver";
-import { FormattedDriverForAssignCard } from "@/types/components";
+import type { Driver } from '@ordersync/types';
+import type { FormattedDriverForAssignCard } from "@/types/orders";
 import useAssign from "@/hooks/order-handlers/useAssign";
 import useOrders from "@/hooks/useOrders";
 

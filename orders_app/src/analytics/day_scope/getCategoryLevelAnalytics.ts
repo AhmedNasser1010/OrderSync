@@ -1,5 +1,5 @@
-import { OrderType } from "@/types/order";
-import { ItemType, CategoryType } from "@/types/menu";
+import type { OrderType } from '@ordersync/types';
+import type { ItemType, CategoryType } from '@ordersync/types';
 
 export default function getCategoryLevelAnalytics(
   orders: OrderType[],

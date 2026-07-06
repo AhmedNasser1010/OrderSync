@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { useQRCode } from "next-qrcode";
 import formatDateFromTimestamp from "@/lib/formatDateFromTimestamp";
 import formatTimeFromTimestamp from "@/lib/formatTimeFromTimestamp";
-import { ItemType } from "@/types/menu";
+import type { ItemType, OrderType, BusinessDocument } from '@ordersync/types';
 
 const InvoiceWrapper = styled.div`
   max-width: 302.362px;
@@ -70,10 +70,11 @@ export default function Invoice({
   orderMenu,
 }: {
   contentRef: React.RefObject<HTMLDivElement | null>;
-  restaurant: any;
-  order: any;
-  orderMenu: any;
+  restaurant: BusinessDocument | undefined;
+  order: OrderType | undefined;
+  orderMenu: (ItemType & { quantity: number; selectedSize: string; discountCode: string; })[] | undefined;
 }) {
+  if (!restaurant || !order) return null;
   const { SVG } = useQRCode();
   return (
     <InvoiceWrapper ref={contentRef}>
@@ -90,9 +91,9 @@ export default function Invoice({
         {order.id}
       </MiddleSpan>
       <MiddleSpan style={{ paddingBottom: "0" }}>
-        {formatDateFromTimestamp(order.timestamp, "/")}
+        {formatDateFromTimestamp(order.createdAt, "/")}
         <br />
-        {formatTimeFromTimestamp(order.timestamp)}
+        {formatTimeFromTimestamp(order.createdAt)}
       </MiddleSpan>
       <Contact>
         <ContactTitle>Contact Info</ContactTitle>
@@ -123,7 +124,7 @@ export default function Invoice({
           </tr>
         </thead>
         <tbody style={{ padding: "10px" }}>
-          {(orderMenu || []).map((item: ItemType) => (
+          {(orderMenu || []).map((item) => (
             <tr
               key={item.id}
               style={{ boxShadow: "rgba(27, 31, 35, 0.15) 0px 1.8px 0px 0px" }}

@@ -5,23 +5,25 @@ import { useRouter } from "next/navigation";
 import {
   useCreateBusinessMutation,
   useUpdateBusinessMutation,
-  type BusinessDocument,
 } from "@/rtk/api/firestoreApi";
+import type { BusinessDocument } from "@ordersync/types";
 import { useAppSelector } from "@/rtk/hooks";
 import { selectUser } from "@/rtk/slices/authSlice";
-import { Restaurant } from "@/lib/mock-data";
 
 export interface ValidationError {
   [key: string]: string;
 }
 
-export function useRestaurantForm(initialData?: Restaurant) {
+export function useRestaurantForm(initialData?: BusinessDocument) {
   const router = useRouter();
   const currentUser = useAppSelector(selectUser);
   const [createBusiness] = useCreateBusinessMutation();
   const [updateBusiness] = useUpdateBusinessMutation();
-  const [formData, setFormData] = useState<Restaurant>(
-    initialData || createEmptyRestaurant(),
+  const [formData, setFormData] = useState<BusinessDocument>(
+    initialData || createEmptyBusinessDocument(),
+  );
+  const [phoneNumbers, setPhoneNumbers] = useState<string[]>(
+    initialData?.owner?.phone ? [initialData.owner.phone] : [""],
   );
   const [errors, setErrors] = useState<ValidationError>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,64 +33,71 @@ export function useRestaurantForm(initialData?: Restaurant) {
 
     const timeoutId = window.setTimeout(() => {
       setFormData(initialData);
+      setPhoneNumbers(initialData?.owner?.phone ? [initialData.owner.phone] : [""]);
       setErrors({});
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
   }, [initialData]);
 
-  const validate = useCallback((data: Restaurant): ValidationError => {
-    const newErrors: ValidationError = {};
+  const validate = useCallback(
+    (data: BusinessDocument, phones: string[]): ValidationError => {
+      const newErrors: ValidationError = {};
 
-    // Owner validation
-    if (!data.owner.name.trim())
-      newErrors["owner.name"] = "Owner name is required";
-    if (!data.owner.email.trim())
-      newErrors["owner.email"] = "Email is required";
-    else if (!isValidEmail(data.owner.email))
-      newErrors["owner.email"] = "Invalid email";
-    if (!data.owner.phone.trim())
-      newErrors["owner.phone"] = "Phone is required";
-    if (!data.owner.userId.trim())
-      newErrors["owner.userId"] = "User ID is required";
+      if (!data.owner.name?.trim())
+        newErrors["owner.name"] = "Owner name is required";
+      if (!data.owner.email.trim())
+        newErrors["owner.email"] = "Email is required";
+      else if (!isValidEmail(data.owner.email))
+        newErrors["owner.email"] = "Invalid email";
+      if (!data.owner.phone.trim())
+        newErrors["owner.phone"] = "Phone is required";
+      if (!data.owner.uid.trim())
+        newErrors["owner.uid"] = "User ID is required";
 
-    // Restaurant info validation
-    if (!data.info.name.trim())
-      newErrors["info.name"] = "Restaurant name is required";
-    if (!data.info.arabicName.trim())
-      newErrors["info.arabicName"] = "Arabic name is required";
+      if (!data.business.name.trim())
+        newErrors["business.name"] = "Restaurant name is required";
+      if (!data.business.nameInAr.trim())
+        newErrors["business.nameInAr"] = "Arabic name is required";
 
-    // Address validation
-    if (!isValidCoordinate(data.info.address.latitude, -90, 90)) {
-      newErrors["info.address.latitude"] =
-        "Latitude must be between -90 and 90";
-    }
-    if (!isValidCoordinate(data.info.address.longitude, -180, 180)) {
-      newErrors["info.address.longitude"] =
-        "Longitude must be between -180 and 180";
-    }
+      if (
+        !isValidCoordinate(data.business.latlng[0], -90, 90)
+      ) {
+        newErrors["business.latlng.0"] =
+          "Latitude must be between -90 and 90";
+      }
+      if (
+        !isValidCoordinate(data.business.latlng[1], -180, 180)
+      ) {
+        newErrors["business.latlng.1"] =
+          "Longitude must be between -180 and 180";
+      }
 
-    // Cook time validation
-    if (data.cookTime.min < 0)
-      newErrors["cookTime.min"] = "Minimum time cannot be negative";
-    if (data.cookTime.max < 0)
-      newErrors["cookTime.max"] = "Maximum time cannot be negative";
-    if (data.cookTime.min > data.cookTime.max) {
-      newErrors["cookTime.max"] = "Maximum time must be greater than minimum";
-    }
+      if (data.services.cookTime[0] < 0)
+        newErrors["services.cookTime.0"] = "Minimum time cannot be negative";
+      if (data.services.cookTime[1] < 0)
+        newErrors["services.cookTime.1"] = "Maximum time cannot be negative";
+      if (data.services.cookTime[0] > data.services.cookTime[1]) {
+        newErrors["services.cookTime.1"] =
+          "Maximum time must be greater than minimum";
+      }
 
-    // Contact validation
-    if (data.contact.phoneNumbers.length === 0) {
-      newErrors["contact.phoneNumbers"] =
-        "At least one phone number is required";
-    }
+      if (phones.length === 0 || !phones[0].trim()) {
+        newErrors["phoneNumbers"] =
+          "At least one phone number is required";
+      }
 
-    return newErrors;
-  }, []);
+      return newErrors;
+    },
+    [],
+  );
 
-  const updateFormData = useCallback((updates: Partial<Restaurant>) => {
-    setFormData((prev) => ({ ...prev, ...updates }));
-  }, []);
+  const updateFormData = useCallback(
+    (updates: Partial<BusinessDocument>) => {
+      setFormData((prev) => ({ ...prev, ...updates }));
+    },
+    [],
+  );
 
   const updateNestedField = useCallback((path: string, value: unknown) => {
     setFormData((prev) => {
@@ -106,7 +115,7 @@ export function useRestaurantForm(initialData?: Restaurant) {
   }, []);
 
   const handleSubmit = useCallback(async (): Promise<boolean> => {
-    const newErrors = validate(formData);
+    const newErrors = validate(formData, phoneNumbers);
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -115,16 +124,17 @@ export function useRestaurantForm(initialData?: Restaurant) {
 
     setIsSubmitting(true);
     try {
-      const payload = toBusinessDocument(formData, currentUser?.uid);
-
-      if (!payload.accessToken) {
+      if (!formData.accessToken) {
         throw new Error("Business access token is missing.");
       }
 
-      if (initialData?.id) {
+      const now = Date.now();
+      const ownerName = formData.owner.name ?? "";
+
+      if (initialData?.accessToken) {
         await updateBusiness({
-          accessToken: payload.accessToken,
-          updates: payload,
+          accessToken: formData.accessToken,
+          updates: { ...formData, updatedOn: now },
         }).unwrap();
       } else {
         if (!currentUser?.uid || !currentUser.email) {
@@ -132,13 +142,13 @@ export function useRestaurantForm(initialData?: Restaurant) {
         }
 
         await createBusiness({
-          business: payload,
+          business: formData,
           user: {
             uid: currentUser.uid,
             email: formData.owner.email,
-            name: formData.owner.name,
+            name: ownerName,
             phone: formData.owner.phone,
-            secondPhone: formData.contact.phoneNumbers[1] ?? "",
+            secondPhone: phoneNumbers[1] ?? "",
             displayName: currentUser.displayName,
             phoneNumber: currentUser.phoneNumber,
           },
@@ -157,6 +167,7 @@ export function useRestaurantForm(initialData?: Restaurant) {
     }
   }, [
     formData,
+    phoneNumbers,
     validate,
     createBusiness,
     updateBusiness,
@@ -185,9 +196,11 @@ export function useRestaurantForm(initialData?: Restaurant) {
 
   return {
     formData,
+    phoneNumbers,
     errors,
     isSubmitting,
     updateFormData,
+    setPhoneNumbers,
     updateNestedField,
     handleSubmit,
     clearErrors,
@@ -197,142 +210,67 @@ export function useRestaurantForm(initialData?: Restaurant) {
   };
 }
 
-function createEmptyRestaurant(): Restaurant {
+function createEmptyBusinessDocument(): BusinessDocument {
   return {
-    id: crypto.randomUUID(),
+    accessToken: crypto.randomUUID(),
+    partnerUid: "",
     owner: {
-      name: "",
+      uid: "",
       email: "",
       phone: "",
-      userId: "",
-    },
-    info: {
-      name: "",
-      arabicName: "",
-      iconUrl: "",
-      coverUrl: "",
-      industry: "restaurant",
-      cuisines: [],
-      address: {
-        latitude: 0,
-        longitude: 0,
-      },
-    },
-    hours: [
-      { day: "Sunday", openTime: "10:00", closeTime: "22:00", closed: false },
-      { day: "Monday", openTime: "10:00", closeTime: "23:00", closed: false },
-      { day: "Tuesday", openTime: "10:00", closeTime: "23:00", closed: false },
-      {
-        day: "Wednesday",
-        openTime: "10:00",
-        closeTime: "23:00",
-        closed: false,
-      },
-      { day: "Thursday", openTime: "10:00", closeTime: "23:00", closed: false },
-      { day: "Friday", openTime: "11:00", closeTime: "00:00", closed: false },
-      { day: "Saturday", openTime: "11:00", closeTime: "00:00", closed: false },
-    ],
-    cookTime: { min: 15, max: 45 },
-    settings: {
-      assignOrdersToCook: true,
-      assignOrdersToDelivery: true,
-      automaticDeliveryAssignment: false,
-      printInvoice: true,
-    },
-    contact: {
-      phoneNumbers: [""],
-    },
-    additional: {
-      promotionalSubtitle: "",
-      closeMessage: "",
-    },
-    status: "active",
-    lastUpdated: new Date().toISOString(),
-  };
-}
-
-function toBusinessDocument(
-  formData: Restaurant,
-  userId?: string,
-): BusinessDocument {
-  const ownerNameParts = splitOwnerName(formData.owner.name);
-  const ownerUid = formData.owner.userId || userId || "";
-
-  return {
-    accessToken: formData.id || "",
-    partnerUid: userId,
-    owner: {
-      uid: ownerUid,
-      name: formData.owner.name,
-      email: formData.owner.email,
-      phone: formData.owner.phone,
-      basic: {
-        fName: ownerNameParts.fName,
-        lName: ownerNameParts.lName,
-      },
-      contact: {
-        name: formData.owner.name,
-        email: formData.owner.email,
-        phone: formData.owner.phone,
-      },
     },
     business: {
-      name: formData.info.name,
-      nameInAr: formData.info.arabicName,
-      industry: formData.info.industry,
-      address: `${formData.info.address.latitude},${formData.info.address.longitude}`,
-      latlng: [formData.info.address.latitude, formData.info.address.longitude],
-      cover: formData.info.coverUrl,
-      icon: formData.info.iconUrl,
-      promotionalSubtitle: formData.additional.promotionalSubtitle,
-      cuisines: formData.info.cuisines,
+      name: "",
+      nameInAr: "",
+      industry: "restaurant",
+      address: "",
+      latlng: [0, 0],
+      cover: "",
+      icon: "",
+      promotionalSubtitle: "",
+      cuisines: [],
     },
     services: {
-      openingHours: Object.fromEntries(
-        formData.hours.map((day) => [
-          day.day.toLowerCase(),
-          { start: day.openTime, end: day.closeTime, closed: day.closed },
-        ]),
-      ),
-      cookTime: [formData.cookTime.min, formData.cookTime.max],
-      paymentMethods: {},
+      openingHours: {
+        sunday: { start: "10:00", end: "22:00", closed: false },
+        monday: { start: "10:00", end: "23:00", closed: false },
+        tuesday: { start: "10:00", end: "23:00", closed: false },
+        wednesday: { start: "10:00", end: "23:00", closed: false },
+        thursday: { start: "10:00", end: "23:00", closed: false },
+        friday: { start: "11:00", end: "00:00", closed: false },
+        saturday: { start: "11:00", end: "00:00", closed: false },
+      },
+      cookTime: [15, 45],
+      paymentMethods: { cash: true },
     },
     settings: {
       siteControl: {
-        closeMsg: formData.additional.closeMessage,
-        availability: formData.status === "active",
+        closeMsg: "",
+        availability: true,
         autoAvailability: true,
         isBusy: false,
         temporaryPause: false,
+        status: "active",
       },
       orderManagement: {
         assign: {
-          forCooks: formData.settings.assignOrdersToCook,
-          forDeliveryWorkers: formData.settings.assignOrdersToDelivery,
+          forCooks: true,
+          forDeliveryWorkers: true,
         },
-        driverAssignment: formData.settings.automaticDeliveryAssignment,
-        printInvoice: formData.settings.printInvoice,
+        driverAssignment: false,
+        printInvoice: true,
       },
     },
-    status: formData.status === "active" ? "active" : "inactive",
-    createdOn: formData.lastUpdated,
-  };
-}
-
-function splitOwnerName(name: string) {
-  const trimmedName = name.trim();
-  if (!trimmedName) {
-    return { fName: "", lName: "" };
-  }
-
-  const parts = trimmedName.split(/\s+/);
-  if (parts.length === 1) {
-    return { fName: trimmedName, lName: "" };
-  }
-
-  return {
-    fName: parts.slice(0, -1).join(" "),
-    lName: parts[parts.length - 1],
+    status: "active",
+    updatedOn: Date.now(),
+    createdOn: Date.now(),
+    topChains: false,
+    reviewSummary: {
+      averageRating: 0,
+      totalRatingPoints: 0,
+      totalReviews: 0,
+      stars: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+    },
   };
 }
 

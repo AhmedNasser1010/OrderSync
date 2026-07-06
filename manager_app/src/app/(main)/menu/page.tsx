@@ -19,7 +19,6 @@ export default function MenuManagementPage() {
     updateMenuItem,
     toggleItemVisibility,
     toggleCategoryVisibility,
-    updateItemDiscount,
     syncToCloud,
     addCategory,
     addMenuItem,
@@ -72,7 +71,7 @@ export default function MenuManagementPage() {
     title: string,
     description: string,
     price: number,
-    sizes?: { size: string; price: string | number }[],
+    sizes?: { size: string; price: string }[],
   ) => {
     if (selectedCategoryForItem) {
       addMenuItem(selectedCategoryForItem, title, description, price, sizes);
@@ -85,7 +84,7 @@ export default function MenuManagementPage() {
     title: string,
     description: string,
     price: number,
-    sizes?: { size: string; price: string | number }[],
+    sizes?: { size: string; price: string }[],
   ) => {
     if (editingItemId) {
       updateMenuItem(editingItemId, { title, description, price, sizes });
@@ -103,7 +102,7 @@ export default function MenuManagementPage() {
   };
 
   const sortedCategories = useMemo(() => {
-    return [...menuData.categories].sort((a, b) => a.position - b.position);
+    return [...menuData.categories];
   }, [menuData.categories]);
 
   const selectedCategory = menuData.categories.find(
@@ -212,9 +211,6 @@ export default function MenuManagementPage() {
                           item={item}
                           onToggleVisibility={() =>
                             toggleItemVisibility(item.id)
-                          }
-                          onUpdateDiscount={(discount) =>
-                            updateItemDiscount(item.id, discount)
                           }
                           onMoveUp={() => moveItem(item.id, "up")}
                           onMoveDown={() => moveItem(item.id, "down")}

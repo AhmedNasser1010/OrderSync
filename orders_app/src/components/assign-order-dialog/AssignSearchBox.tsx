@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { Search, Loader2, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FormattedDriverForAssignCard } from "@/types/components";
+import type { FormattedDriverForAssignCard } from "@/types/orders";
 
 type Props = {
   searchTerm: string;

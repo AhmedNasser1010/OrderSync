@@ -11,8 +11,8 @@ import { useMemo } from "react";
 import { calculateMetrics } from "@/utilities/analytics/calculateMetrics";
 import { calculatePercentageChange } from "@/utilities/analytics/calculatePercentageChange";
 import { generateDashboardData } from "@/utilities/analytics/generateDashboardData";
-import { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
-import { DashboardData } from "@/lib/types/types";
+import type { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
+import type { DashboardData } from "@/lib/types/types";
 
 const useAnalytics = () => {
   const uid = useAppSelector(userUid);

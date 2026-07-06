@@ -13,9 +13,9 @@ import {
   increment,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { OrderType, OrderStatusType } from "@/types/order";
-import { Driver } from "@/types/driver";
-import { RestaurantStatusTypes } from "@/types/restaurant";
+import type { OrderType, OrderStatusType } from '@ordersync/types';
+import type { Driver } from '@ordersync/types';
+import type { RestaurantStatusTypes } from '@ordersync/types';
 
 // const statusForward = {
 //   RECEIVED: "PREPARING",
@@ -57,9 +57,10 @@ export const firestoreApi = createApi({
           }
           const userData = docSnapshot.data();
           return { data: userData };
-        } catch (error: any) {
-          console.error(error.message);
-          return { error: error.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["User"],
@@ -72,9 +73,10 @@ export const firestoreApi = createApi({
           const menu = menuSnapshot.data();
           console.log("Read Operation [fetchMenuData]");
           return { data: menu };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["Menu"],
@@ -87,9 +89,10 @@ export const firestoreApi = createApi({
           const restaurant = resSnapshot.data();
           console.log("Read Operation [fetchRestaurantData]");
           return { data: restaurant };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["Restaurant"],
@@ -109,9 +112,10 @@ export const firestoreApi = createApi({
           );
           console.log("Read Operation [completedOrders]");
           return { data: completedOrders };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["CompletedOrders"],
@@ -131,9 +135,10 @@ export const firestoreApi = createApi({
           );
           console.log("Read Operation [voidedOrders]");
           return { data: voidedOrders };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["VoidedOrders"],
@@ -178,9 +183,10 @@ export const firestoreApi = createApi({
           );
           console.log("Read Operation [historyOrders]");
           return { data: historyOrders };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["HistoryOrders"],
@@ -202,9 +208,10 @@ export const firestoreApi = createApi({
           );
           console.log("Read Operation [dailySummarizationOrders]");
           return { data: dailySummarization };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["DailySummarizationOrders"],
@@ -288,14 +295,11 @@ export const firestoreApi = createApi({
           // Prepare the updated order with status change
           const updatedOrder = {
             ...orderToUpdate,
+            accepted: true,
             status: {
               ...orderToUpdate.status,
               current: updatedStatus,
-              accepted: true,
-              history: [
-                ...orderToUpdate.status.history,
-                { status: updatedStatus, timestamp: Date.now() },
-              ],
+              history: { status: updatedStatus, timestamp: Date.now() },
             },
             orderTimestamps: {
               ...orderToUpdate.orderTimestamps,
@@ -307,7 +311,7 @@ export const firestoreApi = createApi({
                 updatedStatus === "PREPARING" &&
                 (orderToUpdate.status.current === "PICK_UP" ||
                   orderToUpdate.status.current === "ON_ROUTE")
-                  ? null
+                  ? ""
                   : orderToUpdate.delivery.uid,
             },
           };
@@ -353,9 +357,10 @@ export const firestoreApi = createApi({
             "Order status updated and moved to 'completedOrders' if completed",
           );
           return { data: null };
-        } catch (error: any) {
-          console.error("Error updating order status:", error.message);
-          return { error: error.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error updating order status:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["Orders"],
@@ -385,15 +390,12 @@ export const firestoreApi = createApi({
           // Create a new canceled order object with updated status
           const canceledOrder = {
             ...orderToUpdate,
+            accepted: true,
+            cancelAutoAssign: true,
             status: {
               ...orderToUpdate.status,
               current: "CANCELED",
-              cancellationReason,
-              accepted: true,
-              history: [
-                ...orderToUpdate.status.history,
-                { status: "CANCELED", timestamp: Date.now() },
-              ],
+              history: { status: "CANCELED", timestamp: Date.now() },
             },
             orderTimestamps: {
               ...orderToUpdate.orderTimestamps,
@@ -432,9 +434,10 @@ export const firestoreApi = createApi({
 
           console.log("Order canceled and moved to 'voidedOrders'");
           return { data: null };
-        } catch (error: any) {
-          console.error("Error while canceling order:", error.message);
-          return { error: error.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error while canceling order:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["Orders"],
@@ -465,9 +468,10 @@ export const firestoreApi = createApi({
 
           console.log("Write Operation [setRestaurantStatus]");
           return { data: null };
-        } catch (error: any) {
-          console.error("Error updating restaurant status:", error.message);
-          return { error: error.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error updating restaurant status:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["Restaurant"],
@@ -538,9 +542,10 @@ export const firestoreApi = createApi({
             "Close day data saved and old orders deleted successfully",
           );
           return { data: null };
-        } catch (error: any) {
-          console.error("Error while close the day:", error.message);
-          return { error: error.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error while close the day:", message);
+          return { error: message };
         }
       },
       invalidatesTags: [
@@ -582,12 +587,13 @@ export const firestoreApi = createApi({
 
           console.log("Write Operation [setDisplaySettings]");
           return { data: null };
-        } catch (error: any) {
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
           console.error(
             "Error updating restaurant display settings:",
-            error.message,
+            message,
           );
-          return { error: error.message };
+          return { error: message };
         }
       },
       invalidatesTags: ["Restaurant"],
@@ -615,12 +621,13 @@ export const firestoreApi = createApi({
 
           console.log("Write Operation [setOrderWorkflowSettings]");
           return { data: null };
-        } catch (error: any) {
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
           console.error(
             "Error updating restaurant order work flow settings:",
-            error.message,
+            message,
           );
-          return { error: error.message };
+          return { error: message };
         }
       },
       invalidatesTags: ["Restaurant"],
@@ -672,10 +679,7 @@ export const firestoreApi = createApi({
             status: {
               ...orderToUpdate.status,
               current: "ON_ROUTE",
-              history: [
-                ...orderToUpdate.status.history,
-                { status: "ON_ROUTE", timestamp: Date.now() },
-              ],
+              history: { status: "ON_ROUTE", timestamp: Date.now() },
             },
             orderTimestamps: {
               ...orderToUpdate.orderTimestamps,
@@ -699,9 +703,10 @@ export const firestoreApi = createApi({
 
           console.log("Order assigned to driver and status updated.");
           return { data: null };
-        } catch (error: any) {
-          console.error("Error assigning order to driver:", error.message);
-          return { error: error.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error assigning order to driver:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["Orders"],
@@ -731,9 +736,10 @@ export const firestoreApi = createApi({
 
           console.log("Driver dues has been rested");
           return { data: null };
-        } catch (error: any) {
-          console.error("Error assigning order to driver:", error.message);
-          return { error: error.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error assigning order to driver:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["Drivers"],
@@ -759,9 +765,10 @@ export const firestoreApi = createApi({
 
           console.log("Driver status has been updated");
           return { data: null };
-        } catch (error: any) {
-          console.error("Error set status to driver:", error.message);
-          return { error: error.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error set status to driver:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["Drivers"],
@@ -778,9 +785,10 @@ export const firestoreApi = createApi({
           await batch.commit();
 
           return { data: null };
-        } catch (error: any) {
-          console.error("Error delete driver:", error.message);
-          return { error: error.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error delete driver:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["Drivers"],
@@ -831,9 +839,10 @@ export const firestoreApi = createApi({
           await batch.commit();
 
           return { data: null };
-        } catch (error: any) {
-          console.error("Error while added nre driver: ", error.message);
-          return { error: error.message };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error while added nre driver: ", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["Drivers"],

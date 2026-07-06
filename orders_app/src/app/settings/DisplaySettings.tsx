@@ -18,7 +18,7 @@ export default function DisplaySettings() {
   const { data: resData } = useFetchRestaurantDataQuery(userData?.accessToken)
   const [setDisplaySettings] = useSetDisplaySettingsMutation()
 
-  const handleOnBlur = (e: any) => {
+  const handleOnBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setDisplaySettings({
       resId: userData?.accessToken,
       settingName: e.target.name,

@@ -5,17 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface CookTimeSectionProps {
-  data: {
-    min: number;
-    max: number;
-  };
-  onChange: (data: any) => void;
+  data: [number, number];
+  onChange: (data: [number, number]) => void;
 }
 
 export function CookTimeSection({ data, onChange }: CookTimeSectionProps) {
-  const handleChange = (field: string, value: string) => {
+  const [min, max] = data;
+  const handleChange = (index: 0 | 1, value: string) => {
     const numValue = parseInt(value) || 0;
-    onChange({ ...data, [field]: numValue });
+    const next: [number, number] = [...data];
+    next[index] = numValue;
+    onChange(next);
   };
 
   return (
@@ -32,8 +32,8 @@ export function CookTimeSection({ data, onChange }: CookTimeSectionProps) {
             <Input
               id="cook-min"
               type="number"
-              value={data.min}
-              onChange={(e) => handleChange("min", e.target.value)}
+              value={min}
+              onChange={(e) => handleChange(0, e.target.value)}
               placeholder="15"
               className="mt-1.5"
             />
@@ -45,15 +45,15 @@ export function CookTimeSection({ data, onChange }: CookTimeSectionProps) {
             <Input
               id="cook-max"
               type="number"
-              value={data.max}
-              onChange={(e) => handleChange("max", e.target.value)}
+              value={max}
+              onChange={(e) => handleChange(1, e.target.value)}
               placeholder="45"
               className="mt-1.5"
             />
           </div>
         </div>
         <div className="text-sm text-muted-foreground p-3 bg-secondary/50 rounded-lg">
-          Estimated cooking time: {data.min} - {data.max} minutes
+          Estimated cooking time: {min} - {max} minutes
         </div>
       </div>
     </Card>

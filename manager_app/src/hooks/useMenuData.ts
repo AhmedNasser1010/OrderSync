@@ -1,12 +1,8 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import type {
-  MenuData,
-  MenuCategory,
-  MenuDocument,
-  MenuItem,
-} from "@/lib/types/types";
+import type { MenuData, MenuCategory } from "@/lib/types/types";
+import type { ItemType, MainMenuType } from "@ordersync/types";
 import { useAppDispatch, useAppSelector } from "@/lib/rtk/hooks";
 import { userUid } from "@/lib/rtk/slices/constantsSlice";
 import {
@@ -30,7 +26,7 @@ import {
 
 const STORAGE_KEY = "restaurant_menu_data";
 
-type RawMenuCategory = {
+interface RawMenuCategory {
   id?: string;
   title?: string;
   name?: string;
@@ -38,15 +34,15 @@ type RawMenuCategory = {
   visibility?: boolean;
   visible?: boolean;
   topMenu?: boolean;
-  position?: number;
+  createdAt?: number | string;
+  updatedAt?: number | string;
   timestamp?: number | string;
   images?: string | string[];
   backgrounds?: string | string[];
   image?: string;
-  [key: string]: any;
-};
+}
 
-type RawMenuItem = {
+interface RawMenuItem {
   id?: string;
   title?: string;
   name?: string;
@@ -57,28 +53,29 @@ type RawMenuItem = {
   visibility?: boolean;
   visible?: boolean;
   topMenu?: boolean;
+  createdAt?: number | string;
+  updatedAt?: number | string;
   timestamp?: number | string;
-  discount?: any;
   sizes?: { size?: string; price?: string | number }[];
   images?: string | string[];
   backgrounds?: string | string[];
   image?: string;
-  [key: string]: any;
-};
+}
 
-type RawMenuData = {
+interface RawMenuData {
   categories?: RawMenuCategory[];
   items?: RawMenuItem[];
   lastSynced?: string;
-  [key: string]: any;
-};
+}
 
 const emptyMenuData: MenuData = {
   categories: [],
   lastSynced: new Date().toISOString(),
 };
 
-function extractBackgrounds(obj: any): string[] {
+function extractBackgrounds(
+  obj: RawMenuCategory | RawMenuItem | null | undefined,
+): string[] {
   if (!obj) return [];
   const backgrounds = obj.backgrounds ?? obj.images ?? obj.image;
   if (Array.isArray(backgrounds))
@@ -88,41 +85,9 @@ function extractBackgrounds(obj: any): string[] {
   return [];
 }
 
-function normalizeDiscount(discount: any): MenuItem["discount"] {
-  if (!discount) return { type: "percentage", value: 0, active: false };
-
-  if (
-    typeof discount === "object" &&
-    typeof discount.type === "string" &&
-    typeof discount.value !== "undefined"
-  ) {
-    return {
-      type: discount.type === "fixed" ? "fixed" : "percentage",
-      value: Number(discount.value) || 0,
-      active: Boolean(discount.active),
-    };
-  }
-
-  if (typeof discount?.code === "string") {
-    const [rawType, rawValue] = discount.code.split("-");
-    const parsedType =
-      rawType?.toLowerCase() === "fixed" || rawType?.toUpperCase() === "FIXED"
-        ? "fixed"
-        : "percentage";
-
-    return {
-      type: parsedType,
-      value: Number(rawValue) || 0,
-      active: true,
-    };
-  }
-
-  return { type: "percentage", value: 0, active: false };
-}
-
 function normalizeSizes(
   sizes?: { size?: string; price?: string | number }[],
-): MenuItem["sizes"] {
+): ItemType["sizes"] {
   if (!Array.isArray(sizes)) {
     return undefined;
   }
@@ -140,13 +105,13 @@ function normalizeSizes(
         size: label,
         price:
           typeof size?.price === "number"
-            ? size.price
+            ? String(size.price)
             : typeof size?.price === "string"
               ? size.price
               : "",
       };
     })
-    .filter(Boolean) as NonNullable<MenuItem["sizes"]>;
+    .filter(Boolean) as NonNullable<ItemType["sizes"]>;
 
   return normalizedSizes.length > 0 ? normalizedSizes : undefined;
 }
@@ -169,29 +134,41 @@ function stripUndefined<T>(value: T): T {
   return value;
 }
 
+function resolveTimestamp(
+  value: number | string | undefined,
+  fallback: number,
+): number {
+  if (typeof value === "number") return value;
+  if (typeof value === "string") return parseInt(value, 10) || fallback;
+  return fallback;
+}
+
 function normalizeMenuData(rawData?: RawMenuData): MenuData {
   if (!rawData?.categories || !Array.isArray(rawData.categories)) {
     return emptyMenuData;
   }
 
+  const now = Date.now();
+
   const categories: MenuCategory[] = rawData.categories.map(
-    (category, index) => ({
-      id: category.id ?? `cat-${index}`,
-      title: category.title ?? category.name ?? "Category",
-      description: category.description ?? "",
-      visible: category.visibility ?? category.visible ?? true,
-      featured: !!category.topMenu,
-      timestamp:
-        typeof category.timestamp === "number"
-          ? category.timestamp
-          : typeof category.timestamp === "string"
-            ? parseInt(category.timestamp, 10) || Date.now()
-            : Date.now(),
-      position:
-        typeof category.position === "number" ? category.position : index,
-      items: [],
-      backgrounds: extractBackgrounds(category),
-    }),
+    (category, index) => {
+      const ts =
+        resolveTimestamp(category.createdAt, now) ||
+        resolveTimestamp(category.updatedAt, now) ||
+        resolveTimestamp(category.timestamp, now) ||
+        now;
+      return {
+        id: category.id ?? `cat-${index}`,
+        title: category.title ?? category.name ?? "Category",
+        description: category.description ?? "",
+        visibility: category.visibility ?? category.visible ?? true,
+        topMenu: !!category.topMenu,
+        backgrounds: extractBackgrounds(category),
+        createdAt: ts,
+        updatedAt: ts,
+        items: [],
+      };
+    },
   );
 
   const categoryMap = new Map(
@@ -206,7 +183,12 @@ function normalizeMenuData(rawData?: RawMenuData): MenuData {
         item.categoryId ??
         defaultCategory?.id ??
         `cat-${index}`;
-      const mappedItem: MenuItem = {
+      const ts =
+        resolveTimestamp(item.createdAt, now) ||
+        resolveTimestamp(item.updatedAt, now) ||
+        resolveTimestamp(item.timestamp, now) ||
+        now;
+      const mappedItem: ItemType = {
         id: item.id ?? `item-${index}`,
         title: item.title ?? item.name ?? "Item",
         description: item.description ?? "",
@@ -217,17 +199,12 @@ function normalizeMenuData(rawData?: RawMenuData): MenuData {
               ? parseFloat(item.price) || 0
               : 0,
         category: categoryId,
-        visible: item.visibility ?? item.visible ?? true,
-        featured: !!item.topMenu,
-        timestamp:
-          typeof item.timestamp === "number"
-            ? item.timestamp
-            : typeof item.timestamp === "string"
-              ? parseInt(item.timestamp, 10) || Date.now()
-              : Date.now(),
-        discount: normalizeDiscount(item.discount),
-        sizes: normalizeSizes(item.sizes),
+        visibility: item.visibility ?? item.visible ?? true,
+        topMenu: !!item.topMenu,
         backgrounds: extractBackgrounds(item),
+        sizes: normalizeSizes(item.sizes),
+        createdAt: ts,
+        updatedAt: ts,
       };
 
       const category = categoryMap.get(categoryId) ?? defaultCategory;
@@ -243,17 +220,19 @@ function normalizeMenuData(rawData?: RawMenuData): MenuData {
   };
 }
 
-type FirestoreMenuData = MenuDocument;
-
 function createFirestoreMenuData(
   menuData: MenuData,
-  accessToken?: string,
-): FirestoreMenuData {
-  const firestoreMenuData = {
+  accessToken: string,
+  partnerUid: string,
+): MainMenuType {
+  const now = Date.now();
+  const firestoreMenuData: MainMenuType = {
+    accessToken,
+    partnerUid,
+    createdAt: now,
+    updatedAt: now,
     categories: menuData.categories.map(({ items, ...category }) => category),
     items: menuData.categories.flatMap((category) => category.items),
-    lastSynced: menuData.lastSynced,
-    accessToken,
   };
 
   return stripUndefined(firestoreMenuData);
@@ -313,7 +292,7 @@ export function useMenuData() {
   );
 
   const updateMenuItem = useCallback(
-    (itemId: string, updates: Partial<MenuItem>) => {
+    (itemId: string, updates: Partial<ItemType>) => {
       dispatch(updateItemAction({ id: itemId, updates }));
     },
     [dispatch],
@@ -326,29 +305,12 @@ export function useMenuData() {
         .find((i) => i.id === itemId);
       if (item) {
         dispatch(
-          updateItemAction({ id: itemId, updates: { visible: !item.visible } }),
+          updateItemAction({ id: itemId, updates: { visibility: !item.visibility } }),
         );
       }
     },
     [dispatch, menuData.categories],
   );
-
-  // const toggleItemFeatured = useCallback(
-  //   (itemId: string) => {
-  //     const item = menuData.categories
-  //       .flatMap((c) => c.items)
-  //       .find((i) => i.id === itemId);
-  //     if (item) {
-  //       dispatch(
-  //         updateItemAction({
-  //           id: itemId,
-  //           updates: { featured: !item.featured },
-  //         }),
-  //       );
-  //     }
-  //   },
-  //   [dispatch, menuData.categories],
-  // );
 
   const toggleCategoryVisibility = useCallback(
     (categoryId: string) => {
@@ -357,34 +319,12 @@ export function useMenuData() {
         dispatch(
           updateCategoryAction({
             id: categoryId,
-            updates: { visible: !category.visible },
+            updates: { visibility: !category.visibility },
           }),
         );
       }
     },
     [dispatch, menuData.categories],
-  );
-
-  // const toggleCategoryFeatured = useCallback(
-  //   (categoryId: string) => {
-  //     const category = menuData.categories.find((c) => c.id === categoryId);
-  //     if (category) {
-  //       dispatch(
-  //         updateCategoryAction({
-  //           id: categoryId,
-  //           updates: { featured: !category.featured },
-  //         }),
-  //       );
-  //     }
-  //   },
-  //   [dispatch, menuData.categories],
-  // );
-
-  const updateItemDiscount = useCallback(
-    (itemId: string, discount: MenuItem["discount"]) => {
-      dispatch(updateItemAction({ id: itemId, updates: { discount } }));
-    },
-    [dispatch],
   );
 
   const syncToCloud = useCallback(async () => {
@@ -400,33 +340,36 @@ export function useMenuData() {
         ...menuData,
         lastSynced: new Date().toISOString(),
       };
-      const firestoreMenuData = createFirestoreMenuData(syncedMenuData, resId);
+      const partnerUid = user?.partnerUid ?? "";
+      const firestoreMenuData = createFirestoreMenuData(syncedMenuData, resId, partnerUid);
 
       await syncMenuData({ resId, menu: firestoreMenuData }).unwrap();
       dispatch(setLastSynced(syncedMenuData.lastSynced));
 
       setSyncMessage("Menu synced successfully!");
       setTimeout(() => setSyncMessage(null), 3000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       setSyncMessage("Failed to sync menu");
-      console.error("[v0] Sync error:", error?.message ?? error);
+      const message = error instanceof Error ? error.message : String(error);
+      console.error("[v0] Sync error:", message);
     } finally {
       setIsSyncing(false);
     }
-  }, [dispatch, menuData, resId, syncMenuData]);
+  }, [dispatch, menuData, resId, syncMenuData, user]);
 
   const addCategory = useCallback(
     (title: string, description: string) => {
+      const now = Date.now();
       const newCategory: MenuCategory = {
-        id: `cat-${Date.now()}`,
+        id: `cat-${now}`,
         title,
         description,
-        visible: true,
-        featured: false,
-        timestamp: Date.now(),
-        position: menuData.categories.length,
-        items: [],
+        visibility: true,
+        topMenu: false,
         backgrounds: [],
+        createdAt: now,
+        updatedAt: now,
+        items: [],
       };
       dispatch(addCategoryAction(newCategory));
       return newCategory;
@@ -440,20 +383,21 @@ export function useMenuData() {
       title: string,
       description: string,
       price: number,
-      sizes?: { size: string; price: string | number }[],
+      sizes?: ItemType["sizes"],
     ) => {
-      const newItem: MenuItem = {
-        id: `item-${Date.now()}`,
+      const now = Date.now();
+      const newItem: ItemType = {
+        id: `item-${now}`,
         title,
         description,
         price,
         category: categoryId,
-        visible: true,
-        featured: false,
-        timestamp: Date.now(),
-        discount: { type: "percentage", value: 0, active: false },
+        visibility: true,
+        topMenu: false,
         sizes,
         backgrounds: [],
+        createdAt: now,
+        updatedAt: now,
       };
       dispatch(addItemAction(newItem));
       return newItem;
@@ -497,7 +441,6 @@ export function useMenuData() {
     updateMenuItem,
     toggleItemVisibility,
     toggleCategoryVisibility,
-    updateItemDiscount,
     syncToCloud,
     addCategory,
     addMenuItem,

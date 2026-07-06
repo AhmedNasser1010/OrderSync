@@ -2,7 +2,7 @@
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SquareArrowDown, Bike, CookingPot } from "lucide-react";
-import { OrderStatusType } from "@/types/order";
+import type { MainTabTypes } from "@/types/orders";
 import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
 import { activeTab, setActiveTab } from "@/rtk/slices/toggleSlice";
 
@@ -10,14 +10,14 @@ export default function OrdersTabs() {
   const dispatch = useAppDispatch();
   const activeTabValue = useAppSelector(activeTab);
 
-  const handleTabChange = (tab: OrderStatusType) => {
+  const handleTabChange = (tab: MainTabTypes) => {
     dispatch(setActiveTab(tab));
   };
 
   return (
     <Tabs
       value={activeTabValue}
-      onValueChange={(value) => handleTabChange(value as OrderStatusType)}
+      onValueChange={(value) => handleTabChange(value as MainTabTypes)}
     >
       <TabsList className="grid w-full grid-cols-3 mb-4">
         <TabsTrigger value="RECEIVED">

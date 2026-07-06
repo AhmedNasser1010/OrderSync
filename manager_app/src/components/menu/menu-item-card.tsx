@@ -4,23 +4,18 @@ import { useState } from "react";
 import {
   Eye,
   EyeOff,
-  DollarSign,
-  Percent,
   Edit,
   ArrowUp,
   ArrowDown,
+  Trash,
 } from "lucide-react";
-import { Trash } from "lucide-react";
 import { ActionsMenu } from "@/components/ui/actions-menu";
 import { ImageEditDialog } from "@/components/ui/image-edit-dialog";
-import { MenuItem } from "@/lib/types/types";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import type { ItemType } from "@ordersync/types";
 
 interface MenuItemCardProps {
-  item: MenuItem;
+  item: ItemType;
   onToggleVisibility: () => void;
-  onUpdateDiscount: (discount: MenuItem["discount"]) => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onEdit: () => void;
@@ -31,7 +26,6 @@ interface MenuItemCardProps {
 export function MenuItemCard({
   item,
   onToggleVisibility,
-  onUpdateDiscount,
   onMoveUp,
   onMoveDown,
   onEdit,
@@ -39,25 +33,6 @@ export function MenuItemCard({
   onUpdateBackgrounds,
 }: MenuItemCardProps) {
   const [showImageEditor, setShowImageEditor] = useState(false);
-  const [showDiscountEditor, setShowDiscountEditor] = useState(false);
-  const [discountType, setDiscountType] = useState<"percentage" | "fixed">(
-    item.discount?.type || "percentage",
-  );
-  const [discountValue, setDiscountValue] = useState(item.discount?.value || 0);
-  const [discountActive, setDiscountActive] = useState(
-    item.discount?.active || false,
-  );
-
-  const handleSaveDiscount = () => {
-    if (discountValue > 0) {
-      onUpdateDiscount({
-        type: discountType,
-        value: discountValue,
-        active: discountActive,
-      });
-    }
-    setShowDiscountEditor(false);
-  };
 
   return (
     <div className="flex flex-col gap-3 p-4 bg-card/50 border border-border rounded-lg hover:bg-card/70 transition-colors">
@@ -85,7 +60,7 @@ export function MenuItemCard({
               <h4 className="font-semibold text-foreground line-clamp-2">
                 {item.title}
               </h4>
-              {item.visible === false && (
+              {item.visibility === false && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/10 px-2 py-0.5 text-xs text-muted-foreground">
                   <EyeOff size={14} />
                   Hidden
@@ -121,9 +96,9 @@ export function MenuItemCard({
               },
               {
                 key: "toggleVisibility",
-                label: item.visible ? "Hide from menu" : "Show in menu",
+                label: item.visibility ? "Hide from menu" : "Show in menu",
                 onClick: onToggleVisibility,
-                icon: item.visible ? <Eye size={14} /> : <EyeOff size={14} />,
+                icon: item.visibility ? <Eye size={14} /> : <EyeOff size={14} />,
               },
               {
                 key: "delete",
@@ -153,22 +128,6 @@ export function MenuItemCard({
             <span className="text-lg font-semibold text-foreground">
               ${item.price.toFixed(2)}
             </span>
-            {item.discount &&
-              (item.discount.active || item.discount.value > 0) && (
-                <Badge
-                  variant="outline"
-                  className={`h-auto rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm ${
-                    item.discount.active
-                      ? "border-emerald-600 bg-emerald-600 text-white dark:border-emerald-500 dark:bg-emerald-500 dark:text-slate-950"
-                      : "border-slate-500 bg-slate-800 text-slate-100 dark:border-slate-400 dark:bg-slate-900 dark:text-slate-50"
-                  }`}
-                >
-                  {item.discount.type === "percentage"
-                    ? `${item.discount.value}% off`
-                    : `$${item.discount.value.toFixed(2)} off`}
-                  {!item.discount.active ? " (inactive)" : ""}
-                </Badge>
-              )}
           </div>
           {item.sizes && item.sizes.length > 0 ? (
             <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
@@ -186,90 +145,7 @@ export function MenuItemCard({
             </div>
           ) : null}
         </div>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowDiscountEditor(!showDiscountEditor)}
-          className="text-xs"
-        >
-          {item.discount?.active ? "Edit" : "Add"} Discount
-        </Button>
       </div>
-
-      {showDiscountEditor && (
-        <div className="mt-2 p-3 bg-muted rounded-md space-y-3">
-          <div className="flex gap-2">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                checked={discountType === "percentage"}
-                onChange={() => setDiscountType("percentage")}
-                className="w-4 h-4"
-              />
-              <span className="text-sm text-foreground flex items-center gap-1">
-                <Percent size={14} /> Percentage
-              </span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                checked={discountType === "fixed"}
-                onChange={() => setDiscountType("fixed")}
-                className="w-4 h-4"
-              />
-              <span className="text-sm text-foreground flex items-center gap-1">
-                <DollarSign size={14} /> Fixed
-              </span>
-            </label>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-foreground mb-1">
-              Value {discountType === "percentage" ? "(%)" : "($)"}
-            </label>
-            <input
-              type="number"
-              value={discountValue}
-              onChange={(e) =>
-                setDiscountValue(Math.max(0, parseFloat(e.target.value) || 0))
-              }
-              min="0"
-              max={discountType === "percentage" ? "100" : item.price}
-              step="0.01"
-              className="w-full px-2 py-1.5 bg-input border border-border rounded text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-accent"
-            />
-          </div>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={discountActive}
-              onChange={(e) => setDiscountActive(e.target.checked)}
-              className="w-4 h-4"
-            />
-            <span className="text-sm text-foreground">Active</span>
-          </label>
-
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={handleSaveDiscount}
-              className="flex-1 h-8 text-xs bg-accent hover:bg-accent/90"
-            >
-              Save
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowDiscountEditor(false)}
-              className="flex-1 h-8 text-xs"
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

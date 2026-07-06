@@ -1,7 +1,7 @@
 import DriverCardAvatar from "./DriverCardAvatar";
 import DriverCardInfo from "./DriverCardInfo";
 import DriverCardDuesAndActions from "./DriverCardDuesAndActions";
-import { FormattedDriverForAssignCard } from "@/types/components";
+import type { FormattedDriverForAssignCard } from "@/types/orders";
 
 type Props = {
   driver: FormattedDriverForAssignCard;

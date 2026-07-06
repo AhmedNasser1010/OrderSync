@@ -1,5 +1,5 @@
-import { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
-import {
+import type { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
+import type {
   DashboardData,
   KPIData,
   OperationMetrics,

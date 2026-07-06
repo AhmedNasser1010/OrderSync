@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../store";
-import { MainTabTypes } from "@/types/components";
+import type { RootState } from "../store";
+import type { MainTabTypes } from "@/types/orders";
 
 type Toggle = {
   deletePopup: {

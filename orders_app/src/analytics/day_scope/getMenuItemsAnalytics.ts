@@ -1,5 +1,5 @@
-import { OrderType } from "@/types/order";
-import { ItemType } from "@/types/menu";
+import type { OrderType } from '@ordersync/types';
+import type { ItemType } from '@ordersync/types';
 
 export default function getMenuItemsAnalytics(
   orders: OrderType[],

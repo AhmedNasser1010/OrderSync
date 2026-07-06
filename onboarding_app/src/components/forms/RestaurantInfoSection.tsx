@@ -14,14 +14,20 @@ import {
 interface RestaurantInfoSectionProps {
   data: {
     name: string;
-    arabicName: string;
-    iconUrl: string;
-    coverUrl: string;
-    industry: "restaurant" | "coffee-shop";
+    nameInAr: string;
+    icon: string;
+    cover: string;
+    industry: string;
     cuisines: string[];
-    address: any;
   };
-  onChange: (data: any) => void;
+  onChange: (data: {
+    name: string;
+    nameInAr: string;
+    icon: string;
+    cover: string;
+    industry: string;
+    cuisines: string[];
+  }) => void;
 }
 
 export function RestaurantInfoSection({
@@ -56,8 +62,8 @@ export function RestaurantInfoSection({
           </Label>
           <Input
             id="rest-arabic-name"
-            value={data.arabicName}
-            onChange={(e) => handleChange("arabicName", e.target.value)}
+            value={data.nameInAr}
+            onChange={(e) => handleChange("nameInAr", e.target.value)}
             placeholder="e.g. بيت التوابل"
             className="mt-1.5"
           />
@@ -68,7 +74,7 @@ export function RestaurantInfoSection({
           </Label>
           <Select
             value={data.industry}
-            onValueChange={(value: any) => handleChange("industry", value)}
+            onValueChange={(value) => handleChange("industry", value)}
           >
             <SelectTrigger id="rest-industry" className="mt-1.5">
               <SelectValue />
@@ -85,8 +91,8 @@ export function RestaurantInfoSection({
           </Label>
           <Input
             id="rest-icon"
-            value={data.iconUrl}
-            onChange={(e) => handleChange("iconUrl", e.target.value)}
+            value={data.icon}
+            onChange={(e) => handleChange("icon", e.target.value)}
             placeholder="https://example.com/icon.png"
             className="mt-1.5"
           />
@@ -97,8 +103,8 @@ export function RestaurantInfoSection({
           </Label>
           <Input
             id="rest-cover"
-            value={data.coverUrl}
-            onChange={(e) => handleChange("coverUrl", e.target.value)}
+            value={data.cover}
+            onChange={(e) => handleChange("cover", e.target.value)}
             placeholder="https://example.com/cover.png"
             className="mt-1.5"
           />

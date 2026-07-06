@@ -10,13 +10,13 @@ interface MenuItemFormProps {
     title: string,
     description: string,
     price: number,
-    sizes?: { size: string; price: string | number }[],
+    sizes?: { size: string; price: string }[],
   ) => void;
   onCancel: () => void;
   initialTitle?: string;
   initialDescription?: string;
   initialPrice?: number;
-  initialSizes?: { size: string; price: string | number }[];
+  initialSizes?: { size: string; price: string }[];
   isEditing?: boolean;
   submitLabel?: string;
 }
@@ -43,7 +43,7 @@ export function MenuItemForm({
   const [largePrice, setLargePrice] = useState<string>("");
 
   const getSizePrice = (
-    sizes: { size: string; price: string | number }[] | undefined,
+    sizes: { size: string; price: string }[] | undefined,
     aliases: string[],
   ) => {
     if (!Array.isArray(sizes)) {

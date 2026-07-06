@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { FormattedOrderType } from "@/types/order";
-import { MainTabTypes } from "@/types/components";
+import type { FormattedOrderType, MainTabTypes } from "@/types/orders";
 import { useRouter } from "next/navigation";
 import OrderHeader from "./OrderHeader";
 import OrderContent from "./OrderContent";

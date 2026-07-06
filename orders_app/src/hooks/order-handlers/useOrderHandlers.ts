@@ -7,7 +7,7 @@ import {
 } from '@/rtk/api/firestoreApi'
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
-import { OrderType } from "@/types/order";
+import type { OrderType } from '@ordersync/types';
 import { skipToken } from '@reduxjs/toolkit/query';
 
 type OrderHandler = {
@@ -15,7 +15,7 @@ type OrderHandler = {
   deleteOrder: {
     handleDeleteOrder: (orderId: string | null, cancellationReason: string | null) => void;
     isLoading: boolean;
-    error: any;
+    error: unknown;
   }
   handleAcceptOrder: () => void;
   handleRejectOrder: () => void;

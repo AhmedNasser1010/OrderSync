@@ -1,5 +1,5 @@
-import { OrderType } from "@/types/order";
-import { MainMenuType } from "@/types/menu";
+import type { OrderType } from '@ordersync/types';
+import type { MainMenuType } from '@ordersync/types';
 import getMenuItemsAnalytics from "./getMenuItemsAnalytics";
 import getCategoryLevelAnalytics from "./getCategoryLevelAnalytics";
 
@@ -233,8 +233,8 @@ function extractDaySummary(
 
 export default extractDaySummary;
 
-// import { OrderType } from "@/types/order";
-// import { MainMenuType } from "@/types/menu";
+// import { OrderType } from '@ordersync/types';
+// import { MainMenuType } from '@ordersync/types';
 // import { DaySummaryType } from "@/lib/data_extract/types";
 // import calcOrderDurations from "./calcOrderDurations";
 // import getCustomerInsights from "./getCustomerInsights";

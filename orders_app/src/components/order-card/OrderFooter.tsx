@@ -1,7 +1,7 @@
 import ControlMenu from "./ControlMenu";
 import AssignOrder from "../assign-order-dialog/AssignOrder";
-import { OrderStatusType } from "@/types/order";
-import { MainTabTypes } from "@/types/components";
+import type { OrderStatusType, BusinessDocument } from '@ordersync/types';
+import type { MainTabTypes } from "@/types/orders";
 import { CardFooter } from "@/components/ui/card";
 import { useFetchRestaurantDataQuery } from "@/rtk/api/firestoreApi";
 import { accessToken } from "@/rtk/slices/constantsSlice";
@@ -23,7 +23,7 @@ export default function OrderFooter({ id, activeTabValue, status }: Props) {
   return (
     <CardFooter className="flex justify-between">
       <div className="flex space-x-1">
-        {printInvoice && <PrintInvoiceDialog orderId={id} activeTabValue={activeTabValue} restaurant={restaurant} />}
+        {printInvoice && <PrintInvoiceDialog orderId={id} activeTabValue={activeTabValue} restaurant={restaurant as BusinessDocument | undefined} />}
         {activeTabValue === "DELIVERY" && driverAssignment && <AssignOrder orderId={id} />}
       </div>
       <ControlMenu id={id} activeTabValue={activeTabValue} status={status} />

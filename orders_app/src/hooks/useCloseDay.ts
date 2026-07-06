@@ -10,9 +10,9 @@ import {
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
 import { closeDayPopup, setCloseDayPopup } from "@/rtk/slices/toggleSlice";
-import { OrderType } from "@/types/order";
+import type { OrderType } from '@ordersync/types';
+import type { MainMenuType } from '@ordersync/types';
 import extractDaySummary from "@/analytics/day_scope/extractDaySummary";
-import { MainMenuType } from "@/types/menu";
 import { skipToken } from "@reduxjs/toolkit/query";
 
 type UseCloseDay = {
@@ -24,7 +24,7 @@ type UseCloseDay = {
 
 type FetchOrdersType = {
   data?: OrderType[];
-  error?: any;
+  error?: string;
   isLoading?: boolean;
   isError?: boolean;
   refetch?: () => void;
@@ -32,7 +32,7 @@ type FetchOrdersType = {
 
 type FetchMenuType = {
   data?: MainMenuType;
-  error?: any;
+  error?: string;
   isLoading?: boolean;
   isError?: boolean;
 }

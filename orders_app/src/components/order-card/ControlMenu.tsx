@@ -1,4 +1,5 @@
-import { OrderStatusType } from "@/types/order";
+import type { OrderStatusType } from '@ordersync/types';
+import type { MainTabTypes } from "@/types/orders";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import useOrderHandler from "@/hooks/order-handlers/useOrderHandlers";
 import { useAppDispatch } from "@/rtk/hooks";
 import { setDeletePopup } from "@/rtk/slices/toggleSlice";
-import { MainTabTypes } from "@/types/components";
 
 type Props = {
   id: string;

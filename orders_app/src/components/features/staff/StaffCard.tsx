@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { type Driver } from "@/types/driver";
+import type { Driver } from '@ordersync/types';
 import DriverDuesDialog from "@/components/set-driver-dues-dialog/DriverDues";
 import { DeleteMemberDialog } from "./DeleteMemberDialog";
 import StatusToggle from "./StatusToggle";

@@ -7,13 +7,15 @@ import {
 } from "@/components/ui/dialog";
 import { useEffect, useRef, useState } from "react";
 import InvoiceDialogTrigger from "./InvoiceDialogTrigger";
-import { MainTabTypes } from "@/types/components";
+import type { MainTabTypes } from "@/types/orders";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Invoice from "./Invoice";
 import useOrders from "@/hooks/useOrders";
 import { useReactToPrint } from "react-to-print";
+import type { OrderType, ItemType } from '@ordersync/types';
+import type { BusinessDocument } from '@ordersync/types';
 
 export default function PrintInvoiceDialog({
   orderId,
@@ -22,11 +24,11 @@ export default function PrintInvoiceDialog({
 }: {
   orderId: string;
   activeTabValue: MainTabTypes;
-  restaurant: any;
+  restaurant: BusinessDocument | undefined;
 }) {
   const [open, setOpen] = useState(false);
-  const [order, setOrder] = useState<any>(null);
-  const [orderMenu, setOrderMenu] = useState<any>(null);
+  const [order, setOrder] = useState<OrderType | undefined>(undefined);
+  const [orderMenu, setOrderMenu] = useState<(ItemType & { quantity: number; selectedSize: string; discountCode: string; })[] | undefined>(undefined);
   const { getOrder, getOrderMenu, isLoading } = useOrders();
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({ contentRef });

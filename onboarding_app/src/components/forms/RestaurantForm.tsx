@@ -1,6 +1,6 @@
 "use client";
 
-import { Restaurant } from "@/lib/mock-data";
+import type { BusinessDocument } from "@ordersync/types";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { OwnerSection } from "./OwnerSection";
@@ -17,9 +17,10 @@ import { ChevronLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRestaurantForm } from "@/hooks/useRestaurantForm";
+import { useCallback } from "react";
 
 interface RestaurantFormProps {
-  initialData?: Restaurant;
+  initialData?: BusinessDocument;
   isNew?: boolean;
 }
 
@@ -30,9 +31,10 @@ export function RestaurantForm({
   const router = useRouter();
   const {
     formData,
+    phoneNumbers,
     isSubmitting,
     updateFormData,
-    updateNestedField,
+    setPhoneNumbers,
     handleSubmit,
   } = useRestaurantForm(initialData);
 
@@ -42,6 +44,21 @@ export function RestaurantForm({
       router.push("/restaurants");
     }
   };
+
+  const handleAdditionalChange = useCallback(
+    (data: { promotionalSubtitle: string; closeMsg: string }) => {
+      updateFormData({
+        business: { ...formData.business, promotionalSubtitle: data.promotionalSubtitle },
+      });
+      updateFormData({
+        settings: {
+          ...formData.settings,
+          siteControl: { ...formData.settings.siteControl, closeMsg: data.closeMsg },
+        },
+      });
+    },
+    [formData.business, formData.settings, updateFormData],
+  );
 
   return (
     <div className="bg-background pt-4">
@@ -81,52 +98,92 @@ export function RestaurantForm({
               onChange={(owner) => updateFormData({ owner })}
             />
             <RestaurantInfoSection
-              data={formData.info}
-              onChange={(info) => updateFormData({ info })}
+              data={{
+                name: formData.business.name,
+                nameInAr: formData.business.nameInAr,
+                icon: formData.business.icon,
+                cover: formData.business.cover,
+                industry: formData.business.industry,
+                cuisines: formData.business.cuisines,
+              }}
+              onChange={(info) =>
+                updateFormData({
+                  business: {
+                    ...formData.business,
+                    ...info,
+                  },
+                })
+              }
             />
             <CuisinesSection
-              cuisines={formData.info.cuisines}
+              cuisines={formData.business.cuisines}
               onChange={(cuisines) =>
-                updateFormData({ info: { ...formData.info, cuisines } })
+                updateFormData({
+                  business: { ...formData.business, cuisines },
+                })
               }
             />
             <AddressSection
-              data={formData.info.address}
-              onChange={(address) =>
-                updateFormData({ info: { ...formData.info, address } })
+              data={{
+                latitude: formData.business.latlng[0],
+                longitude: formData.business.latlng[1],
+              }}
+              onChange={({ latitude, longitude }) =>
+                updateFormData({
+                  business: {
+                    ...formData.business,
+                    latlng: [latitude, longitude],
+                  },
+                })
               }
             />
             <OpeningHoursSection
-              hours={formData.hours}
-              onChange={(hours) => updateFormData({ hours })}
-            />
-            <CookTimeSection
-              data={formData.cookTime}
-              onChange={(cookTime) => updateFormData({ cookTime })}
-            />
-            <ContactNumbersSection
-              phoneNumbers={formData.contact.phoneNumbers}
-              onChange={(phoneNumbers) =>
-                updateFormData({ contact: { phoneNumbers } })
+              hours={formData.services.openingHours}
+              onChange={(openingHours) =>
+                updateFormData({
+                  services: { ...formData.services, openingHours },
+                })
               }
             />
+            <CookTimeSection
+              data={formData.services.cookTime}
+              onChange={(cookTime) =>
+                updateFormData({
+                  services: { ...formData.services, cookTime },
+                })
+              }
+            />
+            <ContactNumbersSection
+              phoneNumbers={phoneNumbers}
+              onChange={setPhoneNumbers}
+            />
             <AdditionalInfoSection
-              data={formData.additional}
-              onChange={(additional) => updateFormData({ additional })}
+              data={{
+                promotionalSubtitle: formData.business.promotionalSubtitle,
+                closeMsg: formData.settings.siteControl.closeMsg,
+              }}
+              onChange={handleAdditionalChange}
             />
           </div>
 
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
             <PreviewCard
-              name={formData.info.name}
-              arabicName={formData.info.arabicName}
-              coverUrl={formData.info.coverUrl}
-              industry={formData.info.industry}
+              name={formData.business.name}
+              nameInAr={formData.business.nameInAr}
+              cover={formData.business.cover}
+              industry={formData.business.industry}
             />
             <SettingsPanel
-              settings={formData.settings}
-              onChange={(settings) => updateFormData({ settings })}
+              settings={formData.settings.orderManagement}
+              onChange={(orderManagement) =>
+                updateFormData({
+                  settings: {
+                    ...formData.settings,
+                    orderManagement,
+                  },
+                })
+              }
             />
           </div>
         </div>

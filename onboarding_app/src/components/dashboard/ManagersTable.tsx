@@ -23,9 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
-import type { ManagerDocument } from "@/rtk/api/firestoreApi";
-
-export type ManagerUser = ManagerDocument;
+import type { ManagerUser } from "@ordersync/types";
 
 interface ManagersTableProps {
   managers: ManagerUser[];
@@ -111,13 +109,10 @@ export function ManagersTable({
             {managers.map((manager) => {
               const name =
                 manager.userInfo?.name ||
-                manager.owner?.name ||
                 manager.userInfo?.email?.split("@")[0] ||
                 "Unknown";
-              const email =
-                manager.userInfo?.email || manager.owner?.email || "";
-              const phone =
-                manager.userInfo?.phone || manager.owner?.phone || "";
+              const email = manager.userInfo?.email || "";
+              const phone = manager.userInfo?.phone || "";
               const role = manager.userInfo?.role || "MANAGER";
 
               return (

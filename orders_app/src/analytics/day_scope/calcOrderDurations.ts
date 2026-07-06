@@ -1,4 +1,4 @@
-import { OrderType } from "@/types/order";
+import type { OrderType } from '@ordersync/types';
 import { OrderDurationsType } from "@/analytics/types";
 import getAverage from "@/lib/getAverage";
 

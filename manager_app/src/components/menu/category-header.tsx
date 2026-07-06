@@ -12,7 +12,7 @@ import { Trash } from "lucide-react";
 import { useState } from "react";
 import { ActionsMenu } from "@/components/ui/actions-menu";
 import { ImageEditDialog } from "@/components/ui/image-edit-dialog";
-import { MenuCategory } from "@/lib/types/types";
+import type { MenuCategory } from "@/lib/types/types";
 
 interface CategoryHeaderProps {
   category: MenuCategory;
@@ -75,7 +75,7 @@ export function CategoryHeader({
             <h3 className="font-semibold text-foreground line-clamp-2">
               {category.title}
             </h3>
-            {category.visible === false && (
+            {category.visibility === false && (
               <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/10 px-2 py-0.5 text-xs text-muted-foreground">
                 <EyeOff size={14} />
                 Hidden
@@ -96,9 +96,9 @@ export function CategoryHeader({
           items={[
             {
               key: "toggleVisibility",
-              label: category.visible ? "Hide from menu" : "Show in menu",
+              label: category.visibility ? "Hide from menu" : "Show in menu",
               onClick: onToggleVisibility,
-              icon: category.visible ? <Eye size={14} /> : <EyeOff size={14} />,
+              icon: category.visibility ? <Eye size={14} /> : <EyeOff size={14} />,
             },
             {
               key: "moveUp",

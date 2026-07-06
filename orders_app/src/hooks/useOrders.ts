@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect, useCallback } from "react";
-import { OrderType, FormattedOrderType, CartItemType } from "@/types/order";
-import { ItemType } from "@/types/menu";
+import type { OrderType } from '@ordersync/types';
+import type { ItemType } from '@ordersync/types';
+import type { FormattedOrderType, CartItemType } from "@/types/orders";
 import {
   useFetchUserDataQuery,
   useFetchOpenOrdersDataQuery,
@@ -16,14 +17,14 @@ import { skipToken } from "@reduxjs/toolkit/query";
 type UseOrders = {
   orders: OrderType[] | null;
   formattedOrders: FormattedOrderType[] | null;
-  getOrderMenu: (orderCart: CartItemType[]) => any[];
+  getOrderMenu: (orderCart: CartItemType[]) => (ItemType & CartItemType)[];
   getOrder: (id: string) => OrderType | undefined;
   isLoading: boolean;
 };
 
 type FetchOrdersType = {
   data?: OrderType[];
-  error?: any;
+  error?: string;
   isLoading?: boolean;
   isError?: boolean;
   refetch?: () => void;
@@ -114,7 +115,7 @@ const useOrders = (): UseOrders => {
         customer: order.customer.name,
         total: `$${order.cartTotalPrice.total.toFixed(2)}`,
         status: order.status.current,
-        accepted: order.status.accepted,
+        accepted: order.accepted,
         items: getOrderMenu(order.cart)
           .map((item) => `${item?.quantity}x ${item?.title}`)
           .join(", "),

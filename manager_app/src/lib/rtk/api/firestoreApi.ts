@@ -8,9 +8,13 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { User, MenuData, MenuDocument } from "@/lib/types/types";
-import { OrderType } from "@/../../types/order";
-import { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
+import type {
+  ManagerUser,
+  MainMenuType,
+  BusinessDocument,
+} from "@ordersync/types";
+import type { OrderType } from "@ordersync/types";
+import type { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
@@ -26,7 +30,7 @@ export const firestoreApi = createApi({
   ],
   endpoints: (builder) => ({
     // Query Endpoints
-    fetchUserData: builder.query<User, string>({
+    fetchUserData: builder.query<ManagerUser, string>({
       async queryFn(userUid) {
         try {
           const ref = doc(db, "users", userUid);
@@ -35,46 +39,52 @@ export const firestoreApi = createApi({
           if (!docSnapshot.exists()) {
             return { error: "User not found" };
           }
-          const userData = docSnapshot.data() as User;
+          const userData = docSnapshot.data() as ManagerUser;
           return { data: userData };
-        } catch (error: any) {
-          console.error(error.message);
-          return { error: error.message };
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["User"],
     }),
-    fetchMenuData: builder.query({
+    fetchMenuData: builder.query<MainMenuType | undefined, string>({
       async queryFn(resId) {
         try {
           const menuRef = doc(db, "menus", resId);
           const menuSnapshot = await getDoc(menuRef);
-          const menu = menuSnapshot.data();
+          const menu = menuSnapshot.data() as MainMenuType | undefined;
           console.log("Read Operation [fetchMenuData]");
           return { data: menu };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["Menu"],
     }),
-    fetchRestaurantData: builder.query({
+    fetchRestaurantData: builder.query<BusinessDocument | undefined, string>({
       async queryFn(resId) {
         try {
           const resRef = doc(db, "businesses", resId);
           const resSnapshot = await getDoc(resRef);
-          const restaurant = resSnapshot.data();
+          const restaurant = resSnapshot.data() as BusinessDocument | undefined;
           console.log("Read Operation [fetchRestaurantData]");
           return { data: restaurant };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["Restaurant"],
     }),
-    fetchCompletedOrdersData: builder.query({
+    fetchCompletedOrdersData: builder.query<OrderType[], string>({
       async queryFn(resId) {
         try {
           const completedOrdersRef = collection(
@@ -84,19 +94,21 @@ export const firestoreApi = createApi({
             "completedOrders",
           );
           const completedOrdersSnapshot = await getDocs(completedOrdersRef);
-          const completedOrders = completedOrdersSnapshot.docs.map((doc) =>
-            doc.data(),
+          const completedOrders = completedOrdersSnapshot.docs.map(
+            (doc) => doc.data() as OrderType,
           );
           console.log("Read Operation [completedOrders]");
           return { data: completedOrders };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["CompletedOrders"],
     }),
-    fetchVoidedOrdersData: builder.query({
+    fetchVoidedOrdersData: builder.query<OrderType[], string>({
       async queryFn(resId) {
         try {
           const voidedOrdersRef = collection(
@@ -106,14 +118,16 @@ export const firestoreApi = createApi({
             "voidedOrders",
           );
           const voidedOrdersSnapshot = await getDocs(voidedOrdersRef);
-          const voidedOrders = voidedOrdersSnapshot.docs.map((doc) =>
-            doc.data(),
+          const voidedOrders = voidedOrdersSnapshot.docs.map(
+            (doc) => doc.data() as OrderType,
           );
           console.log("Read Operation [voidedOrders]");
           return { data: voidedOrders };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["VoidedOrders"],
@@ -149,27 +163,27 @@ export const firestoreApi = createApi({
       },
       providesTags: ["OpenQueue"],
     }),
-    fetchHistoryOrdersData: builder.query({
+    fetchHistoryOrdersData: builder.query<OrderType[], string>({
       async queryFn(resId) {
         try {
           const historyOrdersRef = collection(db, "orders", resId, "history");
           const historyOrdersSnapshot = await getDocs(historyOrdersRef);
-          const historyOrders = historyOrdersSnapshot.docs.map((doc) =>
-            doc.data(),
+          const historyOrders = historyOrdersSnapshot.docs.map(
+            (doc) => doc.data() as OrderType,
           );
           console.log("Read Operation [historyOrders]");
           return { data: historyOrders };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["HistoryOrders"],
     }),
     fetchOrdersDailySummarizationData: builder.query<AnalyticsEntry[], string>({
-      async queryFn(
-        resId,
-      ): Promise<{ data: AnalyticsEntry[] } | { error: string }> {
+      async queryFn(resId) {
         try {
           const dailySummarizationRef = collection(
             db,
@@ -185,10 +199,12 @@ export const firestoreApi = createApi({
           );
           console.log("Read Operation [dailySummarizationOrders]");
           return { data: dailySummarization };
-        } catch (error: any) {
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error(error);
-          console.error(error?.stack);
-          return { error: error?.message };
+          console.error(error instanceof Error ? error.stack : undefined);
+          return { error: message };
         }
       },
       providesTags: ["DailySummarizationOrders"],
@@ -196,7 +212,7 @@ export const firestoreApi = createApi({
 
     syncMenuData: builder.mutation<
       { synced: true },
-      { resId: string; menu: MenuDocument }
+      { resId: string; menu: MainMenuType }
     >({
       async queryFn({ resId, menu }) {
         try {
@@ -206,9 +222,11 @@ export const firestoreApi = createApi({
           await batch.commit();
           console.log("Write Operation [syncMenuData]");
           return { data: { synced: true } };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
         }
       },
       invalidatesTags: ["Menu"],

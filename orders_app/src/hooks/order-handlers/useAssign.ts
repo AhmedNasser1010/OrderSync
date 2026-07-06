@@ -6,13 +6,13 @@ import {
   useFetchOpenOrdersDataQuery,
   useFetchDriversDataQuery
 } from "@/rtk/api/firestoreApi";
-import { Driver } from "@/types/driver";
+import type { Driver } from '@ordersync/types';
 import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function useAssign() {
   const resAccessToken = useAppSelector(accessToken);
   const { data: ordersData } = useFetchOpenOrdersDataQuery(resAccessToken ?? skipToken);
-  const { data: driversData } = useFetchDriversDataQuery(resAccessToken) as { data: Driver[] };
+  const { data: driversData } = useFetchDriversDataQuery(resAccessToken) as { data: Driver[] | undefined }; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
   const [submitOrder, { isSuccess, reset }] = useAssignOrderToDriverMutation();
   const callbackRef = useRef<(() => void) | null>(null);
 

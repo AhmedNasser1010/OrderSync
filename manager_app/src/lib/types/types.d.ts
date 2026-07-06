@@ -1,3 +1,5 @@
+import type { CategoryType, ItemType } from "@ordersync/types";
+
 export type StatusType = "good" | "warning" | "alert";
 
 export interface KPIData {
@@ -62,6 +64,13 @@ export interface PaymentMethod {
   orders: number;
 }
 
+export interface OrderSource {
+  name: string;
+  orders: number;
+  percentage: number;
+  status: StatusType;
+}
+
 export interface BusinessHealthData {
   score: number;
   maxScore: number;
@@ -89,43 +98,8 @@ export interface DashboardData {
   businessHealth: BusinessHealthData;
 }
 
-export interface MenuItem {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  sizes?: { size: string; price: string | number }[];
-  category: string;
-  visible: boolean;
-  featured: boolean;
-  timestamp: number;
-  discount?: {
-    type: "percentage" | "fixed";
-    value: number;
-    active: boolean;
-  };
-  backgrounds?: string[];
-  promotionRules?: PromotionRule[];
-}
-
-export interface PromotionRule {
-  id: string;
-  name: string;
-  type: "total_spent" | "first_purchase" | "quantity" | "order_count";
-  threshold: number;
-  active: boolean;
-}
-
-export interface MenuCategory {
-  id: string;
-  title: string;
-  description: string;
-  visible: boolean;
-  featured: boolean;
-  timestamp: number;
-  items: MenuItem[];
-  position: number;
-  backgrounds?: string[];
+export interface MenuCategory extends CategoryType {
+  items: ItemType[];
 }
 
 export interface MenuData {
@@ -133,24 +107,4 @@ export interface MenuData {
   lastSynced: string;
 }
 
-export interface MenuDocument {
-  categories: Omit<MenuCategory, "items">[];
-  items: MenuItem[];
-  lastSynced: string;
-  accessToken?: string;
-}
-
-export interface UserInfo {
-  email: string;
-  role: "BUSINESS_MANAGER";
-  uid: string;
-  name: string;
-  phone: string;
-}
-
-export interface User {
-  joinDate: number;
-  userInfo: UserInfo;
-  accessToken: string;
-  partnerUid: string;
-}
+export type { ItemType, CategoryType };

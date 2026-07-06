@@ -1,4 +1,4 @@
-import { OrderType } from "@/types/order";
+import type { OrderType } from '@ordersync/types';
 import { CustomerInsightsType } from "@/analytics/types";
 
 export default function getCustomerInsights(

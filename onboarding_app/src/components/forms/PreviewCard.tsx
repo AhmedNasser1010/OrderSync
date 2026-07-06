@@ -6,15 +6,15 @@ import { Badge } from "@/components/ui/badge";
 
 interface PreviewCardProps {
   name: string;
-  arabicName: string;
-  coverUrl: string;
-  industry: "restaurant" | "coffee-shop";
+  nameInAr: string;
+  cover: string;
+  industry: string;
 }
 
 export function PreviewCard({
   name,
-  arabicName,
-  coverUrl,
+  nameInAr,
+  cover,
   industry,
 }: PreviewCardProps) {
   return (
@@ -23,9 +23,9 @@ export function PreviewCard({
 
       {/* Cover Image */}
       <div className="relative w-full h-40 bg-secondary/30 rounded-lg mb-4 flex items-center justify-center border-2 border-dashed border-border overflow-hidden">
-        {coverUrl ? (
+        {cover ? (
           <Image
-            src={coverUrl}
+            src={cover}
             alt={name}
             fill
             className="object-cover"
@@ -45,7 +45,7 @@ export function PreviewCard({
             {name || "Restaurant Name"}
           </h3>
           <p className="text-sm text-muted-foreground">
-            {arabicName || "الاسم بالعربية"}
+            {nameInAr || "الاسم بالعربية"}
           </p>
         </div>
 

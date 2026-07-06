@@ -6,32 +6,45 @@ import { Label } from "@/components/ui/label";
 
 interface SettingsPanelProps {
   settings: {
-    assignOrdersToCook: boolean;
-    assignOrdersToDelivery: boolean;
-    automaticDeliveryAssignment: boolean;
+    assign: {
+      forCooks: boolean;
+      forDeliveryWorkers: boolean;
+    };
+    driverAssignment: boolean;
     printInvoice: boolean;
   };
-  onChange: (settings: any) => void;
+  onChange: (settings: {
+    assign: { forCooks: boolean; forDeliveryWorkers: boolean };
+    driverAssignment: boolean;
+    printInvoice: boolean;
+  }) => void;
 }
 
 export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
   const handleChange = (field: string, value: boolean) => {
-    onChange({ ...settings, [field]: value });
+    if (field === "forCooks" || field === "forDeliveryWorkers") {
+      onChange({
+        ...settings,
+        assign: { ...settings.assign, [field]: value },
+      });
+    } else {
+      onChange({ ...settings, [field]: value });
+    }
   };
 
   const settingsList = [
     {
-      id: "assignOrdersToCook",
+      id: "forCooks",
       label: "Assign to Cook",
       description: "Automatically assign orders to kitchen staff",
     },
     {
-      id: "assignOrdersToDelivery",
+      id: "forDeliveryWorkers",
       label: "Assign to Delivery",
       description: "Automatically assign delivery orders",
     },
     {
-      id: "automaticDeliveryAssignment",
+      id: "driverAssignment",
       label: "Auto Delivery Assignment",
       description: "Automatically match delivery riders",
     },
@@ -41,6 +54,21 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
       description: "Print invoices for each order",
     },
   ];
+
+  const getValue = (id: string): boolean => {
+    switch (id) {
+      case "forCooks":
+        return settings.assign.forCooks;
+      case "forDeliveryWorkers":
+        return settings.assign.forDeliveryWorkers;
+      case "driverAssignment":
+        return settings.driverAssignment;
+      case "printInvoice":
+        return settings.printInvoice;
+      default:
+        return false;
+    }
+  };
 
   return (
     <Card className="p-6 bg-card border-border sticky top-32">
@@ -57,7 +85,7 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
               </p>
             </div>
             <Switch
-              checked={settings[setting.id as keyof typeof settings]}
+              checked={getValue(setting.id)}
               onCheckedChange={(value) => handleChange(setting.id, value)}
             />
           </div>

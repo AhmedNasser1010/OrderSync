@@ -1,1 +1,0 @@
-export type RestaurantStatusTypes = "active" | "inactive" | "busy" | "pause";

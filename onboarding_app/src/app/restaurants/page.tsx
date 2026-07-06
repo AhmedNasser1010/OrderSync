@@ -15,8 +15,6 @@ import {
   useFetchBusinessesQuery,
   useDeleteBusinessMutation,
 } from "@/rtk/api/firestoreApi";
-import type { BusinessDocument } from "@/rtk/api/firestoreApi";
-import type { Restaurant } from "@/lib/mock-data";
 
 const COOLDOWN_DURATION = 5; // seconds
 
@@ -78,30 +76,25 @@ export default function RestaurantsPage() {
   }, [cooldown]);
   const [deleteBusiness] = useDeleteBusinessMutation();
 
-  const restaurants = useMemo(
-    () => businesses.map(mapBusinessToRestaurant),
-    [businesses],
-  );
-
   const filteredRestaurants = useMemo(() => {
-    return restaurants.filter((restaurant) => {
+    return businesses.filter((restaurant) => {
       const matchesSearch =
         !searchTerm ||
-        restaurant.info.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        restaurant.info.arabicName.includes(searchTerm) ||
-        restaurant.owner.name.toLowerCase().includes(searchTerm.toLowerCase());
+        restaurant.business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        restaurant.business.nameInAr.includes(searchTerm) ||
+        (restaurant.owner.name ?? "").toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesIndustry =
-        !industryFilter || restaurant.info.industry === industryFilter;
+        !industryFilter || restaurant.business.industry === industryFilter;
       const matchesStatus = !statusFilter || restaurant.status === statusFilter;
 
       return matchesSearch && matchesIndustry && matchesStatus;
     });
-  }, [restaurants, searchTerm, industryFilter, statusFilter]);
+  }, [businesses, searchTerm, industryFilter, statusFilter]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (accessToken: string) => {
     if (!authUser) return;
-    await deleteBusiness({ accessToken: id, userUid: authUser.uid }).unwrap();
+    await deleteBusiness({ accessToken, userUid: authUser.uid }).unwrap();
   };
 
   return (
@@ -156,79 +149,4 @@ export default function RestaurantsPage() {
       </div>
     </MainLayout>
   );
-}
-
-function mapBusinessToRestaurant(business: BusinessDocument): Restaurant {
-  const owner = business.owner ?? {};
-  const ownerName =
-    [owner?.basic?.fName, owner?.basic?.lName]
-      .filter(Boolean)
-      .join(" ")
-      .trim() ||
-    owner?.name ||
-    owner?.contact?.name ||
-    "";
-  const ownerEmail = owner?.email || owner?.contact?.email || "";
-  const ownerPhone = owner?.phone || owner?.contact?.phone || "";
-  const industry: Restaurant["info"]["industry"] =
-    business.business?.industry === "coffee-shop"
-      ? "coffee-shop"
-      : "restaurant";
-
-  return {
-    id: business.accessToken,
-    owner: {
-      name: ownerName || ownerEmail || "Unknown",
-      email: ownerEmail,
-      phone: ownerPhone,
-      userId: owner?.uid ?? "",
-    },
-    info: {
-      name: business.business?.name ?? "",
-      arabicName: business.business?.nameInAr ?? "",
-      iconUrl: business.business?.icon ?? "",
-      coverUrl: business.business?.cover ?? "",
-      industry,
-      cuisines: business.business?.cuisines ?? [],
-      address: {
-        latitude: business.business?.latlng?.[0] ?? 0,
-        longitude: business.business?.latlng?.[1] ?? 0,
-      },
-    },
-    hours: Object.entries(business.services?.openingHours ?? {}).map(
-      ([day, value]) => ({
-        day: day.charAt(0).toUpperCase() + day.slice(1),
-        openTime: value?.start ?? "",
-        closeTime: value?.end ?? "",
-        closed: !(value?.start && value?.end),
-      }),
-    ) as Restaurant["hours"],
-    cookTime: {
-      min: business.services?.cookTime?.[0] ?? 0,
-      max: business.services?.cookTime?.[1] ?? 0,
-    },
-    settings: {
-      assignOrdersToCook:
-        !!business.settings?.orderManagement?.assign?.forCooks,
-      assignOrdersToDelivery:
-        !!business.settings?.orderManagement?.assign?.forDeliveryWorkers,
-      automaticDeliveryAssignment:
-        !!business.settings?.orderManagement?.driverAssignment,
-      printInvoice: !!business.settings?.orderManagement?.printInvoice,
-    },
-    contact: {
-      phoneNumbers: ownerPhone ? [ownerPhone] : [],
-    },
-    additional: {
-      promotionalSubtitle: business.business?.promotionalSubtitle ?? "",
-      closeMessage: business.settings?.siteControl?.closeMsg ?? "",
-    },
-    status: business.settings?.siteControl?.status || "inactive",
-    lastUpdated:
-      business.lastUpdate?.date && business.lastUpdate?.time
-        ? new Date(
-            `${business.lastUpdate.date}T${business.lastUpdate.time}`,
-          ).toISOString()
-        : new Date().toISOString(),
-  };
 }

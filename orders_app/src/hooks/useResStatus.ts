@@ -5,13 +5,13 @@ import {
 } from "@/rtk/api/firestoreApi";
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { useSetRestaurantStatusMutation } from "@/rtk/api/firestoreApi";
-import { RestaurantStatusTypes } from "@/types/restaurant";
+import type { RestaurantStatusTypes } from '@ordersync/types';
 import { skipToken } from "@reduxjs/toolkit/query";
 
 type UseResStatus = {
   toggleResStatus: () => void;
   isLoading: boolean;
-  error: any;
+  error: unknown;
   currentStatus: RestaurantStatusTypes;
   isAvailableFeature: boolean;
 };

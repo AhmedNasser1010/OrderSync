@@ -16,8 +16,9 @@ import { Separator } from "@/components/ui/separator";
 import { TypographyH3 } from "@/components/ui/typography";
 import Link from "next/link";
 import Page from "@/components/Page";
-import { OrderType, OrderStatusType } from "@/types/order";
-import { ItemType } from "@/types/menu";
+import type { OrderType, OrderStatusType } from '@ordersync/types';
+import type { ItemType, BusinessDocument } from '@ordersync/types';
+import type { CartItemType } from "@/types/orders";
 import useOrders from "@/hooks/useOrders";
 import Image from "next/image";
 import { useAppSelector } from "@/rtk/hooks";
@@ -45,7 +46,7 @@ export default function OrderDetails({
     skip: !resAccessToken,
   });
   const [order, setOrder] = useState<OrderType | null>(null);
-  const [orderCart, setOrderCart] = useState<ItemType[] | null>(null);
+  const [orderCart, setOrderCart] = useState<(ItemType & CartItemType)[] | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const printInvoice = useReactToPrint({ contentRef });
 
@@ -254,7 +255,7 @@ export default function OrderDetails({
           <ScrollArea className="h-[500px] rounded-md border border-border">
             <Invoice
               contentRef={contentRef}
-              restaurant={restaurant}
+              restaurant={restaurant as BusinessDocument}
               order={order}
               orderMenu={orderCart}
             />

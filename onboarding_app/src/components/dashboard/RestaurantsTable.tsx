@@ -21,13 +21,13 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
-import type { Restaurant } from "@/lib/mock-data";
+import type { BusinessDocument } from "@ordersync/types";
 import { DeleteDialog } from "./DeleteDialog";
 import { format } from "date-fns";
 
 interface RestaurantsTableProps {
-  restaurants: Restaurant[];
-  onDelete: (id: string) => void | Promise<void>;
+  restaurants: BusinessDocument[];
+  onDelete: (accessToken: string) => void | Promise<void>;
   isLoading?: boolean;
   isError?: boolean;
 }
@@ -40,16 +40,16 @@ export function RestaurantsTable({
 }: RestaurantsTableProps) {
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
-    id: string | null;
+    accessToken: string | null;
   }>({
     open: false,
-    id: null,
+    accessToken: null,
   });
 
   const handleDeleteConfirm = () => {
-    if (deleteDialog.id) {
-      onDelete(deleteDialog.id);
-      setDeleteDialog({ open: false, id: null });
+    if (deleteDialog.accessToken) {
+      onDelete(deleteDialog.accessToken);
+      setDeleteDialog({ open: false, accessToken: null });
     }
   };
 
@@ -111,22 +111,22 @@ export function RestaurantsTable({
           <TableBody>
             {restaurants.map((restaurant) => (
               <TableRow
-                key={restaurant.id}
+                key={restaurant.accessToken}
                 className="border-border hover:bg-secondary/50"
               >
                 <TableCell className="py-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-primary">
-                        {restaurant.info.name.charAt(0)}
+                        {restaurant.business.name.charAt(0)}
                       </span>
                     </div>
                     <div>
                       <p className="font-medium text-foreground">
-                        {restaurant.info.name}
+                        {restaurant.business.name}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {restaurant.info.arabicName}
+                        {restaurant.business.nameInAr}
                       </p>
                     </div>
                   </div>
@@ -134,7 +134,7 @@ export function RestaurantsTable({
                 <TableCell className="py-4">
                   <div>
                     <p className="text-sm text-foreground">
-                      {restaurant.owner.name}
+                      {restaurant.owner.name ?? restaurant.owner.email}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       {restaurant.owner.email}
@@ -143,7 +143,7 @@ export function RestaurantsTable({
                 </TableCell>
                 <TableCell className="py-4">
                   <Badge variant="outline" className="capitalize">
-                    {restaurant.info.industry.replace("-", " ")}
+                    {restaurant.business.industry.replace("-", " ")}
                   </Badge>
                 </TableCell>
                 <TableCell className="py-4">
@@ -175,7 +175,7 @@ export function RestaurantsTable({
                 </TableCell>
                 <TableCell className="py-4 text-sm text-muted-foreground">
                   {format(
-                    new Date(restaurant.lastUpdated),
+                    new Date(restaurant.updatedOn),
                     "MMM dd, yyyy hh:mm a",
                   )}
                 </TableCell>
@@ -187,7 +187,9 @@ export function RestaurantsTable({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <Link href={`/restaurants/${restaurant.id}/edit`}>
+                      <Link
+                        href={`/restaurants/${restaurant.accessToken}/edit`}
+                      >
                         <DropdownMenuItem className="cursor-pointer">
                           <Edit className="mr-2 h-4 w-4" />
                           <span>Edit</span>
@@ -197,7 +199,10 @@ export function RestaurantsTable({
                       <DropdownMenuItem
                         className="text-destructive cursor-pointer"
                         onClick={() =>
-                          setDeleteDialog({ open: true, id: restaurant.id })
+                          setDeleteDialog({
+                            open: true,
+                            accessToken: restaurant.accessToken,
+                          })
                         }
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
@@ -215,7 +220,9 @@ export function RestaurantsTable({
       {/* Delete Dialog */}
       <DeleteDialog
         open={deleteDialog.open}
-        onOpenChange={(open) => setDeleteDialog({ open, id: deleteDialog.id })}
+        onOpenChange={(open) =>
+          setDeleteDialog({ open, accessToken: deleteDialog.accessToken })
+        }
         onConfirm={handleDeleteConfirm}
       />
     </>

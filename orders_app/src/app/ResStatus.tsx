@@ -1,6 +1,6 @@
 "use client";
 
-import { RestaurantStatusTypes } from "@/types/restaurant";
+import type { RestaurantStatusTypes } from '@ordersync/types';
 import useResStatus from "@/hooks/useResStatus";
 
 const getStatusColor = (status: RestaurantStatusTypes) => {

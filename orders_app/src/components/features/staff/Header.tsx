@@ -2,7 +2,7 @@ import { Search, Users, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { type Driver } from "@/types/driver";
+import type { Driver } from '@ordersync/types';
 
 export function Header({
   staff,

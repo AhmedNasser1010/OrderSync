@@ -18,7 +18,7 @@ interface UseAuthReturn {
   isAuthLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  authError: any;
+  authError: Error | null;
   authErrorMsg: string | null;
   authListener: () => Promise<FirebaseUser | null>;
 }
@@ -28,7 +28,7 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
   const dispatch = useAppDispatch();
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const isAuthLoading = useAppSelector(isAuthLoadingStatus)
-  const [authError, setAuthError] = useState<any>(null);
+  const [authError, setAuthError] = useState<Error | null>(null);
   const [authErrorMsg, setAuthErrorMsg] = useState<string | null>(null);
   const uid = useAppSelector(userUid);
   const { data: userFetchData } = useFetchUserDataQuery(uid ?? skipToken);
@@ -49,13 +49,14 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
     }
   }, [userFetchData]);
 
-  const onFailedLogin = useCallback((error: any) => {
+  const onFailedLogin = useCallback((error: unknown) => {
     dispatch(setIsAuthLoading(false));
-    setAuthError(error);
+    setAuthError(error instanceof Error ? error : new Error(String(error)));
     autoNavigate && router.push('./login')
 
-    if (authError?.code) {
-      switch (authError.code) {
+    const err = error as { code?: string } | null;
+    if (err?.code) {
+      switch (err.code) {
         case "auth/invalid-credential":
           setAuthErrorMsg(
             "Invalid credential, Please check your email and password"
@@ -66,7 +67,7 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
           break;
         default:
           setAuthErrorMsg("An error occurred");
-          console.error("An error occurred: ", authError);
+          console.error("An error occurred: ", error);
           break;
       }
     }

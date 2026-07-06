@@ -9,7 +9,7 @@ interface AddressSectionProps {
     latitude: number;
     longitude: number;
   };
-  onChange: (data: any) => void;
+  onChange: (data: { latitude: number; longitude: number }) => void;
 }
 
 export function AddressSection({ data, onChange }: AddressSectionProps) {

@@ -10,12 +10,12 @@ import { getUserUid } from "@/app/actions/getUserUid";
 
 interface OwnerSectionProps {
   data: {
-    name: string;
+    uid: string;
     email: string;
     phone: string;
-    userId: string;
+    name?: string;
   };
-  onChange: (data: { name: string; email: string; phone: string; userId: string }) => void;
+  onChange: (data: { uid: string; email: string; phone: string; name?: string }) => void;
 }
 
 function isValidEmail(email: string): boolean {
@@ -45,7 +45,7 @@ export function OwnerSection({ data, onChange }: OwnerSectionProps) {
       const result = await getUserUid(data.email);
 
       if (result.uid) {
-        onChange({ ...data, userId: result.uid });
+        onChange({ ...data, uid: result.uid });
       } else {
         setFetchError(
           result.error || "No user found with this email address"
@@ -133,10 +133,10 @@ export function OwnerSection({ data, onChange }: OwnerSectionProps) {
             User ID
           </Label>
           <Input
-            id="owner-userid"
-            value={data.userId}
-            onChange={(e) => handleChange("userId", e.target.value)}
-            placeholder="e.g. user_1"
+          id="owner-uid"
+          value={data.uid}
+          onChange={(e) => handleChange("uid", e.target.value)}
+          placeholder="e.g. user_1"
             className="mt-1.5"
           />
           <p className="text-sm text-muted-foreground mt-1.5">

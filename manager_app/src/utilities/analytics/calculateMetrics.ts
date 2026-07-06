@@ -1,4 +1,4 @@
-import { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
+import type { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
 
 export const calculateMetrics = (data: AnalyticsEntry[]) => {
   const totalRevenue = data.reduce((sum, day) => sum + day.totalRevenue, 0);

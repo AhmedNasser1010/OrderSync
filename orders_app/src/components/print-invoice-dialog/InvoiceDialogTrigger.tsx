@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MainTabTypes } from "@/types/components";
+import type { MainTabTypes } from "@/types/orders";
 import { Printer } from "lucide-react";
 import { DialogTrigger } from "@/components/ui/dialog";
 

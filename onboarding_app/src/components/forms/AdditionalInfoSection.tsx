@@ -8,9 +8,9 @@ import { Label } from "@/components/ui/label";
 interface AdditionalInfoSectionProps {
   data: {
     promotionalSubtitle: string;
-    closeMessage: string;
+    closeMsg: string;
   };
-  onChange: (data: any) => void;
+  onChange: (data: { promotionalSubtitle: string; closeMsg: string }) => void;
 }
 
 export function AdditionalInfoSection({
@@ -49,9 +49,9 @@ export function AdditionalInfoSection({
             Closed Message
           </Label>
           <Textarea
-            id="close-message"
-            value={data.closeMessage}
-            onChange={(e) => handleChange("closeMessage", e.target.value)}
+          id="close-msg"
+          value={data.closeMsg}
+          onChange={(e) => handleChange("closeMsg", e.target.value)}
             placeholder="Thank you for visiting. We are closed now."
             className="mt-1.5 min-h-24"
           />

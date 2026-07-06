@@ -10,131 +10,15 @@ import {
   updateDoc,
   writeBatch,
   runTransaction,
+  FirestoreError,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { deleteAuthUser } from "@/app/actions/deleteAuthUser";
-import { RestaurantStatusTypes } from "@/types/restaurant";
-
-export interface BusinessSettings {
-  siteControl?: {
-    closeMsg?: string;
-    availability?: boolean;
-    autoAvailability?: boolean;
-    isBusy?: boolean;
-    temporaryPause?: boolean;
-    status?: RestaurantStatusTypes;
-  };
-  orderManagement?: {
-    assign?: {
-      forCooks?: boolean;
-      forDeliveryWorkers?: boolean;
-    };
-    driverAssignment?: boolean;
-    printInvoice?: boolean;
-  };
-}
-
-export interface BusinessDocument {
-  accessToken: string;
-  partnerUid?: string;
-  owner?: {
-    uid?: string;
-    name?: string;
-    email?: string;
-    phone?: string;
-    basic?: {
-      fName?: string;
-      lName?: string;
-      age?: string;
-      gender?: string;
-    };
-    contact?: {
-      email?: string;
-      phone?: string;
-      address?: string;
-      name?: string;
-    };
-  };
-  business?: {
-    name?: string;
-    nameInAr?: string;
-    industry?: string;
-    address?: string;
-    latlng?: [number, number];
-    cover?: string;
-    icon?: string;
-    promotionalSubtitle?: string;
-    cuisines?: string[];
-  };
-  services?: {
-    openingHours?: Record<
-      string,
-      {
-        start?: string;
-        end?: string;
-        closed?: boolean;
-      }
-    >;
-    cookTime?: [number, number];
-    paymentMethods?: Record<string, boolean>;
-  };
-  settings?: BusinessSettings;
-  status?: RestaurantStatusTypes;
-  lastUpdate?: {
-    time: string;
-    date: string;
-  };
-  createdOn?: string;
-}
-
-export interface CreateBusinessInput {
-  business: BusinessDocument;
-  user: {
-    uid: string;
-    email: string;
-    name?: string;
-    phone?: string;
-    secondPhone?: string;
-    displayName?: string | null;
-    phoneNumber?: string | null;
-  };
-}
-
-function normalizeBusinessOwner(
-  owner: BusinessDocument["owner"] | undefined,
-  fallbackUser?: CreateBusinessInput["user"],
-) {
-  const ownerName =
-    owner?.name ??
-    owner?.contact?.name ??
-    fallbackUser?.name ??
-    fallbackUser?.displayName ??
-    "";
-  const ownerEmail =
-    owner?.email ?? owner?.contact?.email ?? fallbackUser?.email ?? "";
-  const ownerPhone =
-    owner?.phone ??
-    owner?.contact?.phone ??
-    fallbackUser?.phone ??
-    fallbackUser?.phoneNumber ??
-    "";
-
-  return {
-    uid: owner?.uid ?? fallbackUser?.uid ?? "",
-    name: ownerName,
-    email: ownerEmail,
-    phone: ownerPhone,
-    basic: owner?.basic ?? {
-      fName: "",
-      lName: "",
-    },
-    contact: {
-      name: ownerName,
-      email: ownerEmail,
-      phone: ownerPhone,
-    },
-  };
-}
+import type {
+  RestaurantStatusTypes,
+  BusinessDocument,
+  ManagerUser,
+} from "@ordersync/types";
 
 export interface UpdateBusinessInput {
   accessToken: string;
@@ -146,28 +30,10 @@ export interface DeleteBusinessInput {
   userUid: string;
 }
 
-export interface ManagerDocument {
-  uid: string;
-  accessToken: string;
-  partnerUid: string;
-  createdAt?: number;
-  updatedAt?: number;
-  userInfo?: {
-    uid?: string;
-    name?: string;
-    email?: string;
-    phone?: string;
-    secondPhone?: string;
-    role?: string;
-  };
-  owner?: {
-    uid?: string;
-    name?: string;
-    email?: string;
-    phone?: string;
-    basic?: Record<string, string>;
-    contact?: Record<string, string>;
-  };
+function getErrorMessage(error: unknown): string {
+  if (error instanceof FirestoreError) return error.message;
+  if (error instanceof Error) return error.message;
+  return String(error);
 }
 
 export const firestoreApi = createApi({
@@ -186,9 +52,10 @@ export const firestoreApi = createApi({
           }
           const userData = docSnapshot.data();
           return { data: userData };
-        } catch (error: any) {
-          console.error(error.message);
-          return { error: error.message };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["User"],
@@ -201,9 +68,10 @@ export const firestoreApi = createApi({
           const restaurant = resSnapshot.data() as BusinessDocument | undefined;
           console.log("Read Operation [fetchRestaurantData]");
           return { data: restaurant };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["Businesses"],
@@ -236,17 +104,18 @@ export const firestoreApi = createApi({
 
           console.log("Read Operation [fetchBusinesses]");
           return { data: businesses };
-        } catch (error: any) {
-          console.error(error?.message);
-          return { error: error?.message };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["Businesses"],
     }),
 
     // Mutation Endpoints
-    createUserDocument: builder.mutation({
-      async queryFn({ uid, email }: { uid: string; email: string }) {
+    createUserDocument: builder.mutation<null, { uid: string; email: string }>({
+      async queryFn({ uid, email }) {
         try {
           const userData = {
             joinDate: Date.now(),
@@ -266,14 +135,29 @@ export const firestoreApi = createApi({
 
           console.log("Write Operation [createUserDocument]");
           return { data: null };
-        } catch (error: any) {
-          console.error("Error creating user document:", error.message);
-          return { error: error.message };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error creating user document:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["User"],
     }),
-    createBusiness: builder.mutation<null, CreateBusinessInput>({
+    createBusiness: builder.mutation<
+      null,
+      {
+        business: BusinessDocument;
+        user: {
+          uid: string;
+          email: string;
+          name?: string;
+          phone?: string;
+          secondPhone?: string;
+          displayName?: string | null;
+          phoneNumber?: string | null;
+        };
+      }
+    >({
       async queryFn({ business, user }) {
         try {
           if (!business?.accessToken) {
@@ -301,16 +185,22 @@ export const firestoreApi = createApi({
               ? userData.data.businesses
               : [];
 
-            const normalizedOwner = normalizeBusinessOwner(
-              business.owner,
-              user,
-            );
+            const ownerName = user.name ?? user.displayName ?? "";
+            const ownerEmail = business.owner?.email ?? user.email ?? "";
+            const ownerPhone =
+              business.owner?.phone ?? user.phone ?? user.phoneNumber ?? "";
+            const normalizedOwner = {
+              uid: business.owner?.uid ?? user.uid ?? "",
+              name: ownerName,
+              email: ownerEmail,
+              phone: ownerPhone,
+            };
             const now = Date.now();
             const normalizedBusiness = {
               ...business,
               owner: normalizedOwner,
               partnerUid: user.uid,
-              createdOn: business.createdOn ?? String(now),
+              createdOn: business.createdOn ?? now,
               createdAt: now,
               updatedAt: now,
             };
@@ -370,9 +260,10 @@ export const firestoreApi = createApi({
 
           console.log("Write Operation [createBusiness]");
           return { data: null };
-        } catch (error: any) {
-          console.error("Error creating business:", error.message);
-          return { error: error.message };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error creating business:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["User", "Businesses"],
@@ -400,9 +291,10 @@ export const firestoreApi = createApi({
 
           console.log("Write Operation [updateBusiness]");
           return { data: null };
-        } catch (error: any) {
-          console.error("Error updating business:", error.message);
-          return { error: error.message };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error updating business:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["Businesses", "User"],
@@ -514,25 +406,26 @@ export const firestoreApi = createApi({
 
           console.log("Write Operation [deleteBusiness]");
           return { data: null };
-        } catch (error: any) {
-          console.error("Error deleting business:", error.message);
-          return { error: error.message };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error deleting business:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["User", "Businesses"],
     }),
-    setRestaurantStatus: builder.mutation({
-      async queryFn({
-        resId,
-        status,
-      }: {
+    setRestaurantStatus: builder.mutation<
+      null,
+      {
         resId: string;
         status: RestaurantStatusTypes;
-      }) {
+      }
+    >({
+      async queryFn({ resId, status }) {
         try {
           // Validate input data
           if (!status) {
-            throw new Error("Order ID is required.");
+            throw new Error("Status is required.");
           }
           if (!resId) {
             throw new Error("Restaurant ID is required.");
@@ -547,14 +440,15 @@ export const firestoreApi = createApi({
 
           console.log("Write Operation [setRestaurantStatus]");
           return { data: null };
-        } catch (error: any) {
-          console.error("Error updating restaurant status:", error.message);
-          return { error: error.message };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error updating restaurant status:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["Businesses"],
     }),
-    fetchManagers: builder.query<ManagerDocument[], string>({
+    fetchManagers: builder.query<ManagerUser[], string>({
       async queryFn(partnerUid: string) {
         try {
           if (!partnerUid) {
@@ -563,25 +457,25 @@ export const firestoreApi = createApi({
           const ref = collection(db, "users");
           const q = query(ref, where("partnerUid", "==", partnerUid));
           const snapshot = await getDocs(q);
-          const managers: ManagerDocument[] = snapshot.docs.map((doc) => ({
+          const managers: ManagerUser[] = snapshot.docs.map((doc) => ({
             uid: doc.id,
             accessToken: doc.data().accessToken ?? "",
             partnerUid: doc.data().partnerUid ?? "",
             createdAt: doc.data().createdAt,
             updatedAt: doc.data().updatedAt,
             userInfo: doc.data().userInfo,
-            owner: doc.data().owner,
           }));
           console.log("Read Operation [fetchManagers]");
           return { data: managers };
-        } catch (error: any) {
-          console.error(error.message);
-          return { error: error.message };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
         }
       },
       providesTags: ["User"],
     }),
-    deleteManager: builder.mutation({
+    deleteManager: builder.mutation<null, string>({
       async queryFn(managerUid: string) {
         try {
           if (!managerUid) {
@@ -598,9 +492,10 @@ export const firestoreApi = createApi({
             );
           }
           return { data: null };
-        } catch (error: any) {
-          console.error("Error deleting manager:", error.message);
-          return { error: error.message };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error deleting manager:", message);
+          return { error: message };
         }
       },
       invalidatesTags: ["User"],

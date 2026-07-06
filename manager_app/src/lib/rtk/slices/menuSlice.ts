@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { MenuCategory, MenuData, MenuItem } from "@/lib/types/types";
+import type { ItemType } from "@ordersync/types";
+import type { MenuCategory, MenuData } from "@/lib/types/types";
 
 const initialState: MenuData = {
   categories: [],
@@ -12,10 +13,9 @@ export const menuSlice = createSlice({
   reducers: {
     addMenu: (_state, { payload }: PayloadAction<MenuData>) => payload,
     clearMenu: () => initialState,
-    addNewItems: (state, { payload }: PayloadAction<MenuItem[]>) => {
+    addNewItems: (state, { payload }: PayloadAction<ItemType[]>) => {
       payload.forEach((item) => {
-        const categoryId = item.category ?? (item as any).categoryId;
-        const category = state.categories.find((cat) => cat.id === categoryId);
+        const category = state.categories.find((cat) => cat.id === item.category);
         if (category) {
           category.items.push(item);
         }
@@ -32,13 +32,8 @@ export const menuSlice = createSlice({
     clearAllCategories: (state) => {
       state.categories = [];
     },
-    categoryIndexesMove: (state, { payload }: PayloadAction<number[]>) => {
-      state.categories = payload
-        .map((index) => state.categories[index - 1])
-        .filter(Boolean) as MenuCategory[];
-      state.categories.forEach((category, index) => {
-        category.position = index;
-      });
+    reorderCategories: (state, { payload }: PayloadAction<MenuCategory[]>) => {
+      state.categories = payload;
     },
     moveCategory: (
       state,
@@ -65,9 +60,6 @@ export const menuSlice = createSlice({
         state.categories[targetIndex],
         state.categories[index],
       ];
-      state.categories.forEach((category, idx) => {
-        category.position = idx;
-      });
     },
     moveItem: (
       state,
@@ -102,16 +94,15 @@ export const menuSlice = createSlice({
         category.items[index],
       ];
     },
-    addItem: (state, { payload }: PayloadAction<MenuItem>) => {
-      const categoryId = payload.category ?? (payload as any).categoryId;
-      const category = state.categories.find((cat) => cat.id === categoryId);
+    addItem: (state, { payload }: PayloadAction<ItemType>) => {
+      const category = state.categories.find((cat) => cat.id === payload.category);
       if (category) {
         category.items.push(payload);
       }
     },
     updateItem: (
       state,
-      { payload }: PayloadAction<{ id: string; updates: Partial<MenuItem> }>,
+      { payload }: PayloadAction<{ id: string; updates: Partial<ItemType> }>,
     ) => {
       state.categories.forEach((category) => {
         category.items = category.items.map((item) =>
@@ -153,7 +144,7 @@ export const menuSlice = createSlice({
     ) => {
       state.categories = state.categories.map((category) =>
         category.id === payload.categoryId
-          ? { ...category, visible: payload.visibilityValue }
+          ? { ...category, visibility: payload.visibilityValue }
           : category,
       );
     },
@@ -163,7 +154,7 @@ export const menuSlice = createSlice({
     ) => {
       state.categories = state.categories.map((category) =>
         category.id === payload.categoryId
-          ? { ...category, featured: payload.topMenuValue }
+          ? { ...category, topMenu: payload.topMenuValue }
           : category,
       );
     },
@@ -175,7 +166,7 @@ export const menuSlice = createSlice({
         ...category,
         items: category.items.map((item) =>
           item.id === payload.itemId
-            ? { ...item, visible: payload.visibilityValue }
+            ? { ...item, visibility: payload.visibilityValue }
             : item,
         ),
       }));
@@ -188,7 +179,7 @@ export const menuSlice = createSlice({
         ...category,
         items: category.items.map((item) =>
           item.id === payload.itemId
-            ? { ...item, featured: payload.topMenuValue }
+            ? { ...item, topMenu: payload.topMenuValue }
             : item,
         ),
       }));
@@ -229,7 +220,7 @@ export const {
   clearAllItems,
   addNewCategories,
   clearAllCategories,
-  categoryIndexesMove,
+  reorderCategories,
   addItem,
   updateItem,
   addCategory,

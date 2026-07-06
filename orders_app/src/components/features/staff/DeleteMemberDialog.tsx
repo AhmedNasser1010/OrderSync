@@ -10,7 +10,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import useStaff from "@/hooks/useStaff";
-import { type Driver } from "@/types/driver";
+import type { Driver } from '@ordersync/types';
 import { toast } from "sonner";
 
 export function DeleteMemberDialog({
