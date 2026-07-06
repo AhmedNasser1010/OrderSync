@@ -38,7 +38,22 @@ export interface BusinessDocument {
   accessToken: string;
   partnerUid?: string;
   owner?: {
-    uid: string;
+    uid?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+    basic?: {
+      fName?: string;
+      lName?: string;
+      age?: string;
+      gender?: string;
+    };
+    contact?: {
+      email?: string;
+      phone?: string;
+      address?: string;
+      name?: string;
+    };
   };
   business?: {
     name?: string;
@@ -85,6 +100,42 @@ export interface CreateBusinessInput {
   };
 }
 
+function normalizeBusinessOwner(
+  owner: BusinessDocument["owner"] | undefined,
+  fallbackUser?: CreateBusinessInput["user"],
+) {
+  const ownerName =
+    owner?.name ??
+    owner?.contact?.name ??
+    fallbackUser?.name ??
+    fallbackUser?.displayName ??
+    "";
+  const ownerEmail =
+    owner?.email ?? owner?.contact?.email ?? fallbackUser?.email ?? "";
+  const ownerPhone =
+    owner?.phone ??
+    owner?.contact?.phone ??
+    fallbackUser?.phone ??
+    fallbackUser?.phoneNumber ??
+    "";
+
+  return {
+    uid: owner?.uid ?? fallbackUser?.uid ?? "",
+    name: ownerName,
+    email: ownerEmail,
+    phone: ownerPhone,
+    basic: owner?.basic ?? {
+      fName: "",
+      lName: "",
+    },
+    contact: {
+      name: ownerName,
+      email: ownerEmail,
+      phone: ownerPhone,
+    },
+  };
+}
+
 export interface UpdateBusinessInput {
   accessToken: string;
   updates: Partial<BusinessDocument>;
@@ -93,6 +144,30 @@ export interface UpdateBusinessInput {
 export interface DeleteBusinessInput {
   accessToken: string;
   userUid: string;
+}
+
+export interface ManagerDocument {
+  uid: string;
+  accessToken: string;
+  partnerUid: string;
+  createdAt?: number;
+  updatedAt?: number;
+  userInfo?: {
+    uid?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+    secondPhone?: string;
+    role?: string;
+  };
+  owner?: {
+    uid?: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+    basic?: Record<string, string>;
+    contact?: Record<string, string>;
+  };
 }
 
 export const firestoreApi = createApi({
@@ -154,7 +229,9 @@ export const firestoreApi = createApi({
           );
 
           const businesses = snapshots.flatMap((snapshot) =>
-            snapshot.docs.map((businessDoc) => businessDoc.data() as BusinessDocument),
+            snapshot.docs.map(
+              (businessDoc) => businessDoc.data() as BusinessDocument,
+            ),
           );
 
           console.log("Read Operation [fetchBusinesses]");
@@ -209,6 +286,7 @@ export const firestoreApi = createApi({
           await runTransaction(db, async (transaction) => {
             const businessRef = doc(db, "businesses", business.accessToken);
             const menuRef = doc(db, "menus", business.accessToken);
+            const ordersRef = doc(db, "orders", business.accessToken);
             const userRef = doc(db, "users", user.uid);
             const businessSnapshot = await transaction.get(businessRef);
 
@@ -216,11 +294,29 @@ export const firestoreApi = createApi({
               throw new Error("Business already exists.");
             }
 
-            // 1. Create business document
-            transaction.set(businessRef, {
+            // Read user data BEFORE any writes (Firestore requires all reads before writes)
+            const userSnapshot = await transaction.get(userRef);
+            const userData = userSnapshot.data();
+            const currentBusinesses = Array.isArray(userData?.data?.businesses)
+              ? userData.data.businesses
+              : [];
+
+            const normalizedOwner = normalizeBusinessOwner(
+              business.owner,
+              user,
+            );
+            const now = Date.now();
+            const normalizedBusiness = {
               ...business,
-              createdOn: business.createdOn ?? String(Date.now()),
-            });
+              owner: normalizedOwner,
+              partnerUid: user.uid,
+              createdOn: business.createdOn ?? String(now),
+              createdAt: now,
+              updatedAt: now,
+            };
+
+            // 1. Create business document
+            transaction.set(businessRef, normalizedBusiness);
 
             // 2. Create empty menu document for the business
             transaction.set(menuRef, {
@@ -228,39 +324,44 @@ export const firestoreApi = createApi({
               partnerUid: user.uid,
               items: [],
               categories: [],
+              createdAt: now,
+              updatedAt: now,
             });
 
-            // 3. Update the creator's user document to include the new business accessToken
+            // 3. Initialize the orders root document for the business
+            transaction.set(ordersRef, {
+              accessToken: business.accessToken,
+              partnerUid: user.uid,
+              createdAt: now,
+              updatedAt: now,
+            });
+
+            // 4. Update the creator's user document to include the new business accessToken
             //    in the data.businesses array
-            const userSnapshot = await transaction.get(userRef);
-            const userData = userSnapshot.data();
-            const currentBusinesses = Array.isArray(userData?.data?.businesses)
-              ? userData.data.businesses
-              : [];
             transaction.update(userRef, {
               ["data.businesses"]: [...currentBusinesses, business.accessToken],
             });
 
-            // 4. Create/update business manager document using the manager's UID as the document ID
+            // 5. Create/update business manager document using the manager's UID as the document ID
             //    This creates a separate document under `users/{managerUid}` rather than overwriting
             //    the current authenticated user's document (the businesses creator).
-            const now = Date.now();
-            const ownerUid = business.owner?.uid;
+            const ownerUid = normalizedOwner.uid;
             const managerRef = ownerUid ? doc(db, "users", ownerUid) : userRef;
             transaction.set(
               managerRef,
               {
-                accessToken: business.accessToken,
+                accessToken: normalizedBusiness.accessToken,
                 partnerUid: user.uid,
                 createdAt: now,
                 updatedAt: now,
+                owner: normalizedOwner,
                 userInfo: {
-                  email: user.email,
-                  name: user.name ?? null,
-                  phone: user.phone ?? null,
+                  email: normalizedOwner.email || user.email,
+                  name: normalizedOwner.name || user.name || null,
+                  phone: normalizedOwner.phone || user.phone || null,
                   secondPhone: user.secondPhone ?? null,
                   role: "BUSINESS_MANAGER",
-                  uid: ownerUid ?? user.uid,
+                  uid: ownerUid || user.uid,
                 },
               },
               { merge: true },
@@ -304,7 +405,7 @@ export const firestoreApi = createApi({
           return { error: error.message };
         }
       },
-      invalidatesTags: ["Businesses"],
+      invalidatesTags: ["Businesses", "User"],
     }),
     deleteBusiness: builder.mutation<null, DeleteBusinessInput>({
       async queryFn({ accessToken, userUid }) {
@@ -324,7 +425,9 @@ export const firestoreApi = createApi({
 
           // Fetch the business document to get the owner's UID
           const businessSnapshot = await getDoc(businessRef);
-          const businessData = businessSnapshot.data() as BusinessDocument | undefined;
+          const businessData = businessSnapshot.data() as
+            | BusinessDocument
+            | undefined;
           const ownerUid = businessData?.owner?.uid;
 
           // Fetch and update the current user's document (remove accessToken from businesses array)
@@ -337,10 +440,16 @@ export const firestoreApi = createApi({
           // Batch delete operations:
           // 1. Delete the business document
           batch.delete(businessRef);
+          console.log("Cleanup [deleteBusiness]: Business document deleted");
+
           // 2. Delete the menu document
           batch.delete(menuRef);
+          console.log("Cleanup [deleteBusiness]: Menu document deleted");
+
           // 3. Delete the orders document
           batch.delete(ordersRef);
+          console.log("Cleanup [deleteBusiness]: Orders document deleted");
+
           // 4. Remove accessToken from the current user's businesses array
           batch.set(
             userRef,
@@ -355,6 +464,9 @@ export const firestoreApi = createApi({
             },
             { merge: true },
           );
+          console.log(
+            "Cleanup [deleteBusiness]: Access token removed from user's businesses array",
+          );
 
           // 5. Delete the owner/manager user document if it exists and is different from the current user
           if (ownerUid && ownerUid !== userUid) {
@@ -362,19 +474,42 @@ export const firestoreApi = createApi({
             const ownerSnapshot = await getDoc(ownerRef);
             if (ownerSnapshot.exists()) {
               batch.delete(ownerRef);
+              console.log(
+                `Cleanup [deleteBusiness]: Owner/manager user document deleted (ownerUid: ${ownerUid})`,
+              );
+            } else {
+              console.log(
+                `Cleanup [deleteBusiness]: Owner/manager user document does not exist (ownerUid: ${ownerUid}), skipping`,
+              );
             }
+          } else {
+            console.log(
+              "Cleanup [deleteBusiness]: No separate owner document to delete (owner is the same as current user)",
+            );
           }
 
           await batch.commit();
+          console.log("Cleanup [deleteBusiness]: Batch committed successfully");
 
           // 6. Delete the owner's Firebase Auth account using Admin SDK
           //    This removes the business manager's authentication so they can no longer log in.
           //    Only delete if the owner is different from the current authenticated user.
           if (ownerUid && ownerUid !== userUid) {
             const result = await deleteAuthUser(ownerUid);
-            if (!result.success) {
-              console.error("Failed to delete auth user:", result.error);
+            if (result.success) {
+              console.log(
+                `Cleanup [deleteBusiness]: Owner auth user deleted (ownerUid: ${ownerUid})`,
+              );
+            } else {
+              console.error(
+                "Cleanup [deleteBusiness]: Failed to delete auth user:",
+                result.error,
+              );
             }
+          } else {
+            console.log(
+              "Cleanup [deleteBusiness]: No separate auth user to delete (owner is the same as current user)",
+            );
           }
 
           console.log("Write Operation [deleteBusiness]");
@@ -419,17 +554,70 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ["Businesses"],
     }),
+    fetchManagers: builder.query<ManagerDocument[], string>({
+      async queryFn(partnerUid: string) {
+        try {
+          if (!partnerUid) {
+            return { data: [] };
+          }
+          const ref = collection(db, "users");
+          const q = query(ref, where("partnerUid", "==", partnerUid));
+          const snapshot = await getDocs(q);
+          const managers: ManagerDocument[] = snapshot.docs.map((doc) => ({
+            uid: doc.id,
+            accessToken: doc.data().accessToken ?? "",
+            partnerUid: doc.data().partnerUid ?? "",
+            createdAt: doc.data().createdAt,
+            updatedAt: doc.data().updatedAt,
+            userInfo: doc.data().userInfo,
+            owner: doc.data().owner,
+          }));
+          console.log("Read Operation [fetchManagers]");
+          return { data: managers };
+        } catch (error: any) {
+          console.error(error.message);
+          return { error: error.message };
+        }
+      },
+      providesTags: ["User"],
+    }),
+    deleteManager: builder.mutation({
+      async queryFn(managerUid: string) {
+        try {
+          if (!managerUid) {
+            throw new Error("Manager UID is required.");
+          }
+          const managerRef = doc(db, "users", managerUid);
+          await writeBatch(db).delete(managerRef).commit();
+          console.log("Write Operation [deleteManager]");
+          const result = await deleteAuthUser(managerUid);
+          if (!result.success) {
+            console.error(
+              "deleteManager: Failed to delete auth user:",
+              result.error,
+            );
+          }
+          return { data: null };
+        } catch (error: any) {
+          console.error("Error deleting manager:", error.message);
+          return { error: error.message };
+        }
+      },
+      invalidatesTags: ["User"],
+    }),
   }),
 });
 
 export const {
   useFetchUserDataQuery,
   useFetchRestaurantDataQuery,
-  useFetchBusinessesQuery, //1 Read
+  useFetchBusinessesQuery,
+  useFetchManagersQuery,
 
   useCreateUserDocumentMutation,
-  useCreateBusinessMutation, //2 Create
-  useUpdateBusinessMutation, //3 Update
-  useDeleteBusinessMutation, //4 Delete
+  useCreateBusinessMutation,
+  useUpdateBusinessMutation,
+  useDeleteBusinessMutation,
+  useDeleteManagerMutation,
   useSetRestaurantStatusMutation,
 } = firestoreApi;

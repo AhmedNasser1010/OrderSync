@@ -84,27 +84,22 @@ export function useAuth(autoNavigate = true) {
     if (autoNavigate) router.push("/auth/signup");
   }, [dispatch, router, autoNavigate]);
 
-  const authListener = useCallback((): Promise<FirebaseUser | null> => {
-    return new Promise((resolve, reject) => {
-      const unsubscribe = onAuthStateChanged(
-        auth,
-        (firebaseUser) => {
-          if (firebaseUser) {
-            setFirebaseUser(firebaseUser);
-            resolve(firebaseUser);
-          } else {
-            setFirebaseUser(null);
-            onNotLoggedIn();
-            resolve(null);
-          }
-        },
-        (err) => {
+  const authListener = useCallback(() => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (firebaseUser) => {
+        if (firebaseUser) {
+          setFirebaseUser(firebaseUser);
+        } else {
+          setFirebaseUser(null);
           onNotLoggedIn();
-          reject(err);
-        },
-      );
-      return () => unsubscribe();
-    });
+        }
+      },
+      () => {
+        onNotLoggedIn();
+      },
+    );
+    return unsubscribe;
   }, [onNotLoggedIn]);
 
   const signIn = useCallback(

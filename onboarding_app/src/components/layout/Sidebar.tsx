@@ -1,8 +1,10 @@
 "use client";
 
-import { ChevronRight, Menu, X, Utensils, LogOut } from "lucide-react";
+import { ChevronRight, Menu, X, Utensils, Users, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export function Sidebar({
   isOpen,
@@ -11,10 +13,12 @@ export function Sidebar({
   isOpen: boolean;
   onToggle: () => void;
 }) {
-  const { user, signOut } = useAuth();
+  const { user, signOut } = useAuth(false);
+  const pathname = usePathname();
 
   const navigationItems = [
-    { icon: Utensils, label: "Restaurants", href: "/restaurants", active: true },
+    { icon: Utensils, label: "Restaurants", href: "/restaurants" },
+    { icon: Users, label: "Managers", href: "/managers" },
   ];
 
   return (
@@ -56,24 +60,30 @@ export function Sidebar({
           className="flex-1 overflow-y-auto px-3 py-4 space-y-2"
           aria-label="Sidebar navigation"
         >
-          {navigationItems.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group ${
-                item.active
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-              }`}
-            >
-              <item.icon className="h-5 w-5 flex-shrink-0" />
-              {isOpen && (
-                <span className="text-sm font-medium truncate group-hover:translate-x-0.5 transition-transform">
-                  {item.label}
-                </span>
-              )}
-            </a>
-          ))}
+          {navigationItems.map((item) => {
+            const isActive = item.href === "/restaurants"
+              ? pathname.startsWith("/restaurants")
+              : pathname.startsWith(item.href);
+
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors group ${
+                  isActive
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                }`}
+              >
+                <item.icon className="h-5 w-5 flex-shrink-0" />
+                {isOpen && (
+                  <span className="text-sm font-medium truncate group-hover:translate-x-0.5 transition-transform">
+                    {item.label}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Footer */}

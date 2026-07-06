@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   useCreateBusinessMutation,
@@ -25,6 +25,17 @@ export function useRestaurantForm(initialData?: Restaurant) {
   );
   const [errors, setErrors] = useState<ValidationError>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!initialData) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setFormData(initialData);
+      setErrors({});
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [initialData]);
 
   const validate = useCallback((data: Restaurant): ValidationError => {
     const newErrors: ValidationError = {};
@@ -79,7 +90,7 @@ export function useRestaurantForm(initialData?: Restaurant) {
     setFormData((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  const updateNestedField = useCallback((path: string, value: any) => {
+  const updateNestedField = useCallback((path: string, value: unknown) => {
     setFormData((prev) => {
       const newData = JSON.parse(JSON.stringify(prev));
       const keys = path.split(".");
@@ -104,35 +115,35 @@ export function useRestaurantForm(initialData?: Restaurant) {
 
     setIsSubmitting(true);
     try {
-    const payload = toBusinessDocument(formData, currentUser?.uid);
+      const payload = toBusinessDocument(formData, currentUser?.uid);
 
-    if (!payload.accessToken) {
-      throw new Error("Business access token is missing.");
-    }
-
-    if (initialData?.id) {
-      await updateBusiness({
-        accessToken: payload.accessToken,
-        updates: payload,
-      }).unwrap();
-    } else {
-      if (!currentUser?.uid || !currentUser.email) {
-        throw new Error("You must be signed in to create a business.");
+      if (!payload.accessToken) {
+        throw new Error("Business access token is missing.");
       }
 
-      await createBusiness({
-        business: payload,
-        user: {
-          uid: currentUser.uid,
-          email: formData.owner.email,
-          name: formData.owner.name,
-          phone: formData.owner.phone,
-          secondPhone: formData.contact.phoneNumbers[1] ?? "",
-          displayName: currentUser.displayName,
-          phoneNumber: currentUser.phoneNumber,
-        },
-      }).unwrap();
-    }
+      if (initialData?.id) {
+        await updateBusiness({
+          accessToken: payload.accessToken,
+          updates: payload,
+        }).unwrap();
+      } else {
+        if (!currentUser?.uid || !currentUser.email) {
+          throw new Error("You must be signed in to create a business.");
+        }
+
+        await createBusiness({
+          business: payload,
+          user: {
+            uid: currentUser.uid,
+            email: formData.owner.email,
+            name: formData.owner.name,
+            phone: formData.owner.phone,
+            secondPhone: formData.contact.phoneNumbers[1] ?? "",
+            displayName: currentUser.displayName,
+            phoneNumber: currentUser.phoneNumber,
+          },
+        }).unwrap();
+      }
 
       console.log("Form submitted successfully:", formData);
       setErrors({});
@@ -144,7 +155,15 @@ export function useRestaurantForm(initialData?: Restaurant) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, validate, createBusiness, updateBusiness, currentUser, initialData, router]);
+  }, [
+    formData,
+    validate,
+    createBusiness,
+    updateBusiness,
+    currentUser,
+    initialData,
+    router,
+  ]);
 
   const clearErrors = useCallback(() => {
     setErrors({});
@@ -232,12 +251,30 @@ function createEmptyRestaurant(): Restaurant {
   };
 }
 
-function toBusinessDocument(formData: Restaurant, userId?: string): BusinessDocument {
+function toBusinessDocument(
+  formData: Restaurant,
+  userId?: string,
+): BusinessDocument {
+  const ownerNameParts = splitOwnerName(formData.owner.name);
+  const ownerUid = formData.owner.userId || userId || "";
+
   return {
     accessToken: formData.id || "",
     partnerUid: userId,
     owner: {
-      uid: formData.owner.userId,
+      uid: ownerUid,
+      name: formData.owner.name,
+      email: formData.owner.email,
+      phone: formData.owner.phone,
+      basic: {
+        fName: ownerNameParts.fName,
+        lName: ownerNameParts.lName,
+      },
+      contact: {
+        name: formData.owner.name,
+        email: formData.owner.email,
+        phone: formData.owner.phone,
+      },
     },
     business: {
       name: formData.info.name,
@@ -279,6 +316,23 @@ function toBusinessDocument(formData: Restaurant, userId?: string): BusinessDocu
     },
     status: formData.status === "active" ? "active" : "inactive",
     createdOn: formData.lastUpdated,
+  };
+}
+
+function splitOwnerName(name: string) {
+  const trimmedName = name.trim();
+  if (!trimmedName) {
+    return { fName: "", lName: "" };
+  }
+
+  const parts = trimmedName.split(/\s+/);
+  if (parts.length === 1) {
+    return { fName: trimmedName, lName: "" };
+  }
+
+  return {
+    fName: parts.slice(0, -1).join(" "),
+    lName: parts[parts.length - 1],
   };
 }
 

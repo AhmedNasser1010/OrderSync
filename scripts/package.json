@@ -1,0 +1,21 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "export": "tsx exportFirestore.ts",
+    "import": "tsx importFirestore.ts",
+    "export:auth": "tsx exportAuth.ts",
+    "import:auth": "tsx importAuth.ts",
+    "auth:create": "tsx createAuthUsersFromFirestore.ts",
+    "clone": "npm run export && npm run import",
+    "clone:auth": "tsx clone.ts --auth"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "firebase-admin": "^14.1.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.0"
+  }
+}

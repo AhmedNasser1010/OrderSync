@@ -10,7 +10,10 @@ export default function AuthProvider({
   const { isAuthenticated, isLoading, authListener } = useAuth(false);
 
   useEffect(() => {
-    authListener()
+    const unsubscribe = authListener()
+    return () => {
+      if (unsubscribe) unsubscribe()
+    }
   }, [authListener])
 
   if (!isAuthenticated && isLoading) {

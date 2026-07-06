@@ -15,6 +15,7 @@ import {
   useFetchBusinessesQuery,
   useDeleteBusinessMutation,
 } from "@/rtk/api/firestoreApi";
+import type { BusinessDocument } from "@/rtk/api/firestoreApi";
 import type { Restaurant } from "@/lib/mock-data";
 
 const COOLDOWN_DURATION = 5; // seconds
@@ -92,8 +93,7 @@ export default function RestaurantsPage() {
 
       const matchesIndustry =
         !industryFilter || restaurant.info.industry === industryFilter;
-      const matchesStatus =
-        !statusFilter || restaurant.status === statusFilter;
+      const matchesStatus = !statusFilter || restaurant.status === statusFilter;
 
       return matchesSearch && matchesIndustry && matchesStatus;
     });
@@ -158,50 +158,66 @@ export default function RestaurantsPage() {
   );
 }
 
-function mapBusinessToRestaurant(business: any): Restaurant {
+function mapBusinessToRestaurant(business: BusinessDocument): Restaurant {
+  const owner = business.owner ?? {};
+  const ownerName =
+    [owner?.basic?.fName, owner?.basic?.lName]
+      .filter(Boolean)
+      .join(" ")
+      .trim() ||
+    owner?.name ||
+    owner?.contact?.name ||
+    "";
+  const ownerEmail = owner?.email || owner?.contact?.email || "";
+  const ownerPhone = owner?.phone || owner?.contact?.phone || "";
+  const industry: Restaurant["info"]["industry"] =
+    business.business?.industry === "coffee-shop"
+      ? "coffee-shop"
+      : "restaurant";
+
   return {
     id: business.accessToken,
     owner: {
-      name:
-        `${business.owner?.basic?.fName ?? ""} ${business.owner?.basic?.lName ?? ""}`.trim() ||
-        business.owner?.contact?.email ||
-        "Unknown",
-      email: business.owner?.contact?.email ?? "",
-      phone: business.owner?.contact?.phone ?? "",
-      userId: business.owner?.uid ?? "",
+      name: ownerName || ownerEmail || "Unknown",
+      email: ownerEmail,
+      phone: ownerPhone,
+      userId: owner?.uid ?? "",
     },
     info: {
       name: business.business?.name ?? "",
       arabicName: business.business?.nameInAr ?? "",
       iconUrl: business.business?.icon ?? "",
       coverUrl: business.business?.cover ?? "",
-      industry: business.business?.industry === "coffee-shop" ? "coffee-shop" : "restaurant",
+      industry,
       cuisines: business.business?.cuisines ?? [],
       address: {
         latitude: business.business?.latlng?.[0] ?? 0,
         longitude: business.business?.latlng?.[1] ?? 0,
       },
     },
-    hours: Object.entries(business.services?.openingHours ?? {}).map(([day, value]) => ({
-      day: day.charAt(0).toUpperCase() + day.slice(1),
-      openTime: value?.start ?? "",
-      closeTime: value?.end ?? "",
-      closed: !(value?.start && value?.end),
-    })) as Restaurant["hours"],
+    hours: Object.entries(business.services?.openingHours ?? {}).map(
+      ([day, value]) => ({
+        day: day.charAt(0).toUpperCase() + day.slice(1),
+        openTime: value?.start ?? "",
+        closeTime: value?.end ?? "",
+        closed: !(value?.start && value?.end),
+      }),
+    ) as Restaurant["hours"],
     cookTime: {
       min: business.services?.cookTime?.[0] ?? 0,
       max: business.services?.cookTime?.[1] ?? 0,
     },
     settings: {
-      assignOrdersToCook: !!business.settings?.orderManagement?.assign?.forCooks,
-      assignOrdersToDelivery: !!business.settings?.orderManagement?.assign?.forDeliveryWorkers,
-      automaticDeliveryAssignment: !!business.settings?.orderManagement?.driverAssignment,
+      assignOrdersToCook:
+        !!business.settings?.orderManagement?.assign?.forCooks,
+      assignOrdersToDelivery:
+        !!business.settings?.orderManagement?.assign?.forDeliveryWorkers,
+      automaticDeliveryAssignment:
+        !!business.settings?.orderManagement?.driverAssignment,
       printInvoice: !!business.settings?.orderManagement?.printInvoice,
     },
     contact: {
-      phoneNumbers: business.owner?.contact?.phone
-        ? [business.owner.contact.phone]
-        : [],
+      phoneNumbers: ownerPhone ? [ownerPhone] : [],
     },
     additional: {
       promotionalSubtitle: business.business?.promotionalSubtitle ?? "",
@@ -210,7 +226,9 @@ function mapBusinessToRestaurant(business: any): Restaurant {
     status: business.settings?.siteControl?.status || "inactive",
     lastUpdated:
       business.lastUpdate?.date && business.lastUpdate?.time
-        ? new Date(`${business.lastUpdate.date}T${business.lastUpdate.time}`).toISOString()
+        ? new Date(
+            `${business.lastUpdate.date}T${business.lastUpdate.time}`,
+          ).toISOString()
         : new Date().toISOString(),
   };
 }

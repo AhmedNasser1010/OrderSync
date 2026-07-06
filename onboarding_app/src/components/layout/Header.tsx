@@ -11,25 +11,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
-import { setSearchTerm } from "@/rtk/slices/uiSlice";
+import { setSearchTerm, toggleTheme } from "@/rtk/slices/uiSlice";
 import { useAuth } from "@/hooks/useAuth";
 
 export function Header({ sidebarOpen }: { sidebarOpen: boolean }) {
-  const [isDark, setIsDark] = useState(false);
   const dispatch = useAppDispatch();
   const searchTerm = useAppSelector((state) => state.ui.searchTerm);
+  const isDark = useAppSelector((state) => state.ui.isDark);
   const { user, signOut } = useAuth();
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
+  // Apply theme on load and whenever it changes
+  useEffect(() => {
     if (isDark) {
-      document.documentElement.classList.remove("dark");
-    } else {
       document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
     }
-  };
+  }, [isDark]);
 
   return (
     <header
@@ -53,15 +53,15 @@ export function Header({ sidebarOpen }: { sidebarOpen: boolean }) {
       {/* Right Actions */}
       <div className="flex items-center gap-2 ml-auto">
         {/* Theme Toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleTheme}
-          className="h-9 w-9"
-          title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-        >
-          {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => dispatch(toggleTheme())}
+            className="h-9 w-9"
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
 
         {/* Notifications */}
         {/* <Button variant="ghost" size="icon" className="h-9 w-9 relative">

@@ -1,0 +1,363 @@
+rules_version = '2';
+
+// =========================================================================
+// FOOD-DELIVERY PLATFORM — FIRESTORE SECURITY RULES
+//
+// Apps served by this ruleset:
+//   customer_app        -> customers place/track orders, leave reviews
+//   business_manager     -> restaurant staff manage menu/orders for 1 business
+//   driver_app           -> couriers pick up / deliver orders
+//   businesses_creator   -> "partners" who onboard & own one or more businesses
+// =========================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =====================================================================
+    // HELPER FUNCTIONS
+    // =====================================================================
+
+    // ---------------------------------------------------------------------
+    // Low-level helper functions
+    // Basic authentication, ownership, and utility helpers.
+    // ---------------------------------------------------------------------
+
+    // Returns true if the request is authenticated.
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Returns true if the authenticated user owns the given user ID.
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Extracts the owner's UID from a composite ID (e.g. "token_uid").
+    function ownerUidFromCompositeId(id) {
+      return id.split('_')[1];
+    }
+
+    // ---------------------------------------------------------------------
+    // Data access helpers
+    // Read document data used throughout the rules.
+    // ---------------------------------------------------------------------
+
+    // Returns the existing document data.
+    function resourceData() {
+      return resource.data;
+    }
+
+    // Returns the incoming document data from the current request.
+    function incomingData() {
+      return request.resource.data;
+    }
+
+    // Returns the authenticated user's document.
+    function getUsersDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    // Returns the authenticated customer's document.
+    function getCustomerData() {
+      return get(/databases/$(database)/documents/customers/$(request.auth.uid)).data;
+    }
+
+    // Returns the authenticated driver's document.
+    function getDriverAccountData() {
+      return get(/databases/$(database)/documents/drivers/$(request.auth.uid)).data;
+    }
+
+    // Returns the business document managed by the authenticated manager.
+    function getManagerBusiness() {
+      return get(/databases/$(database)/documents/businesses/$(managerAccessToken())).data;
+    }
+
+    // ---------------------------------------------------------------------
+    // High-level authorization helpers
+    // Business-specific permission checks.
+    // ---------------------------------------------------------------------
+
+    // Returns true if the authenticated user is a customer.
+    function isCustomer() {
+      return isSignedIn() && getCustomerData().userInfo.role == 'CUSTOMER';
+    }
+
+    // Returns true if the authenticated user is a business manager.
+    function isManager() {
+      return isSignedIn() && getUsersDoc().userInfo.role == 'BUSINESS_MANAGER';
+    }
+
+    // Returns true if the authenticated user is a business creator (partner).
+    function isPartner() {
+      return isSignedIn() && getUsersDoc().userInfo.role == 'BUSINESSES_CREATOR';
+    }
+
+    // Returns true if the authenticated user is a driver.
+    function isRider() {
+      return isSignedIn() && getDriverAccountData().userInfo.role == 'DRIVER';
+    }
+
+    // Returns the business access token assigned to the authenticated manager.
+    function managerAccessToken() {
+      return getUsersDoc().accessToken;
+    }
+
+    // Returns true if the authenticated manager is assigned to the given business.
+    function isManagerOf(id) {
+      return isManager() && managerAccessToken() == id;
+    }
+
+    // Returns true if the authenticated partner owns the given business token.
+    function partnerOwnsToken(token) {
+      return token in getUsersDoc().businesses;
+    }
+
+    // Returns true if the authenticated customer is the owner encoded in the composite ID.
+    function isOrderParty(compositeId) {
+      return isCustomer() && request.auth.uid == ownerUidFromCompositeId(compositeId);
+    }
+
+    // Returns true if the authenticated partner owns the given partner UID.
+    function isPartnerOwner(partnerUid) {
+      return isPartner() && isOwner(partnerUid);
+    }
+
+    // =====================================================================
+    // /users/{userId} — Users, Partners
+    // =====================================================================
+    match /users/{userId} {
+    	// Users can read their own profile.
+			// Partners can read accounts they created.
+      allow read: if isOwner(userId);
+      // allow read: if isPartnerOwner(resourceData().partnerUid);
+      allow read: if isSignedIn(); // TEMP
+
+			// Partners can create manager accounts.
+      allow create: if isOwner(userId) || isPartnerOwner(incomingData().partnerUid);
+
+      // Users can update their own profile.
+      allow update: if isOwner(userId)
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['userInfo'])
+        && request.resource.data.userInfo.role == resource.data.userInfo.role;
+
+      // Partners can update or delete their own accounts and manager accounts.
+      allow update, delete: if isPartnerOwner(resourceData().partnerUid);
+    }
+    
+    // DEBUG TEST - onboarding_app - business creation
+    match /users/{userId} {
+      allow write: if true;
+    }
+
+    // =====================================================================
+    // /reviews/{reviewId} — Everyone, Customers
+    // =====================================================================
+    match /reviews/{reviewId} {
+    	// Everyone can read all reviews.
+      allow read: if true;
+      
+      // Customers can create new reviews.
+      allow create: if isCustomer();
+      
+      // No one can update or delete reviews.
+      allow update, delete: if false;
+    }
+
+    // =====================================================================
+    // /businesses/{busId} — Everyone, Partner, Customers, Managers
+    // =====================================================================
+    match /businesses/{busId} {
+    	// Everyone can read businesses.
+      allow read: if true;
+
+			// Partners can create new businesses.
+      allow create: if isPartnerOwner(incomingData().partnerUid);
+
+			// Customers can update only the reviewSummary field.
+      allow update: if isCustomer()
+        && request.resource.data.diff(resource.data)
+            .affectedKeys()
+            .hasOnly(['reviewSummary']);
+
+			// Managers can update their own business.
+      allow update: if isManagerOf(busId);
+
+			// Partners can update or delete their own businesses.
+      allow update, delete: if isPartnerOwner(resourceData().partnerUid);
+    }
+    
+    // DEBUG TEST - onboarding_app - business creation
+    match /businesses/{busId} {
+      allow write: if true;
+    }
+
+    // =====================================================================
+    // /menus/{menuId} — Everyone, Managers, Partners
+    // =====================================================================
+    match /menus/{menuId} {
+    	// Everyone can read menus.
+      allow read: if true;
+
+			// Managers can update or delete their own menu.
+      allow update, delete: if isManagerOf(menuId);
+      
+      // Partners can creates new menu
+      allow create: if isPartnerOwner(incomingData().partnerUid);
+      
+      // Partners can update or delete their own menus.
+      allow update, delete: if isPartner() &&
+      partnerOwnsToken(resourceData().accessToken);
+    }
+    
+    // DEBUG TEST - onboarding_app - business creation
+    match /menus/{menuId} {
+      allow write: if true;
+    }
+
+    // =====================================================================
+    // /customers/{userId} — Customers
+    // =====================================================================
+    match /customers/{userId} {
+    	// Customers can read their own account.
+      allow read: if isOwner(userId);
+
+			// Customers can create their own account.
+      allow create: if isOwner(userId)
+        && incomingData().userInfo.role == 'CUSTOMER';
+
+			// Customers can update their own account.
+      allow update: if isCustomer() && isOwner(userId);
+
+			// No one can delete customer accounts.
+      allow delete: if false;
+    }
+
+    // =====================================================================
+    // /drivers/{driverId} — Drivers, Customers, Managers, Partners
+    // =====================================================================
+    match /drivers/{driverId} {
+    	// Drivers can read their own account.
+      allow read: if isOwner(driverId);
+      
+      // Customers can read driver data only if the tracked order belongs to that driver.
+      allow read: if isCustomer() && getCustomerData().trackedOrder.driverId == driverId;
+      
+      // Managers can reads their own drivers
+      allow read: if isManagerOf(resourceData().accessToken);
+      
+      // Partner can reads their own drivers
+      allow read: if isPartnerOwner(resourceData().partnerUid);
+      
+      // Managers can create new drivers. -- TEMP
+      allow create: if isManager() && getManagerBusiness().settings.orderManagement.assign.forDeliveryWorkers;
+      
+      // Partners can create new drivers.
+      allow create: if isPartnerOwner(incomingData().partnerUid);
+      
+      // Drivers can update their own account.
+      allow update: if isOwner(driverId);
+      
+      // Managers can update their own drivers.
+      allow update: if isManagerOf(resourceData().accessToken);
+      
+      // Partners can update their own drivers.
+      allow update: if isPartner() && resourceData().partnerUid == request.auth.uid;
+      
+      // Managers can delete their own drivers.
+      allow delete: if isManagerOf(resourceData().accessToken);
+      
+      // Partners can delete their own drivers.
+      allow delete: if isPartner() && resourceData().partnerUid == request.auth.uid;
+    }
+
+    // =====================================================================
+    // /orders/{ordersId} 					— Everyone, Partners
+    //   /openQueue/{orderId} 			— Customers, Drivers, Managers
+    //   /completedOrders/{orderId} — Customer, Drivers, Managers
+    //   /voidedOrders/{orderId}	  — Customers, Managers
+    //   /history/{orderId} 				— Managers
+    //   /dailySummarization/{summaryId} — Managers
+    // =====================================================================
+    match /orders/{ordersId} {
+    	// Everyone can read order metadata.
+    	allow read: if true;
+
+			// Partners can create order metadata.
+      allow create: if isPartnerOwner(incomingData().partnerUid);
+
+			// Partners can update or delete their own order metadata.
+      // allow update, delete: if isPartnerOwner(resourceData().partnerUid);
+      allow update, delete: if isSignedIn(); // TEMP
+
+      match /openQueue/{orderId} {
+      	// Customers can read or delete their own orders.
+        allow read, delete: if isOrderParty(orderId);
+        
+        // Drivers can read or delete their assigned orders.
+        allow read, delete: if isRider() && request.auth.uid == resourceData().delivery.uid;
+        
+        // Managers can read or write their own orders.
+        allow read, write: if isManagerOf(ordersId);
+
+				// Customers can create a new order only if they do not have a tracked order.
+        allow create: if isOrderParty(orderId) && getCustomerData().trackedOrder.id == null;
+
+				// Customers can update their own orders.
+        allow update: if isOrderParty(orderId);
+        
+        // Drivers can update their assigned orders.
+        allow update: if isRider() && request.auth.uid == resourceData().delivery.uid;
+      }
+
+      match /completedOrders/{orderId} {
+      	// Customers can read or update their own orders.
+        allow read, update: if isOrderParty(orderId);
+        
+        // Managers can read or write their own orders.
+        allow read, write: if isManagerOf(ordersId);
+
+				// Drivers can create (move) their assigned orders.
+        allow create: if isRider() && request.auth.uid == incomingData().delivery.uid;
+      }
+
+      match /voidedOrders/{orderId} {
+      	// Customers can read or create (move) their own orders.
+        allow read, create: if isOrderParty(orderId);
+        
+        // Managers can read or write their own orders.
+        allow read, write: if isManagerOf(ordersId);
+      }
+
+      match /history/{historyOrderId} {
+      	// Managers can read or write their own order history.
+        allow read, write: if isManagerOf(ordersId);
+      }
+
+      match /dailySummarization/{summaryId} {
+      	// Managers can read or write their own daily summaries.
+        allow read, write: if isManagerOf(ordersId);
+      }
+    }
+  }
+}
+
+// =====================================================================
+// TODO: Future Improvements
+//
+// 1. Restrict customer updates on /orders/{ordersId}/openQueue/{orderId}
+//    to only the fields they are allowed to modify.
+//
+// 2. Restrict driver updates on /orders/{ordersId}/openQueue/{orderId}
+//    to only delivery-related fields.
+//
+// 3. Replace the current Firestore document role checks with Firebase
+//    Authentication Custom Claims.
+//
+//    This will:
+//    - Eliminate extra get() calls to /users/{uid}.
+//    - Solve the bootstrap problem during first account creation.
+//    - Improve security by storing roles in Firebase Authentication.
+//    - Reduce Firestore rule evaluation cost and complexity.
+//
+// =====================================================================
