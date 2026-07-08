@@ -13,9 +13,9 @@ import {
   increment,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { OrderType, OrderStatusType } from '@ordersync/types';
-import type { Driver } from '@ordersync/types';
-import type { RestaurantStatusTypes } from '@ordersync/types';
+import type { OrderType, OrderStatusType } from "@ordersync/types";
+import type { Driver } from "@ordersync/types";
+import type { RestaurantStatusTypes } from "@ordersync/types";
 
 // const statusForward = {
 //   RECEIVED: "PREPARING",
@@ -58,7 +58,8 @@ export const firestoreApi = createApi({
           const userData = docSnapshot.data();
           return { data: userData };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error(message);
           return { error: message };
         }
@@ -74,7 +75,8 @@ export const firestoreApi = createApi({
           console.log("Read Operation [fetchMenuData]");
           return { data: menu };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error(message);
           return { error: message };
         }
@@ -90,7 +92,8 @@ export const firestoreApi = createApi({
           console.log("Read Operation [fetchRestaurantData]");
           return { data: restaurant };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error(message);
           return { error: message };
         }
@@ -113,7 +116,8 @@ export const firestoreApi = createApi({
           console.log("Read Operation [completedOrders]");
           return { data: completedOrders };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error(message);
           return { error: message };
         }
@@ -136,7 +140,8 @@ export const firestoreApi = createApi({
           console.log("Read Operation [voidedOrders]");
           return { data: voidedOrders };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error(message);
           return { error: message };
         }
@@ -171,7 +176,7 @@ export const firestoreApi = createApi({
 
         await cacheEntryRemoved;
         unsubscribe();
-      }
+      },
     }),
     fetchHistoryOrdersData: builder.query({
       async queryFn(resId) {
@@ -184,7 +189,8 @@ export const firestoreApi = createApi({
           console.log("Read Operation [historyOrders]");
           return { data: historyOrders };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error(message);
           return { error: message };
         }
@@ -209,7 +215,8 @@ export const firestoreApi = createApi({
           console.log("Read Operation [dailySummarizationOrders]");
           return { data: dailySummarization };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error(message);
           return { error: message };
         }
@@ -251,7 +258,7 @@ export const firestoreApi = createApi({
 
         await cacheEntryRemoved;
         unsubscribe();
-      }
+      },
     }),
 
     // Mutation Endpoints
@@ -358,7 +365,8 @@ export const firestoreApi = createApi({
           );
           return { data: null };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error("Error updating order status:", message);
           return { error: message };
         }
@@ -435,7 +443,8 @@ export const firestoreApi = createApi({
           console.log("Order canceled and moved to 'voidedOrders'");
           return { data: null };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error("Error while canceling order:", message);
           return { error: message };
         }
@@ -469,7 +478,8 @@ export const firestoreApi = createApi({
           console.log("Write Operation [setRestaurantStatus]");
           return { data: null };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error("Error updating restaurant status:", message);
           return { error: message };
         }
@@ -543,7 +553,8 @@ export const firestoreApi = createApi({
           );
           return { data: null };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error("Error while close the day:", message);
           return { error: message };
         }
@@ -588,11 +599,9 @@ export const firestoreApi = createApi({
           console.log("Write Operation [setDisplaySettings]");
           return { data: null };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
-          console.error(
-            "Error updating restaurant display settings:",
-            message,
-          );
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error("Error updating restaurant display settings:", message);
           return { error: message };
         }
       },
@@ -622,7 +631,8 @@ export const firestoreApi = createApi({
           console.log("Write Operation [setOrderWorkflowSettings]");
           return { data: null };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error(
             "Error updating restaurant order work flow settings:",
             message,
@@ -704,7 +714,8 @@ export const firestoreApi = createApi({
           console.log("Order assigned to driver and status updated.");
           return { data: null };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error("Error assigning order to driver:", message);
           return { error: message };
         }
@@ -737,7 +748,8 @@ export const firestoreApi = createApi({
           console.log("Driver dues has been rested");
           return { data: null };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error("Error assigning order to driver:", message);
           return { error: message };
         }
@@ -766,7 +778,8 @@ export const firestoreApi = createApi({
           console.log("Driver status has been updated");
           return { data: null };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error("Error set status to driver:", message);
           return { error: message };
         }
@@ -786,7 +799,8 @@ export const firestoreApi = createApi({
 
           return { data: null };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error("Error delete driver:", message);
           return { error: message };
         }
@@ -840,7 +854,8 @@ export const firestoreApi = createApi({
 
           return { data: null };
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           console.error("Error while added nre driver: ", message);
           return { error: message };
         }

@@ -48,6 +48,11 @@ export async function initAdmin() {
     );
   }
 
+  if (process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATOR === "true") {
+    process.env.FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099";
+    process.env.FIRESTORE_EMULATOR_HOST = "127.0.0.1:8080";
+  }
+
   return createFirebaseAdminApp(params);
 }
 

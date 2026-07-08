@@ -144,14 +144,17 @@ export function useAuth(autoNavigate = true) {
 
       if (!docSnapshot.exists()) {
         await setDoc(userDocRef, {
-          joinDate: Date.now(),
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
           uid: firebaseUser.uid,
           userInfo: {
             uid: firebaseUser.uid,
             email: firebaseUser.email,
             role: "BUSINESSES_CREATOR",
+            provider: "Google",
           },
           data: {
+            uid: firebaseUser.uid,
             businesses: [],
           },
         });

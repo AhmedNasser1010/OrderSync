@@ -6,14 +6,15 @@ import { Label } from "@/components/ui/label";
 
 interface AddressSectionProps {
   data: {
+    address: string;
     latitude: number;
     longitude: number;
   };
-  onChange: (data: { latitude: number; longitude: number }) => void;
+  onChange: (data: { address: string; latitude: number; longitude: number }) => void;
 }
 
 export function AddressSection({ data, onChange }: AddressSectionProps) {
-  const handleChange = (field: string, value: string) => {
+  const handleNumericChange = (field: string, value: string) => {
     const numValue = parseFloat(value) || 0;
     onChange({ ...data, [field]: numValue });
   };
@@ -24,6 +25,19 @@ export function AddressSection({ data, onChange }: AddressSectionProps) {
         Address & Location
       </h2>
       <div className="space-y-4">
+        <div>
+          <Label htmlFor="address" className="text-foreground">
+            Address
+          </Label>
+          <Input
+            id="address"
+            type="text"
+            value={data.address}
+            onChange={(e) => onChange({ ...data, address: e.target.value })}
+            placeholder="123 Main St, City, Country"
+            className="mt-1.5"
+          />
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="latitude" className="text-foreground">
@@ -34,7 +48,7 @@ export function AddressSection({ data, onChange }: AddressSectionProps) {
               type="number"
               step="0.0001"
               value={data.latitude}
-              onChange={(e) => handleChange("latitude", e.target.value)}
+              onChange={(e) => handleNumericChange("latitude", e.target.value)}
               placeholder="24.7136"
               className="mt-1.5"
             />
@@ -51,7 +65,7 @@ export function AddressSection({ data, onChange }: AddressSectionProps) {
               type="number"
               step="0.0001"
               value={data.longitude}
-              onChange={(e) => handleChange("longitude", e.target.value)}
+              onChange={(e) => handleNumericChange("longitude", e.target.value)}
               placeholder="46.6753"
               className="mt-1.5"
             />

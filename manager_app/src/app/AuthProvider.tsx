@@ -1,9 +1,10 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 import useUser from "@/hooks/useUser";
-import AutoLoginLoadingScreen from '@/components/AutoLoginLoadingScreen'
-import UnassignedUserDialog from '@/components/UnassignedUserDialog'
+import AutoLoginLoadingScreen from "@/components/AutoLoginLoadingScreen";
+import { Button } from "@/components/ui/button";
 
 export default function AuthProvider({
   children,
@@ -12,6 +13,8 @@ export default function AuthProvider({
 }) {
   const { user, isAuthLoading, logout } = useAuth(false);
   const { user: userData, isLoading: isUserDataLoading } = useUser();
+  const router = useRouter();
+  const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = useCallback(async () => {
@@ -23,14 +26,27 @@ export default function AuthProvider({
     }
   }, [logout]);
 
+  const isAuthPage =
+    pathname?.startsWith("/login") || pathname?.startsWith("/signup");
+
+  // Redirect unauthenticated users to login on protected pages
+  useEffect(() => {
+    if (!user?.uid && !isAuthLoading && !isAuthPage) {
+      router.push("/login");
+    }
+  }, [user?.uid, isAuthLoading, isAuthPage, router]);
+
   // Show loading screen while auth is loading
   if (!user?.uid && isAuthLoading) {
     return <AutoLoginLoadingScreen />;
   }
 
-  // If user is not logged in, render children (they'll be redirected to login by useAuth)
+  // If user is not logged in on a protected page, show loading while redirecting
   if (!user?.uid) {
-    return <>{children}</>;
+    if (isAuthPage) {
+      return <>{children}</>;
+    }
+    return <AutoLoginLoadingScreen />;
   }
 
   // Show loading while user data is being fetched from Firestore
@@ -38,21 +54,35 @@ export default function AuthProvider({
     return <AutoLoginLoadingScreen />;
   }
 
-  // If user data is loaded but accessToken is empty/missing, show restricted dialog
+  // If user data is loaded but accessToken is empty/missing or role is not BUSINESS_MANAGER, show restricted dialog
   const accessToken = userData?.accessToken;
-  const isUnassigned = !accessToken || accessToken.trim() === "";
+  const userRole = userData?.userInfo?.role;
+  const isUnassigned = !accessToken || accessToken.trim() === "" || userRole !== "BUSINESS_MANAGER";
 
   if (isUnassigned) {
     return (
-      <>
-        <UnassignedUserDialog
-          open={!isLoggingOut}
-          email={user.email || "unknown@email.com"}
-          onLogout={handleLogout}
-        />
-        {/* Render nothing accessible */}
-        <div className="fixed inset-0 bg-background" />
-      </>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+        <div className="bg-card border border-border rounded-lg p-6 shadow-lg mx-4 max-w-md w-full">
+          <h2 className="text-lg font-semibold text-foreground text-center">
+            Access Restricted
+          </h2>
+          <p className="text-sm text-muted-foreground text-center pt-2">
+            You aren't assigned to any businesses yet
+            <br />
+            Signed in as <strong>{user.email || "unknown@email.com"}</strong>
+          </p>
+          <div className="flex items-center justify-center mt-6 pt-4 border-t border-border">
+            <Button
+              variant="destructive"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="w-full sm:w-auto"
+            >
+              {isLoggingOut ? "Logging out..." : "Logout"}
+            </Button>
+          </div>
+        </div>
+      </div>
     );
   }
 

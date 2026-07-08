@@ -26,16 +26,8 @@ export type BusinessDocument = {
     uid: string;
     email: string;
     phone: string;
-    basic?: {
-      fName: string;
-      lName: string;
-    };
-    name?: string;
-    contact?: {
-      name: string;
-      email: string;
-      phone: string;
-    };
+    name: string;
+    secondPhone?: string;
   };
   business: {
     name: string;
@@ -66,8 +58,8 @@ export type BusinessDocument = {
   };
   settings: BusinessSettings;
   status: RestaurantStatusTypes;
-  updatedOn: number;
-  createdOn: number;
+  updatedAt: number;
+  createdAt: number;
   topChains: boolean;
   reviewSummary: {
     averageRating: number;

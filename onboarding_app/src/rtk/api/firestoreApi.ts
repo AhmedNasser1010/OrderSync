@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { deleteAuthUser } from "@/app/actions/deleteAuthUser";
+import { getUserProvider } from "@/app/actions/getUserProvider";
 import type {
   RestaurantStatusTypes,
   BusinessDocument,
@@ -118,14 +119,17 @@ export const firestoreApi = createApi({
       async queryFn({ uid, email }) {
         try {
           const userData = {
-            joinDate: Date.now(),
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
             uid,
             userInfo: {
               uid,
               email,
               role: "BUSINESSES_CREATOR",
+              provider: "Email/Password",
             },
             data: {
+              uid,
               businesses: [],
             },
           };
@@ -167,6 +171,23 @@ export const firestoreApi = createApi({
             throw new Error("User UID is required.");
           }
 
+          const ownerName = user.name ?? user.displayName ?? "";
+          const ownerEmail = business.owner?.email ?? user.email ?? "";
+          const ownerPhone =
+            business.owner?.phone ?? user.phone ?? user.phoneNumber ?? "";
+          const normalizedOwner = {
+            uid: business.owner?.uid ?? user.uid ?? "",
+            name: ownerName,
+            email: ownerEmail,
+            phone: ownerPhone,
+          };
+          const managerUid = normalizedOwner.uid || user.uid;
+          const now = Date.now();
+
+          // Fetch manager's provider from Firebase Auth (not Partner data)
+          const providerResult = await getUserProvider(managerUid);
+          const managerProvider = providerResult.provider || "Email/Password";
+
           await runTransaction(db, async (transaction) => {
             const businessRef = doc(db, "businesses", business.accessToken);
             const menuRef = doc(db, "menus", business.accessToken);
@@ -185,22 +206,10 @@ export const firestoreApi = createApi({
               ? userData.data.businesses
               : [];
 
-            const ownerName = user.name ?? user.displayName ?? "";
-            const ownerEmail = business.owner?.email ?? user.email ?? "";
-            const ownerPhone =
-              business.owner?.phone ?? user.phone ?? user.phoneNumber ?? "";
-            const normalizedOwner = {
-              uid: business.owner?.uid ?? user.uid ?? "",
-              name: ownerName,
-              email: ownerEmail,
-              phone: ownerPhone,
-            };
-            const now = Date.now();
             const normalizedBusiness = {
               ...business,
               owner: normalizedOwner,
               partnerUid: user.uid,
-              createdOn: business.createdOn ?? now,
               createdAt: now,
               updatedAt: now,
             };
@@ -237,25 +246,23 @@ export const firestoreApi = createApi({
             //    the current authenticated user's document (the businesses creator).
             const ownerUid = normalizedOwner.uid;
             const managerRef = ownerUid ? doc(db, "users", ownerUid) : userRef;
-            transaction.set(
-              managerRef,
-              {
-                accessToken: normalizedBusiness.accessToken,
-                partnerUid: user.uid,
-                createdAt: now,
-                updatedAt: now,
-                owner: normalizedOwner,
-                userInfo: {
-                  email: normalizedOwner.email || user.email,
-                  name: normalizedOwner.name || user.name || null,
-                  phone: normalizedOwner.phone || user.phone || null,
-                  secondPhone: user.secondPhone ?? null,
-                  role: "BUSINESS_MANAGER",
-                  uid: ownerUid || user.uid,
-                },
+            const managerData: ManagerUser = {
+              uid: managerUid,
+              accessToken: normalizedBusiness.accessToken,
+              partnerUid: user.uid,
+              createdAt: now,
+              updatedAt: now,
+              userInfo: {
+                uid: managerUid,
+                email: normalizedOwner.email || user.email,
+                name: normalizedOwner.name || user.name || "",
+                phone: normalizedOwner.phone || user.phone || "",
+                secondPhone: user.secondPhone ?? undefined,
+                role: "BUSINESS_MANAGER",
+                provider: managerProvider,
               },
-              { merge: true },
-            );
+            };
+            transaction.set(managerRef, managerData, { merge: true });
           });
 
           console.log("Write Operation [createBusiness]");

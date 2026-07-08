@@ -14,8 +14,9 @@ interface OwnerSectionProps {
     email: string;
     phone: string;
     name?: string;
+    secondPhone?: string;
   };
-  onChange: (data: { uid: string; email: string; phone: string; name?: string }) => void;
+  onChange: (data: { uid: string; email: string; phone: string; name?: string; secondPhone?: string }) => void;
 }
 
 function isValidEmail(email: string): boolean {
@@ -125,6 +126,18 @@ export function OwnerSection({ data, onChange }: OwnerSectionProps) {
             value={data.phone}
             onChange={(e) => handleChange("phone", e.target.value)}
             placeholder="e.g. +966501234567"
+            className="mt-1.5"
+          />
+        </div>
+        <div>
+          <Label htmlFor="owner-second-phone" className="text-foreground">
+            Second Phone Number
+          </Label>
+          <Input
+            id="owner-second-phone"
+            value={data.secondPhone ?? ""}
+            onChange={(e) => handleChange("secondPhone", e.target.value)}
+            placeholder="e.g. +966501234568"
             className="mt-1.5"
           />
         </div>

@@ -9,21 +9,21 @@ export default function AuthLayout({
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-12 h-12 bg-primary rounded-lg mb-4">
             <span className="text-lg font-bold text-primary-foreground">
-              M
+              O
             </span>
           </div>
           <h1 className="text-3xl font-bold text-foreground">
-            Manager
+            Orders
           </h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Manage your restaurant with ease
+            Manage your orders with ease
           </p>
         </div>
 
         <div>{children}</div>
 
         <div className="mt-8 text-center text-xs text-muted-foreground">
-          <p>&copy; 2025 OrderSync. All rights reserved.</p>
+          <p>&copy; 2025 Orders. All rights reserved.</p>
         </div>
       </div>
     </div>

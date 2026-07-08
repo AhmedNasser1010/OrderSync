@@ -1,13 +1,13 @@
 import { useMemo, useState, useEffect, useCallback } from "react";
-import type { OrderType } from '@ordersync/types';
-import type { ItemType } from '@ordersync/types';
+import type { OrderType } from "@ordersync/types";
+import type { ItemType } from "@ordersync/types";
 import type { FormattedOrderType, CartItemType } from "@/types/orders";
 import {
   useFetchUserDataQuery,
   useFetchOpenOrdersDataQuery,
   useFetchMenuDataQuery,
   useFetchCompletedOrdersDataQuery,
-  useFetchVoidedOrdersDataQuery
+  useFetchVoidedOrdersDataQuery,
 } from "@/rtk/api/firestoreApi";
 import { useAppSelector } from "@/rtk/hooks";
 import { userUid } from "@/rtk/slices/constantsSlice";
@@ -34,7 +34,7 @@ const useOrders = (): UseOrders => {
   const uid = useAppSelector(userUid);
   const activeTabValue = useAppSelector(activeTab);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { data: userData } = useFetchUserDataQuery(uid ?? skipToken);
+  const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
 
   const { data: openOrdersData, isLoading: openOrdersIsLoading } =
     useFetchOpenOrdersDataQuery(userData?.accessToken, {
@@ -59,7 +59,7 @@ const useOrders = (): UseOrders => {
 
   const { data: menuData, isLoading: menuIsLoading } = useFetchMenuDataQuery(
     userData?.accessToken,
-    { skip: !userData?.accessToken }
+    { skip: !userData?.accessToken },
   );
 
   useEffect(() => {
@@ -86,26 +86,31 @@ const useOrders = (): UseOrders => {
       openOrdersIsLoading,
       menuIsLoading,
       completedOrdersIsLoading,
-      voidedOrdersIsLoading
+      voidedOrdersIsLoading,
     ].every((loading) => loading === false);
     setIsLoading(!allLoading);
-  }, [openOrdersIsLoading, menuIsLoading, completedOrdersIsLoading, voidedOrdersIsLoading]);
+  }, [
+    openOrdersIsLoading,
+    menuIsLoading,
+    completedOrdersIsLoading,
+    voidedOrdersIsLoading,
+  ]);
 
   const getOrder = useCallback(
     (id: string) => orders?.find((order) => order.id === id),
-    [orders]
+    [orders],
   );
 
   const getOrderMenu = useCallback(
     (orderCart: CartItemType[]) => {
       return orderCart.map((cartItem) => {
         const menuItem = menuData?.items?.find(
-          (menuItem: ItemType) => menuItem.id === cartItem.id
+          (menuItem: ItemType) => menuItem.id === cartItem.id,
         );
         return { ...menuItem, ...cartItem };
       });
     },
-    [menuData]
+    [menuData],
   );
 
   const formattedOrders = useMemo<FormattedOrderType[] | null>(() => {

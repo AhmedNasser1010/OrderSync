@@ -45,7 +45,7 @@ type UseStaff = {
 
 const useStaff = (): UseStaff => {
   const uid = useAppSelector(userUid);
-  const { data: userData } = useFetchUserDataQuery(uid ?? skipToken);
+  const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
   const {
     data: driversData,
     isLoading: driversLoading,

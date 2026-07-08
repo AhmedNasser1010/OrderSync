@@ -125,13 +125,15 @@ export function RestaurantForm({
             />
             <AddressSection
               data={{
+                address: formData.business.address,
                 latitude: formData.business.latlng[0],
                 longitude: formData.business.latlng[1],
               }}
-              onChange={({ latitude, longitude }) =>
+              onChange={({ address, latitude, longitude }) =>
                 updateFormData({
                   business: {
                     ...formData.business,
+                    address,
                     latlng: [latitude, longitude],
                   },
                 })
@@ -176,6 +178,7 @@ export function RestaurantForm({
             />
             <SettingsPanel
               settings={formData.settings.orderManagement}
+              topChains={formData.topChains}
               onChange={(orderManagement) =>
                 updateFormData({
                   settings: {
@@ -183,6 +186,9 @@ export function RestaurantForm({
                     orderManagement,
                   },
                 })
+              }
+              onTopChainsChange={(value) =>
+                updateFormData({ topChains: value })
               }
             />
           </div>

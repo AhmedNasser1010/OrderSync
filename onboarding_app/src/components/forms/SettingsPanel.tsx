@@ -13,14 +13,21 @@ interface SettingsPanelProps {
     driverAssignment: boolean;
     printInvoice: boolean;
   };
+  topChains: boolean;
   onChange: (settings: {
     assign: { forCooks: boolean; forDeliveryWorkers: boolean };
     driverAssignment: boolean;
     printInvoice: boolean;
   }) => void;
+  onTopChainsChange: (value: boolean) => void;
 }
 
-export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
+export function SettingsPanel({
+  settings,
+  topChains,
+  onChange,
+  onTopChainsChange,
+}: SettingsPanelProps) {
   const handleChange = (field: string, value: boolean) => {
     if (field === "forCooks" || field === "forDeliveryWorkers") {
       onChange({
@@ -53,6 +60,11 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
       label: "Print Invoice",
       description: "Print invoices for each order",
     },
+    {
+      id: "topChains",
+      label: "Top Chains",
+      description: "Feature this restaurant in top chains",
+    },
   ];
 
   const getValue = (id: string): boolean => {
@@ -65,6 +77,8 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
         return settings.driverAssignment;
       case "printInvoice":
         return settings.printInvoice;
+      case "topChains":
+        return topChains;
       default:
         return false;
     }
@@ -86,7 +100,13 @@ export function SettingsPanel({ settings, onChange }: SettingsPanelProps) {
             </div>
             <Switch
               checked={getValue(setting.id)}
-              onCheckedChange={(value) => handleChange(setting.id, value)}
+              onCheckedChange={(value) => {
+                if (setting.id === "topChains") {
+                  onTopChainsChange(value);
+                } else {
+                  handleChange(setting.id, value);
+                }
+              }}
             />
           </div>
         ))}

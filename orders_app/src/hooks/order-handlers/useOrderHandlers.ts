@@ -23,7 +23,7 @@ type OrderHandler = {
 
 const useOrderHandler = (): OrderHandler => {
   const uid = useAppSelector(userUid);
-  const { data: userData } = useFetchUserDataQuery(uid ?? skipToken);
+  const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
   const { data: orders } = useFetchOpenOrdersDataQuery(userData?.accessToken ?? skipToken);
   const { data: restaurant } = useFetchRestaurantDataQuery(userData?.accessToken ?? skipToken);
   const [setOrderStatus] = useSetOrderStatusMutation();

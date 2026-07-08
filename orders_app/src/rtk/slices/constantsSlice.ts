@@ -16,10 +16,10 @@ export const constantsSlice = createSlice({
   initialState,
   reducers: {
     setUserUid(state, { payload }) {
-      state.userUid = payload
+      state.userUid = payload?.toString().trim() ? payload : null
     },
     setAccessToken(state, { payload }) {
-      state.accessToken = payload
+      state.accessToken = payload?.toString().trim() ? payload : null
     }
   },
 });

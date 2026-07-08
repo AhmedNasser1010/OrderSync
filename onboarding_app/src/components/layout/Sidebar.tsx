@@ -61,9 +61,10 @@ export function Sidebar({
           aria-label="Sidebar navigation"
         >
           {navigationItems.map((item) => {
-            const isActive = item.href === "/restaurants"
-              ? pathname.startsWith("/restaurants")
-              : pathname.startsWith(item.href);
+            const isActive =
+              item.href === "/restaurants"
+                ? pathname.startsWith("/restaurants")
+                : pathname.startsWith(item.href);
 
             return (
               <Link
@@ -90,12 +91,13 @@ export function Sidebar({
         <div className="border-t border-sidebar-border p-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-medium text-primary">
-              {(user?.displayName ?? user?.email)?.charAt(0)?.toUpperCase() ?? 'U'}
+              {(user?.displayName ?? user?.email)?.charAt(0)?.toUpperCase() ??
+                "U"}
             </div>
             {isOpen && (
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-sidebar-foreground truncate">
-                  {user?.displayName ?? user?.email?.split('@')[0] ?? 'User'}
+                  {user?.displayName ?? user?.email?.split("@")[0] ?? "User"}
                 </p>
                 <p className="text-xs text-sidebar-foreground/60 truncate">
                   {user?.email}

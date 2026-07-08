@@ -36,7 +36,7 @@ export default function RestaurantsPage() {
     isFetching,
     refetch,
   } = useFetchBusinessesQuery(userData?.data?.businesses, {
-    skip: !userData?.data?.businesses?.length,
+    skip: !userData?.data?.businesses,
   });
 
   const handleRefetch = useCallback(() => {

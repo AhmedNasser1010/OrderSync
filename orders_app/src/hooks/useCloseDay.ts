@@ -5,13 +5,13 @@ import {
   useFetchMenuDataQuery,
   useFetchCompletedOrdersDataQuery,
   useFetchVoidedOrdersDataQuery,
-  useSetCloseDayMutation
+  useSetCloseDayMutation,
 } from "@/rtk/api/firestoreApi";
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
 import { closeDayPopup, setCloseDayPopup } from "@/rtk/slices/toggleSlice";
-import type { OrderType } from '@ordersync/types';
-import type { MainMenuType } from '@ordersync/types';
+import type { OrderType } from "@ordersync/types";
+import type { MainMenuType } from "@ordersync/types";
 import extractDaySummary from "@/analytics/day_scope/extractDaySummary";
 import { skipToken } from "@reduxjs/toolkit/query";
 
@@ -35,44 +35,45 @@ type FetchMenuType = {
   error?: string;
   isLoading?: boolean;
   isError?: boolean;
-}
+};
 
 const useCloseDay = (): UseCloseDay => {
   const dispatch = useAppDispatch();
   const uid = useAppSelector(userUid);
   const closeDayPopupValues = useAppSelector(closeDayPopup);
-  const { data: userData } = useFetchUserDataQuery(uid ?? skipToken);
-  const [setCloseDay, { isLoading: isSaving, isSuccess, isError, error, reset }] =
-    useSetCloseDayMutation();
+  const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
+  const [
+    setCloseDay,
+    { isLoading: isSaving, isSuccess, isError, error, reset },
+  ] = useSetCloseDayMutation();
 
-  const { data: openOrdersData } =
-    useFetchOpenOrdersDataQuery(userData?.accessToken, {
+  const { data: openOrdersData } = useFetchOpenOrdersDataQuery(
+    userData?.accessToken,
+    {
       skip: !userData?.accessToken,
-    }) as FetchOrdersType;
+    },
+  ) as FetchOrdersType;
 
-    const {
-      data: completedOrdersData,
-    } = useFetchCompletedOrdersDataQuery(userData?.accessToken, {
+  const { data: completedOrdersData } = useFetchCompletedOrdersDataQuery(
+    userData?.accessToken,
+    {
       skip: !userData?.accessToken,
-    }) as FetchOrdersType;
-  
-    const {
-      data: voidedOrdersData,
-    } = useFetchVoidedOrdersDataQuery(userData?.accessToken, {
-      skip: !userData?.accessToken,
-    }) as FetchOrdersType;
+    },
+  ) as FetchOrdersType;
 
-    const { data: menuData } = useFetchMenuDataQuery(
-      userData?.accessToken,
-      { skip: !userData?.accessToken }
-    ) as FetchMenuType;
+  const { data: voidedOrdersData } = useFetchVoidedOrdersDataQuery(
+    userData?.accessToken,
+    {
+      skip: !userData?.accessToken,
+    },
+  ) as FetchOrdersType;
+
+  const { data: menuData } = useFetchMenuDataQuery(userData?.accessToken, {
+    skip: !userData?.accessToken,
+  }) as FetchMenuType;
 
   useEffect(() => {
-    if (
-      openOrdersData &&
-      completedOrdersData &&
-      closeDayPopupValues.isOpen
-    ) {
+    if (openOrdersData && completedOrdersData && closeDayPopupValues.isOpen) {
       // non-completed orders check
       const hasNonCompletedOrders = openOrdersData?.length ? true : false;
       // Has completed orders check
@@ -96,10 +97,15 @@ const useCloseDay = (): UseCloseDay => {
                 : "",
             },
           },
-        })
+        }),
       );
     }
-  }, [openOrdersData, completedOrdersData, closeDayPopupValues.isOpen, dispatch]);
+  }, [
+    openOrdersData,
+    completedOrdersData,
+    closeDayPopupValues.isOpen,
+    dispatch,
+  ]);
 
   useEffect(() => {
     if (!closeDayPopupValues.isOpen) {
@@ -115,7 +121,7 @@ const useCloseDay = (): UseCloseDay => {
             type: "success",
             text: "Day closed successfully.",
           },
-        })
+        }),
       );
       return;
     }
@@ -127,11 +133,19 @@ const useCloseDay = (): UseCloseDay => {
           result: {
             type: "error",
             text:
-              (error as { data?: string; error?: string; message?: string } | undefined)?.data ||
-              (error as { data?: string; error?: string; message?: string } | undefined)?.message ||
+              (
+                error as
+                  | { data?: string; error?: string; message?: string }
+                  | undefined
+              )?.data ||
+              (
+                error as
+                  | { data?: string; error?: string; message?: string }
+                  | undefined
+              )?.message ||
               "Failed to close day.",
           },
-        })
+        }),
       );
     }
   }, [closeDayPopupValues.isOpen, dispatch, error, isError, isSuccess, reset]);
@@ -145,15 +159,14 @@ const useCloseDay = (): UseCloseDay => {
   };
 
   const closeDay = () => {
-    if (
-      isPassed() &&
-      completedOrdersData &&
-      voidedOrdersData &&
-      menuData
-    ) {
-      const allOrders = [...completedOrdersData, ...voidedOrdersData]
-      const todayDate = new Date().toISOString().split('T')[0]
-      const extractDaySummaryData = extractDaySummary(allOrders, menuData, todayDate)
+    if (isPassed() && completedOrdersData && voidedOrdersData && menuData) {
+      const allOrders = [...completedOrdersData, ...voidedOrdersData];
+      const todayDate = new Date().toISOString().split("T")[0];
+      const extractDaySummaryData = extractDaySummary(
+        allOrders,
+        menuData,
+        todayDate,
+      );
       dispatch(
         setCloseDayPopup({
           isLoading: true,
@@ -161,15 +174,17 @@ const useCloseDay = (): UseCloseDay => {
             type: null,
             text: "",
           },
-        })
+        }),
       );
       setCloseDay({
         resId: userData?.accessToken,
         orders: allOrders,
-        summaryData: extractDaySummaryData
-      }).unwrap().catch(() => {
-        // Error state is handled by the effect above.
-      });
+        summaryData: extractDaySummaryData,
+      })
+        .unwrap()
+        .catch(() => {
+          // Error state is handled by the effect above.
+        });
     }
   };
 
@@ -177,7 +192,7 @@ const useCloseDay = (): UseCloseDay => {
     closeDay,
     isPassed,
     isLoading: closeDayPopupValues.isLoading,
-    isSaving
+    isSaving,
   };
 };
 

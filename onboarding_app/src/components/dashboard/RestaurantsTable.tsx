@@ -175,7 +175,7 @@ export function RestaurantsTable({
                 </TableCell>
                 <TableCell className="py-4 text-sm text-muted-foreground">
                   {format(
-                    new Date(restaurant.updatedOn),
+                    new Date(restaurant.updatedAt),
                     "MMM dd, yyyy hh:mm a",
                   )}
                 </TableCell>

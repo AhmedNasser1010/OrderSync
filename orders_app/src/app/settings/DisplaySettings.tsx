@@ -8,23 +8,35 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useSetDisplaySettingsMutation, useFetchUserDataQuery, useFetchRestaurantDataQuery } from '@/rtk/api/firestoreApi'
+import {
+  useSetDisplaySettingsMutation,
+  useFetchUserDataQuery,
+  useFetchRestaurantDataQuery,
+} from "@/rtk/api/firestoreApi";
 import { useAppSelector } from "@/rtk/hooks";
-import { userUid } from '@/rtk/slices/constantsSlice'
+import { userUid } from "@/rtk/slices/constantsSlice";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function DisplaySettings() {
-  const uid = useAppSelector(userUid)
-  const { data: userData } = useFetchUserDataQuery(uid)
-  const { data: resData } = useFetchRestaurantDataQuery(userData?.accessToken)
-  const [setDisplaySettings] = useSetDisplaySettingsMutation()
+  const uid = useAppSelector(userUid);
+  const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
+  const { data: resData } = useFetchRestaurantDataQuery(
+    userData?.accessToken ?? skipToken,
+    {
+      skip: !userData?.accessToken,
+    },
+  );
+  const [setDisplaySettings] = useSetDisplaySettingsMutation();
 
-  const handleOnBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleOnBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setDisplaySettings({
       resId: userData?.accessToken,
       settingName: e.target.name,
-      value: e.target.value
-    })
-  }
+      value: e.target.value,
+    });
+  };
 
   return (
     <Card className="border border-border">
@@ -37,19 +49,43 @@ export default function DisplaySettings() {
       <CardContent>
         <div className="grid w-full items-center gap-1.5 mb-4">
           <Label htmlFor="promotional-subtitle">Promotional Subtitle</Label>
-          <Input id="promotional-subtitle" type="text" defaultValue={resData?.business?.promotionalSubtitle} name="promotionalSubtitle" onBlur={handleOnBlur} />
+          <Input
+            id="promotional-subtitle"
+            type="text"
+            defaultValue={resData?.business?.promotionalSubtitle}
+            name="promotionalSubtitle"
+            onBlur={handleOnBlur}
+          />
         </div>
         <div className="grid w-full items-center gap-1.5 mb-4">
           <Label htmlFor="brand-logo">Brand Logo URL</Label>
-          <Input id="brand-logo" type="text" defaultValue={resData?.business?.icon} name="icon" onBlur={handleOnBlur} />
+          <Input
+            id="brand-logo"
+            type="text"
+            defaultValue={resData?.business?.icon}
+            name="icon"
+            onBlur={handleOnBlur}
+          />
         </div>
         <div className="grid w-full items-center gap-1.5 mb-4">
           <Label htmlFor="brand-cover">Brand Cover URL</Label>
-          <Input id="brand-cover" type="text" name="cover" defaultValue={resData?.business?.cover} onBlur={handleOnBlur} />
+          <Input
+            id="brand-cover"
+            type="text"
+            name="cover"
+            defaultValue={resData?.business?.cover}
+            onBlur={handleOnBlur}
+          />
         </div>
         <div className="grid w-full gap-1.5">
           <Label htmlFor="message">Temporary Pause Close Message</Label>
-          <Textarea placeholder="Type your message here." id="message" defaultValue={resData?.settings?.siteControl?.closeMsg} name="closeMsg" onBlur={handleOnBlur} />
+          <Textarea
+            placeholder="Type your message here."
+            id="message"
+            defaultValue={resData?.settings?.siteControl?.closeMsg}
+            name="closeMsg"
+            onBlur={handleOnBlur}
+          />
         </div>
       </CardContent>
     </Card>

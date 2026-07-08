@@ -134,7 +134,7 @@ export function useRestaurantForm(initialData?: BusinessDocument) {
       if (initialData?.accessToken) {
         await updateBusiness({
           accessToken: formData.accessToken,
-          updates: { ...formData, updatedOn: now },
+          updates: { ...formData, updatedAt: now },
         }).unwrap();
       } else {
         if (!currentUser?.uid || !currentUser.email) {
@@ -148,7 +148,7 @@ export function useRestaurantForm(initialData?: BusinessDocument) {
             email: formData.owner.email,
             name: ownerName,
             phone: formData.owner.phone,
-            secondPhone: phoneNumbers[1] ?? "",
+            secondPhone: formData.owner.secondPhone ?? "",
             displayName: currentUser.displayName,
             phoneNumber: currentUser.phoneNumber,
           },
@@ -218,6 +218,8 @@ function createEmptyBusinessDocument(): BusinessDocument {
       uid: "",
       email: "",
       phone: "",
+      name: "",
+      secondPhone: "",
     },
     business: {
       name: "",
@@ -262,8 +264,8 @@ function createEmptyBusinessDocument(): BusinessDocument {
       },
     },
     status: "active",
-    updatedOn: Date.now(),
-    createdOn: Date.now(),
+    updatedAt: Date.now(),
+    createdAt: Date.now(),
     topChains: false,
     reviewSummary: {
       averageRating: 0,
