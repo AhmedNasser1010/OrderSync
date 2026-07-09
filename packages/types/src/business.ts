@@ -1,27 +1,14 @@
 export type RestaurantStatusTypes = "active" | "inactive" | "busy" | "pause";
 
-export type BusinessSettings = {
-  siteControl: {
-    closeMsg: string;
-    availability: boolean;
-    autoAvailability: boolean;
-    isBusy: boolean;
-    temporaryPause: boolean;
-    status: RestaurantStatusTypes;
-  };
-  orderManagement: {
-    assign: {
-      forCooks: boolean;
-      forDeliveryWorkers: boolean;
-    };
-    driverAssignment: boolean;
-    printInvoice: boolean;
-  };
-};
-
 export type BusinessDocument = {
   accessToken: string;
   partnerUid: string;
+  branding: {
+    closeMsg: string;
+    promotionalSubtitle: string;
+    cover: string;
+    icon: string;
+  };
   owner: {
     uid: string;
     email: string;
@@ -29,18 +16,15 @@ export type BusinessDocument = {
     name: string;
     secondPhone?: string;
   };
-  business: {
+  profile: {
     name: string;
     nameInAr: string;
     industry: string;
     address: string;
-    latlng: [number, number];
-    cover: string;
-    icon: string;
-    promotionalSubtitle: string;
+    latlng: [number, number]; // coordinates
     cuisines: string[];
   };
-  services: {
+  operations: {
     openingHours: Record<
       string,
       {
@@ -56,7 +40,9 @@ export type BusinessDocument = {
       vodafoneCash?: boolean;
     };
   };
-  settings: BusinessSettings;
+  settings: {
+    printInvoice: boolean;
+  };
   status: RestaurantStatusTypes;
   updatedAt: number;
   createdAt: number;

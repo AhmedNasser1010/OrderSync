@@ -283,18 +283,7 @@ export const firestoreApi = createApi({
           }
 
           const businessRef = doc(db, "businesses", accessToken);
-          await updateDoc(businessRef, {
-            ...updates,
-            lastUpdate: {
-              time: new Date().toLocaleTimeString("en-GB", {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-                hour12: false,
-              }),
-              date: new Date().toLocaleDateString("en-CA"),
-            },
-          });
+          await updateDoc(businessRef, updates);
 
           console.log("Write Operation [updateBusiness]");
           return { data: null };
@@ -442,7 +431,7 @@ export const firestoreApi = createApi({
           const docRef = doc(db, "businesses", resId);
 
           await updateDoc(docRef, {
-            ["settings.siteControl.status"]: status,
+            ["status"]: status,
           });
 
           console.log("Write Operation [setRestaurantStatus]");

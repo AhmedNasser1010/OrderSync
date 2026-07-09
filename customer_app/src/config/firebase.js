@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import {getAuth, GoogleAuthProvider} from "firebase/auth"
-import { getFirestore } from "firebase/firestore"
+import {getAuth, GoogleAuthProvider, connectAuthEmulator} from "firebase/auth"
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore"
 
 !import.meta.env.VITE_FIREBASE_API && console.error('Error VITE_FIREBASE_API .env value not found!')
 !import.meta.env.VITE_FIREBASE_AUTHDOMAIN && console.error('Error VITE_FIREBASE_AUTHDOMAIN .env value not found!')
@@ -23,5 +23,10 @@ const app = initializeApp(firebaseConfig)
 
 const auth = getAuth(app)
 const db = getFirestore(app)
+
+if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === "true") {
+  connectFirestoreEmulator(db, "127.0.0.1", 8080)
+  connectAuthEmulator(auth, "http://127.0.0.1:9099")
+}
 
 export {auth, db}

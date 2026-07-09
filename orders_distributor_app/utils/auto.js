@@ -34,12 +34,7 @@ function on() {
 
   const restaurants = store.restaurants.values
   const restaurantsIDs = store.user.values.data.businesses
-  const businessIDsWithTrueAssign = restaurantsIDs.filter(resID => {
-    const restaurant = restaurants.find(res => res.accessToken === resID)
-    if (!restaurant.settings.orderManagement.assign.forDeliveryWorkers) {
-      return resID
-    }
-  })
+  const businessIDsWithTrueAssign = restaurantsIDs
   const q = query(collection(db, "orders"), where("accessToken", "in", businessIDsWithTrueAssign))
 
 
@@ -101,7 +96,7 @@ setSubscribe(async (store) => {
       // Phase 5: Get the belonging restaursnt to the order
       const restaurant = await getBelongingRes(store.restaurants.values, order)
       if (!restaurant) return
-      const resLocation = restaurant.business.latlng
+      const resLocation = restaurant.profile.latlng
 
       // Phase 6: Find an a drivers within specific distance
       const driversWithDistance = await findDriversWithinDistance(order, availableDrivers, resLocation)
@@ -129,7 +124,7 @@ setSubscribe(async (store) => {
       const neardyOrders = getNeardyOrders(currentResInProgressOrders, order)
 
       // Phase 13: Get the about to done orders
-      const aboutToDone = getAboutToDone(neardyOrders, restaurant.services.cookTime)
+      const aboutToDone = getAboutToDone(neardyOrders, restaurant.operations.cookTime)
 
       // Phase 14: Assign the orders to the driver
       const isAssigned = await assign(choosedDriver, [ ...aboutToDone, order ])

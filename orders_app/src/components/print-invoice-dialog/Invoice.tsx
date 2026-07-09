@@ -79,8 +79,8 @@ export default function Invoice({
   return (
     <InvoiceWrapper ref={contentRef}>
       <IconContainer>
-        <Icon src={restaurant.business.icon} alt="logo" />
-        <Title>{restaurant.business.name.toUpperCase()}</Title>
+        <Icon src={restaurant.branding.icon} alt="logo" />
+        <Title>{restaurant.profile.name.toUpperCase()}</Title>
       </IconContainer>
       <hr />
       <MiddleSpan

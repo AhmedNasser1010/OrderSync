@@ -164,8 +164,8 @@ function CheckoutUserPayment({ handleCurrentState, res }) {
 			})
 		})
 
-		setTotal(total + res?.services?.deliveryTax?.max)
-		setTotalWithDiscount(totalWithDiscount + res?.services?.deliveryTax?.max)
+		setTotal(total + res?.operations?.deliveryTax?.max)
+		setTotalWithDiscount(totalWithDiscount + res?.operations?.deliveryTax?.max)
 	}, [])
 
 	return (

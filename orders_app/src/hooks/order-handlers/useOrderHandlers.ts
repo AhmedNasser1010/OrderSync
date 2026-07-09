@@ -34,7 +34,7 @@ const useOrderHandler = (): OrderHandler => {
       let statusForward;
       let statusBackward;
 
-      if (restaurant?.settings?.orderManagement?.driverAssignment) {
+      if (false) {
         statusForward = {
           RECEIVED: "PREPARING",
           PREPARING: "PICK_UP",

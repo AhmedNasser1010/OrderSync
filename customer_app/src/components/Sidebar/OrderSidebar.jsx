@@ -67,15 +67,15 @@ function OrderSidebar() {
   const currentRes = restaurants?.find((res) => res.accessToken === user.trackedOrder.restaurant)
   const { cancelOrder, trackedOrderData } = useOrder()
   const defaultCenter = [29.620106778124843, 31.255811811669496]
-  const fallbackDriverLocation = currentRes?.business?.latlng
-    ? [currentRes.business.latlng[0] + 0.0008, currentRes.business.latlng[1] + 0.0008]
+  const fallbackDriverLocation = currentRes?.profile?.latlng
+    ? [currentRes.profile.latlng[0] + 0.0008, currentRes.profile.latlng[1] + 0.0008]
     : null
   const driverLocation =
     trackedOrderData?.delivery?.liveLocation?.[0] && trackedOrderData?.delivery?.liveLocation?.[1]
       ? trackedOrderData.delivery.liveLocation
       : fallbackDriverLocation
   const mapPoints = [
-    currentRes?.business?.latlng,
+    currentRes?.profile?.latlng,
     trackedOrderData?.location?.latlng,
     driverLocation
   ]
@@ -198,9 +198,9 @@ function OrderSidebar() {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; <a href="https://ahmed-nasser.netlify.app/" target="_blank">Ahmed Nasser</a> OrderSync Systems'
             />
-            {currentRes?.business?.latlng && (
-              <Marker position={currentRes?.business?.latlng} icon={restaurantMapIcon}>
-                <Popup>{currentRes?.business?.name || t('Restaurant')}</Popup>
+            {currentRes?.profile?.latlng && (
+              <Marker position={currentRes?.profile?.latlng} icon={restaurantMapIcon}>
+                <Popup>{currentRes?.profile?.name || t('Restaurant')}</Popup>
               </Marker>
             )}
             {trackedOrderData?.location?.latlng && (
@@ -228,8 +228,8 @@ function OrderSidebar() {
             {currentRes && !trackedOrderData?.delivery && (
               <Marker
                 position={[
-                  currentRes?.business?.latlng[0] + 0.0008,
-                  currentRes?.business?.latlng[1] + 0.0008
+                  currentRes?.profile?.latlng[0] + 0.0008,
+                  currentRes?.profile?.latlng[1] + 0.0008
                 ]}
                 icon={driverMapIcon}>
                 <Popup>
@@ -245,25 +245,25 @@ function OrderSidebar() {
                 </Popup>
               </Marker>
             )}
-            {currentRes?.business?.latlng &&
+            {currentRes?.profile?.latlng &&
               trackedOrderData?.delivery?.liveLocation &&
               trackedOrderData?.delivery?.liveLocation[0] &&
               trackedOrderData?.delivery?.liveLocation[1] && (
                 <Polyline
                   pathOptions={{ color: 'grey' }}
                   positions={[
-                    currentRes?.business?.latlng,
+    currentRes?.profile?.latlng,
                     trackedOrderData?.delivery?.liveLocation
                   ]}
                 />
               )}
-            {currentRes?.business?.latlng && !trackedOrderData?.delivery && (
+            {currentRes?.profile?.latlng && !trackedOrderData?.delivery && (
               <Polyline
                 positions={[
-                  currentRes?.business?.latlng,
+                  currentRes?.profile?.latlng,
                   [
-                    currentRes?.business?.latlng[0] + 0.0008,
-                    currentRes?.business?.latlng[1] + 0.0008
+                    currentRes?.profile?.latlng[0] + 0.0008,
+                    currentRes?.profile?.latlng[1] + 0.0008
                   ]
                 ]}
               />
@@ -279,13 +279,13 @@ function OrderSidebar() {
                   ]}
                 />
               )}
-            {trackedOrderData?.location?.latlng && !trackedOrderData?.delivery && (
+            {              trackedOrderData?.location?.latlng && !trackedOrderData?.delivery && (
               <Polyline
                 positions={[
                   trackedOrderData?.location?.latlng,
                   [
-                    currentRes?.business?.latlng[0] + 0.0008,
-                    currentRes?.business?.latlng[1] + 0.0008
+                    currentRes?.profile?.latlng[0] + 0.0008,
+                    currentRes?.profile?.latlng[1] + 0.0008
                   ]
                 ]}
               />

@@ -76,21 +76,21 @@ function TopRestaurant() {
           <div className="top-chain-category overflow-x-scroll scroll-smooth scrollbar-hide max-w-[1500px]">
             <div className="flex gap-8">
               {topChains?.map((res) => (
-                <div className="cursor-pointer" key={res?.accessToken}>
+                <div className="shrink-0 w-80" key={res?.accessToken}>
                   <Link
-                    className="relative transition-all hover:scale-95"
-                    to={`/${res?.business.name.split(' ').join('-')}`}>
+                    className="relative block transition-all hover:scale-95"
+                    to={`/${res?.profile.name.split(' ').join('-')}`}>
                     <RestaurantCard
                       info={{
                         areaName: t('El-Ayat'),
-                        name: res?.business?.name,
-                        nameInAr: res?.business?.nameInAr || res?.business?.name,
+                        name: res?.profile?.name,
+                        nameInAr: res?.profile?.nameInAr || res?.profile?.name,
                         avgRating: '4.5',
-                        cloudinaryImageId: res?.business?.cover,
-                        sla: `${res.services.cookTime[0] / 60000}-${res.services.cookTime[1] / 60000} ${t('min')}`,
-                        cuisines: res?.business?.cuisines,
-                        status: res?.settings?.siteControl?.status,
-                        promotionalSubtitle: res?.business?.promotionalSubtitle
+                        cloudinaryImageId: res?.branding?.cover,
+                        sla: `${res.operations.cookTime[0]}-${res.operations.cookTime[1]} ${t('min')}`,
+                        cuisines: res?.profile?.cuisines,
+                        status: res?.status,
+                        promotionalSubtitle: res?.branding?.promotionalSubtitle
                       }}
                     />
                   </Link>

@@ -6,17 +6,10 @@ import { Label } from "@/components/ui/label";
 
 interface SettingsPanelProps {
   settings: {
-    assign: {
-      forCooks: boolean;
-      forDeliveryWorkers: boolean;
-    };
-    driverAssignment: boolean;
     printInvoice: boolean;
   };
   topChains: boolean;
   onChange: (settings: {
-    assign: { forCooks: boolean; forDeliveryWorkers: boolean };
-    driverAssignment: boolean;
     printInvoice: boolean;
   }) => void;
   onTopChainsChange: (value: boolean) => void;
@@ -29,32 +22,10 @@ export function SettingsPanel({
   onTopChainsChange,
 }: SettingsPanelProps) {
   const handleChange = (field: string, value: boolean) => {
-    if (field === "forCooks" || field === "forDeliveryWorkers") {
-      onChange({
-        ...settings,
-        assign: { ...settings.assign, [field]: value },
-      });
-    } else {
-      onChange({ ...settings, [field]: value });
-    }
+    onChange({ ...settings, [field]: value });
   };
 
   const settingsList = [
-    {
-      id: "forCooks",
-      label: "Assign to Cook",
-      description: "Automatically assign orders to kitchen staff",
-    },
-    {
-      id: "forDeliveryWorkers",
-      label: "Assign to Delivery",
-      description: "Automatically assign delivery orders",
-    },
-    {
-      id: "driverAssignment",
-      label: "Auto Delivery Assignment",
-      description: "Automatically match delivery riders",
-    },
     {
       id: "printInvoice",
       label: "Print Invoice",
@@ -69,12 +40,6 @@ export function SettingsPanel({
 
   const getValue = (id: string): boolean => {
     switch (id) {
-      case "forCooks":
-        return settings.assign.forCooks;
-      case "forDeliveryWorkers":
-        return settings.assign.forDeliveryWorkers;
-      case "driverAssignment":
-        return settings.driverAssignment;
       case "printInvoice":
         return settings.printInvoice;
       case "topChains":

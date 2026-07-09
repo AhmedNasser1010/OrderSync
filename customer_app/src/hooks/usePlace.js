@@ -25,10 +25,10 @@ const usePlace = () => {
   const currentRes = restaurants?.find((restaurant) => restaurant.accessToken === cart.restaurant)
   const userDistanceFromRes =
     user?.locations?.selected &&
-    currentRes?.business?.latlng &&
+    currentRes?.profile?.latlng &&
     getDistanceFromLatlngInKm(
       user.locations[user.locations.selected].latlng,
-      currentRes.business.latlng
+      currentRes.profile.latlng
     )
   const deliveryFees = getDeliveryFees(userDistanceFromRes, services.deliveryFees)
   const [setPlaceOrder] = useSetPlaceOrderMutation()

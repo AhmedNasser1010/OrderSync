@@ -37,9 +37,8 @@ function Checkout() {
 	}, [currentState])
 
 	useEffect(() => {
-		const autoAvailability = res?.settings?.siteControl.autoAvailability
-		const openingHours = res?.services?.openingHours
-		if (workingDaysChecker(openingHours, autoAvailability)) {
+		const openingHours = res?.operations?.openingHours
+		if (workingDaysChecker(openingHours, false)) {
 			cart?.length ? setCurrentState('ON_USER_INFO') : setCurrentState('CART_IS_EMPTY')
 		} else {
 			setCurrentState('NOT_AVAILABLE')
@@ -59,7 +58,7 @@ function Checkout() {
 			}
 
 			{ currentState === 'CART_IS_EMPTY' &&  <PopupMsg title='Empty Cart' subject='Your cart is empty continue shopping and come back again' button={<Link to="/">Continue Shopping</Link>} />}
-			{ currentState === 'NOT_AVAILABLE' && <PopupMsg title='Not Available' subject={res?.settings?.siteControl.closeMsg || `Sorry we are not available right now come back again later.`} button={<Link to="/">Back To Home</Link>} />}
+			{ currentState === 'NOT_AVAILABLE' && <PopupMsg title='Not Available' subject={res?.branding?.closeMsg || `Sorry we are not available right now come back again later.`} button={<Link to="/">Back To Home</Link>} />}
 			{ currentState === 'ON_USER_INFO' && <CheckoutUserInfoForm handleCurrentState={handleCurrentState} /> }
 			{ currentState === 'ON_USER_ADDRESS' && <CheckoutUserAddress handleCurrentState={handleCurrentState} /> }
 			{ currentState === 'ON_PAYMENT' && <CheckoutUserPayment handleCurrentState={handleCurrentState} res={res} /> }

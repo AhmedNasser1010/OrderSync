@@ -22,9 +22,8 @@ const useResStatus = (): UseResStatus => {
   const { data: resData } = useFetchRestaurantDataQuery(
     userData?.accessToken ?? skipToken,
   );
-  const currentStatus = resData?.settings?.siteControl?.status || "inactive";
-  const isAvailableFeature =
-    !resData?.settings?.siteControl?.autoAvailability || false;
+  const currentStatus = resData?.status || "inactive";
+  const isAvailableFeature = false;
   const [setRestaurantStatus, { isLoading, error }] =
     useSetRestaurantStatusMutation();
 

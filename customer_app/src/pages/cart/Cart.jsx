@@ -183,7 +183,7 @@ const Cart = () => {
     if (resInfo && user.locations) {
       const userDistanceFromRes = getDistanceFromLatlngInKm(
         user.locations[user.locations.selected].latlng,
-        resInfo.business.latlng
+        resInfo.profile.latlng
       )
       const fees = getDeliveryFees(userDistanceFromRes, services.deliveryFees)
       setDeliveryFees(fees)
@@ -502,11 +502,11 @@ const Cart = () => {
             <div className="checkout-container">
               <div className="flex items-start justify-center gap-4 my-3">
                 <div>
-                  <img src={resInfo?.business.cover} alt="res-img" className="w-20" />
+                  <img src={resInfo?.branding.cover} alt="res-img" className="w-20" />
                 </div>
                 <div className="tracking-tighter">
                   <h2 className="font-ProximaNovaMed sm:text-2xl text-lg">
-                    {resInfo?.business?.name}
+                    {resInfo?.profile?.name}
                   </h2>
                   <p className="font-ProximaNovaThin sm:text-base text-sm -mt-1">{t('El-Ayat')}</p>
                 </div>

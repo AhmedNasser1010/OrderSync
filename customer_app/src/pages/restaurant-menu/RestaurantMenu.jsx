@@ -26,11 +26,11 @@ const RestaurantMenu = () => {
   const menu = useSelector((state) => state.menu)
 
   const res = useMemo(() => {
-    return restaurants.filter((res) => res.business.name === resId.split('-').join(' '))[0]
+    return restaurants.filter((res) => res.profile.name === resId.split('-').join(' '))[0]
   }, [resId, restaurants])
 
-  const resName = lang === 'ar' ? res?.business?.nameInAr : res?.business?.name
-  const status = res?.settings?.siteControl?.status || 'pause'
+  const resName = lang === 'ar' ? res?.profile?.nameInAr : res?.profile?.name
+  const status = res?.status || 'pause'
 
   useEffect(() => {
     res?.accessToken && resMenu(res.accessToken)
@@ -42,10 +42,10 @@ const RestaurantMenu = () => {
 
   const resMainInfo = {
     city: t('El-Ayat'),
-    name: lang === 'ar' ? res?.business?.nameInAr : res?.business?.name,
-    cuisines: res?.business?.cuisines,
+    name: lang === 'ar' ? res?.profile?.nameInAr : res?.profile?.name,
+    cuisines: res?.profile?.cuisines,
     areaName: t('El-Ayat'),
-    sla: `${res?.services?.cookTime[0] / 60000}-${res?.services?.cookTime[1] / 60000} ${t('min')}`,
+    sla: `${res?.operations?.cookTime[0]}-${res?.operations?.cookTime[1]} ${t('min')}`,
     avgRating: '4.5',
     totalRatingsString: t('500+ ratings')
   }

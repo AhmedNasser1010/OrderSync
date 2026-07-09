@@ -13,37 +13,23 @@ interface CuisinesSectionProps {
   onChange: (cuisines: string[]) => void;
 }
 
-const availableCuisines = [
-  "Indian",
-  "Italian",
-  "Chinese",
-  "Japanese",
-  "Thai",
-  "Mexican",
-  "Middle Eastern",
-  "American",
-  "French",
-  "Korean",
-  "Fast Food",
-  "Specialty Coffee",
-  "Pastries",
-  "Mediterranean",
-  "Vietnamese",
-  "Turkish",
-];
-
 export function CuisinesSection({ cuisines, onChange }: CuisinesSectionProps) {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [value, setValue] = useState("");
 
-  const filteredCuisines = availableCuisines.filter(
-    (c) =>
-      c.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !cuisines.includes(c),
-  );
+  const trimmed = value.trim();
 
-  const handleAddCuisine = (cuisine: string) => {
+  const handleAdd = () => {
+    const cuisine = trimmed;
+    if (!cuisine || cuisines.includes(cuisine)) return;
     onChange([...cuisines, cuisine]);
-    setSearchTerm("");
+    setValue("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAdd();
+    }
   };
 
   const handleRemoveCuisine = (cuisine: string) => {
@@ -55,32 +41,27 @@ export function CuisinesSection({ cuisines, onChange }: CuisinesSectionProps) {
       <h2 className="text-lg font-semibold text-foreground mb-4">Cuisines</h2>
       <div className="space-y-4">
         <div>
-          <Label htmlFor="cuisines-search" className="text-foreground">
+          <Label htmlFor="cuisines-input" className="text-foreground">
             Add Cuisines
           </Label>
-          <div className="relative mt-1.5">
+          <div className="flex gap-2 mt-1.5">
             <Input
-              id="cuisines-search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search cuisines..."
-              className="pr-10"
+              id="cuisines-input"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type a cuisine and press Enter..."
+              className="flex-1"
             />
-            {searchTerm && filteredCuisines.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-lg shadow-lg z-50">
-                <div className="max-h-48 overflow-y-auto p-2 space-y-1">
-                  {filteredCuisines.map((cuisine) => (
-                    <button
-                      key={cuisine}
-                      onClick={() => handleAddCuisine(cuisine)}
-                      className="w-full text-left px-3 py-2 rounded hover:bg-secondary text-sm text-foreground"
-                    >
-                      {cuisine}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            <Button
+              type="button"
+              size="icon"
+              variant="secondary"
+              disabled={!trimmed || cuisines.includes(trimmed)}
+              onClick={handleAdd}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
           </div>
         </div>
 

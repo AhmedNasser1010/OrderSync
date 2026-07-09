@@ -4,7 +4,7 @@ export type CategoryType = {
   description?: string;
   topMenu: boolean;
   visibility: boolean;
-  backgrounds: string[];
+  backgrounds?: string[];
   createdAt: number;
   updatedAt: number;
 };

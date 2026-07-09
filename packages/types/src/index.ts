@@ -1,4 +1,4 @@
-export type { RestaurantStatusTypes, BusinessSettings, BusinessDocument } from "./business";
+export type { RestaurantStatusTypes, BusinessDocument } from "./business";
 export type { CustomersRes, CustomerType } from "./customer";
 export type { CustomerFeedbackType } from "./review";
 export type { Driver } from "./driver";

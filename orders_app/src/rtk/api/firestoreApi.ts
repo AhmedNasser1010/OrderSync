@@ -472,7 +472,7 @@ export const firestoreApi = createApi({
           const docRef = doc(db, "businesses", resId);
 
           await updateDoc(docRef, {
-            ["settings.siteControl.status"]: status,
+            ["status"]: status,
           });
 
           console.log("Write Operation [setRestaurantStatus]");
@@ -543,7 +543,7 @@ export const firestoreApi = createApi({
 
           const docRef = doc(db, "businesses", resId);
           batch.update(docRef, {
-            ["settings.siteControl.status"]: "inactive",
+            ["status"]: "inactive",
           });
 
           await batch.commit();
@@ -585,14 +585,11 @@ export const firestoreApi = createApi({
           if (
             settingName === "promotionalSubtitle" ||
             settingName === "cover" ||
-            settingName === "icon"
+            settingName === "icon" ||
+            settingName === "closeMsg"
           ) {
             await updateDoc(docRef, {
-              [`business.${settingName}`]: value,
-            });
-          } else if (settingName === "closeMsg") {
-            await updateDoc(docRef, {
-              ["settings.siteControl.closeMsg"]: value,
+              [`branding.${settingName}`]: value,
             });
           }
 
@@ -625,7 +622,7 @@ export const firestoreApi = createApi({
           const docRef = doc(db, "businesses", resId);
 
           await updateDoc(docRef, {
-            [`settings.orderManagement.${settingName}`]: value,
+            [`settings.${settingName}`]: value,
           });
 
           console.log("Write Operation [setOrderWorkflowSettings]");

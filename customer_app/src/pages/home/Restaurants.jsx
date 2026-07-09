@@ -29,25 +29,25 @@ function Restaurants() {
       <RestaurantsFilter />
 
       {filteredRestaurants && filteredRestaurants.length ? (
-        <div className="flex gap-8 flex-wrap mt-10 2xl:justify-start justify-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-10">
           {filteredRestaurants.map((res) => (
             <Link
               className="relative transition-all hover:scale-95"
               key={res?.accessToken}
-              to={`/${res?.business.name.split(' ').join('-')}`}>
+               to={`/${res?.profile.name.split(' ').join('-')}`}>
               <RestaurantCard
                 info={{
                   areaName: t('El-Ayat'),
-                  name: res?.business?.name,
-                  nameInAr: res?.business?.nameInAr || res?.business?.name,
+                  name: res?.profile?.name,
+                  nameInAr: res?.profile?.nameInAr || res?.profile?.name,
                   avgRating: '4.5',
-                  cloudinaryImageId: res?.business?.cover,
-                  sla: `${res.services.cookTime[0] / 60000}-${res.services.cookTime[1] / 60000} ${t(
+                  cloudinaryImageId: res?.branding?.cover,
+                  sla: `${res.operations.cookTime[0]}-${res.operations.cookTime[1]} ${t(
                     'min'
                   )}`,
-                  cuisines: res?.business?.cuisines,
-                  status: res?.settings?.siteControl?.status,
-                  promotionalSubtitle: res?.business?.promotionalSubtitle
+                  cuisines: res?.profile?.cuisines,
+                  status: res?.status,
+                  promotionalSubtitle: res?.branding?.promotionalSubtitle
                 }}
               />
             </Link>

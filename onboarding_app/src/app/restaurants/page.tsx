@@ -80,12 +80,12 @@ export default function RestaurantsPage() {
     return businesses.filter((restaurant) => {
       const matchesSearch =
         !searchTerm ||
-        restaurant.business.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        restaurant.business.nameInAr.includes(searchTerm) ||
+        restaurant.profile.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        restaurant.profile.nameInAr.includes(searchTerm) ||
         (restaurant.owner.name ?? "").toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesIndustry =
-        !industryFilter || restaurant.business.industry === industryFilter;
+        !industryFilter || restaurant.profile.industry === industryFilter;
       const matchesStatus = !statusFilter || restaurant.status === statusFilter;
 
       return matchesSearch && matchesIndustry && matchesStatus;

@@ -17,20 +17,17 @@ const getBusinessInfo = async (req, res, next) => {
       let data = docData.data()
 
       const finalData = {
-        services: {
-          openingHours: data.services.openingHours,
-          deliveryTax: data.services.deliveryTax
+        operations: {
+          openingHours: data.operations.openingHours,
+          deliveryTax: data.operations.deliveryTax
         },
-        business: {
-          latlng: data.business.latlng,
-          name: data.business.name,
-          address: data.business.address
+        profile: {
+          latlng: data.profile.latlng,
+          name: data.profile.name,
+          address: data.profile.address
         },
-        settings: {
-          siteControl: {
-            availability: data.settings.siteControl.availability,
-            closeMsg: data.settings.siteControl.closeMsg
-          }
+        branding: {
+          closeMsg: data.branding.closeMsg,
         }
       }
 

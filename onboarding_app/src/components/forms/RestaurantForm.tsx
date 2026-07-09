@@ -48,16 +48,10 @@ export function RestaurantForm({
   const handleAdditionalChange = useCallback(
     (data: { promotionalSubtitle: string; closeMsg: string }) => {
       updateFormData({
-        business: { ...formData.business, promotionalSubtitle: data.promotionalSubtitle },
-      });
-      updateFormData({
-        settings: {
-          ...formData.settings,
-          siteControl: { ...formData.settings.siteControl, closeMsg: data.closeMsg },
-        },
+        branding: { ...formData.branding, ...data },
       });
     },
-    [formData.business, formData.settings, updateFormData],
+    [formData.branding, updateFormData],
   );
 
   return (
@@ -99,40 +93,51 @@ export function RestaurantForm({
             />
             <RestaurantInfoSection
               data={{
-                name: formData.business.name,
-                nameInAr: formData.business.nameInAr,
-                icon: formData.business.icon,
-                cover: formData.business.cover,
-                industry: formData.business.industry,
-                cuisines: formData.business.cuisines,
+                name: formData.profile.name,
+                nameInAr: formData.profile.nameInAr,
+                icon: formData.branding.icon,
+                cover: formData.branding.cover,
+                industry: formData.profile.industry,
+                cuisines: formData.profile.cuisines,
               }}
-              onChange={(info) =>
+              onChange={(info) => {
                 updateFormData({
-                  business: {
-                    ...formData.business,
-                    ...info,
+                  profile: {
+                    name: info.name,
+                    nameInAr: info.nameInAr,
+                    industry: info.industry,
+                    address: formData.profile.address,
+                    latlng: formData.profile.latlng,
+                    cuisines: info.cuisines,
                   },
-                })
-              }
+                });
+                updateFormData({
+                  branding: {
+                    ...formData.branding,
+                    icon: info.icon,
+                    cover: info.cover,
+                  },
+                });
+              }}
             />
             <CuisinesSection
-              cuisines={formData.business.cuisines}
+              cuisines={formData.profile.cuisines}
               onChange={(cuisines) =>
                 updateFormData({
-                  business: { ...formData.business, cuisines },
+                  profile: { ...formData.profile, cuisines },
                 })
               }
             />
             <AddressSection
               data={{
-                address: formData.business.address,
-                latitude: formData.business.latlng[0],
-                longitude: formData.business.latlng[1],
+                address: formData.profile.address,
+                latitude: formData.profile.latlng[0],
+                longitude: formData.profile.latlng[1],
               }}
               onChange={({ address, latitude, longitude }) =>
                 updateFormData({
-                  business: {
-                    ...formData.business,
+                  profile: {
+                    ...formData.profile,
                     address,
                     latlng: [latitude, longitude],
                   },
@@ -140,18 +145,18 @@ export function RestaurantForm({
               }
             />
             <OpeningHoursSection
-              hours={formData.services.openingHours}
+              hours={formData.operations.openingHours}
               onChange={(openingHours) =>
                 updateFormData({
-                  services: { ...formData.services, openingHours },
+                  operations: { ...formData.operations, openingHours },
                 })
               }
             />
             <CookTimeSection
-              data={formData.services.cookTime}
+              data={formData.operations.cookTime}
               onChange={(cookTime) =>
                 updateFormData({
-                  services: { ...formData.services, cookTime },
+                  operations: { ...formData.operations, cookTime },
                 })
               }
             />
@@ -161,8 +166,8 @@ export function RestaurantForm({
             />
             <AdditionalInfoSection
               data={{
-                promotionalSubtitle: formData.business.promotionalSubtitle,
-                closeMsg: formData.settings.siteControl.closeMsg,
+                promotionalSubtitle: formData.branding.promotionalSubtitle,
+                closeMsg: formData.branding.closeMsg,
               }}
               onChange={handleAdditionalChange}
             />
@@ -171,20 +176,19 @@ export function RestaurantForm({
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
             <PreviewCard
-              name={formData.business.name}
-              nameInAr={formData.business.nameInAr}
-              cover={formData.business.cover}
-              industry={formData.business.industry}
+              name={formData.profile.name}
+              nameInAr={formData.profile.nameInAr}
+              cover={formData.branding.cover}
+              industry={formData.profile.industry}
             />
             <SettingsPanel
-              settings={formData.settings.orderManagement}
+              settings={{
+                printInvoice: formData.settings.printInvoice,
+              }}
               topChains={formData.topChains}
-              onChange={(orderManagement) =>
+              onChange={(settings) =>
                 updateFormData({
-                  settings: {
-                    ...formData.settings,
-                    orderManagement,
-                  },
+                  settings,
                 })
               }
               onTopChainsChange={(value) =>

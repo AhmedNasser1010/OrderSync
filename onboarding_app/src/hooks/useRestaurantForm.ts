@@ -55,30 +55,30 @@ export function useRestaurantForm(initialData?: BusinessDocument) {
       if (!data.owner.uid.trim())
         newErrors["owner.uid"] = "User ID is required";
 
-      if (!data.business.name.trim())
-        newErrors["business.name"] = "Restaurant name is required";
-      if (!data.business.nameInAr.trim())
-        newErrors["business.nameInAr"] = "Arabic name is required";
+      if (!data.profile.name.trim())
+        newErrors["profile.name"] = "Restaurant name is required";
+      if (!data.profile.nameInAr.trim())
+        newErrors["profile.nameInAr"] = "Arabic name is required";
 
       if (
-        !isValidCoordinate(data.business.latlng[0], -90, 90)
+        !isValidCoordinate(data.profile.latlng[0], -90, 90)
       ) {
-        newErrors["business.latlng.0"] =
+        newErrors["profile.latlng.0"] =
           "Latitude must be between -90 and 90";
       }
       if (
-        !isValidCoordinate(data.business.latlng[1], -180, 180)
+        !isValidCoordinate(data.profile.latlng[1], -180, 180)
       ) {
-        newErrors["business.latlng.1"] =
+        newErrors["profile.latlng.1"] =
           "Longitude must be between -180 and 180";
       }
 
-      if (data.services.cookTime[0] < 0)
-        newErrors["services.cookTime.0"] = "Minimum time cannot be negative";
-      if (data.services.cookTime[1] < 0)
-        newErrors["services.cookTime.1"] = "Maximum time cannot be negative";
-      if (data.services.cookTime[0] > data.services.cookTime[1]) {
-        newErrors["services.cookTime.1"] =
+      if (data.operations.cookTime[0] < 0)
+        newErrors["operations.cookTime.0"] = "Minimum time cannot be negative";
+      if (data.operations.cookTime[1] < 0)
+        newErrors["operations.cookTime.1"] = "Maximum time cannot be negative";
+      if (data.operations.cookTime[0] > data.operations.cookTime[1]) {
+        newErrors["operations.cookTime.1"] =
           "Maximum time must be greater than minimum";
       }
 
@@ -214,6 +214,12 @@ function createEmptyBusinessDocument(): BusinessDocument {
   return {
     accessToken: crypto.randomUUID(),
     partnerUid: "",
+    branding: {
+      closeMsg: "",
+      promotionalSubtitle: "",
+      cover: "",
+      icon: "",
+    },
     owner: {
       uid: "",
       email: "",
@@ -221,18 +227,15 @@ function createEmptyBusinessDocument(): BusinessDocument {
       name: "",
       secondPhone: "",
     },
-    business: {
+    profile: {
       name: "",
       nameInAr: "",
       industry: "restaurant",
       address: "",
       latlng: [0, 0],
-      cover: "",
-      icon: "",
-      promotionalSubtitle: "",
       cuisines: [],
     },
-    services: {
+    operations: {
       openingHours: {
         sunday: { start: "10:00", end: "22:00", closed: false },
         monday: { start: "10:00", end: "23:00", closed: false },
@@ -246,22 +249,7 @@ function createEmptyBusinessDocument(): BusinessDocument {
       paymentMethods: { cash: true },
     },
     settings: {
-      siteControl: {
-        closeMsg: "",
-        availability: true,
-        autoAvailability: true,
-        isBusy: false,
-        temporaryPause: false,
-        status: "active",
-      },
-      orderManagement: {
-        assign: {
-          forCooks: true,
-          forDeliveryWorkers: true,
-        },
-        driverAssignment: false,
-        printInvoice: true,
-      },
+      printInvoice: true,
     },
     status: "active",
     updatedAt: Date.now(),

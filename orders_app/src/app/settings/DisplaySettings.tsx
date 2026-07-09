@@ -52,7 +52,7 @@ export default function DisplaySettings() {
           <Input
             id="promotional-subtitle"
             type="text"
-            defaultValue={resData?.business?.promotionalSubtitle}
+            defaultValue={resData?.branding?.promotionalSubtitle}
             name="promotionalSubtitle"
             onBlur={handleOnBlur}
           />
@@ -62,7 +62,7 @@ export default function DisplaySettings() {
           <Input
             id="brand-logo"
             type="text"
-            defaultValue={resData?.business?.icon}
+            defaultValue={resData?.branding?.icon}
             name="icon"
             onBlur={handleOnBlur}
           />
@@ -73,7 +73,7 @@ export default function DisplaySettings() {
             id="brand-cover"
             type="text"
             name="cover"
-            defaultValue={resData?.business?.cover}
+            defaultValue={resData?.branding?.cover}
             onBlur={handleOnBlur}
           />
         </div>
@@ -82,7 +82,7 @@ export default function DisplaySettings() {
           <Textarea
             placeholder="Type your message here."
             id="message"
-            defaultValue={resData?.settings?.siteControl?.closeMsg}
+            defaultValue={resData?.branding?.closeMsg}
             name="closeMsg"
             onBlur={handleOnBlur}
           />

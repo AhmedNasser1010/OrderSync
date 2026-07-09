@@ -44,7 +44,7 @@ const RestaurantCard = ({ info }) => {
 
   return (
     <div className="flex flex-col gap-3 cursor-pointer">
-      <div className="w-80 h-56 card relative rounded-xl">
+      <div className="w-full h-56 card relative rounded-xl overflow-hidden">
         <img
           src={cloudinaryImageId}
           alt="res-img"

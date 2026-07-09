@@ -118,15 +118,15 @@ export function RestaurantsTable({
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <span className="text-xs font-bold text-primary">
-                        {restaurant.business.name.charAt(0)}
+                        {restaurant.profile.name.charAt(0)}
                       </span>
                     </div>
                     <div>
                       <p className="font-medium text-foreground">
-                        {restaurant.business.name}
+                        {restaurant.profile.name}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {restaurant.business.nameInAr}
+                        {restaurant.profile.nameInAr}
                       </p>
                     </div>
                   </div>
@@ -143,7 +143,7 @@ export function RestaurantsTable({
                 </TableCell>
                 <TableCell className="py-4">
                   <Badge variant="outline" className="capitalize">
-                    {restaurant.business.industry.replace("-", " ")}
+                    {restaurant.profile.industry.replace("-", " ")}
                   </Badge>
                 </TableCell>
                 <TableCell className="py-4">

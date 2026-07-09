@@ -17,8 +17,8 @@ type Props = {
 export default function OrderFooter({ id, activeTabValue, status }: Props) {
   const resAccessToken = useAppSelector(accessToken)
   const { data: restaurant } = useFetchRestaurantDataQuery(resAccessToken);
-  const driverAssignment = restaurant?.settings?.orderManagement?.driverAssignment ?? false;
-  const printInvoice = restaurant?.settings?.orderManagement?.printInvoice ?? false;
+  const driverAssignment = false;
+  const printInvoice = restaurant?.settings?.printInvoice ?? false;
 
   return (
     <CardFooter className="flex justify-between">

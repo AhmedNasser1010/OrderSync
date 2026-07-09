@@ -20,10 +20,9 @@ export default function OrderWorkflow() {
       skip: !userData?.accessToken,
     },
   );
-  const driverAssignment =
-    resData?.settings?.orderManagement?.driverAssignment ?? false;
+  const driverAssignment = false;
   const printInvoice =
-    resData?.settings?.orderManagement?.printInvoice ?? false;
+    resData?.settings?.printInvoice ?? false;
   const [setOrderWorkflowSettings] = useSetOrderWorkflowSettingsMutation();
 
   const handleDriverAssignment = (checked: boolean) => {

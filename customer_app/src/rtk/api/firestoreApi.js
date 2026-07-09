@@ -109,7 +109,7 @@ export const firestoreApi = createApi({
           }
 
           const restaurantData = restaurantSnap.data()
-          const restaurantStatus = restaurantData?.settings?.siteControl?.status || 'pause'
+          const restaurantStatus = restaurantData?.status || 'pause'
 
           if (restaurantStatus === 'inactive' || restaurantStatus === 'pause') {
             return {
