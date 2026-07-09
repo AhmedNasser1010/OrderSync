@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import type { MenuData, MenuCategory } from "@/lib/types/types";
 import type { ItemType, MainMenuType } from "@ordersync/types";
 import { useAppDispatch, useAppSelector } from "@/lib/rtk/hooks";
@@ -239,6 +240,7 @@ function createFirestoreMenuData(
 }
 
 export function useMenuData() {
+  const t = useTranslations("Menu.sync");
   const dispatch = useAppDispatch();
   const uid = useAppSelector(userUid);
   const menuData = useAppSelector((state) => state.menu);
@@ -333,7 +335,7 @@ export function useMenuData() {
 
     try {
       if (!resId) {
-        throw new Error("Restaurant ID is unavailable.");
+        throw new Error(t("restaurantIdUnavailable"));
       }
 
       const syncedMenuData: MenuData = {
@@ -346,10 +348,10 @@ export function useMenuData() {
       await syncMenuData({ resId, menu: firestoreMenuData }).unwrap();
       dispatch(setLastSynced(syncedMenuData.lastSynced));
 
-      setSyncMessage("Menu synced successfully!");
+      setSyncMessage(t("success"));
       setTimeout(() => setSyncMessage(null), 3000);
     } catch (error: unknown) {
-      setSyncMessage("Failed to sync menu");
+      setSyncMessage(t("failed"));
       const message = error instanceof Error ? error.message : String(error);
       console.error("[v0] Sync error:", message);
     } finally {

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Trash } from "lucide-react";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ActionsMenu } from "@/components/ui/actions-menu";
 import { ImageEditDialog } from "@/components/ui/image-edit-dialog";
 import type { MenuCategory } from "@/lib/types/types";
@@ -37,6 +38,8 @@ export function CategoryHeader({
   onDelete,
   onUpdateBackgrounds,
 }: CategoryHeaderProps) {
+  const t = useTranslations("Menu.categoryHeader");
+  const common = useTranslations("Common");
   const [showImageEditor, setShowImageEditor] = useState(false);
   return (
     <div className="flex items-center gap-3 p-4 bg-card border border-border rounded-lg hover:bg-card/80 transition-colors">
@@ -56,7 +59,7 @@ export function CategoryHeader({
         <button
           onClick={() => setShowImageEditor(true)}
           className="w-12 h-12 rounded-md overflow-hidden bg-background/50 flex items-center justify-center shrink-0"
-          title="Edit backgrounds"
+          title={common("editBackgrounds")}
         >
           {category.backgrounds && category.backgrounds[0] ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -66,7 +69,7 @@ export function CategoryHeader({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="text-sm text-muted-foreground">No background</div>
+            <div className="text-sm text-muted-foreground">{common("noBackground")}</div>
           )}
         </button>
 
@@ -78,7 +81,7 @@ export function CategoryHeader({
             {category.visibility === false && (
               <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/10 px-2 py-0.5 text-xs text-muted-foreground">
                 <EyeOff size={14} />
-                Hidden
+                {common("hidden")}
               </span>
             )}
           </div>
@@ -86,7 +89,7 @@ export function CategoryHeader({
             {category.description}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            {category.items.length} items
+            {category.items.length} {t("items")}
           </p>
         </div>
       </div>
@@ -96,31 +99,31 @@ export function CategoryHeader({
           items={[
             {
               key: "toggleVisibility",
-              label: category.visibility ? "Hide from menu" : "Show in menu",
+              label: category.visibility ? t("hideFromMenu") : t("showInMenu"),
               onClick: onToggleVisibility,
               icon: category.visibility ? <Eye size={14} /> : <EyeOff size={14} />,
             },
             {
               key: "moveUp",
-              label: "Move category up",
+              label: t("moveUp"),
               onClick: onMoveUp,
               icon: <ArrowUp size={14} />,
             },
             {
               key: "moveDown",
-              label: "Move category down",
+              label: t("moveDown"),
               onClick: onMoveDown,
               icon: <ArrowDown size={14} />,
             },
             {
               key: "edit",
-              label: "Edit category",
+              label: t("edit"),
               onClick: onEdit,
               icon: <Edit size={14} />,
             },
             {
               key: "delete",
-              label: "Delete category",
+              label: t("delete"),
               onClick: () => onDelete && onDelete(),
               icon: <Trash size={14} />,
               destructive: true,

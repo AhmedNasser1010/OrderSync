@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Eye,
   EyeOff,
@@ -32,6 +33,8 @@ export function MenuItemCard({
   onDelete,
   onUpdateBackgrounds,
 }: MenuItemCardProps) {
+  const t = useTranslations("Menu.itemCard");
+  const common = useTranslations("Common");
   const [showImageEditor, setShowImageEditor] = useState(false);
 
   return (
@@ -41,7 +44,7 @@ export function MenuItemCard({
           <button
             onClick={() => setShowImageEditor(true)}
             className="w-12 h-12 rounded-md overflow-hidden bg-background/50 flex items-center justify-center shrink-0"
-            title="Edit backgrounds"
+            title={common("editBackgrounds")}
           >
             {item.backgrounds && item.backgrounds[0] ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -51,7 +54,7 @@ export function MenuItemCard({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="text-sm text-muted-foreground">No image</div>
+              <div className="text-sm text-muted-foreground">{common("noImage")}</div>
             )}
           </button>
 
@@ -63,7 +66,7 @@ export function MenuItemCard({
               {item.visibility === false && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/10 px-2 py-0.5 text-xs text-muted-foreground">
                   <EyeOff size={14} />
-                  Hidden
+                  {common("hidden")}
                 </span>
               )}
             </div>
@@ -78,31 +81,31 @@ export function MenuItemCard({
             items={[
               {
                 key: "moveUp",
-                label: "Move item up",
+                label: t("moveUp"),
                 onClick: onMoveUp,
                 icon: <ArrowUp size={14} />,
               },
               {
                 key: "moveDown",
-                label: "Move item down",
+                label: t("moveDown"),
                 onClick: onMoveDown,
                 icon: <ArrowDown size={14} />,
               },
               {
                 key: "edit",
-                label: "Edit item",
+                label: t("edit"),
                 onClick: onEdit,
                 icon: <Edit size={14} />,
               },
               {
                 key: "toggleVisibility",
-                label: item.visibility ? "Hide from menu" : "Show in menu",
+                label: item.visibility ? t("hideFromMenu") : t("showInMenu"),
                 onClick: onToggleVisibility,
                 icon: item.visibility ? <Eye size={14} /> : <EyeOff size={14} />,
               },
               {
                 key: "delete",
-                label: "Delete item",
+                label: t("delete"),
                 onClick: () => onDelete && onDelete(),
                 icon: <Trash size={14} />,
                 destructive: true,
@@ -131,7 +134,7 @@ export function MenuItemCard({
           </div>
           {item.sizes && item.sizes.length > 0 ? (
             <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
-              {item.sizes.map((size) => (
+              {item.sizes.filter((s) => s.price !== "").map((size) => (
                 <div
                   key={size.size}
                   className="rounded-md border border-border bg-background/80 px-2 py-1 text-center"

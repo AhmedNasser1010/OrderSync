@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { usePathname, useRouter } from "@/i18n/routing";
 import { BarChart3, UtensilsCrossed, Settings } from "lucide-react";
 
 interface BottomNavProps {
@@ -9,28 +10,32 @@ interface BottomNavProps {
   onTabChange?: (tab: string) => void;
 }
 
-const tabs = [
-  { id: "analytics", label: "Analytics", icon: BarChart3, href: "/" },
-  { id: "menu", label: "Menu", icon: UtensilsCrossed, href: "/menu" },
-  {
-    id: "restaurant-settings",
-    label: "Restaurant Settings",
-    icon: Settings,
-    href: "/restaurant-settings",
-  },
-];
-
 export function BottomNav({
   activeTab = "analytics",
   onTabChange,
 }: BottomNavProps) {
+  const t = useTranslations("Dashboard.bottomNav");
   const pathname = usePathname();
   const router = useRouter();
 
+  const tabs = useMemo(
+    () => [
+      { id: "analytics", label: t("analytics"), icon: BarChart3, href: "/" },
+      { id: "menu", label: t("menu"), icon: UtensilsCrossed, href: "/menu" },
+      {
+        id: "settings",
+        label: t("restaurantSettings"),
+        icon: Settings,
+        href: "/settings",
+      },
+    ],
+    [t],
+  );
+
   const active = useMemo(() => {
     if (pathname?.startsWith("/menu")) return "menu";
-    if (pathname?.startsWith("/restaurant-settings"))
-      return "restaurant-settings";
+    if (pathname?.startsWith("/settings"))
+      return "settings";
     return pathname === "/" ? "analytics" : activeTab;
   }, [pathname, activeTab]);
 

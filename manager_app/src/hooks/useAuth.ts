@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/routing";
 import { useAppSelector, useAppDispatch } from "@/lib/rtk/hooks";
 import { auth } from "@/lib/firebase";
 import {
@@ -29,6 +30,7 @@ interface UseAuthReturn {
 }
 
 const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
+  const t = useTranslations("Auth.errors");
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -67,23 +69,23 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
         case "auth/invalid-credential":
         case "auth/user-not-found":
         case "auth/wrong-password":
-          msg = "Invalid credential, Please check your email and password";
+          msg = t("invalidCredential");
           break;
         case "auth/too-many-requests":
-          msg = "Too many requests. Please try again later.";
+          msg = t("tooManyRequests");
           break;
         case "auth/email-already-in-use":
-          msg = "This email is already in use.";
+          msg = t("emailAlreadyInUse");
           break;
         case "auth/weak-password":
-          msg = "Password should be at least 6 characters.";
+          msg = t("weakPassword");
           break;
         case "auth/cancelled-popup-request":
         case "auth/popup-closed-by-user":
-          msg = "Google sign in was canceled.";
+          msg = t("googleSignInCanceled");
           break;
         default:
-          msg = "An error occurred";
+          msg = t("anErrorOccurred");
           console.error("An error occurred: ", error);
           break;
       }
@@ -164,9 +166,7 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
           await firebaseSignOut(auth);
           setUser(null);
           dispatch(setUserUid(null));
-          throw new Error(
-            "Access denied. Only business managers can access this app.",
-          );
+          throw new Error(t("accessDenied"));
         }
       }
       // Auth state will be updated by the onAuthStateChanged listener
@@ -206,9 +206,7 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
           await firebaseSignOut(auth);
           setUser(null);
           dispatch(setUserUid(null));
-          throw new Error(
-            "Access denied. Only business managers can access this app.",
-          );
+          throw new Error(t("accessDenied"));
         }
       }
       // Auth state will be updated by the onAuthStateChanged listener

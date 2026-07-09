@@ -1,21 +1,26 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { DeliveryArea } from "@/lib/types/types";
 import { MapPin } from "lucide-react";
+import { WidgetHelp } from "@/components/ui/widget-help";
 
 interface DeliveryAreasProps {
   areas: DeliveryArea[];
 }
 
 export function DeliveryAreas({ areas }: DeliveryAreasProps) {
+  const t = useTranslations("Dashboard.deliveryAreas");
+
   return (
     <div className="bg-card border border-border rounded-2xl p-4 mx-4 my-3">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-card-foreground">
-          Top Delivery Areas
+        <h3 className="text-sm font-semibold text-card-foreground flex items-center gap-1">
+          {t("title")}
+          <WidgetHelp widgetKey="deliveryAreas" />
         </h3>
         <button className="text-xs font-medium px-2.5 py-1 bg-primary text-primary-foreground rounded-lg hover:opacity-90">
-          View Map
+          {t("viewMap")}
         </button>
       </div>
 

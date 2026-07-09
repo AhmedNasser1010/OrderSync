@@ -1,7 +1,9 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { PaymentMethod } from "@/lib/types/types";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { WidgetHelp } from "@/components/ui/widget-help";
 
 interface PaymentMethodsProps {
   methods: PaymentMethod[];
@@ -15,6 +17,7 @@ const COLORS = [
 ];
 
 export function PaymentMethods({ methods }: PaymentMethodsProps) {
+  const t = useTranslations("Dashboard.paymentMethods");
   const chartData = methods.map((m) => ({
     name: m.name,
     value: m.percentage,
@@ -23,8 +26,9 @@ export function PaymentMethods({ methods }: PaymentMethodsProps) {
 
   return (
     <div className="bg-card border border-border rounded-2xl p-4 mx-4 my-3">
-      <h3 className="text-sm font-semibold text-card-foreground mb-4">
-        Payment Methods
+      <h3 className="text-sm font-semibold text-card-foreground mb-4 flex items-center gap-1">
+        {t("title")}
+        <WidgetHelp widgetKey="paymentMethods" />
       </h3>
 
       <ResponsiveContainer width="100%" height={200}>

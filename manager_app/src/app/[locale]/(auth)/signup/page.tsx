@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { AuthForm } from "@/components/auth/AuthForm";
 import useAuth from "@/hooks/useAuth";
 
-export default function SignInPage() {
+export default function SignUpPage() {
   const router = useRouter();
   const { user, isAuthLoading } = useAuth(false);
 
@@ -27,7 +27,7 @@ export default function SignInPage() {
 
   return (
     <AuthForm
-      mode="signin"
+      mode="signup"
       onSuccess={() => {
         router.push("/");
       }}

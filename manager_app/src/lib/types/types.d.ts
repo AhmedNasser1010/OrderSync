@@ -45,11 +45,17 @@ export interface CustomerData {
   };
 }
 
+export type AIInsight =
+  | { type: "bestSeller"; itemName: string }
+  | { type: "strongRetention"; percentage: number }
+  | { type: "topCategory"; categoryName: string; percentage: number };
+
 export interface OperationMetrics {
-  label: string;
-  time: string;
+  type: "prepTime" | "deliveryTime" | "completion";
+  value: number;
   status: StatusType;
-  benchmark: string;
+  target: number;
+  unit: "minutes" | "percentage";
 }
 
 export interface DeliveryArea {
@@ -71,22 +77,36 @@ export interface OrderSource {
   status: StatusType;
 }
 
+export type StrengthItem =
+  | { type: "strongRetention"; percentage: number }
+  | { type: "excellentCompletion"; rate: number }
+  | { type: "fastPrepTime"; minutes: number }
+  | { type: "revenueIncrease"; growth: number };
+
+export type AlertItem =
+  | { type: "lowRetention" }
+  | { type: "lowCompletion" }
+  | { type: "slowPrepTime" }
+  | { type: "weakCategory"; categoryName: string; percentage: number };
+
+export interface TrendItem {
+  type: "revenueGrowth" | "customerGrowth" | "efficiency";
+  change: number;
+  status: StatusType;
+}
+
 export interface BusinessHealthData {
   score: number;
   maxScore: number;
-  strengths: string[];
-  alerts: string[];
-  trends: {
-    label: string;
-    change: number;
-    status: StatusType;
-  }[];
+  strengths: StrengthItem[];
+  alerts: AlertItem[];
+  trends: TrendItem[];
 }
 
 export interface DashboardData {
   dateRange: string;
   kpis: KPIData[];
-  aiInsights: string[];
+  aiInsights: AIInsight[];
   salesTrends: ChartDataPoint[];
   topItems: TopItem[];
   categories: Category[];

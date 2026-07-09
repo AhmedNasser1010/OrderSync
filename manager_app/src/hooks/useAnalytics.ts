@@ -2,9 +2,10 @@ import {
   useFetchOrdersDailySummarizationDataQuery,
   useFetchUserDataQuery,
 } from "@/lib/rtk/api/firestoreApi";
+import { useTranslations } from "next-intl";
 import { useAppSelector } from "@/lib/rtk/hooks";
 import { userUid } from "@/lib/rtk/slices/constantsSlice";
-import { timeRange } from "@/lib/rtk/slices/toggleSlice";
+import { timeRange, customDateRange } from "@/lib/rtk/slices/toggleSlice";
 import filterDataByDateRange from "@/utilities/filterDataByDateRange";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useMemo } from "react";
@@ -15,6 +16,7 @@ import type { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
 import type { DashboardData } from "@/lib/types/types";
 
 const useAnalytics = () => {
+  const t = useTranslations("Dashboard.kpis");
   const uid = useAppSelector(userUid);
 
   const { data: user } = useFetchUserDataQuery(uid ?? skipToken);
@@ -25,12 +27,23 @@ const useAnalytics = () => {
     useFetchOrdersDailySummarizationDataQuery(resId ?? skipToken);
 
   const timeRangeValue = useAppSelector(timeRange);
+  const customRange = useAppSelector(customDateRange);
 
   const currentPeriodData = useMemo(() => {
     if (!dailySummarizationData) return [];
 
     if (timeRangeValue === "all") {
       return dailySummarizationData;
+    }
+
+    if (timeRangeValue === "custom") {
+      if (!customRange.start || !customRange.end) return [];
+      return filterDataByDateRange(
+        customRange.start,
+        customRange.end,
+        "date",
+        dailySummarizationData,
+      );
     }
 
     const startDate = new Date(
@@ -47,11 +60,26 @@ const useAnalytics = () => {
       "date",
       dailySummarizationData,
     );
-  }, [dailySummarizationData, timeRangeValue]);
+  }, [dailySummarizationData, timeRangeValue, customRange.start, customRange.end]);
 
   const previousPeriodData = useMemo(() => {
     if (!dailySummarizationData || timeRangeValue === "all") {
       return [];
+    }
+
+    if (timeRangeValue === "custom") {
+      if (!customRange.start || !customRange.end) return [];
+      const diff =
+        new Date(customRange.end).getTime() -
+        new Date(customRange.start).getTime();
+      const previousEnd = new Date(new Date(customRange.start).getTime() - 1);
+      const previousStart = new Date(previousEnd.getTime() - diff);
+      return filterDataByDateRange(
+        previousStart.toISOString().split("T")[0],
+        previousEnd.toISOString().split("T")[0],
+        "date",
+        dailySummarizationData,
+      );
     }
 
     const days = Number(timeRangeValue);
@@ -69,7 +97,7 @@ const useAnalytics = () => {
       "date",
       dailySummarizationData,
     );
-  }, [dailySummarizationData, timeRangeValue]);
+  }, [dailySummarizationData, timeRangeValue, customRange.start, customRange.end]);
 
   const dashboardData = useMemo(() => {
     const currentMetrics = calculateMetrics(currentPeriodData);
@@ -78,7 +106,7 @@ const useAnalytics = () => {
 
     const kpis = [
       {
-        label: "Revenue",
+        label: t("revenue"),
         value: currentMetrics.totalRevenue,
         change: calculatePercentageChange(
           currentMetrics.totalRevenue,
@@ -87,7 +115,7 @@ const useAnalytics = () => {
         icon: "TrendingUp",
       },
       {
-        label: "Orders",
+        label: t("orders"),
         value: currentMetrics.totalOrders,
         change: calculatePercentageChange(
           currentMetrics.totalOrders,
@@ -96,7 +124,7 @@ const useAnalytics = () => {
         icon: "ShoppingCart",
       },
       {
-        label: "Avg Order Value",
+        label: t("avgOrderValue"),
         value: currentMetrics.avgOrderValue,
         change: calculatePercentageChange(
           currentMetrics.avgOrderValue,
@@ -105,7 +133,7 @@ const useAnalytics = () => {
         icon: "DollarSign",
       },
       {
-        label: "Cancellation Rate",
+        label: t("cancellationRate"),
         value: currentMetrics.cancellationRate,
         change: calculatePercentageChange(
           currentMetrics.cancellationRate,
@@ -127,6 +155,7 @@ const useAnalytics = () => {
     previousData: previousPeriodData,
     dashboardData,
     loading: !dailySummarizationData,
+    hasData: currentPeriodData.length > 0,
   };
 };
 

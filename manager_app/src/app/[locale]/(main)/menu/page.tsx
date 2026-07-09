@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Plus, Cloud } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Plus, Cloud, UtensilsCrossed } from "lucide-react";
 import { useMenuData } from "@/hooks/useMenuData";
 import { CategoryHeader } from "@/components/menu/category-header";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { CategoryForm } from "@/components/menu/category-form";
 import { MenuItemForm } from "@/components/menu/menu-item-form";
 import { Button } from "@/components/ui/button";
-import { UserAvatar } from "@/components/user-avatar";
+import { AppHeader } from "@/components/dashboard/app-header";
 
 export default function MenuManagementPage() {
   const {
@@ -39,6 +40,9 @@ export default function MenuManagementPage() {
   const [selectedCategoryForItem, setSelectedCategoryForItem] = useState<
     string | null
   >(null);
+  const t = useTranslations("Menu.page");
+  const common = useTranslations("Common");
+
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
   const toggleCategoryExpand = (categoryId: string) => {
@@ -111,61 +115,46 @@ export default function MenuManagementPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/60">
-        <div className="max-w-4xl mx-auto px-4 py-4 sm:py-6">
-          <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-                  Restaurant Menu
-                </h1>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Manage categories, items, and promotions
-                </p>
-              </div>
-              <UserAvatar />
-            </div>
+      <AppHeader
+        title={t("title")}
+        subtitle={t("subtitle")}
+        icon={<UtensilsCrossed className="w-5 h-5" />}
+      />
 
-            <div className="flex gap-2">
-              <Button
-                onClick={() => setShowCategoryForm(true)}
-                className="flex-1 bg-accent hover:bg-accent/90 text-accent-foreground gap-2"
-              >
-                <Plus size={18} />
-                <span>Category</span>
-              </Button>
+      <main className="max-w-5xl mx-auto px-4 py-6 pb-24">
+        <div className="flex flex-col gap-2 mb-6">
+          <Button
+            onClick={() => setShowCategoryForm(true)}
+            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground gap-2"
+          >
+            <Plus size={18} />
+            <span>{t("addCategory")}</span>
+          </Button>
 
-              <Button
-                onClick={syncToCloud}
-                disabled={isSyncing}
-                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
-              >
-                <Cloud size={18} />
-                <span>{isSyncing ? "Syncing..." : "Sync"}</span>
-              </Button>
-            </div>
-          </div>
-
-          {syncMessage && (
-            <div className="mt-4 p-3 bg-accent/20 border border-accent rounded-md text-sm text-accent">
-              {syncMessage}
-            </div>
-          )}
+          <Button
+            onClick={syncToCloud}
+            disabled={isSyncing}
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
+          >
+            <Cloud size={18} />
+            <span>{isSyncing ? t("syncing") : t("sync")}</span>
+          </Button>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-6">
+        {syncMessage && (
+          <div className="mb-6 p-3 bg-accent/20 border border-accent rounded-md text-sm text-accent">
+            {syncMessage}
+          </div>
+        )}
         <div className="space-y-4">
           {sortedCategories.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-muted-foreground mb-4">No categories yet</p>
+              <p className="text-muted-foreground mb-4">{t("noCategories")}</p>
               <Button
                 onClick={() => setShowCategoryForm(true)}
                 className="bg-accent hover:bg-accent/90"
               >
-                Create First Category
+                {t("createFirstCategory")}
               </Button>
             </div>
           ) : (
@@ -194,14 +183,14 @@ export default function MenuManagementPage() {
                     {category.items.length === 0 ? (
                       <div className="p-4 bg-card/30 border border-border rounded-lg text-center">
                         <p className="text-sm text-muted-foreground mb-3">
-                          No items in this category
+                          {t("noItems")}
                         </p>
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => openAddItemForm(category.id)}
                         >
-                          Add First Item
+                          {t("addFirstItem")}
                         </Button>
                       </div>
                     ) : (
@@ -227,7 +216,7 @@ export default function MenuManagementPage() {
                       onClick={() => openAddItemForm(category.id)}
                       className="w-full p-3 border-2 border-dashed border-border rounded-lg text-foreground hover:bg-card/50 transition-colors text-sm font-medium"
                     >
-                      + Add Item
+                      {t("addItem")}
                     </button>
                   </div>
                 )}
@@ -241,7 +230,7 @@ export default function MenuManagementPage() {
           suppressHydrationWarning
           className="mt-8 p-4 bg-card/50 border border-border rounded-lg text-xs text-muted-foreground text-center"
         >
-          Last synced: {new Date(menuData.lastSynced).toLocaleString()}
+          {t("lastSynced")} {new Date(menuData.lastSynced).toLocaleString()}
         </div>
       </main>
 

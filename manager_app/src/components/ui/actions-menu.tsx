@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { MoreVertical } from "lucide-react";
 
 type MenuItem = {
@@ -17,6 +18,7 @@ interface ActionsMenuProps {
 }
 
 export function ActionsMenu({ items, className = "" }: ActionsMenuProps) {
+  const t = useTranslations("Common");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -42,13 +44,13 @@ export function ActionsMenu({ items, className = "" }: ActionsMenuProps) {
         className="p-2 rounded-md transition-colors bg-muted text-muted-foreground hover:bg-muted/80"
         aria-haspopup="menu"
         aria-expanded={open}
-        title="Actions"
+        title={t("actions")}
       >
         <MoreVertical size={16} />
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-md shadow-lg z-50">
+        <div className="absolute left-0 mt-2 w-48 bg-card border border-border rounded-md shadow-lg z-50">
           <div role="menu" className="flex flex-col py-1">
             {items.map((it) => (
               <button

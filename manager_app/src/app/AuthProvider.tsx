@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useRouter, usePathname } from "@/i18n/routing";
 import useAuth from "@/hooks/useAuth";
 import useUser from "@/hooks/useUser";
 import AutoLoginLoadingScreen from "@/components/AutoLoginLoadingScreen";
@@ -11,6 +12,7 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const t = useTranslations("Auth.unassigned");
   const { user, isAuthLoading, logout } = useAuth(false);
   const { user: userData, isLoading: isUserDataLoading } = useUser();
   const router = useRouter();
@@ -64,12 +66,12 @@ export default function AuthProvider({
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
         <div className="bg-card border border-border rounded-lg p-6 shadow-lg mx-4 max-w-md w-full">
           <h2 className="text-lg font-semibold text-foreground text-center">
-            Access Restricted
+            {t("title")}
           </h2>
           <p className="text-sm text-muted-foreground text-center pt-2">
-            You aren't assigned to any businesses yet
+            {t("description")}
             <br />
-            Signed in as <strong>{user.email || "unknown@email.com"}</strong>
+            {t("signedInAs")} <strong>{user.email || "unknown@email.com"}</strong>
           </p>
           <div className="flex items-center justify-center mt-6 pt-4 border-t border-border">
             <Button
@@ -78,7 +80,7 @@ export default function AuthProvider({
               disabled={isLoggingOut}
               className="w-full sm:w-auto"
             >
-              {isLoggingOut ? "Logging out..." : "Logout"}
+              {isLoggingOut ? t("loggingOut") : t("logout")}
             </Button>
           </div>
         </div>

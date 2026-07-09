@@ -7,6 +7,7 @@ import {
   DollarSign,
   AlertCircle,
 } from "lucide-react";
+import { WidgetHelp } from "@/components/ui/widget-help";
 
 interface KPICardsProps {
   kpis: KPIData[];
@@ -44,7 +45,10 @@ export function KPICards({ kpis }: KPICardsProps) {
                 {changeSymbol} {Math.abs(kpi.change)}%
               </span>
             </div>
-            <p className="text-xs text-muted-foreground mb-1">{kpi.label}</p>
+            <div className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
+              {kpi.label}
+              <WidgetHelp widgetKey="kpis" />
+            </div>
             <p className="text-lg font-bold text-card-foreground">
               {displayValue}
             </p>

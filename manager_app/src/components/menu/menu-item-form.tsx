@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -80,6 +81,9 @@ export function MenuItemForm({
     }
   }, [initialTitle, initialDescription, initialPrice, initialSizes]);
 
+  const t = useTranslations("Menu.itemForm");
+  const common = useTranslations("Common");
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim() && price) {
@@ -107,8 +111,8 @@ export function MenuItemForm({
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">
             {isEditing
-              ? `Edit Item in ${categoryName}`
-              : `Add Item to ${categoryName}`}
+              ? t("editTitle", { categoryName })
+              : t("addTitle", { categoryName })}
           </h2>
           <button
             onClick={onCancel}
@@ -121,13 +125,13 @@ export function MenuItemForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Item Title *
+              {t("itemTitleLabel")}
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Grilled Salmon"
+              placeholder={t("itemTitlePlaceholder")}
               className="w-full px-3 py-2 bg-input border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               required
             />
@@ -135,12 +139,12 @@ export function MenuItemForm({
 
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Description
+              {t("descriptionLabel")}
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of the item"
+              placeholder={t("descriptionPlaceholder")}
               rows={3}
               className="w-full px-3 py-2 bg-input border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
             />
@@ -148,13 +152,13 @@ export function MenuItemForm({
 
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Price *
+              {t("priceLabel")}
             </label>
             <input
               type="number"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
-              placeholder="0.00"
+              placeholder={t("pricePlaceholder")}
               step="0.01"
               min="0"
               className="w-full px-3 py-2 bg-input border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
@@ -164,7 +168,7 @@ export function MenuItemForm({
 
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Sizes (tiered pricing)
+              {t("sizesLabel")}
             </label>
             {sizesEnabled ? (
               <div className="grid grid-cols-3 gap-2">
@@ -172,7 +176,7 @@ export function MenuItemForm({
                   type="number"
                   value={smallPrice}
                   onChange={(e) => setSmallPrice(e.target.value)}
-                  placeholder="Small Price"
+                  placeholder={t("smallPlaceholder")}
                   step="0.01"
                   min="0"
                   className="w-full px-2 py-2 bg-input border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
@@ -181,7 +185,7 @@ export function MenuItemForm({
                   type="number"
                   value={mediumPrice}
                   onChange={(e) => setMediumPrice(e.target.value)}
-                  placeholder="Medium Price"
+                  placeholder={t("mediumPlaceholder")}
                   step="0.01"
                   min="0"
                   className="w-full px-2 py-2 bg-input border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
@@ -190,7 +194,7 @@ export function MenuItemForm({
                   type="number"
                   value={largePrice}
                   onChange={(e) => setLargePrice(e.target.value)}
-                  placeholder="Large Price"
+                  placeholder={t("largePlaceholder")}
                   step="0.01"
                   min="0"
                   className="w-full px-2 py-2 bg-input border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
@@ -204,7 +208,7 @@ export function MenuItemForm({
               onClick={() => setSizesEnabled(true)}
               className="mt-2"
             >
-              Enable Sizes
+              {t("enableSizes")}
             </Button>
           </div>
 
@@ -214,7 +218,7 @@ export function MenuItemForm({
                 type="submit"
                 className="flex-1 bg-accent hover:bg-accent/90"
               >
-                {submitLabel ?? (isEditing ? "Save Item" : "Add Item")}
+                {submitLabel ?? (isEditing ? t("saveItem") : t("addItem"))}
               </Button>
               <Button
                 type="button"
@@ -222,7 +226,7 @@ export function MenuItemForm({
                 onClick={onCancel}
                 className="flex-1"
               >
-                Cancel
+                {common("cancel")}
               </Button>
             </div>
           </div>

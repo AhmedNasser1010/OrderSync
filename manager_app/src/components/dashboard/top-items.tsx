@@ -1,17 +1,22 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { TopItem } from "@/lib/types/types";
 import { TrendingUp, TrendingDown } from "lucide-react";
+import { WidgetHelp } from "@/components/ui/widget-help";
 
 interface TopItemsProps {
   items: TopItem[];
 }
 
 export function TopItems({ items }: TopItemsProps) {
+  const t = useTranslations("Dashboard.topItems");
+
   return (
     <div className="bg-card border border-border rounded-2xl p-4 mx-4 my-3">
-      <h3 className="text-sm font-semibold text-card-foreground mb-3">
-        Top Selling Items
+      <h3 className="text-sm font-semibold text-card-foreground mb-3 flex items-center gap-1">
+        {t("title")}
+        <WidgetHelp widgetKey="topItems" />
       </h3>
       <div className="space-y-2">
         {items.map((item) => {
@@ -34,7 +39,7 @@ export function TopItems({ items }: TopItemsProps) {
                     {item.name}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    ${item.revenue} revenue
+                    ${item.revenue} {t("revenue")}
                   </p>
                 </div>
               </div>
@@ -52,7 +57,7 @@ export function TopItems({ items }: TopItemsProps) {
         })}
       </div>
       <button className="w-full mt-3 py-2 text-xs font-medium text-primary hover:bg-muted rounded-lg transition">
-        View All Items
+        {t("viewAll")}
       </button>
     </div>
   );

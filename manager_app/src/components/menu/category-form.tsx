@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -27,6 +28,9 @@ export function CategoryForm({
     setDescription(initialDescription);
   }, [initialTitle, initialDescription]);
 
+  const t = useTranslations("Menu.categoryForm");
+  const common = useTranslations("Common");
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim()) {
@@ -41,7 +45,7 @@ export function CategoryForm({
       <div className="w-full md:w-96 bg-card border border-border rounded-t-lg md:rounded-lg p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold">
-            {isEditing ? "Edit Category" : "New Category"}
+            {isEditing ? t("editTitle") : t("newTitle")}
           </h2>
           <button
             onClick={onCancel}
@@ -54,13 +58,13 @@ export function CategoryForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Category Title *
+              {t("titleLabel")}
             </label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g., Appetizers"
+              placeholder={t("titlePlaceholder")}
               className="w-full px-3 py-2 bg-input border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent"
               required
             />
@@ -68,12 +72,12 @@ export function CategoryForm({
 
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
-              Description
+              {t("descriptionLabel")}
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of this category"
+              placeholder={t("descriptionPlaceholder")}
               rows={3}
               className="w-full px-3 py-2 bg-input border border-border rounded-md text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-accent resize-none"
             />
@@ -85,7 +89,7 @@ export function CategoryForm({
                 type="submit"
                 className="flex-1 bg-accent hover:bg-accent/90"
               >
-                {isEditing ? "Save Changes" : "Create Category"}
+                {isEditing ? t("saveChanges") : t("createCategory")}
               </Button>
               <Button
                 type="button"
@@ -93,7 +97,7 @@ export function CategoryForm({
                 onClick={onCancel}
                 className="flex-1"
               >
-                Cancel
+                {common("cancel")}
               </Button>
             </div>
           </div>

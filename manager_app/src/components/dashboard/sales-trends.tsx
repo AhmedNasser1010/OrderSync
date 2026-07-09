@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { ChartDataPoint } from "@/lib/types/types";
+import { WidgetHelp } from "@/components/ui/widget-help";
 import {
   LineChart,
   Line,
@@ -17,6 +19,7 @@ interface SalesTrendsProps {
 }
 
 export function SalesTrends({ data }: SalesTrendsProps) {
+  const t = useTranslations("Dashboard.salesTrends");
   const [metric, setMetric] = useState<"revenue" | "orders">("revenue");
 
   const toggleMetric = () => {
@@ -26,14 +29,15 @@ export function SalesTrends({ data }: SalesTrendsProps) {
   return (
     <div className="bg-card border border-border rounded-2xl p-4 mx-4 my-3">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-card-foreground">
-          Sales Trends
+        <h3 className="text-sm font-semibold text-card-foreground flex items-center gap-1">
+          {t("title")}
+          <WidgetHelp widgetKey="salesTrends" />
         </h3>
         <button
           onClick={toggleMetric}
           className="text-xs font-medium px-2.5 py-1 bg-muted rounded-lg text-muted-foreground hover:bg-muted/80"
         >
-          {metric === "revenue" ? "Revenue" : "Orders"}
+          {metric === "revenue" ? t("revenue") : t("orders")}
         </button>
       </div>
 

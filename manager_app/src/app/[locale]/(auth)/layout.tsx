@@ -1,8 +1,12 @@
-export default function AuthLayout({
+import { getTranslations } from "next-intl/server";
+
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const t = await getTranslations("Auth.layout");
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
@@ -13,17 +17,17 @@ export default function AuthLayout({
             </span>
           </div>
           <h1 className="text-3xl font-bold text-foreground">
-            Manager
+            {t("title")}
           </h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Manage your restaurant with ease
+            {t("tagline")}
           </p>
         </div>
 
         <div>{children}</div>
 
         <div className="mt-8 text-center text-xs text-muted-foreground">
-          <p>&copy; 2025 OrderSync. All rights reserved.</p>
+          <p>{t("copyright")}</p>
         </div>
       </div>
     </div>

@@ -1,14 +1,6 @@
-import type { Metadata } from "next";
+import { ReactNode } from "react";
+import Script from "next/script";
 import localFont from "next/font/local";
-import "./globals.css";
-
-import StoreProvider from "./StoreProvider";
-import AuthProvider from "./AuthProvider";
-import PopupProvider from "./PopupProvider";
-import { Inter } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -21,32 +13,32 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
-  title: "OrderSync | Home",
-  description: "Track your restaurant performance and analytics",
-};
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={cn("font-sans", inter.variable)}
-      suppressHydrationWarning
-    >
+    <html suppressHydrationWarning>
+      <head>
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(){
+                try {
+                  var t = localStorage.getItem("theme");
+                  if (t) { try { t = JSON.parse(t); } catch(e) {} }
+                  if (t === "dark" || (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+                    document.documentElement.classList.add("dark");
+                  }
+                } catch(e){}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <StoreProvider>
-          <AuthProvider>
-            <PopupProvider>
-              {children}
-            </PopupProvider>
-          </AuthProvider>
-        </StoreProvider>
+        {children}
       </body>
     </html>
   );

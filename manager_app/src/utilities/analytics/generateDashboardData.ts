@@ -3,6 +3,10 @@ import type {
   DashboardData,
   KPIData,
   OperationMetrics,
+  AIInsight,
+  StrengthItem,
+  AlertItem,
+  TrendItem,
   StatusType,
 } from "@/lib/types/types";
 import { getGrowthPercentage } from "./getGrowthPercentage";
@@ -285,35 +289,38 @@ export const generateDashboardData = ({
 
   const operations: OperationMetrics[] = [
     {
-      label: "Avg Prep Time",
-      time: `${prepMinutes} min`,
+      type: "prepTime",
+      value: prepMinutes,
       status:
         prepMinutes <= 15 ? "good" : prepMinutes <= 25 ? "warning" : "alert",
-      benchmark: "vs 15 min avg",
+      target: 15,
+      unit: "minutes",
     },
 
     {
-      label: "Avg Delivery Time",
-      time: `${deliveryMinutes} min`,
+      type: "deliveryTime",
+      value: deliveryMinutes,
       status:
         deliveryMinutes <= 35
           ? "good"
           : deliveryMinutes <= 50
             ? "warning"
             : "alert",
-      benchmark: "vs 35 min avg",
+      target: 35,
+      unit: "minutes",
     },
 
     {
-      label: "Order Completion",
-      time: `${completionRate}%`,
+      type: "completion",
+      value: completionRate,
       status:
         completionRate >= 97
           ? "good"
           : completionRate >= 90
             ? "warning"
             : "alert",
-      benchmark: "vs 97% target",
+      target: 97,
+      unit: "percentage",
     },
   ];
 
@@ -405,24 +412,20 @@ export const generateDashboardData = ({
   // AI Insights
   // --------------------
 
-  const aiInsights: string[] = [];
+  const aiInsights: AIInsight[] = [];
 
   if (topItems.length > 0) {
-    aiInsights.push(`${topItems[0].name} is currently the best-selling item.`);
+    aiInsights.push({ type: "bestSeller", itemName: topItems[0].name });
   }
 
   if (customerAnalytics.returningPercentage > 50) {
-    aiInsights.push(
-      `Strong customer retention at ${customerAnalytics.returningPercentage}%.`,
-    );
+    aiInsights.push({ type: "strongRetention", percentage: customerAnalytics.returningPercentage });
   }
 
   const topCategory = categories[0];
 
   if (topCategory) {
-    aiInsights.push(
-      `${topCategory.name} generates ${topCategory.percentage}% of total revenue.`,
-    );
+    aiInsights.push({ type: "topCategory", categoryName: topCategory.name, percentage: topCategory.percentage });
   }
 
   // --------------------
@@ -477,77 +480,55 @@ export const generateDashboardData = ({
   else if (efficiencyScore >= 70) score += 15;
   else score += 10;
 
-  const strengths: string[] = [];
-  const alerts: string[] = [];
-
-  // Strengths
+  const strengths: StrengthItem[] = [];
+  const alerts: AlertItem[] = [];
 
   if (customerAnalytics.returningPercentage >= 50) {
-    strengths.push(
-      `Strong customer retention (${customerAnalytics.returningPercentage}% repeat customers)`,
-    );
+    strengths.push({ type: "strongRetention", percentage: customerAnalytics.returningPercentage });
   }
 
   if (completionRate >= 97) {
-    strengths.push(`Excellent order completion rate (${completionRate}%)`);
+    strengths.push({ type: "excellentCompletion", rate: completionRate });
   }
 
   if (prepMinutes <= 15) {
-    strengths.push(`Fast preparation time (${prepMinutes} min average)`);
+    strengths.push({ type: "fastPrepTime", minutes: prepMinutes });
   }
 
   if (revenueGrowth > 10) {
-    strengths.push(
-      `Revenue increased by ${revenueGrowth}% compared to previous period`,
-    );
+    strengths.push({ type: "revenueIncrease", growth: revenueGrowth });
   }
 
-  // Alerts
-
   if (customerAnalytics.returningPercentage < 30) {
-    alerts.push("Low customer retention rate. Consider loyalty programs.");
+    alerts.push({ type: "lowRetention" });
   }
 
   if (completionRate < 90) {
-    alerts.push("Order completion rate is below target.");
+    alerts.push({ type: "lowCompletion" });
   }
 
   if (prepMinutes > 25) {
-    alerts.push("Preparation time is slower than expected.");
+    alerts.push({ type: "slowPrepTime" });
   }
 
   const weakestCategory = categories[categories.length - 1];
 
   if (weakestCategory && weakestCategory.percentage < 10) {
-    alerts.push(
-      `${weakestCategory.name} contributes only ${weakestCategory.percentage}% of revenue.`,
-    );
+    alerts.push({ type: "weakCategory", categoryName: weakestCategory.name, percentage: weakestCategory.percentage });
   }
 
-  const trends = [
+  const trends: TrendItem[] = [
+    { type: "revenueGrowth", change: revenueGrowth, status: revenueGrowth >= 0 ? "good" : "alert" },
+    { type: "customerGrowth", change: customerGrowth, status: customerGrowth >= 0 ? "good" : "alert" },
     {
-      label: "Revenue Growth",
-      change: revenueGrowth,
-      status:
-        revenueGrowth >= 0 ? ("good" as StatusType) : ("alert" as StatusType),
-    },
-
-    {
-      label: "Customer Growth",
-      change: customerGrowth,
-      status:
-        customerGrowth >= 0 ? ("good" as StatusType) : ("alert" as StatusType),
-    },
-
-    {
-      label: "Efficiency",
+      type: "efficiency",
       change: prepMinutes <= 15 ? 10 : prepMinutes <= 25 ? 0 : -10,
       status:
         prepMinutes <= 15
-          ? ("good" as StatusType)
+          ? "good"
           : prepMinutes <= 25
-            ? ("warning" as StatusType)
-            : ("alert" as StatusType),
+            ? "warning"
+            : "alert",
     },
   ];
 

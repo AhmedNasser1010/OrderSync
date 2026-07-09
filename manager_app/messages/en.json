@@ -1,0 +1,279 @@
+{
+  "Common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "loading": "Loading...",
+    "noImage": "No image",
+    "noBackground": "No background",
+    "hidden": "Hidden",
+    "actions": "Actions",
+    "editBackgrounds": "Edit backgrounds"
+  },
+  "Auth": {
+    "layout": {
+      "title": "Manager",
+      "tagline": "Manage your restaurant with ease",
+      "copyright": "\u00a9 2025 OrderSync. All rights reserved."
+    },
+    "form": {
+      "signIn": "Sign In",
+      "createAccount": "Create Account",
+      "dontHaveAccount": "Don't have an account?",
+      "signUpLink": "Sign up",
+      "alreadyHaveAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "continueWithGoogle": "Continue with Google",
+      "or": "or",
+      "email": "Email",
+      "emailPlaceholder": "name@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "passwordSignupPlaceholder": "At least 6 characters",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "signInButton": "Sign In",
+      "createAccountButton": "Create Account",
+      "anErrorOccurred": "An error occurred",
+      "loading": "Loading..."
+    },
+    "errors": {
+      "invalidCredential": "Invalid credential. Please check your email and password",
+      "tooManyRequests": "Too many requests. Please try again later.",
+      "emailAlreadyInUse": "This email is already in use.",
+      "weakPassword": "Password should be at least 6 characters.",
+      "googleSignInCanceled": "Google sign in was canceled.",
+      "anErrorOccurred": "An error occurred",
+      "accessDenied": "Access denied. Only business managers can access this app."
+    },
+    "unassigned": {
+      "title": "Access Restricted",
+      "description": "You aren't assigned to any businesses yet",
+      "signedInAs": "Signed in as",
+      "logout": "Logout",
+      "loggingOut": "Logging out..."
+    },
+    "notFound": {
+      "title": "Auth Not Found",
+      "description": "Please try again later."
+    },
+    "autoLogin": {
+      "title": "Logging you in...",
+      "description": "Please wait while we securely log you into your account."
+    }
+  },
+  "Dashboard": {
+    "header": {
+      "title": "Data Analysis",
+      "welcome": "Welcome back to OrderSync",
+      "selectRange": "Select range",
+      "allTime": "All time",
+      "last24Hours": "Last 24 hours",
+      "last3Hours": "Last 3 hours",
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "last3Months": "Last 3 months",
+      "last6Months": "Last 6 months",
+      "custom": "Custom"
+    },
+    "bottomNav": {
+      "analytics": "Analytics",
+      "menu": "Menu",
+      "settings": "Settings"
+    },
+    "kpis": {
+      "revenue": "Revenue",
+      "orders": "Orders",
+      "avgOrderValue": "Avg Order Value",
+      "cancellationRate": "Cancellation Rate"
+    },
+    "insights": {
+      "title": "Insights",
+      "bestSeller": "{item} is currently the best-selling item.",
+      "strongRetention": "Strong customer retention at {percentage}%.",
+      "topCategory": "{category} generates {percentage}% of total revenue."
+    },
+    "salesTrends": {
+      "title": "Sales Trends",
+      "revenue": "Revenue",
+      "orders": "Orders"
+    },
+    "topItems": {
+      "title": "Top Selling Items",
+      "revenue": "revenue",
+      "viewAll": "View All Items"
+    },
+    "categoryPerf": {
+      "title": "Category Performance"
+    },
+    "customerAnalytics": {
+      "title": "Customer Analytics",
+      "totalCustomers": "Total Customers",
+      "returningCustomers": "Returning Customers",
+      "topCustomer": "Top Customer",
+      "orders": "orders"
+    },
+    "deliveryAreas": {
+      "title": "Top Delivery Areas",
+      "viewMap": "View Map"
+    },
+    "operationsPerf": {
+      "title": "Operations Performance",
+      "prepTime": "Avg Prep Time",
+      "deliveryTime": "Avg Delivery Time",
+      "completion": "Order Completion",
+      "prepTimeBenchmark": "vs {target} min avg",
+      "deliveryTimeBenchmark": "vs {target} min avg",
+      "completionBenchmark": "vs {target}% target",
+      "minutes": "min"
+    },
+    "paymentMethods": {
+      "title": "Payment Methods"
+    },
+    "noData": {
+      "title": "No data available",
+      "description": "The selected timeline has no data yet. Try selecting a different range."
+    },
+    "widgetHelp": {
+      "kpis": {
+        "title": "Key Performance Indicators",
+        "description": "Shows your most important business metrics at a glance: total revenue, number of orders, average order value, and cancellation rate. Each metric includes a percentage change comparing the current period to the previous period."
+      },
+      "insights": {
+        "title": "AI Insights",
+        "description": "AI-generated observations about your business performance, highlighting best-selling items, customer retention rates, and top-performing categories."
+      },
+      "salesTrends": {
+        "title": "Sales Trends",
+        "description": "A line chart showing your revenue and order volume over time. Toggle between revenue and orders to track how your sales are trending across the selected period."
+      },
+      "topItems": {
+        "title": "Top Selling Items",
+        "description": "Your best-performing menu items ranked by revenue. Shows each item's quantity sold and growth percentage compared to the previous period."
+      },
+      "categoryPerf": {
+        "title": "Category Performance",
+        "description": "Breakdown of revenue by menu category. Bars show each category's contribution to total revenue, with status indicators for performance level."
+      },
+      "customerAnalytics": {
+        "title": "Customer Analytics",
+        "description": "Overview of your customer base including total customer count, returning customer percentage, and your top customer by order value."
+      },
+      "operationsPerf": {
+        "title": "Operations Performance",
+        "description": "Tracks operational efficiency metrics like average preparation time, delivery time, and order completion rate compared to targets."
+      },
+      "deliveryAreas": {
+        "title": "Top Delivery Areas",
+        "description": "Geographic breakdown of where your orders are being delivered, showing order volume and percentage share for each area."
+      },
+      "paymentMethods": {
+        "title": "Payment Methods",
+        "description": "Distribution of orders by payment method, showing the percentage and order count for each method used by your customers."
+      },
+      "businessScore": {
+        "title": "Business Health Score",
+        "description": "An overall health score for your business based on revenue growth, customer retention, and operational efficiency. Includes strengths, areas to improve, and trend indicators."
+      }
+    },
+    "businessScore": {
+      "title": "Business Health Score",
+      "outOf": "/",
+      "strengths": "Strengths",
+      "areasToImprove": "Areas to Improve",
+      "trends": "Trends",
+      "revenueGrowth": "Revenue Growth",
+      "customerGrowth": "Customer Growth",
+      "efficiency": "Efficiency",
+      "strongRetention": "Strong customer retention ({percentage}% repeat customers)",
+      "excellentCompletion": "Excellent order completion rate ({rate}%)",
+      "fastPrepTime": "Fast preparation time ({minutes} min average)",
+      "revenueIncrease": "Revenue increased by {growth}% compared to previous period",
+      "lowRetention": "Low customer retention rate. Consider loyalty programs.",
+      "lowCompletion": "Order completion rate is below target.",
+      "slowPrepTime": "Preparation time is slower than expected.",
+      "weakCategory": "{category} contributes only {percentage}% of revenue."
+    }
+  },
+  "Menu": {
+    "page": {
+      "title": "Restaurant Menu",
+      "subtitle": "Manage categories, items, and promotions",
+      "addCategory": "Category",
+      "sync": "Sync",
+      "syncing": "Syncing...",
+      "noCategories": "No categories yet",
+      "createFirstCategory": "Create First Category",
+      "noItems": "No items in this category",
+      "addFirstItem": "Add First Item",
+      "addItem": "+ Add Item",
+      "lastSynced": "Last synced:"
+    },
+    "categoryForm": {
+      "editTitle": "Edit Category",
+      "newTitle": "New Category",
+      "titleLabel": "Category Title *",
+      "titlePlaceholder": "e.g., Appetizers",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Brief description of this category",
+      "saveChanges": "Save Changes",
+      "createCategory": "Create Category"
+    },
+    "itemForm": {
+      "editTitle": "Edit Item in {categoryName}",
+      "addTitle": "Add Item to {categoryName}",
+      "itemTitleLabel": "Item Title *",
+      "itemTitlePlaceholder": "e.g., Grilled Salmon",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Brief description of the item",
+      "priceLabel": "Price *",
+      "pricePlaceholder": "0.00",
+      "sizesLabel": "Sizes (tiered pricing)",
+      "smallPlaceholder": "Small Price",
+      "mediumPlaceholder": "Medium Price",
+      "largePlaceholder": "Large Price",
+      "enableSizes": "Enable Sizes",
+      "saveItem": "Save Item",
+      "addItem": "Add Item"
+    },
+    "categoryHeader": {
+      "hideFromMenu": "Hide from menu",
+      "showInMenu": "Show in menu",
+      "moveUp": "Move category up",
+      "moveDown": "Move category down",
+      "edit": "Edit category",
+      "delete": "Delete category",
+      "items": "items"
+    },
+    "itemCard": {
+      "moveUp": "Move item up",
+      "moveDown": "Move item down",
+      "edit": "Edit item",
+      "hideFromMenu": "Hide from menu",
+      "showInMenu": "Show in menu",
+      "delete": "Delete item"
+    },
+    "sync": {
+      "success": "Menu synced successfully!",
+      "failed": "Failed to sync menu",
+      "restaurantIdUnavailable": "Restaurant ID is unavailable."
+    }
+  },
+  "Settings": {
+    "title": "Settings",
+    "subtitle": "Manage your app preferences",
+    "theme": "Theme",
+    "themeDescription": "Toggle between light and dark mode",
+    "language": "Language",
+    "languageDescription": "Choose your preferred language"
+  },
+  "ImageEditor": {
+    "title": "Edit Images",
+    "imageLabel": "Image {number}",
+    "urlPlaceholder": "https://..."
+  },
+  "Metadata": {
+    "title": "OrderSync | Home",
+    "description": "Track your restaurant performance and analytics"
+  }
+}

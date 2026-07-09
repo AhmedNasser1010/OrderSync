@@ -59,9 +59,13 @@ function DialogContent({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      onClick={() => onOpenChange?.(false)}
+    >
       <div
         className={`w-full max-w-md bg-card border border-border rounded-lg p-6 shadow-lg mx-4 ${className}`}
+        onClick={(e) => e.stopPropagation()}
       >
         {!hideCloseButton && onOpenChange && (
           <button

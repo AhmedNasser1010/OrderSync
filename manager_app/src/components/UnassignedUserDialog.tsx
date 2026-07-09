@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,15 +22,17 @@ export default function UnassignedUserDialog({
   email,
   onLogout,
 }: UnassignedUserDialogProps) {
+  const t = useTranslations("Auth.unassigned");
+
   return (
     <Dialog open={open}>
       <DialogContent className="sm:max-w-md" hideCloseButton>
         <DialogHeader>
-          <DialogTitle className="text-center">Access Restricted</DialogTitle>
+          <DialogTitle className="text-center">{t("title")}</DialogTitle>
           <DialogDescription className="text-center pt-2">
-            You aren't assigned to any businesses yet
+            {t("description")}
             <br />
-            Signed in as <strong>{email}</strong>
+            {t("signedInAs")} <strong>{email}</strong>
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-center">
@@ -38,7 +41,7 @@ export default function UnassignedUserDialog({
             onClick={onLogout}
             className="w-full sm:w-auto"
           >
-            Logout
+            {t("logout")}
           </Button>
         </DialogFooter>
       </DialogContent>

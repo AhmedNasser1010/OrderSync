@@ -1,17 +1,22 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Category } from "@/lib/types/types";
 import { StatusIndicator } from "./status-indicator";
+import { WidgetHelp } from "@/components/ui/widget-help";
 
 interface CategoryPerfProps {
   categories: Category[];
 }
 
 export function CategoryPerf({ categories }: CategoryPerfProps) {
+  const t = useTranslations("Dashboard.categoryPerf");
+
   return (
     <div className="bg-card border border-border rounded-2xl p-4 mx-4 my-3">
-      <h3 className="text-sm font-semibold text-card-foreground mb-4">
-        Category Performance
+      <h3 className="text-sm font-semibold text-card-foreground mb-4 flex items-center gap-1">
+        {t("title")}
+        <WidgetHelp widgetKey="categoryPerf" />
       </h3>
       <div className="space-y-4">
         {categories.map((cat, idx) => (
