@@ -1,11 +1,9 @@
 export type Driver = {
   partnerUid: string;
-  uid: string;
   createdAt: number;
   updatedAt: number;
-  ordersDues: number;
-  trackingFeature: boolean;
   liveLocation: [number, number];
+  uid: string;
   online: {
     byManager: boolean;
     byUser: boolean;
@@ -17,9 +15,16 @@ export type Driver = {
     phone: string;
     secondPhone?: string;
     role: "DRIVER";
+    provider: string;
+    uid: string;
   };
   licensePlate?: {
     letters: string;
     numbers: number;
   };
-}
+  finance: {
+    currentCash: number;
+    warningLimit: number;
+    blockLimit: number;
+  };
+};

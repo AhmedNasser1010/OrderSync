@@ -737,7 +737,7 @@ export const firestoreApi = createApi({
           const batch = writeBatch(db);
 
           batch.update(driverRef, {
-            ["ordersDues"]: duesValue ? increment(-duesValue) : 0,
+            ["finance.currentCash"]: duesValue ? increment(-duesValue) : 0,
           });
 
           await batch.commit();
@@ -830,7 +830,11 @@ export const firestoreApi = createApi({
             partnerUid,
             joinDate: Date.now(),
             trackingFeature: true,
-            ordersDues: 0,
+            finance: {
+              currentCash: 0,
+              warningLimit: 350,
+              blockLimit: 500,
+            },
             online: {
               byManager: true,
               byUser: false,
@@ -844,6 +848,7 @@ export const firestoreApi = createApi({
               name,
               phone,
               role: "DRIVER",
+              uid,
             },
           });
 

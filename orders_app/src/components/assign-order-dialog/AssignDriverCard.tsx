@@ -25,7 +25,7 @@ export default function AssignDriverCard({
     >
       <DriverCardAvatar avatar={driver.avatar} name={driver.name} />
       <DriverCardInfo status={driver.status} name={driver.name} />
-      <DriverCardDuesAndActions driverId={driver.id} orderDues={driver.ordersDues} />
+      <DriverCardDuesAndActions driverId={driver.id} orderDues={driver.currentCash} />
     </div>
   );
 }

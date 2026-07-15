@@ -80,9 +80,9 @@ export function StaffCard({ member }: { member: Driver }) {
         <div className="flex justify-between">
           <span className="text-muted-foreground">Dues</span>
           <span
-            className={`font-medium ${member.ordersDues > 0 ? "text-destructive" : "text-green-500"}`}
+            className={`font-medium ${member.finance.currentCash > 0 ? "text-destructive" : "text-green-500"}`}
           >
-            ${member.ordersDues.toFixed(2)}
+            ${member.finance.currentCash.toFixed(2)}
           </span>
         </div>
       </div>

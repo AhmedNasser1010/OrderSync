@@ -8,6 +8,7 @@ import {
   where,
   setDoc,
   updateDoc,
+  deleteDoc,
   writeBatch,
   runTransaction,
   FirestoreError,
@@ -19,6 +20,7 @@ import type {
   RestaurantStatusTypes,
   BusinessDocument,
   ManagerUser,
+  Driver,
 } from "@ordersync/types";
 
 export interface UpdateBusinessInput {
@@ -39,7 +41,7 @@ function getErrorMessage(error: unknown): string {
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["User", "Businesses"],
+  tagTypes: ["User", "Businesses", "Drivers"],
   endpoints: (builder) => ({
     // Query Endpoints
     fetchUserData: builder.query({
@@ -496,6 +498,152 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ["User"],
     }),
+    fetchDriverUsers: builder.query<Driver[], string>({
+      async queryFn(partnerUid: string) {
+        try {
+          if (!partnerUid) {
+            return { data: [] };
+          }
+          const ref = collection(db, "drivers");
+          const q = query(ref, where("partnerUid", "==", partnerUid));
+          const snapshot = await getDocs(q);
+          const drivers = snapshot.docs.map((docSnap) => {
+            const data = docSnap.data();
+            return {
+              uid: docSnap.id,
+              partnerUid: data.partnerUid ?? "",
+              createdAt: data.createdAt ?? 0,
+              updatedAt: data.updatedAt ?? 0,
+              liveLocation: data.liveLocation ?? [0, 0],
+              online: data.online ?? { byManager: false, byUser: false },
+              queue: data.queue ?? [],
+              userInfo: data.userInfo ?? {},
+              licensePlate: data.licensePlate,
+              finance: data.finance ?? { currentCash: 0, warningLimit: 0, blockLimit: 0 },
+            } as Driver;
+          });
+          console.log("Read Operation [fetchDriverUsers]");
+          return { data: drivers };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
+        }
+      },
+      providesTags: ["Drivers"],
+    }),
+    createDriverDocument: builder.mutation<
+      null,
+      {
+        uid: string;
+        partnerUid: string;
+        email: string;
+        name: string;
+        phone: string;
+        secondPhone?: string;
+        provider: string;
+        licensePlate?: { letters: string; numbers: number };
+      }
+    >({
+      async queryFn({ uid, partnerUid, email, name, phone, secondPhone, provider, licensePlate }) {
+        try {
+          if (!uid) throw new Error("Driver UID is required.");
+          if (!partnerUid) throw new Error("Partner UID is required.");
+
+          const now = Date.now();
+          const userInfo: Record<string, unknown> = {
+            uid,
+            email,
+            name,
+            phone,
+            role: "DRIVER" as const,
+            provider,
+          };
+          if (secondPhone) userInfo.secondPhone = secondPhone;
+
+          const driverData: Record<string, unknown> = {
+            uid,
+            partnerUid,
+            createdAt: now,
+            updatedAt: now,
+            liveLocation: [0, 0],
+            online: {
+              byManager: false,
+              byUser: false,
+            },
+            queue: [],
+            userInfo,
+            finance: {
+              currentCash: 0,
+              warningLimit: 350,
+              blockLimit: 500,
+            },
+          };
+          if (licensePlate) driverData.licensePlate = licensePlate;
+
+          const docRef = doc(db, "drivers", uid);
+          await setDoc(docRef, driverData);
+
+          console.log("Write Operation [createDriverDocument]");
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error creating driver document:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Drivers"],
+    }),
+    updateDriverDocument: builder.mutation<
+      null,
+      { uid: string; updates: Partial<Driver> }
+    >({
+      async queryFn({ uid, updates }) {
+        try {
+          if (!uid) throw new Error("Driver UID is required.");
+
+          const driverRef = doc(db, "drivers", uid);
+          await updateDoc(driverRef, {
+            ...updates,
+            updatedAt: Date.now(),
+          });
+
+          console.log("Write Operation [updateDriverDocument]");
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error updating driver document:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Drivers"],
+    }),
+    deleteDriverDocument: builder.mutation<null, string>({
+      async queryFn(uid: string) {
+        try {
+          if (!uid) throw new Error("Driver UID is required.");
+
+          const driverRef = doc(db, "drivers", uid);
+          await deleteDoc(driverRef);
+
+          const result = await deleteAuthUser(uid);
+          if (!result.success) {
+            console.error(
+              "deleteDriverDocument: Failed to delete auth user:",
+              result.error,
+            );
+          }
+
+          console.log("Write Operation [deleteDriverDocument]");
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error deleting driver document:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Drivers"],
+    }),
   }),
 });
 
@@ -504,6 +652,7 @@ export const {
   useFetchRestaurantDataQuery,
   useFetchBusinessesQuery,
   useFetchManagersQuery,
+  useFetchDriverUsersQuery,
 
   useCreateUserDocumentMutation,
   useCreateBusinessMutation,
@@ -511,4 +660,7 @@ export const {
   useDeleteBusinessMutation,
   useDeleteManagerMutation,
   useSetRestaurantStatusMutation,
+  useCreateDriverDocumentMutation,
+  useUpdateDriverDocumentMutation,
+  useDeleteDriverDocumentMutation,
 } = firestoreApi;

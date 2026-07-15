@@ -14,7 +14,7 @@ export function Header({
   setSearchQuery: (query: string) => void;
 }) {
   const activeCount = staff.filter((member) => member.online.byManager).length;
-  const totalDues = staff.reduce((sum, member) => sum + member.ordersDues, 0);
+  const totalDues = staff.reduce((sum, member) => sum + member.finance.currentCash, 0);
   return (
     <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border px-4 py-4">
       {/* Back Button */}

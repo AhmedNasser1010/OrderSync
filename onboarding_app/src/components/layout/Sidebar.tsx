@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Menu, X, Utensils, Users, LogOut } from "lucide-react";
+import { ChevronRight, Menu, X, Utensils, Users, Truck, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { usePathname } from "next/navigation";
@@ -19,6 +19,7 @@ export function Sidebar({
   const navigationItems = [
     { icon: Utensils, label: "Restaurants", href: "/restaurants" },
     { icon: Users, label: "Managers", href: "/managers" },
+    { icon: Truck, label: "Drivers", href: "/drivers" },
   ];
 
   return (

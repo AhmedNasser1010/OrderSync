@@ -30,7 +30,7 @@ export default function AssignOrder({ orderId }: { orderId: string }) {
           id: driver.uid,
           name: driver.userInfo.name,
           avatar: "/placeholder.svg?height=40&width=40",
-          ordersDues: driver.ordersDues,
+          currentCash: driver.finance.currentCash,
           status:
             driver.online.byManager && driver.online.byUser
               ? driver.queue.length

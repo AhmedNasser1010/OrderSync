@@ -23,6 +23,6 @@ export type FormattedDriverForAssignCard = {
   id: string;
   name: string;
   avatar: string;
-  ordersDues: number;
+  currentCash: number;
   status: string;
 };
