@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import Info from './Info'
 
-function OrderInfo({ deliveryFees, orderId }) {
+function OrderInfo({ deliveryFees, orderNumber }) {
 	const { t } = useTranslation()
 
 	return (
@@ -14,9 +14,9 @@ function OrderInfo({ deliveryFees, orderId }) {
 					<span className='egp text-sm'>{ deliveryFees }</span>
 				</Info>
 
-				{orderId &&
+				{orderNumber &&
 					<Info label={t('Invoice No')}>
-						<span>{orderId}</span>
+						<span>#{orderNumber}</span>
 					</Info>
 				}
 

@@ -11,16 +11,14 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Settings, TicketX, TicketCheck, KeyRound, Wrench } from "lucide-react";
+import { Settings, KeyRound, Cog } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import {
-  setActiveTab,
   optionMenuView,
   setOptionsMenuView,
   setCloseDayPopup,
 } from "@/rtk/slices/toggleSlice";
 import MenuCard from "./MenuCard";
-import { RiEBike2Line } from "react-icons/ri";
 
 function SettingsMenu() {
   const router = useRouter();
@@ -51,20 +49,6 @@ function SettingsMenu() {
         <div className="grid grid-cols-2 gap-4 py-4">
           <MenuCard
             callback={() =>
-              afterTriggerAction(() => dispatch(setActiveTab("COMPLETED")))
-            }
-            title="Completed Orders"
-            icon={<TicketCheck className="h-8 w-8 mb-2" />}
-          />
-          <MenuCard
-            callback={() =>
-              afterTriggerAction(() => dispatch(setActiveTab("VOIDED")))
-            }
-            title="Rejected Orders"
-            icon={<TicketX className="h-8 w-8 mb-2" />}
-          />
-          <MenuCard
-            callback={() =>
               afterTriggerAction(() =>
                 dispatch(setCloseDayPopup({ isOpen: true })),
               )
@@ -75,12 +59,7 @@ function SettingsMenu() {
           <MenuCard
             callback={() => afterTriggerAction(() => router.push("/settings"))}
             title="Settings"
-            icon={<Wrench className="h-8 w-8 mb-2" />}
-          />
-          <MenuCard
-            callback={() => afterTriggerAction(() => router.push("/staff"))}
-            title="Staff Management"
-            icon={<RiEBike2Line className="h-8 w-8 mb-2" />}
+            icon={<Cog className="h-8 w-8 mb-2" />}
           />
         </div>
       </SheetContent>

@@ -13,10 +13,10 @@ interface OwnerSectionProps {
     uid: string;
     email: string;
     phone: string;
-    name?: string;
+    name: string;
     secondPhone?: string;
   };
-  onChange: (data: { uid: string; email: string; phone: string; name?: string; secondPhone?: string }) => void;
+  onChange: (data: { uid: string; email: string; phone: string; name: string; secondPhone?: string }) => void;
 }
 
 function isValidEmail(email: string): boolean {

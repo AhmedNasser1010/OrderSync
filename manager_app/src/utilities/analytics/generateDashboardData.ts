@@ -61,7 +61,7 @@ export const generateDashboardData = ({
   // --------------------
 
   const salesTrends = currentPeriodData.map((day) => ({
-    date: day.date,
+    date: day.businessDate,
     revenue: day.totalRevenue,
     orders: day.totalOrders,
   }));
@@ -186,7 +186,7 @@ export const generateDashboardData = ({
     .sort((a, b) => b.revenue - a.revenue);
 
   const [startDate, endDate] = currentPeriodData
-    .map((day) => day.date)
+    .map((day) => day.businessDate)
     .sort((a, b) => a.localeCompare(b));
 
   const dateRange = startDate
@@ -227,7 +227,7 @@ export const generateDashboardData = ({
 
   const latestHighestValueCustomer =
     currentPeriodData[currentPeriodData.length - 1]?.revenuePerCustomer
-      .highestValueCustomer;
+      ?.highestValueCustomer;
 
   const customerAnalytics = {
     totalCustomers,

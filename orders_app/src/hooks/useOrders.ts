@@ -1,13 +1,11 @@
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useCallback } from "react";
 import type { OrderType } from "@ordersync/types";
 import type { ItemType } from "@ordersync/types";
 import type { FormattedOrderType, CartItemType } from "@/types/orders";
 import {
   useFetchUserDataQuery,
-  useFetchOpenOrdersDataQuery,
+  useFetchActiveOrdersQuery,
   useFetchMenuDataQuery,
-  useFetchCompletedOrdersDataQuery,
-  useFetchVoidedOrdersDataQuery,
 } from "@/rtk/api/firestoreApi";
 import { useAppSelector } from "@/rtk/hooks";
 import { userUid } from "@/rtk/slices/constantsSlice";
@@ -22,83 +20,27 @@ type UseOrders = {
   isLoading: boolean;
 };
 
-type FetchOrdersType = {
-  data?: OrderType[];
-  error?: string;
-  isLoading?: boolean;
-  isError?: boolean;
-  refetch?: () => void;
-};
-
 const useOrders = (): UseOrders => {
   const uid = useAppSelector(userUid);
   const activeTabValue = useAppSelector(activeTab);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
+  const { data: userData, isLoading: isUserDataLoading } =
+    useFetchUserDataQuery(uid ? uid : skipToken);
 
-  const { data: openOrdersData, isLoading: openOrdersIsLoading } =
-    useFetchOpenOrdersDataQuery(userData?.accessToken, {
+  const { data: activeOrdersData, isLoading: activeOrdersIsLoading } =
+    useFetchActiveOrdersQuery(userData?.accessToken ?? skipToken, {
       skip: !userData?.accessToken,
-    }) as FetchOrdersType;
-
-  const {
-    data: completedOrdersData,
-    isLoading: completedOrdersIsLoading,
-    refetch: refetchCompletedOrders,
-  } = useFetchCompletedOrdersDataQuery(userData?.accessToken, {
-    skip: !userData?.accessToken,
-  }) as FetchOrdersType;
-
-  const {
-    data: voidedOrdersData,
-    isLoading: voidedOrdersIsLoading,
-    refetch: refetchVoidedOrders,
-  } = useFetchVoidedOrdersDataQuery(userData?.accessToken, {
-    skip: !userData?.accessToken,
-  }) as FetchOrdersType;
+    }) as { data?: OrderType[]; isLoading?: boolean };
 
   const { data: menuData, isLoading: menuIsLoading } = useFetchMenuDataQuery(
     userData?.accessToken,
     { skip: !userData?.accessToken },
   );
 
-  useEffect(() => {
-    if (refetchCompletedOrders && activeTabValue === "COMPLETED") {
-      refetchCompletedOrders();
-    } else if (refetchVoidedOrders && activeTabValue === "VOIDED") {
-      refetchVoidedOrders();
-    }
-  }, [activeTabValue, refetchCompletedOrders, refetchVoidedOrders]);
-
-  const orders = useMemo<OrderType[] | null>(() => {
-    switch (activeTabValue) {
-      case "COMPLETED":
-        return completedOrdersData || null;
-      case "VOIDED":
-        return voidedOrdersData || null;
-      default:
-        return openOrdersData || null;
-    }
-  }, [activeTabValue, openOrdersData, completedOrdersData, voidedOrdersData]);
-
-  useEffect(() => {
-    const allLoading = [
-      openOrdersIsLoading,
-      menuIsLoading,
-      completedOrdersIsLoading,
-      voidedOrdersIsLoading,
-    ].every((loading) => loading === false);
-    setIsLoading(!allLoading);
-  }, [
-    openOrdersIsLoading,
-    menuIsLoading,
-    completedOrdersIsLoading,
-    voidedOrdersIsLoading,
-  ]);
+  const isLoading = isUserDataLoading || activeOrdersIsLoading || menuIsLoading;
 
   const getOrder = useCallback(
-    (id: string) => orders?.find((order) => order.id === id),
-    [orders],
+    (id: string) => activeOrdersData?.find((order) => order.id === id),
+    [activeOrdersData],
   );
 
   const getOrderMenu = useCallback(
@@ -113,23 +55,47 @@ const useOrders = (): UseOrders => {
     [menuData],
   );
 
+  const filteredOrders = useMemo<OrderType[] | null>(() => {
+    if (!activeOrdersData) return null;
+
+    return activeOrdersData.filter((order) => {
+      const status = order.status.current;
+
+      switch (activeTabValue) {
+      case "RECEIVED":
+        return status === "RECEIVED";
+      case "PREPARING":
+        return ["ACCEPTED", "PREPARING"].includes(status);
+      case "DELIVERY":
+          return ["READY", "RESERVED", "PICKED_UP", "ON_ROUTE"].includes(status);
+        case "COMPLETED":
+          return status === "DELIVERED" || status === "GIVEN_FEEDBACK";
+        case "VOIDED":
+          return ["CANCELED", "REJECTED", "VOIDED"].includes(status);
+        default:
+          return false;
+      }
+    });
+  }, [activeOrdersData, activeTabValue]);
+
   const formattedOrders = useMemo<FormattedOrderType[] | null>(() => {
     return (
-      orders?.map((order) => ({
+      filteredOrders?.map((order) => ({
         id: order.id,
+        orderNumber: order.orderNumber,
         customer: order.customer.name,
-        total: `$${order.cartTotalPrice.total.toFixed(2)}`,
+        total: `$${order.pricing.total.toFixed(2)}`,
         status: order.status.current,
-        accepted: order.accepted,
         items: getOrderMenu(order.cart)
           .map((item) => `${item?.quantity}x ${item?.title}`)
           .join(", "),
+        placedAt: order.timeline.placedAt,
       })) || null
     );
-  }, [orders, getOrderMenu]);
+  }, [filteredOrders, getOrderMenu]);
 
   return {
-    orders: orders || null,
+    orders: filteredOrders,
     formattedOrders,
     getOrderMenu,
     getOrder,

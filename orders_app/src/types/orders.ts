@@ -1,5 +1,5 @@
-import type { ItemType } from '@ordersync/types';
-import type { OrderStatusType } from '@ordersync/types';
+import type { ItemType } from "@ordersync/types";
+import type { OrderStatusType } from "@ordersync/types";
 
 export type MainTabTypes = "RECEIVED" | "PREPARING" | "DELIVERY" | "COMPLETED" | "VOIDED";
 
@@ -7,22 +7,15 @@ export type CartItemType = {
   id: string;
   quantity: number;
   selectedSize: string;
-  discountCode: string;
+  discountCode?: string;
 };
 
 export type FormattedOrderType = {
   id: string;
+  orderNumber: number;
   customer: string;
   total: string;
   status: OrderStatusType;
-  accepted: boolean | null;
   items: string;
-};
-
-export type FormattedDriverForAssignCard = {
-  id: string;
-  name: string;
-  avatar: string;
-  currentCash: number;
-  status: string;
+  placedAt: number;
 };

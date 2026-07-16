@@ -87,8 +87,7 @@ const useOrder = () => {
   const cancelOrder = () => {
     if (trackedOrderData?.status?.current === 'RECEIVED') {
       cancelOrderMutation({
-        resId: user?.trackedOrder?.restaurant,
-        orderData: trackedOrderData,
+        orderId: trackedOrderData?.id,
         uid: user?.uid
       })
     }

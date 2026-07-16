@@ -1,11 +1,17 @@
 "use client";
 
-import { useOrders } from "@/hooks/useOrders";
+import { useMarketplaceOrders } from "@/hooks/useOrders";
+import { useOrderActions } from "@/hooks/useOrderActions";
+import { useAppSelector } from "@/rtk/hooks";
+import { selectUser } from "@/rtk/slices/authSlice";
 import { OrderCard } from "@/components/orders/OrderCard";
 import { Package, Store } from "lucide-react";
 
 export default function OrdersPage() {
-  const { orders, accessToken, isLoading, error, hasQueue } = useOrders();
+  const authUser = useAppSelector(selectUser);
+  const driverUid = authUser?.uid ?? "";
+  const { orders, isLoading, error } = useMarketplaceOrders();
+  const { claim, isLoading: isClaiming } = useOrderActions();
 
   if (isLoading) {
     return (
@@ -26,33 +32,12 @@ export default function OrdersPage() {
     );
   }
 
-  if (!hasQueue) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <header className="sticky top-0 z-10 bg-background border-b px-4 py-3">
-          <h1 className="text-lg font-semibold">Pick Up Orders</h1>
-        </header>
-        <main className="flex-1 p-4">
-          <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3">
-            <Store className="h-12 w-12 text-muted-foreground/50" />
-            <div className="text-center">
-              <p className="text-sm font-medium">No restaurants assigned</p>
-              <p className="text-xs text-muted-foreground">
-                Contact your manager to get assigned to a restaurant
-              </p>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-10 bg-background border-b px-4 py-3">
-        <h1 className="text-lg font-semibold">Pick Up Orders</h1>
+        <h1 className="text-lg font-semibold">Marketplace</h1>
         <p className="text-xs text-muted-foreground">
-          {orders.length} order{orders.length !== 1 ? "s" : ""} ready
+          {orders.length} order{orders.length !== 1 ? "s" : ""} available
         </p>
       </header>
 
@@ -61,7 +46,7 @@ export default function OrdersPage() {
           <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3">
             <Package className="h-12 w-12 text-muted-foreground/50" />
             <div className="text-center">
-              <p className="text-sm font-medium">No orders to pick up</p>
+              <p className="text-sm font-medium">No orders available</p>
               <p className="text-xs text-muted-foreground">
                 New orders will appear here
               </p>
@@ -73,7 +58,6 @@ export default function OrdersPage() {
               <OrderCard
                 key={order.id}
                 order={order}
-                accessToken={accessToken}
               />
             ))}
           </div>

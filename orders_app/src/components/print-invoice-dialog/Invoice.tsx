@@ -72,7 +72,7 @@ export default function Invoice({
   contentRef: React.RefObject<HTMLDivElement | null>;
   restaurant: BusinessDocument | undefined;
   order: OrderType | undefined;
-  orderMenu: (ItemType & { quantity: number; selectedSize: string; discountCode: string; })[] | undefined;
+  orderMenu: (ItemType & { quantity: number; selectedSize: string; discountCode?: string; })[] | undefined;
 }) {
   if (!restaurant || !order) return null;
   const { SVG } = useQRCode();
@@ -88,7 +88,7 @@ export default function Invoice({
       >
         Invoice No :
         <br />
-        {order.id}
+        #{order.orderNumber}
       </MiddleSpan>
       <MiddleSpan style={{ paddingBottom: "0" }}>
         {formatDateFromTimestamp(order.createdAt, "/")}
@@ -97,7 +97,7 @@ export default function Invoice({
       </MiddleSpan>
       <Contact>
         <ContactTitle>Contact Info</ContactTitle>
-        <ContactSpan>Address : {order.location.address}</ContactSpan>
+        <ContactSpan>Address : {order.delivery.address}</ContactSpan>
         <ContactSpan>Phone : {order.customer.phone}</ContactSpan>
         <ContactSpan>Name : {order.customer.name}</ContactSpan>
       </Contact>
@@ -153,7 +153,7 @@ export default function Invoice({
             </td>
             <td></td>
             <td></td>
-            <td>{order.deliveryFees}</td>
+            <td>{order.pricing.deliveryFees}</td>
           </tr>
         </tbody>
         <tfoot
@@ -169,16 +169,16 @@ export default function Invoice({
             </td>
             <td></td>
             <td></td>
-            <td>{order.cartTotalPrice.total}LE</td>
+            <td>{order.pricing.total}LE</td>
           </tr>
-          {order.cartTotalPrice.discount !== order.cartTotalPrice.total && (
+          {order.pricing.discount !== order.pricing.total && (
             <tr>
               <td style={{ width: "200px", padding: "10px 0 15px 10px" }}>
                 Discounted To
               </td>
               <td></td>
               <td></td>
-              <td>{order.cartTotalPrice.discount}LE</td>
+              <td>{order.pricing.discount}LE</td>
             </tr>
           )}
         </tfoot>
@@ -187,7 +187,7 @@ export default function Invoice({
       <QrWrapper>
         <QrBg>
           <SVG
-            text={`Order Now! https://merro.vercel.app\nInvoice No: ${order.id}*${restaurant.accessToken}\n\nMade with <3 by Ahmed Nasser\n01117073085`}
+            text={`Order Now! https://merro.vercel.app\nInvoice No: ${order.orderNumber}*${restaurant.accessToken}\n\nMade with <3 by Ahmed Nasser\n01117073085`}
             options={{
               margin: 2,
               width: 200,

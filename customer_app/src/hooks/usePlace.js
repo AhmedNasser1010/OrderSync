@@ -2,7 +2,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { toggleLoginSidebar, toggleOrderSidebar } from '../rtk/slices/toggleSlice'
 import toast from 'react-hot-toast'
-import randomOrderId from '../utils/randomOrderId'
+
 import filterObject from '../utils/filterObject'
 import getUserSource from '../utils/getUserSource'
 import priceAfterDiscount from '../utils/priceAfterDiscount'
@@ -136,7 +136,6 @@ const usePlace = () => {
     const cartTotalPrice = getCartTotalPrice()
 
     return {
-      id: randomOrderId(),
       timestamp,
       accessToken,
       cancelAutoAssign: false,

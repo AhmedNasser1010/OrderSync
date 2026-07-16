@@ -4,91 +4,68 @@ import {
   collection,
   doc,
   getDoc,
+  setDoc,
   updateDoc,
   onSnapshot,
   writeBatch,
-  runTransaction
+  runTransaction,
+  query,
+  where
 } from 'firebase/firestore'
 import { db } from '../../config/firebase'
+import { canTransition, getTimelineField } from '@ordersync/order-utils'
+import randomOrderNumber from '../../utils/randomOrderId'
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: ['OpenQueue', 'User'],
+  tagTypes: ['OrderTracking', 'User'],
   endpoints: (builder) => ({
     // Query Endpoints
     fetchOrderTrackingData: builder.query({
       queryFn: () => ({ data: {} }),
       async onCacheEntryAdded(
-        { resId, orderId, uid },
+        { orderId },
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch }
       ) {
         await cacheDataLoaded
 
-        const nextPath = {
-          openQueue: 'completedOrders',
-          completedOrders: 'voidedOrders'
-        }
+        // Listen to the single order document in the global collection
+        const orderRef = doc(db, 'orders', orderId)
 
-        let unsubscribe = null
-        let orderPath = 'openQueue'
-
-        const changeOrderPath = (newPath) => {
-          if (unsubscribe) {
-            unsubscribe()
-            unsubscribe = null
-          }
-
-          orderPath = newPath
-          const docRef = doc(db, 'orders', resId, orderPath, `${orderId}_${uid}`)
-
-          unsubscribe = onSnapshot(
-            docRef,
-            (docSnapshot) => {
+        const unsubscribe = onSnapshot(
+          orderRef,
+          (docSnapshot) => {
+            if (docSnapshot.exists()) {
               const data = docSnapshot.data()
-
-              if (data?.id) {
-                updateCachedData((draft) => {
-                  Object.assign(draft, data)
-                })
-                dispatch({
-                  type: 'toggle/setHasOrder',
-                  payload: true
-                })
-              } else {
-                if (orderPath === 'voidedOrders') {
-                  updateCachedData((draft) => {
-                    Object.assign(draft, {})
-                  })
-                  dispatch({
-                    type: 'toggle/setHasOrder',
-                    payload: false
-                  })
-                }
-
-                unsubscribe()
-                unsubscribe = null
-                changeOrderPath(nextPath[orderPath])
-                return
-              }
-
-              console.log(`Real-time Update [orderTracking > ${orderPath}]`)
-            },
-            (error) => {
-              console.error(
-                `Error in real-time listener [orderTracking > ${orderPath}]:`,
-                error?.message
-              )
+              updateCachedData((draft) => {
+                Object.assign(draft, data)
+              })
+              dispatch({
+                type: 'toggle/setHasOrder',
+                payload: true
+              })
+            } else {
+              updateCachedData((draft) => {
+                Object.assign(draft, {})
+              })
+              dispatch({
+                type: 'toggle/setHasOrder',
+                payload: false
+              })
             }
-          )
-        }
 
-        changeOrderPath(orderPath)
+            console.log('Real-time Update [orderTracking]')
+          },
+          (error) => {
+            console.error(
+              'Error in real-time listener [orderTracking]:',
+              error?.message
+            )
+          }
+        )
 
         await cacheEntryRemoved
-        if (unsubscribe) {
-          unsubscribe()
-          unsubscribe = null
-        }
+        unsubscribe()
       }
     }),
 
@@ -96,7 +73,6 @@ export const firestoreApi = createApi({
     setPlaceOrder: builder.mutation({
       async queryFn(orderData, { dispatch }) {
         try {
-          // Validate input data
           if (!orderData) {
             throw new Error('Order data is required.')
           }
@@ -126,31 +102,56 @@ export const firestoreApi = createApi({
             payload: true
           })
 
-          // References to Firestore collection
-          const openQueueRef = collection(db, 'orders', orderData.accessToken, 'openQueue')
           const customerRef = doc(db, 'customers', orderData.customer.uid)
+
+          // Write order to the global collection with RECEIVED status
+          const batch = writeBatch(db)
+
+          const orderRef = doc(collection(db, 'orders'))
+          const now = Date.now()
+          const orderNumber = randomOrderNumber()
+
           const pendingLoyalty = {
-            orderId: orderData.id,
+            orderId: orderRef.id,
             restaurant: orderData.accessToken,
-            amount: orderData?.cartTotalPrice?.discount ?? orderData?.cartTotalPrice?.total ?? 0,
+            amount: orderData?.pricing?.discount ?? orderData?.pricing?.total ?? 0,
             items: Array.isArray(orderData?.cart)
               ? orderData.cart.reduce((sum, item) => sum + (item?.quantity || 0), 0)
               : 0,
             totalOrders: 1,
             firstOrderTime:
-              orderData?.customer?.firstOrderDate ?? orderData?.timestamp ?? Date.now(),
+              orderData?.customer?.firstOrderDate ?? orderData?.createdAt ?? Date.now(),
             counted: false
           }
 
-          // Add new order to the open queue
-          const batch = writeBatch(db)
+          const newOrder = {
+            ...orderData,
+            id: orderRef.id,
+            orderNumber,
+            businessId: orderData.accessToken,
+            pricing: {
+              subtotal: (orderData.cartTotalPrice?.total ?? 0) - (orderData.deliveryFees ?? 0),
+              discount: (orderData.cartTotalPrice?.total ?? 0) - (orderData.cartTotalPrice?.discount ?? 0),
+              deliveryFees: orderData.deliveryFees ?? 0,
+              total: orderData.cartTotalPrice?.discount ?? orderData.cartTotalPrice?.total ?? 0
+            },
+            status: {
+              current: 'RECEIVED',
+              history: [{ status: 'RECEIVED', timestamp: now, by: 'customer' }]
+            },
+            timeline: {
+              ...orderData.timeline,
+              placedAt: now
+            },
+            createdAt: now,
+            updatedAt: now
+          }
 
-          const newOrderRef = doc(openQueueRef, `${orderData.id}_${orderData.customer.uid}`)
-
-          batch.set(newOrderRef, orderData)
+          batch.set(orderRef, newOrder)
           batch.update(customerRef, {
             trackedOrder: {
-              id: orderData.id,
+              id: orderRef.id,
+              orderNumber,
               restaurant: orderData.accessToken,
               pendingLoyalty
             }
@@ -158,85 +159,78 @@ export const firestoreApi = createApi({
 
           await batch.commit()
 
-          console.log('New order added to openQueue')
+          console.log('New order placed in global collection')
           return { data: null }
         } catch (error) {
-          console.error('Error while place a new order:', error.message)
+          console.error('Error while placing a new order:', error.message)
           return { error: error.message }
         }
       },
-      invalidatesTags: ['OpenQueue']
+      invalidatesTags: ['OrderTracking']
     }),
+
     cancelOrder: builder.mutation({
-      async queryFn({ resId, orderData, uid }) {
+      async queryFn({ orderId, uid }) {
         try {
-          const orderId = orderData.id
-          const orderRef = doc(db, 'orders', resId, 'openQueue', `${orderId}_${uid}`)
-          const voidedOrderRef = doc(db, 'orders', resId, 'voidedOrders', `${orderId}_${uid}`)
-          const customerRef = doc(db, 'customers', uid)
-          const timestamp = Date.now()
+          if (!orderId || !uid) throw new Error('Order ID and user ID required.')
 
-          const batch = writeBatch(db)
+          const orderRef = doc(db, 'orders', orderId)
 
-          batch.set(voidedOrderRef, {
-            ...orderData,
-            status: {
-              ...orderData.status,
-              cancelledBy: 'customer',
-              current: 'CANCELED',
-              history: arrayUnion({ status: 'CANCELED', timestamp })
-            },
-            orderTimestamps: {
-              ...orderData.orderTimestamps,
-              canceledAt: timestamp
+          await runTransaction(db, async (transaction) => {
+            const orderSnap = await transaction.get(orderRef)
+            if (!orderSnap.exists()) {
+              throw new Error('Order not found.')
             }
+
+            const order = orderSnap.data()
+
+            if (!canTransition(order.status.current, 'CANCELED')) {
+              throw new Error(`Cannot cancel order in status: ${order.status.current}`)
+            }
+
+            const now = Date.now()
+            const timelineField = getTimelineField('CANCELED')
+
+            transaction.update(orderRef, {
+              'status.current': 'CANCELED',
+              'status.history': arrayUnion({
+                status: 'CANCELED',
+                timestamp: now,
+                by: 'customer'
+              }),
+              [`timeline.${timelineField}`]: now,
+              updatedAt: now
+            })
           })
 
-          batch.delete(orderRef)
-
-          batch.update(customerRef, {
+          // Update customer trackedOrder
+          const customerRef = doc(db, 'customers', uid)
+          await updateDoc(customerRef, {
             'trackedOrder.id': null
           })
 
-          await batch.commit()
           return { data: {} }
         } catch (error) {
           console.error('Error canceling order:', error.message)
           return { error: error.message }
         }
       },
-      invalidatesTags: ['OpenQueue']
+      invalidatesTags: ['OrderTracking']
     }),
+
     setOrderFeedback: builder.mutation({
-      async queryFn({ orderData, uid, feedback, resId }) {
+      async queryFn({ orderId, uid, feedback, resId }) {
         try {
           console.log('[setOrderFeedback] Starting feedback submission', {
-            orderId: orderData.id,
+            orderId,
             uid,
             resId,
             feedback
           })
 
-          const completedOrderRef = doc(
-            db,
-            'orders',
-            orderData.accessToken,
-            'completedOrders',
-            `${orderData.id}_${uid}`
-          )
-
-          const openQueueRef = doc(
-            db,
-            'orders',
-            orderData.accessToken,
-            'openQueue',
-            `${orderData.id}_${uid}`
-          )
-
+          const orderRef = doc(db, 'orders', orderId)
           const userRef = doc(db, 'customers', uid)
-
-          const reviewRef = doc(db, 'reviews', orderData.id)
-
+          const reviewRef = doc(db, 'reviews', orderId)
           const businessRef = doc(db, 'businesses', resId)
 
           const rating = feedback.rating === 0 ? null : feedback.rating
@@ -253,17 +247,28 @@ export const firestoreApi = createApi({
           }
 
           await runTransaction(db, async (transaction) => {
+            const orderSnap = await transaction.get(orderRef)
             const reviewSnap = await transaction.get(reviewRef)
             const businessSnap = await transaction.get(businessRef)
+
+            if (!orderSnap.exists()) {
+              throw new Error('Order not found.')
+            }
 
             if (reviewSnap.exists()) {
               throw new Error('Review already exists for this order')
             }
 
+            const order = orderSnap.data()
+
+            if (!canTransition(order.status.current, 'GIVEN_FEEDBACK')) {
+              throw new Error(`Cannot give feedback for order in status: ${order.status.current}`)
+            }
+
             const timestamp = Date.now()
 
             transaction.set(reviewRef, {
-              orderId: orderData.id,
+              orderId,
               restaurantId: resId,
               customerId: uid,
               rating,
@@ -271,16 +276,19 @@ export const firestoreApi = createApi({
               createdAt: timestamp
             })
 
-            transaction.update(completedOrderRef, {
-              'customerFeedback.rating': rating,
-              'customerFeedback.comment': comment,
-              'orderTimestamps.feedbackAt': timestamp
+            transaction.update(orderRef, {
+              'customerFeedback': { rating, comment },
+              'status.current': 'GIVEN_FEEDBACK',
+              'status.history': arrayUnion({
+                status: 'GIVEN_FEEDBACK',
+                timestamp,
+                by: 'customer'
+              }),
+              'timeline.feedbackAt': timestamp,
+              updatedAt: timestamp
             })
 
-            transaction.delete(openQueueRef)
-
             const businessData = businessSnap.data()
-
             const existingSummary = businessData?.reviewSummary
 
             const reviewSummary = existingSummary || {
@@ -334,18 +342,19 @@ export const firestoreApi = createApi({
           }
         }
       },
-      invalidatesTags: ['OpenQueue']
+      invalidatesTags: ['OrderTracking']
     }),
+
     setUserOrderIdToNull: builder.mutation({
       async queryFn(uid) {
         try {
           const customerRef = doc(db, 'customers', uid)
 
-          updateDoc(customerRef, {
+          await updateDoc(customerRef, {
             'trackedOrder.id': null
           })
 
-          console.log('User orderId seated to null')
+          console.log('User orderId set to null')
           return { data: null }
         } catch (error) {
           console.error('Error while set customer orderId to null:', error.message)
@@ -354,6 +363,7 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ['User']
     }),
+
     finalizePendingLoyalty: builder.mutation({
       async queryFn({ uid, orderId }) {
         try {
@@ -432,7 +442,6 @@ export const firestoreApi = createApi({
 
 export const {
   useFetchOrderTrackingDataQuery,
-  useFetchOpenQueueOrderTrackingDataQuery,
   useSetPlaceOrderMutation,
   useCancelOrderMutation,
   useSetOrderFeedbackMutation,

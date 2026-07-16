@@ -28,6 +28,7 @@ export type CustomerType = {
   restaurants: CustomersRes[];
   trackedOrder: {
     id: string | null;
+    orderNumber: number | null;
     loyaltyCountedForOrderId: string;
     pendingLoyalty: string | null;
     restaurant: string;

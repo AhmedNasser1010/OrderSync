@@ -1,10 +1,12 @@
 import { db } from '../config/firebase.js'
 import {
   doc,
+  getDoc,
+  setDoc,
   updateDoc,
   arrayUnion
 } from 'firebase/firestore'
-import randomOrderId from '../utils/randomOrderId.js'
+import randomOrderNumber from '../utils/randomOrderId.js'
 
 const usePlaceOrder = () => {
   const newOrder = async (data, accessToken) => {
@@ -16,14 +18,25 @@ const usePlaceOrder = () => {
 
       const final = {
         ...data,
-        id: randomOrderId(),
+        orderNumber: randomOrderNumber(),
         status: 'RECEIVED',
         timestamp: Date.now(),
       }
 
-      await updateDoc(orderRef, {
-        open: arrayUnion(final)
-      })
+      const snap = await getDoc(orderRef)
+      if (snap.exists()) {
+        await updateDoc(orderRef, {
+          open: arrayUnion(final)
+        })
+      } else {
+        await setDoc(orderRef, {
+          accessToken,
+          partnerUid: data.businessId || '',
+          open: [final],
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        })
+      }
 
       return true
     } catch (error) {

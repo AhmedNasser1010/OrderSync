@@ -41,7 +41,7 @@ export default function DeleteOrderPopup() {
 
   const handleDelete = () => {
     if (!deletePopupValue.error) {
-      deleteOrder.handleDeleteOrder(deletePopupValue.orderId, deletePopupValue.cancellationReason)
+      deleteOrder.handleDeleteOrder(deletePopupValue.orderId)
       handleClose()
     }
   }

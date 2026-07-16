@@ -9,16 +9,6 @@ const nextConfig = {
   turbopack: {
     root: path.resolve(__dirname, '..'),
   },
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'media-assets.swiggy.com',
-        port: '',
-        pathname: '/swiggy/image/upload/**',
-      },
-    ],
-  },
 };
 
 export default nextConfig;

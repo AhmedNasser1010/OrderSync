@@ -1,13 +1,14 @@
 "use client";
 
 import { use, useState, useEffect, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useFetchPickUpOrdersQuery } from "@/rtk/api/firestoreApi";
+import { useRouter } from "next/navigation";
+import { useFetchMyOrdersQuery, useFetchMarketplaceOrdersQuery } from "@/rtk/api/firestoreApi";
 import { useOrderActions } from "@/hooks/useOrderActions";
 import { useAppSelector } from "@/rtk/hooks";
 import { selectUser } from "@/rtk/slices/authSlice";
 import { OrderMap } from "@/components/orders/OrderMap";
 import { ArrowLeft, MapPin, Phone, User } from "lucide-react";
+import type { OrderType } from "@ordersync/types";
 
 export default function OrderDetailPage({
   params,
@@ -16,36 +17,65 @@ export default function OrderDetailPage({
 }) {
   const { orderId } = use(params);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const accessToken = searchParams.get("accessToken") ?? "";
 
   const authUser = useAppSelector(selectUser);
   const driverUid = authUser?.uid ?? "";
 
-  const { data: orders } = useFetchPickUpOrdersQuery(
-    { accessToken, driverUid },
-    { skip: !accessToken || !driverUid },
-  );
-  const { pickUpOrder, isLoading: isPickingUp } = useOrderActions();
+  // Check if order is in marketplace (READY) or in my orders (RESERVED, PICKED_UP, etc.)
+  const { data: marketplaceOrders } = useFetchMarketplaceOrdersQuery(driverUid, {
+    skip: !driverUid,
+  });
+  const { data: myOrders } = useFetchMyOrdersQuery(driverUid, {
+    skip: !driverUid,
+  });
 
-  const order = orders?.find((o) => o.id === orderId);
-  const compositeOrderId = order
-    ? `${order.id}_${order.customer?.uid}`
-    : "";
+  const allOrders = [...(marketplaceOrders ?? []), ...(myOrders ?? [])];
+  const order = allOrders.find((o) => o.id === orderId);
+
+  const { claim, start, complete, cancel, isLoading } = useOrderActions();
 
   const [driverLocation, setDriverLocation] = useState<
     [number, number] | null
   >(null);
 
-  const handlePickUp = useCallback(async () => {
-    if (!order || !accessToken || !driverUid || !compositeOrderId) return;
+  const handleClaim = useCallback(async () => {
+    if (!order || !driverUid) return;
     try {
-      await pickUpOrder(order.id, compositeOrderId, accessToken, driverUid);
+      await claim(order.id, driverUid);
       router.push("/orders");
     } catch {
-      alert("Failed to pick up order");
+      alert("Failed to claim order");
     }
-  }, [order, accessToken, driverUid, compositeOrderId, pickUpOrder, router]);
+  }, [order, driverUid, claim, router]);
+
+  const handleStartDelivery = useCallback(async () => {
+    if (!order || !driverUid) return;
+    try {
+      await start(order.id, driverUid);
+    } catch {
+      alert("Failed to start delivery");
+    }
+  }, [order, driverUid, start]);
+
+  const handleCompleteDelivery = useCallback(async () => {
+    if (!order || !driverUid) return;
+    try {
+      await complete(order.id, driverUid);
+      router.push("/orders");
+    } catch {
+      alert("Failed to complete delivery");
+    }
+  }, [order, driverUid, complete, router]);
+
+  const handleCancel = useCallback(async () => {
+    if (!order || !driverUid) return;
+    try {
+      await cancel(order.id, driverUid);
+      router.push("/orders");
+    } catch {
+      alert("Failed to cancel order");
+    }
+  }, [order, driverUid, cancel, router]);
 
   useEffect(() => {
     if (!navigator.geolocation) return;
@@ -72,11 +102,13 @@ export default function OrderDetailPage({
     );
   }
 
-  const orderLocation = order.location?.latlng;
+  const orderLocation = order.delivery?.latlng;
   const hasOrderLocation =
     orderLocation && orderLocation[0] && orderLocation[1];
   const hasDriverLocation =
     driverLocation && driverLocation[0] && driverLocation[1];
+
+  const currentStatus = order.status?.current;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -86,9 +118,9 @@ export default function OrderDetailPage({
         </button>
         <div>
           <h1 className="text-lg font-semibold">
-            #{orderId.slice(-6).toUpperCase()}
+            #{order.orderNumber}
           </h1>
-          <p className="text-xs text-muted-foreground">Order Details</p>
+          <p className="text-xs text-muted-foreground">{currentStatus}</p>
         </div>
       </header>
 
@@ -116,10 +148,10 @@ export default function OrderDetailPage({
                 {order.customer?.phone}
               </a>
             </div>
-            {order.location?.address && (
+            {order.delivery?.address && (
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span className="text-sm">{order.location.address}</span>
+                <span className="text-sm">{order.delivery.address}</span>
               </div>
             )}
           </div>
@@ -150,27 +182,56 @@ export default function OrderDetailPage({
           <div className="border-t mt-3 pt-3 flex items-center justify-between">
             <span className="text-sm font-medium">Total</span>
             <span className="font-semibold">
-              {order.cartTotalPrice?.total?.toFixed(2) ?? "0.00"}
+              {order.pricing?.total?.toFixed(2) ?? "0.00"}
             </span>
           </div>
         </section>
 
-        {order.orderNote && (
+        {order.notes?.order && (
           <section className="border rounded-lg p-4">
             <h2 className="font-semibold text-sm mb-1">Note</h2>
-            <p className="text-sm text-muted-foreground">{order.orderNote}</p>
+            <p className="text-sm text-muted-foreground">{order.notes.order}</p>
           </section>
         )}
       </main>
 
       <div className="sticky bottom-0 bg-background border-t p-4">
-        <button
-          onClick={handlePickUp}
-          disabled={isPickingUp}
-          className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
-        >
-          {isPickingUp ? "Picking Up..." : "Pick Up Order"}
-        </button>
+        {currentStatus === "READY" && (
+          <button
+            onClick={handleClaim}
+            disabled={isLoading}
+            className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+          >
+            {isLoading ? "Claiming..." : "Claim Order"}
+          </button>
+        )}
+        {currentStatus === "RESERVED" && (
+          <button
+            onClick={handleStartDelivery}
+            disabled={isLoading}
+            className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+          >
+            {isLoading ? "Starting..." : "Start Delivery"}
+          </button>
+        )}
+        {currentStatus === "PICKED_UP" && (
+          <button
+            onClick={handleCompleteDelivery}
+            disabled={isLoading}
+            className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+          >
+            {isLoading ? "Completing..." : "Complete Delivery"}
+          </button>
+        )}
+        {(currentStatus === "RESERVED" || currentStatus === "PICKED_UP") && (
+          <button
+            onClick={handleCancel}
+            disabled={isLoading}
+            className="w-full mt-2 bg-destructive text-destructive-foreground py-3 rounded-lg font-semibold hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+          >
+            {isLoading ? "Canceling..." : "Cancel Order"}
+          </button>
+        )}
       </div>
     </div>
   );

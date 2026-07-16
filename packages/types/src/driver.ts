@@ -8,7 +8,6 @@ export type Driver = {
     byManager: boolean;
     byUser: boolean;
   };
-  queue: string[];
   userInfo: {
     email: string;
     name: string;

@@ -1,5 +1,5 @@
 import {
-  useFetchOrdersDailySummarizationDataQuery,
+  useFetchDailyReportsDataQuery,
   useFetchUserDataQuery,
 } from "@/lib/rtk/api/firestoreApi";
 import { useTranslations } from "next-intl";
@@ -12,7 +12,7 @@ import { useMemo } from "react";
 import { calculateMetrics } from "@/utilities/analytics/calculateMetrics";
 import { calculatePercentageChange } from "@/utilities/analytics/calculatePercentageChange";
 import { generateDashboardData } from "@/utilities/analytics/generateDashboardData";
-import type { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
+import type { DailyReport } from "@ordersync/types";
 import type { DashboardData } from "@/lib/types/types";
 
 const useAnalytics = () => {
@@ -23,17 +23,17 @@ const useAnalytics = () => {
 
   const resId = user?.accessToken;
 
-  const { data: dailySummarizationData } =
-    useFetchOrdersDailySummarizationDataQuery(resId ?? skipToken);
+  const { data: dailyReportsData } =
+    useFetchDailyReportsDataQuery(resId ?? skipToken);
 
   const timeRangeValue = useAppSelector(timeRange);
   const customRange = useAppSelector(customDateRange);
 
   const currentPeriodData = useMemo(() => {
-    if (!dailySummarizationData) return [];
+    if (!dailyReportsData) return [];
 
     if (timeRangeValue === "all") {
-      return dailySummarizationData;
+      return dailyReportsData;
     }
 
     if (timeRangeValue === "custom") {
@@ -41,8 +41,8 @@ const useAnalytics = () => {
       return filterDataByDateRange(
         customRange.start,
         customRange.end,
-        "date",
-        dailySummarizationData,
+        "businessDate",
+        dailyReportsData,
       );
     }
 
@@ -57,13 +57,13 @@ const useAnalytics = () => {
     return filterDataByDateRange(
       startDate,
       endDate,
-      "date",
-      dailySummarizationData,
+      "businessDate",
+      dailyReportsData,
     );
-  }, [dailySummarizationData, timeRangeValue, customRange.start, customRange.end]);
+  }, [dailyReportsData, timeRangeValue, customRange.start, customRange.end]);
 
   const previousPeriodData = useMemo(() => {
-    if (!dailySummarizationData || timeRangeValue === "all") {
+    if (!dailyReportsData || timeRangeValue === "all") {
       return [];
     }
 
@@ -77,8 +77,8 @@ const useAnalytics = () => {
       return filterDataByDateRange(
         previousStart.toISOString().split("T")[0],
         previousEnd.toISOString().split("T")[0],
-        "date",
-        dailySummarizationData,
+        "businessDate",
+        dailyReportsData,
       );
     }
 
@@ -94,10 +94,10 @@ const useAnalytics = () => {
     return filterDataByDateRange(
       previousStart.toISOString().split("T")[0],
       previousEnd.toISOString().split("T")[0],
-      "date",
-      dailySummarizationData,
+      "businessDate",
+      dailyReportsData,
     );
-  }, [dailySummarizationData, timeRangeValue, customRange.start, customRange.end]);
+  }, [dailyReportsData, timeRangeValue, customRange.start, customRange.end]);
 
   const dashboardData = useMemo(() => {
     const currentMetrics = calculateMetrics(currentPeriodData);
@@ -154,7 +154,7 @@ const useAnalytics = () => {
     data: currentPeriodData,
     previousData: previousPeriodData,
     dashboardData,
-    loading: !dailySummarizationData,
+    loading: !dailyReportsData,
     hasData: currentPeriodData.length > 0,
   };
 };

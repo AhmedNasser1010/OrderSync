@@ -1,7 +1,6 @@
 import * as yup from 'yup';
 
 const orderYupSchema = yup.object().shape({
-  id: yup.string().required(),
   timestamp: yup.number().required(),
   accessToken: yup.string().required(),
   cancelAutoAssign: yup.boolean().required(),

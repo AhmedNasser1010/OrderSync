@@ -54,16 +54,18 @@ export type CancelledOrders = {
   cancellationRate: number;
 };
 
-// Represents a single analytics entry
+// Represents a single analytics entry (compatible with DailyReport)
 export type AnalyticsEntry = {
-  date: string;
+  businessDate: string;
+  businessId: string;
+  createdAt: number;
   totalDeliveryFees: number;
   totalDiscounts: number;
   totalRevenue: number;
   totalOrders: number;
   orderSources: Record<string, number>;
   paymentMethods: Record<string, number>;
-  revenuePerCustomer: RevenuePerCustomer;
+  revenuePerCustomer?: RevenuePerCustomer;
   orderDurations: OrderDurations;
   customerInsights: CustomerInsights;
   cancelledOrders: CancelledOrders;

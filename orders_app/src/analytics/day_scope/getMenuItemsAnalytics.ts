@@ -18,8 +18,8 @@ export default function getMenuItemsAnalytics(
 
   orders.forEach((order) => {
     const totalDiscountsSave =
-      (order.cartTotalPrice?.total || 0) -
-      (order.cartTotalPrice?.discount || 0);
+      (order.pricing?.total || 0) -
+      (order.pricing?.discount || 0);
 
     const totalItemsInCart = order.cart.reduce(
       (acc, cartItem) => acc + cartItem.quantity,

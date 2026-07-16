@@ -1,10 +1,8 @@
 import { useEffect } from "react";
 import {
   useFetchUserDataQuery,
-  useFetchOpenOrdersDataQuery,
+  useFetchActiveOrdersQuery,
   useFetchMenuDataQuery,
-  useFetchCompletedOrdersDataQuery,
-  useFetchVoidedOrdersDataQuery,
   useSetCloseDayMutation,
 } from "@/rtk/api/firestoreApi";
 import { userUid } from "@/rtk/slices/constantsSlice";
@@ -22,21 +20,6 @@ type UseCloseDay = {
   isSaving: boolean;
 };
 
-type FetchOrdersType = {
-  data?: OrderType[];
-  error?: string;
-  isLoading?: boolean;
-  isError?: boolean;
-  refetch?: () => void;
-};
-
-type FetchMenuType = {
-  data?: MainMenuType;
-  error?: string;
-  isLoading?: boolean;
-  isError?: boolean;
-};
-
 const useCloseDay = (): UseCloseDay => {
   const dispatch = useAppDispatch();
   const uid = useAppSelector(userUid);
@@ -47,37 +30,20 @@ const useCloseDay = (): UseCloseDay => {
     { isLoading: isSaving, isSuccess, isError, error, reset },
   ] = useSetCloseDayMutation();
 
-  const { data: openOrdersData } = useFetchOpenOrdersDataQuery(
-    userData?.accessToken,
+  const { data: activeOrdersData } = useFetchActiveOrdersQuery(
+    userData?.accessToken ?? skipToken,
     {
       skip: !userData?.accessToken,
     },
-  ) as FetchOrdersType;
-
-  const { data: completedOrdersData } = useFetchCompletedOrdersDataQuery(
-    userData?.accessToken,
-    {
-      skip: !userData?.accessToken,
-    },
-  ) as FetchOrdersType;
-
-  const { data: voidedOrdersData } = useFetchVoidedOrdersDataQuery(
-    userData?.accessToken,
-    {
-      skip: !userData?.accessToken,
-    },
-  ) as FetchOrdersType;
+  ) as { data?: OrderType[]; isLoading?: boolean };
 
   const { data: menuData } = useFetchMenuDataQuery(userData?.accessToken, {
     skip: !userData?.accessToken,
-  }) as FetchMenuType;
+  }) as { data?: MainMenuType; isLoading?: boolean };
 
   useEffect(() => {
-    if (openOrdersData && completedOrdersData && closeDayPopupValues.isOpen) {
-      // non-completed orders check
-      const hasNonCompletedOrders = openOrdersData?.length ? true : false;
-      // Has completed orders check
-      const hasCompletedOrders = completedOrdersData?.length ? true : false;
+    if (activeOrdersData && closeDayPopupValues.isOpen) {
+      const hasActiveOrders = activeOrdersData.length > 0;
 
       dispatch(
         setCloseDayPopup({
@@ -85,27 +51,20 @@ const useCloseDay = (): UseCloseDay => {
           errors: {
             ...closeDayPopupValues.errors,
             noQueue: {
-              isPassed: !hasNonCompletedOrders,
-              text: hasNonCompletedOrders
-                ? "There are orders in queue, cleanup first."
+              isPassed: !hasActiveOrders,
+              text: hasActiveOrders
+                ? "There are active orders. Wait for them to complete before closing the day."
                 : "",
             },
             hasCompletedOrders: {
-              isPassed: hasCompletedOrders,
-              text: !hasCompletedOrders
-                ? "You have non completed orders yet."
-                : "",
+              isPassed: true,
+              text: "",
             },
           },
         }),
       );
     }
-  }, [
-    openOrdersData,
-    completedOrdersData,
-    closeDayPopupValues.isOpen,
-    dispatch,
-  ]);
+  }, [activeOrdersData, closeDayPopupValues.isOpen, dispatch]);
 
   useEffect(() => {
     if (!closeDayPopupValues.isOpen) {
@@ -153,17 +112,17 @@ const useCloseDay = (): UseCloseDay => {
   const isPassed = () => {
     const errors = closeDayPopupValues?.errors;
     const noQueue = errors?.noQueue?.isPassed;
-    const hasCompletedOrders = errors?.hasCompletedOrders?.isPassed;
 
-    return !closeDayPopupValues.isLoading && noQueue && hasCompletedOrders;
+    return !closeDayPopupValues.isLoading && noQueue;
   };
 
   const closeDay = () => {
-    if (isPassed() && completedOrdersData && voidedOrdersData && menuData) {
-      const allOrders = [...completedOrdersData, ...voidedOrdersData];
+    if (isPassed() && menuData) {
       const todayDate = new Date().toISOString().split("T")[0];
+      // Use all orders (including delivered, voided) for the daily summary
+      // The extractDaySummary function will filter as needed
       const extractDaySummaryData = extractDaySummary(
-        allOrders,
+        activeOrdersData || [],
         menuData,
         todayDate,
       );
@@ -178,8 +137,10 @@ const useCloseDay = (): UseCloseDay => {
       );
       setCloseDay({
         resId: userData?.accessToken,
-        orders: allOrders,
-        summaryData: extractDaySummaryData,
+        summaryData: {
+          ...extractDaySummaryData,
+          date: todayDate,
+        },
       })
         .unwrap()
         .catch(() => {

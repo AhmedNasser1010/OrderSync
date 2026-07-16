@@ -13,7 +13,7 @@ import { toggleLoginSidebar, toggleOrderSidebar } from '../../rtk/slices/toggleS
 
 import priceAfterDiscount from '../../utils/priceAfterDiscount'
 import generateDiscountObj from '../../utils/generateDiscountObj'
-import randomOrderId from '../../utils/randomOrderId'
+import randomOrderNumber from '../../utils/randomOrderId'
 import DB_ARRAY_UNION from '../../utils/DB_ARRAY_UNION'
 import useUpdateUserOnSendOrder from '../../hooks/useUpdateUserOnSendOrder.js'
 import getDistanceFromLatlngInKm from '../../utils/getDistanceFromLatlngInKm'
@@ -356,7 +356,7 @@ const Cart = () => {
           const filteredCart = valid.cart.map(obj => filterObject(obj, [], true))
 
           const final = {
-            id: randomOrderId(),
+            orderNumber: randomOrderNumber(),
             timestamp,
             accessToken,
             cancelAutoAssign: false,
@@ -560,7 +560,7 @@ const Cart = () => {
                   </div>
                 )
               })}
-              <OrderInfo deliveryFees={deliveryFees} orderId={user?.trackedOrder?.id} />
+              <OrderInfo deliveryFees={deliveryFees} orderNumber={user?.trackedOrder?.orderNumber} />
               {cartTotalPrice.total !== cartTotalPrice.discount && (
                 <>
                   <div className="discount flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">

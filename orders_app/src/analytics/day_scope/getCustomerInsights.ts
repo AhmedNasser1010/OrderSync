@@ -19,7 +19,7 @@ export default function getCustomerInsights(
       returningCustomers++;
     }
   }
-  if (order.customerFeedback.rating !== null) {
+  if (order.customerFeedback?.rating) {
     totalRatings += order.customerFeedback.rating;
     feedbackCount++;
   }

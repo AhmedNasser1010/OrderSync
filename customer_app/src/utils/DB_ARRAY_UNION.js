@@ -1,4 +1,4 @@
-import { doc, updateDoc, arrayUnion } from "firebase/firestore"; 
+import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore"; 
 import { db } from "../config/firebase.js";
 
 const DB_ARRAY_UNION = async (collection, subcollection, arrayPath, value) => {
@@ -7,10 +7,17 @@ const DB_ARRAY_UNION = async (collection, subcollection, arrayPath, value) => {
     console.log('Write: ', window.write)
 
     const docRef = doc(db, collection, subcollection);
+    const snap = await getDoc(docRef);
 
-    await updateDoc(docRef, {
-      [arrayPath]: arrayUnion(value)
-    })
+    if (snap.exists()) {
+      await updateDoc(docRef, {
+        [arrayPath]: arrayUnion(value)
+      })
+    } else {
+      await setDoc(docRef, {
+        [arrayPath]: [value]
+      })
+    }
 
     return true
   } catch (error) {

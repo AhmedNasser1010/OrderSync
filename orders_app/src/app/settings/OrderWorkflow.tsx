@@ -9,7 +9,6 @@ import {
 import { useAppSelector } from "@/rtk/hooks";
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
-import React from "react";
 
 export default function OrderWorkflow() {
   const uid = useAppSelector(userUid);
@@ -20,18 +19,8 @@ export default function OrderWorkflow() {
       skip: !userData?.accessToken,
     },
   );
-  const driverAssignment = false;
-  const printInvoice =
-    resData?.settings?.printInvoice ?? false;
+  const printInvoice = resData?.settings?.printInvoice ?? false;
   const [setOrderWorkflowSettings] = useSetOrderWorkflowSettingsMutation();
-
-  const handleDriverAssignment = (checked: boolean) => {
-    setOrderWorkflowSettings({
-      resId: userData?.accessToken,
-      settingName: "driverAssignment",
-      value: checked,
-    });
-  };
 
   const handlePrintInvoice = (checked: boolean) => {
     setOrderWorkflowSettings({
@@ -47,14 +36,6 @@ export default function OrderWorkflow() {
         <CardTitle>Order Workflow Customization</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="rider-tracking">Driver Assign Feature</Label>
-          <Switch
-            id="rider-tracking"
-            defaultChecked={driverAssignment}
-            onCheckedChange={handleDriverAssignment}
-          />
-        </div>
         <div className="flex items-center justify-between">
           <Label htmlFor="print-invoice">Print Invoice</Label>
           <Switch

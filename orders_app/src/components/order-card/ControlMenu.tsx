@@ -1,9 +1,9 @@
-import type { OrderStatusType } from '@ordersync/types';
-import type { MainTabTypes } from "@/types/orders";
+import type { OrderStatusType } from "@ordersync/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -11,55 +11,93 @@ import {
   ArrowDownCircle,
   MoreVertical,
   Trash2,
+  Ban,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import useOrderHandler from "@/hooks/order-handlers/useOrderHandlers";
-import { useAppDispatch } from "@/rtk/hooks";
-import { setDeletePopup } from "@/rtk/slices/toggleSlice";
 
 type Props = {
-  id: string;
-  activeTabValue: MainTabTypes;
-  status: OrderStatusType;
+  overflowStatuses: OrderStatusType[];
+  previousStatuses: OrderStatusType[];
+  destructiveStatuses: OrderStatusType[];
+  onStatusChange: (status: OrderStatusType) => void;
 };
 
-export default function ControlMenu({ id, activeTabValue, status }: Props) {
-  const { handleChangeStatus } = useOrderHandler();
-  const dispatch = useAppDispatch();
+export default function ControlMenu({
+  overflowStatuses,
+  previousStatuses,
+  destructiveStatuses,
+  onStatusChange,
+}: Props) {
+  const hasItems =
+    overflowStatuses.length > 0 ||
+    previousStatuses.length > 0 ||
+    destructiveStatuses.length > 0;
+
+  if (!hasItems) return null;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          className={activeTabValue === "RECEIVED" ? "ml-auto" : undefined}
           variant="ghost"
-          size="sm"
+          size="icon"
+          className="h-8 w-8 disabled-click-1"
           onClick={(e) => e.preventDefault()}
         >
           <MoreVertical className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="disabled-click-1 border border-border">
-        {status !== "DELIVERED" && (
-          <DropdownMenuItem onClick={() => handleChangeStatus(id, "forward")}>
+        {overflowStatuses.map((nextStatus) => (
+          <DropdownMenuItem
+            key={nextStatus}
+            onClick={() => onStatusChange(nextStatus)}
+          >
             <ArrowUpCircle className="mr-2 h-4 w-4" />
-            <span>Move Forward</span>
+            <span>Move to {nextStatus.replace("_", " ")}</span>
           </DropdownMenuItem>
+        ))}
+        {previousStatuses.length > 0 && (
+          <>
+            {overflowStatuses.length > 0 && <DropdownMenuSeparator />}
+            {previousStatuses.map((prevStatus) => (
+              <DropdownMenuItem
+                key={prevStatus}
+                onClick={() => onStatusChange(prevStatus)}
+              >
+                <ArrowDownCircle className="mr-2 h-4 w-4" />
+                <span>Move back to {prevStatus.replace("_", " ")}</span>
+              </DropdownMenuItem>
+            ))}
+          </>
         )}
-        {status !== "RECEIVED" && (
-          <DropdownMenuItem onClick={() => handleChangeStatus(id, "backward")}>
-            <ArrowDownCircle className="mr-2 h-4 w-4" />
-            <span>Move Backward</span>
-          </DropdownMenuItem>
+        {destructiveStatuses.length > 0 && (
+          <>
+            {(overflowStatuses.length > 0 || previousStatuses.length > 0) && (
+              <DropdownMenuSeparator />
+            )}
+            {destructiveStatuses.map((nextStatus) => (
+              <DropdownMenuItem
+                key={nextStatus}
+                onClick={() => onStatusChange(nextStatus)}
+                className="text-destructive focus:text-destructive"
+              >
+                {nextStatus === "CANCELED" || nextStatus === "VOIDED" ? (
+                  <Trash2 className="mr-2 h-4 w-4" />
+                ) : (
+                  <Ban className="mr-2 h-4 w-4" />
+                )}
+                <span>
+                  {nextStatus === "CANCELED"
+                    ? "Cancel Order"
+                    : nextStatus === "REJECTED"
+                      ? "Reject Order"
+                      : "Void Order"}
+                </span>
+              </DropdownMenuItem>
+            ))}
+          </>
         )}
-        <DropdownMenuItem
-          onClick={() =>
-            dispatch(setDeletePopup({ orderId: id, isOpen: true }))
-          }
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          <span>Delete Order</span>
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

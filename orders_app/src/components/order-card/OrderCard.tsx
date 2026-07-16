@@ -26,16 +26,15 @@ const OrderCard = ({
 
   return (
     <Card
-      className={`cursor-pointer transition-shadow hover:shadow-md border-border ${
-        order.accepted ? "" : "bg-green-100 dark:bg-green-900"
-      }`}
+      className="cursor-pointer transition-shadow hover:shadow-md border-border"
       onClick={handleNavigate}
     >
-      <OrderHeader id={order.id} status={order.status} />
+      <OrderHeader id={order.id} orderNumber={order.orderNumber} status={order.status} />
       <OrderContent
         total={order.total}
         customer={order.customer}
         items={order.items}
+        placedAt={order.placedAt}
       />
       <OrderFooter
         id={order.id}

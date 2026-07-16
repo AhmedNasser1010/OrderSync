@@ -16,8 +16,8 @@ import { Separator } from "@/components/ui/separator";
 import { TypographyH3 } from "@/components/ui/typography";
 import Link from "next/link";
 import Page from "@/components/Page";
-import type { OrderType, OrderStatusType } from '@ordersync/types';
-import type { ItemType, BusinessDocument } from '@ordersync/types';
+import type { OrderType, OrderStatusType } from "@ordersync/types";
+import type { ItemType, BusinessDocument } from "@ordersync/types";
 import type { CartItemType } from "@/types/orders";
 import useOrders from "@/hooks/useOrders";
 import Image from "next/image";
@@ -67,19 +67,33 @@ export default function OrderDetails({
       case "RECEIVED":
         return "bg-blue-500";
       case "PREPARING":
+      case "ACCEPTED":
         return "bg-yellow-500";
+      case "READY":
+        return "bg-purple-500";
+      case "RESERVED":
+      case "PICKED_UP":
+      case "ON_ROUTE":
+        return "bg-orange-500";
       case "DELIVERED":
+      case "GIVEN_FEEDBACK":
         return "bg-green-500";
+      case "REJECTED":
+      case "CANCELED":
+      case "VOIDED":
+        return "bg-red-500";
       default:
         return "bg-gray-500";
     }
   };
 
   const openMap = () => {
-    window.open(
-      `https://maps.google.com/?q=${order?.location?.latlng[0]},${order?.location?.latlng[0]}`,
-      "_blank"
-    );
+    if (order?.delivery?.latlng) {
+      window.open(
+        `https://maps.google.com/?q=${order.delivery.latlng[0]},${order.delivery.latlng[1]}`,
+        "_blank"
+      );
+    }
   };
 
   const openCaller = () => {
@@ -93,6 +107,7 @@ export default function OrderDetails({
   if (!order) {
     return <h3>Loading...</h3>;
   }
+
   return (
     <Page>
       <div className="flex justify-between items-center mb-6">
@@ -111,7 +126,7 @@ export default function OrderDetails({
           >
             {order.status.current.charAt(0).toUpperCase() + order.status.current.slice(1)}
           </Badge>
-          <Badge variant="outline">CASH</Badge>
+          <Badge variant="outline">{order.payment.method}</Badge>
           <Button
             variant="outline"
             size="sm"
@@ -124,7 +139,7 @@ export default function OrderDetails({
         </div>
       </div>
       <TypographyH3 className="mb-4">
-        Order #{order.id.split("-")[0]}
+        Order #{order.orderNumber}
       </TypographyH3>
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
@@ -136,7 +151,7 @@ export default function OrderDetails({
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <MapPin className="mr-2 h-4 w-4" />
-                  <span>{order.location.address}</span>
+                  <span>{order.delivery.address}</span>
                 </div>
                 <Button
                   variant="outline"
@@ -166,27 +181,6 @@ export default function OrderDetails({
             </div>
           </CardContent>
         </Card>
-        {/* <Card>
-          <CardHeader>
-            <CardTitle>Order Timeline</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span>Placed on:</span>
-                <span>{order.placedOn}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Accepted on:</span>
-                <span>{order.acceptedOn}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span>Fulfillment:</span>
-                <span>{order.fulfillmentOn}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card> */}
       </div>
       <Card className="mt-6">
         <CardHeader>
@@ -217,20 +211,6 @@ export default function OrderDetails({
                       {item.quantity} x ${item.price}
                     </span>
                   </div>
-                  {/* {item.notes && (
-                    <div className="text-sm text-muted-foreground">
-                      {item.notes}
-                    </div>
-                  )}
-                  {item.options && (
-                    <div className="text-sm mt-1">
-                      {Object.entries(item.options).map(([key, value]) => (
-                        <span key={key} className="mr-2">
-                          {key}: {value}
-                        </span>
-                      ))}
-                    </div>
-                  )} */}
                 </div>
               </div>
             ))}
@@ -240,13 +220,21 @@ export default function OrderDetails({
       <Card className="mt-6">
         <CardContent>
           <div className="flex justify-between items-center py-2">
-            <span>No Discount</span>
-            <span>${order.cartTotalPrice.discount.toFixed(2)}</span>
+            <span>Subtotal</span>
+            <span>${order.pricing.subtotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between items-center py-2">
+            <span>Discount</span>
+            <span>${order.pricing.discount.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between items-center py-2">
+            <span>Delivery Fees</span>
+            <span>${order.pricing.deliveryFees.toFixed(2)}</span>
           </div>
           <Separator className="my-2" />
           <div className="flex justify-between items-center py-2 font-bold">
             <span>Total</span>
-            <span>${order.cartTotalPrice.total.toFixed(2)}</span>
+            <span>${order.pricing.total.toFixed(2)}</span>
           </div>
         </CardContent>
       </Card>

@@ -7,16 +7,20 @@ import {
   getDocs,
   onSnapshot,
   query,
-  updateDoc,
   where,
-  writeBatch,
+  runTransaction,
+  arrayUnion,
+  arrayRemove,
+  orderBy,
+  limit,
 } from "firebase/firestore";
 import type { Driver, OrderType, OrderStatusType } from "@ordersync/types";
+import { canTransition, getTimelineField, isMarketplaceVisible, isFinalStatus } from "@ordersync/order-utils";
 
 export const firestoreApi = createApi({
   reducerPath: "firestoreApi",
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["UserData", "DriverProfile", "PickUpOrders", "OrderStatus"],
+  tagTypes: ["UserData", "DriverProfile", "MarketplaceOrders", "MyOrders"],
   endpoints: (builder) => ({
     fetchUserData: builder.query<
       Pick<Driver, "userInfo" | "online">,
@@ -71,97 +75,292 @@ export const firestoreApi = createApi({
       providesTags: ["DriverProfile"],
     }),
 
-    fetchPickUpOrders: builder.query<
-      OrderType[],
-      { accessToken: string; driverUid: string }
-    >({
-      queryFn: async ({ accessToken, driverUid }) => {
-        if (!accessToken || !driverUid) {
-          return { data: [] };
-        }
-        try {
-          const ordersRef = collection(db, "orders", accessToken, "openQueue");
-          const q = query(
-            ordersRef,
-            where("delivery.uid", "==", driverUid)
-          );
-          const snapshot = await getDocs(q);
-          const orders = snapshot.docs.map((doc) => doc.data() as OrderType);
-          return { data: orders };
-        } catch (error) {
-          const message = error instanceof Error ? error.message : String(error);
-          console.error("Error fetching pickup orders:", message);
-          return { error: { message, data: "" } };
-        }
+    // Marketplace: query READY orders from global collection
+    fetchMarketplaceOrders: builder.query<OrderType[], string>({
+      queryFn: () => ({ data: [] }),
+      async onCacheEntryAdded(
+        _arg,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
+      ) {
+        const ordersRef = collection(db, "orders");
+        const q = query(
+          ordersRef,
+          where("status.current", "==", "READY"),
+          orderBy("createdAt", "desc"),
+        );
+
+        await cacheDataLoaded;
+
+        const unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            updateCachedData((draft: OrderType[]) => {
+              draft.length = 0;
+              snapshot.docs.forEach((doc) =>
+                draft.push(doc.data() as OrderType),
+              );
+            });
+          },
+          (error) => {
+            console.error("Error in marketplace listener:", error?.message);
+          },
+        );
+
+        await cacheEntryRemoved;
+        unsubscribe();
       },
-      providesTags: (result) =>
-        result
-          ? [
-              ...result.map(({ id }) => ({
-                type: "OrderStatus" as const,
-                id,
-              })),
-            ]
-          : [],
+      providesTags: ["MarketplaceOrders"],
     }),
 
-    setOrderStatus: builder.mutation<
-      void,
-      {
-        orderId: string;
-        compositeOrderId: string;
-        accessToken: string;
-        status: OrderStatusType;
-        driverUid: string;
-      }
-    >({
-      queryFn: async ({ orderId, compositeOrderId, accessToken, status, driverUid }) => {
+    // My active orders: orders assigned to this driver (not yet delivered/canceled)
+    fetchMyOrders: builder.query<OrderType[], string>({
+      queryFn: () => ({ data: [] }),
+      async onCacheEntryAdded(
+        driverUid,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
+      ) {
+        if (!driverUid) return;
+
+        const ordersRef = collection(db, "orders");
+        const q = query(
+          ordersRef,
+          where("assignment.driverUid", "==", driverUid),
+          where("status.current", "not-in", [
+            "DELIVERED",
+            "GIVEN_FEEDBACK",
+            "CANCELED",
+            "REJECTED",
+            "VOIDED",
+          ]),
+        );
+
+        await cacheDataLoaded;
+
+        const unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            updateCachedData((draft: OrderType[]) => {
+              draft.length = 0;
+              snapshot.docs.forEach((doc) =>
+                draft.push(doc.data() as OrderType),
+              );
+            });
+          },
+          (error) => {
+            console.error("Error in my orders listener:", error?.message);
+          },
+        );
+
+        await cacheEntryRemoved;
+        unsubscribe();
+      },
+      providesTags: ["MyOrders"],
+    }),
+
+    // Transactional: Claim a READY order
+    claimOrder: builder.mutation({
+      async queryFn({ orderId, driverUid }: { orderId: string; driverUid: string }) {
         try {
-          const openQueueRef = doc(
-            db,
-            "orders",
-            accessToken,
-            "openQueue",
-            compositeOrderId
-          );
+          if (!orderId || !driverUid) throw new Error("Order ID and Driver UID required.");
 
-          if (status === "DELIVERED" || status === "CANCELED" || status === "VOIDED") {
-            const batch = writeBatch(db);
-            batch.delete(openQueueRef);
+          const orderRef = doc(db, "orders", orderId);
+          const driverRef = doc(db, "drivers", driverUid);
 
-            const targetCollection =
-              status === "DELIVERED" ? "completedOrders" : "voidedOrders";
-            const targetRef = doc(
-              db,
-              "orders",
-              accessToken,
-              targetCollection,
-              compositeOrderId
-            );
-            batch.set(targetRef, {
-              orderId,
-              status: { current: status },
-              delivery: { uid: driverUid },
+          await runTransaction(db, async (transaction) => {
+            const orderSnap = await transaction.get(orderRef);
+            if (!orderSnap.exists()) throw new Error(`Order not found: ${orderId}`);
+
+            const order = orderSnap.data() as OrderType;
+
+            if (order.status.current !== "READY") {
+              throw new Error(`Order is not READY. Current status: ${order.status.current}`);
+            }
+            if (order.assignment.driverUid) {
+              throw new Error("Order already claimed by another driver.");
+            }
+
+            const now = Date.now();
+            const customerUid = order.customer?.uid;
+
+            transaction.update(orderRef, {
+              "assignment.driverUid": driverUid,
+              "status.current": "RESERVED",
+              "status.history": arrayUnion({
+                status: "RESERVED",
+                timestamp: now,
+                by: `driver:${driverUid}`,
+              }),
+              "timeline.reservedAt": now,
+              updatedAt: now,
             });
 
-            await batch.commit();
-          } else {
-            await updateDoc(openQueueRef, {
-              "status.current": status,
-            });
-          }
+            if (customerUid) {
+              transaction.update(driverRef, {
+                trackingCustomerIds: arrayUnion(customerUid),
+              });
+            }
+          });
 
-          return { data: undefined };
+          return { data: null };
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error);
-          console.error("Error updating order status:", message);
+          console.error("Error claiming order:", message);
           return { error: { message, data: "" } };
         }
       },
-      invalidatesTags: (result, error, arg) => [
-        { type: "OrderStatus", id: arg.orderId },
-        "PickUpOrders",
-      ],
+      invalidatesTags: ["MarketplaceOrders", "MyOrders"],
+    }),
+
+    // Transactional: Start delivery (RESERVED -> PICKED_UP)
+    startDelivery: builder.mutation({
+      async queryFn({ orderId, driverUid }: { orderId: string; driverUid: string }) {
+        try {
+          if (!orderId || !driverUid) throw new Error("Order ID and Driver UID required.");
+
+          const orderRef = doc(db, "orders", orderId);
+
+          await runTransaction(db, async (transaction) => {
+            const orderSnap = await transaction.get(orderRef);
+            if (!orderSnap.exists()) throw new Error(`Order not found: ${orderId}`);
+
+            const order = orderSnap.data() as OrderType;
+
+            if (order.status.current !== "RESERVED") {
+              throw new Error(`Order is not RESERVED. Current status: ${order.status.current}`);
+            }
+            if (order.assignment.driverUid !== driverUid) {
+              throw new Error("You are not assigned to this order.");
+            }
+
+            const now = Date.now();
+
+            transaction.update(orderRef, {
+              "status.current": "PICKED_UP",
+              "status.history": arrayUnion({
+                status: "PICKED_UP",
+                timestamp: now,
+                by: `driver:${driverUid}`,
+              }),
+              "timeline.pickedUpAt": now,
+              updatedAt: now,
+            });
+          });
+
+          return { data: null };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          console.error("Error starting delivery:", message);
+          return { error: { message, data: "" } };
+        }
+      },
+      invalidatesTags: ["MyOrders"],
+    }),
+
+    // Transactional: Complete delivery (PICKED_UP -> DELIVERED)
+    completeDelivery: builder.mutation({
+      async queryFn({ orderId, driverUid }: { orderId: string; driverUid: string }) {
+        try {
+          if (!orderId || !driverUid) throw new Error("Order ID and Driver UID required.");
+
+          const orderRef = doc(db, "orders", orderId);
+          const driverRef = doc(db, "drivers", driverUid);
+
+          await runTransaction(db, async (transaction) => {
+            const orderSnap = await transaction.get(orderRef);
+            if (!orderSnap.exists()) throw new Error(`Order not found: ${orderId}`);
+
+            const order = orderSnap.data() as OrderType;
+
+            if (order.status.current !== "PICKED_UP") {
+              throw new Error(`Order is not PICKED_UP. Current status: ${order.status.current}`);
+            }
+            if (order.assignment.driverUid !== driverUid) {
+              throw new Error("You are not assigned to this order.");
+            }
+
+            const now = Date.now();
+            const customerUid = order.customer?.uid;
+
+            transaction.update(orderRef, {
+              "status.current": "DELIVERED",
+              "status.history": arrayUnion({
+                status: "DELIVERED",
+                timestamp: now,
+                by: `driver:${driverUid}`,
+              }),
+              "timeline.deliveredAt": now,
+              updatedAt: now,
+            });
+
+            if (customerUid) {
+              transaction.update(driverRef, {
+                trackingCustomerIds: arrayRemove(customerUid),
+              });
+            }
+          });
+
+          return { data: null };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          console.error("Error completing delivery:", message);
+          return { error: { message, data: "" } };
+        }
+      },
+      invalidatesTags: ["MyOrders"],
+    }),
+
+    // Transactional: Cancel order (any active status -> CANCELED)
+    cancelOrder: builder.mutation({
+      async queryFn({ orderId, driverUid }: { orderId: string; driverUid: string }) {
+        try {
+          if (!orderId || !driverUid) throw new Error("Order ID and Driver UID required.");
+
+          const orderRef = doc(db, "orders", orderId);
+          const driverRef = doc(db, "drivers", driverUid);
+
+          await runTransaction(db, async (transaction) => {
+            const orderSnap = await transaction.get(orderRef);
+            if (!orderSnap.exists()) throw new Error(`Order not found: ${orderId}`);
+
+            const order = orderSnap.data() as OrderType;
+
+            if (!canTransition(order.status.current, "CANCELED")) {
+              throw new Error(`Cannot cancel order in status: ${order.status.current}`);
+            }
+            if (order.assignment.driverUid !== driverUid) {
+              throw new Error("You are not assigned to this order.");
+            }
+
+            const now = Date.now();
+            const timelineField = getTimelineField("CANCELED");
+            const customerUid = order.customer?.uid;
+
+            transaction.update(orderRef, {
+              "status.current": "CANCELED",
+              "status.history": arrayUnion({
+                status: "CANCELED",
+                timestamp: now,
+                by: `driver:${driverUid}`,
+              }),
+              [`timeline.${timelineField}`]: now,
+              updatedAt: now,
+            });
+
+            if (customerUid) {
+              transaction.update(driverRef, {
+                trackingCustomerIds: arrayRemove(customerUid),
+              });
+            }
+          });
+
+          return { data: null };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          console.error("Error canceling order:", message);
+          return { error: { message, data: "" } };
+        }
+      },
+      invalidatesTags: ["MyOrders", "MarketplaceOrders"],
     }),
   }),
 });
@@ -171,7 +370,10 @@ export const {
   useLazyFetchDriverProfileQuery,
   useLazyFetchUserDataQuery,
   useFetchUserDataQuery,
-  useFetchPickUpOrdersQuery,
-  useLazyFetchPickUpOrdersQuery,
-  useSetOrderStatusMutation,
+  useFetchMarketplaceOrdersQuery,
+  useFetchMyOrdersQuery,
+  useClaimOrderMutation,
+  useStartDeliveryMutation,
+  useCompleteDeliveryMutation,
+  useCancelOrderMutation,
 } = firestoreApi;

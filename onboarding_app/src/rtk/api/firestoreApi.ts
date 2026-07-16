@@ -193,7 +193,6 @@ export const firestoreApi = createApi({
           await runTransaction(db, async (transaction) => {
             const businessRef = doc(db, "businesses", business.accessToken);
             const menuRef = doc(db, "menus", business.accessToken);
-            const ordersRef = doc(db, "orders", business.accessToken);
             const userRef = doc(db, "users", user.uid);
             const businessSnapshot = await transaction.get(businessRef);
 
@@ -229,21 +228,13 @@ export const firestoreApi = createApi({
               updatedAt: now,
             });
 
-            // 3. Initialize the orders root document for the business
-            transaction.set(ordersRef, {
-              accessToken: business.accessToken,
-              partnerUid: user.uid,
-              createdAt: now,
-              updatedAt: now,
-            });
-
-            // 4. Update the creator's user document to include the new business accessToken
+            // 3. Update the creator's user document to include the new business accessToken
             //    in the data.businesses array
             transaction.update(userRef, {
               ["data.businesses"]: [...currentBusinesses, business.accessToken],
             });
 
-            // 5. Create/update business manager document using the manager's UID as the document ID
+            // 4. Create/update business manager document using the manager's UID as the document ID
             //    This creates a separate document under `users/{managerUid}` rather than overwriting
             //    the current authenticated user's document (the businesses creator).
             const ownerUid = normalizedOwner.uid;
@@ -310,7 +301,6 @@ export const firestoreApi = createApi({
           const batch = writeBatch(db);
           const businessRef = doc(db, "businesses", accessToken);
           const menuRef = doc(db, "menus", accessToken);
-          const ordersRef = doc(db, "orders", accessToken);
           const userRef = doc(db, "users", userUid);
 
           // Fetch the business document to get the owner's UID
@@ -336,11 +326,7 @@ export const firestoreApi = createApi({
           batch.delete(menuRef);
           console.log("Cleanup [deleteBusiness]: Menu document deleted");
 
-          // 3. Delete the orders document
-          batch.delete(ordersRef);
-          console.log("Cleanup [deleteBusiness]: Orders document deleted");
-
-          // 4. Remove accessToken from the current user's businesses array
+          // 3. Remove accessToken from the current user's businesses array
           batch.set(
             userRef,
             {

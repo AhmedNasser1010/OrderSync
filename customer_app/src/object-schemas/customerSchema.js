@@ -28,6 +28,7 @@ const customerSchema = ({ uid, name, email, phone, referredBy, avatar, provider 
 		},
 		trackedOrder: {
 			id: null,
+			orderNumber: null,
 			restaurant: null,
 			loyaltyCountedForOrderId: null,
 			pendingLoyalty: null

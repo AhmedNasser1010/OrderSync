@@ -1,101 +1,77 @@
 import {
   useSetOrderStatusMutation,
-  useFetchOpenOrdersDataQuery,
+  useFetchActiveOrdersQuery,
   useFetchUserDataQuery,
-  useSetDeleteOrderStatusMutation,
-  useFetchRestaurantDataQuery
-} from '@/rtk/api/firestoreApi'
+  useSetCancelOrderMutation,
+  useFetchRestaurantDataQuery,
+} from "@/rtk/api/firestoreApi";
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
-import type { OrderType } from '@ordersync/types';
-import { skipToken } from '@reduxjs/toolkit/query';
+import type { OrderType, OrderStatusType } from "@ordersync/types";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { canTransition, canReverseTransition, getNextStatuses, getPreviousStatuses } from "@ordersync/order-utils";
 
 type OrderHandler = {
-  handleChangeStatus: (orderId: string, direction: "forward" | "backward") => void;
+  handleChangeStatus: (orderId: string, nextStatus: OrderStatusType) => void;
   deleteOrder: {
-    handleDeleteOrder: (orderId: string | null, cancellationReason: string | null) => void;
+    handleDeleteOrder: (orderId: string | null) => void;
     isLoading: boolean;
     error: unknown;
-  }
-  handleAcceptOrder: () => void;
-  handleRejectOrder: () => void;
-}
+  };
+  getPossibleNextStatuses: (orderId: string) => OrderStatusType[];
+  getPossiblePreviousStatuses: (orderId: string) => OrderStatusType[];
+};
 
 const useOrderHandler = (): OrderHandler => {
   const uid = useAppSelector(userUid);
   const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
-  const { data: orders } = useFetchOpenOrdersDataQuery(userData?.accessToken ?? skipToken);
+  const { data: orders } = useFetchActiveOrdersQuery(userData?.accessToken ?? skipToken);
   const { data: restaurant } = useFetchRestaurantDataQuery(userData?.accessToken ?? skipToken);
   const [setOrderStatus] = useSetOrderStatusMutation();
-  const [setOrderCancellation, { isLoading: orderCancellationIsLoading, error: orderCancellationError }] = useSetDeleteOrderStatusMutation();
+  const [setCancelOrder, { isLoading: orderCancellationIsLoading, error: orderCancellationError }] =
+    useSetCancelOrderMutation();
 
-  const handleChangeStatus = (orderId: string, direction: "forward" | "backward") => {
-    if (orders?.length && orderId && direction && userData?.accessToken) {
-      let statusForward;
-      let statusBackward;
+  const handleChangeStatus = (orderId: string, nextStatus: OrderStatusType) => {
+    if (!orders?.length || !orderId) return;
 
-      if (false) {
-        statusForward = {
-          RECEIVED: "PREPARING",
-          PREPARING: "PICK_UP",
-          PICK_UP: "DELIVERED",
-          ON_ROUTE: "DELIVERED",
-        };
-        statusBackward = {
-          PREPARING: "RECEIVED",
-          PICK_UP: "PREPARING",
-          ON_ROUTE: "PREPARING",
-        };
-      } else {
-        statusForward = {
-          RECEIVED: "PREPARING",
-          PREPARING: "ON_ROUTE",
-          ON_ROUTE: "DELIVERED",
-        };
-  
-        statusBackward = {
-          PREPARING: "RECEIVED",
-          ON_ROUTE: "PREPARING",
-        };
-      }
+    const orderToUpdate = orders.find((order: OrderType) => order.id === orderId);
+    if (!orderToUpdate) {
+      console.error(`Cannot find order with id "${orderId}"`);
+      return;
+    }
 
-      const orderToUpdate = orders.find(
-        (order: OrderType) => order.id === orderId
-      );
-      if (!orderToUpdate) {
-        console.error(`Cannot find order with id "${orderId}"`);
-        return
-      }
+    const currentStatus = orderToUpdate.status.current;
+    const isValidForward = canTransition(currentStatus, nextStatus);
+    const isValidReverse = canReverseTransition(currentStatus, nextStatus);
 
-      const updatedStatus =
-        direction === "forward"
-          ? statusForward[
-              orderToUpdate.status.current as keyof typeof statusForward
-            ]
-          : statusBackward[
-              orderToUpdate.status.current as keyof typeof statusBackward
-            ];
+    if (!isValidForward && !isValidReverse) {
+      console.error(`Invalid transition: ${currentStatus} -> ${nextStatus}`);
+      return;
+    }
 
-      setOrderStatus({ orderToUpdate, orderId, resId: userData?.accessToken, updatedStatus })
+    if (nextStatus === "CANCELED" || nextStatus === "REJECTED") {
+      setCancelOrder({ orderId });
+    } else {
+      setOrderStatus({ orderId, updatedStatus: nextStatus });
     }
   };
 
-  const handleDeleteOrder = (orderId: string | null, cancellationReason: string | null) => {
-    if (!orderId) {
-      console.log('Order Id Not Found')
-      return
-    }
-    setOrderCancellation({
-      orders,
-      orderId,
-      resId: userData?.accessToken,
-      cancellationReason
-    })
+  const getPossibleNextStatuses = (orderId: string): OrderStatusType[] => {
+    const order = orders?.find((o) => o.id === orderId);
+    if (!order) return [];
+    return getNextStatuses(order.status.current);
   };
 
-  const handleAcceptOrder = () => {};
+  const getPossiblePreviousStatuses = (orderId: string): OrderStatusType[] => {
+    const order = orders?.find((o) => o.id === orderId);
+    if (!order) return [];
+    return getPreviousStatuses(order.status.current);
+  };
 
-  const handleRejectOrder = () => {};
+  const handleDeleteOrder = (orderId: string | null) => {
+    if (!orderId) return;
+    setCancelOrder({ orderId });
+  };
 
   return {
     handleChangeStatus,
@@ -104,8 +80,8 @@ const useOrderHandler = (): OrderHandler => {
       isLoading: orderCancellationIsLoading,
       error: orderCancellationError,
     },
-    handleAcceptOrder,
-    handleRejectOrder,
+    getPossibleNextStatuses,
+    getPossiblePreviousStatuses,
   };
 };
 

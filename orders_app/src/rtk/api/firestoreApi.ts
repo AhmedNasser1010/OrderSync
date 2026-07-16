@@ -3,238 +3,93 @@ import {
   collection,
   doc,
   updateDoc,
-  getDocs,
   getDoc,
   onSnapshot,
+  runTransaction,
   writeBatch,
+  arrayUnion,
   query,
   where,
-  CollectionReference,
-  increment,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { OrderType, OrderStatusType } from "@ordersync/types";
-import type { Driver } from "@ordersync/types";
-import type { RestaurantStatusTypes } from "@ordersync/types";
-
-// const statusForward = {
-//   RECEIVED: "PREPARING",
-//   PREPARING: "PICK_UP",
-//   PICK_UP: "DELIVERED",
-//   ON_ROUTE: "DELIVERED",
-// };
-
-// const statusBackward = {
-//   PREPARING: "RECEIVED",
-//   PICK_UP: "PREPARING",
-//   ON_ROUTE: "PREPARING",
-// };
+import type { OrderType, OrderStatusType, RestaurantStatusTypes } from "@ordersync/types";
+import type { DailyReport } from "@ordersync/types";
+import { canTransition, canReverseTransition, getTimelineField } from "@ordersync/order-utils";
+import { ordersForDateRange, getDailyReportRef } from "@ordersync/order-utils";
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: [
-    "User",
-    "Orders",
-    "Menu",
-    "Restaurant",
-    "CompletedOrders",
-    "VoidedOrders",
-    "OpenQueue",
-    "HistoryOrders",
-    "DailySummarizationOrders",
-    "Drivers",
-  ],
+  tagTypes: ["User", "Orders", "Menu", "Restaurant", "DailyReports"],
   endpoints: (builder) => ({
+    // =====================================================================
     // Query Endpoints
+    // =====================================================================
+
     fetchUserData: builder.query({
       async queryFn(userUid) {
         try {
           const ref = doc(db, "users", userUid);
           const docSnapshot = await getDoc(ref);
-          console.log("Read Operation [fetchUserData]");
           if (!docSnapshot.exists()) {
             return { error: "User not found" };
           }
-          const userData = docSnapshot.data();
-          return { data: userData };
+          return { data: docSnapshot.data() };
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
+          const message = error instanceof Error ? error.message : "Unknown error";
           console.error(message);
           return { error: message };
         }
       },
       providesTags: ["User"],
     }),
+
     fetchMenuData: builder.query({
       async queryFn(resId) {
         try {
           const menuRef = doc(db, "menus", resId);
           const menuSnapshot = await getDoc(menuRef);
-          const menu = menuSnapshot.data();
-          console.log("Read Operation [fetchMenuData]");
-          return { data: menu };
+          return { data: menuSnapshot.data() };
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
+          const message = error instanceof Error ? error.message : "Unknown error";
           console.error(message);
           return { error: message };
         }
       },
       providesTags: ["Menu"],
     }),
+
     fetchRestaurantData: builder.query({
       async queryFn(resId) {
         try {
           const resRef = doc(db, "businesses", resId);
           const resSnapshot = await getDoc(resRef);
-          const restaurant = resSnapshot.data();
-          console.log("Read Operation [fetchRestaurantData]");
-          return { data: restaurant };
+          return { data: resSnapshot.data() };
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
+          const message = error instanceof Error ? error.message : "Unknown error";
           console.error(message);
           return { error: message };
         }
       },
       providesTags: ["Restaurant"],
     }),
-    fetchCompletedOrdersData: builder.query({
-      async queryFn(resId) {
-        try {
-          const completedOrdersRef = collection(
-            db,
-            "orders",
-            resId,
-            "completedOrders",
-          );
-          const completedOrdersSnapshot = await getDocs(completedOrdersRef);
-          const completedOrders = completedOrdersSnapshot.docs.map(
-            (doc) => doc.data() as OrderType,
-          );
-          console.log("Read Operation [completedOrders]");
-          return { data: completedOrders };
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error(message);
-          return { error: message };
-        }
-      },
-      providesTags: ["CompletedOrders"],
-    }),
-    fetchVoidedOrdersData: builder.query({
-      async queryFn(resId) {
-        try {
-          const voidedOrdersRef = collection(
-            db,
-            "orders",
-            resId,
-            "voidedOrders",
-          );
-          const voidedOrdersSnapshot = await getDocs(voidedOrdersRef);
-          const voidedOrders = voidedOrdersSnapshot.docs.map((doc) =>
-            doc.data(),
-          );
-          console.log("Read Operation [voidedOrders]");
-          return { data: voidedOrders };
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error(message);
-          return { error: message };
-        }
-      },
-      providesTags: ["VoidedOrders"],
-    }),
-    fetchOpenOrdersData: builder.query<OrderType[], string>({
+
+    fetchActiveOrders: builder.query<OrderType[], string>({
       queryFn: () => ({ data: [] }),
       async onCacheEntryAdded(
-        resId,
+        businessId,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
       ) {
-        const openQueueRef = collection(db, "orders", resId, "openQueue");
-
-        await cacheDataLoaded;
-
-        const unsubscribe = onSnapshot(
-          openQueueRef,
-          (snapshot) => {
-            updateCachedData((draft: OrderType[]) => {
-              draft.length = 0;
-              snapshot.docs.forEach((doc) =>
-                draft.push(doc.data() as OrderType),
-              );
-            });
-            console.log("Real-time Update [openQueue]");
-          },
-          (error) => {
-            console.error("Error in real-time listener:", error?.message);
-          },
-        );
-
-        await cacheEntryRemoved;
-        unsubscribe();
-      },
-    }),
-    fetchHistoryOrdersData: builder.query({
-      async queryFn(resId) {
-        try {
-          const historyOrdersRef = collection(db, "orders", resId, "history");
-          const historyOrdersSnapshot = await getDocs(historyOrdersRef);
-          const historyOrders = historyOrdersSnapshot.docs.map((doc) =>
-            doc.data(),
-          );
-          console.log("Read Operation [historyOrders]");
-          return { data: historyOrders };
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error(message);
-          return { error: message };
-        }
-      },
-      providesTags: ["HistoryOrders"],
-    }),
-    fetchOrdersDailySummarizationData: builder.query({
-      async queryFn(resId) {
-        try {
-          const dailySummarizationRef = collection(
-            db,
-            "orders",
-            resId,
-            "dailySummarization",
-          );
-          const dailySummarizationSnapshot = await getDocs(
-            dailySummarizationRef,
-          );
-          const dailySummarization = dailySummarizationSnapshot.docs.map(
-            (doc) => doc.data(),
-          );
-          console.log("Read Operation [dailySummarizationOrders]");
-          return { data: dailySummarization };
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error(message);
-          return { error: message };
-        }
-      },
-      providesTags: ["DailySummarizationOrders"],
-    }),
-    fetchDriversData: builder.query({
-      queryFn: () => ({ data: [] }),
-      async onCacheEntryAdded(
-        accessToken,
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
-      ) {
-        const driversRef = collection(db, "drivers");
-
+        const ordersRef = collection(db, "orders");
         const q = query(
-          driversRef,
-          where("accessToken", "==", accessToken),
-          where("sync", "==", "LOCAL"),
+          ordersRef,
+          where("businessId", "==", businessId),
+          where("status.current", "not-in", [
+            "DELIVERED",
+            "GIVEN_FEEDBACK",
+            "CANCELED",
+            "REJECTED",
+            "VOIDED",
+          ]),
         );
 
         await cacheDataLoaded;
@@ -242,651 +97,253 @@ export const firestoreApi = createApi({
         const unsubscribe = onSnapshot(
           q,
           (snapshot) => {
-            updateCachedData((draft: Driver[]) => {
+            updateCachedData((draft: OrderType[]) => {
               draft.length = 0;
-              snapshot.docs.forEach((doc) => draft.push(doc.data() as Driver));
+              snapshot.docs.forEach((doc) =>
+                draft.push(doc.data() as OrderType),
+              );
             });
-            console.log("Real-time Update [fetchDriversData]");
           },
           (error) => {
-            console.error(
-              "Error in real-time listener [fetchDriversData]:",
-              error?.message,
-            );
+            console.error("Error in real-time listener [fetchActiveOrders]:", error?.message);
           },
         );
 
         await cacheEntryRemoved;
         unsubscribe();
       },
+      providesTags: ["Orders"],
     }),
 
-    // Mutation Endpoints
+    // =====================================================================
+    // Mutation Endpoints — All use Firestore Transactions
+    // =====================================================================
+
     setOrderStatus: builder.mutation({
-      async queryFn({ orderToUpdate, orderId, resId, updatedStatus }) {
+      async queryFn({ orderId, updatedStatus }: { orderId: string; updatedStatus: OrderStatusType }) {
         try {
-          // Validate input data
-          if (!orderToUpdate) {
-            throw new Error("Order to update not found");
-          }
-          if (!orderId) {
-            throw new Error("Order ID is required.");
-          }
-          if (!resId) {
-            throw new Error("Restaurant ID is required.");
-          }
+          if (!orderId) throw new Error("Order ID is required.");
+          if (!updatedStatus) throw new Error("Target status is required.");
 
-          const getStatusTimestampKey = (status: OrderStatusType) => {
-            switch (status) {
-              case "RECEIVED":
-                return "placedAt";
-              case "PREPARING":
-                return "preparedAt";
-              case "PICK_UP":
-                return "pickUpAt";
-              case "DELIVERED":
-                return "deliveredAt";
-              case "CANCELED":
-                return "canceledAt";
-              case "REJECTED":
-                return "rejectedAt";
-              default:
-                return "unknown";
+          const orderRef = doc(db, "orders", orderId);
+
+          await runTransaction(db, async (transaction) => {
+            const orderSnap = await transaction.get(orderRef);
+            if (!orderSnap.exists()) {
+              throw new Error(`Order not found: ${orderId}`);
             }
-          };
 
-          const timestampKeyName = getStatusTimestampKey(
-            updatedStatus as OrderStatusType,
-          );
+            const order = orderSnap.data() as OrderType;
+            const currentStatus = order.status.current;
 
-          // Prepare the updated order with status change
-          const updatedOrder = {
-            ...orderToUpdate,
-            accepted: true,
-            status: {
-              ...orderToUpdate.status,
-              current: updatedStatus,
-              history: { status: updatedStatus, timestamp: Date.now() },
-            },
-            orderTimestamps: {
-              ...orderToUpdate.orderTimestamps,
-              [timestampKeyName]: Date.now(),
-            },
-            delivery: {
-              ...orderToUpdate.delivery,
-              uid:
-                updatedStatus === "PREPARING" &&
-                (orderToUpdate.status.current === "PICK_UP" ||
-                  orderToUpdate.status.current === "ON_ROUTE")
-                  ? ""
-                  : orderToUpdate.delivery.uid,
-            },
-          };
+            if (!canTransition(currentStatus, updatedStatus) && !canReverseTransition(currentStatus, updatedStatus)) {
+              throw new Error(
+                `Invalid transition: ${currentStatus} -> ${updatedStatus}`,
+              );
+            }
 
-          // Firestore references for batch operation
-          const openQueueRef = collection(db, "orders", resId, "openQueue");
-          const completedOrdersRef = collection(
-            db,
-            "orders",
-            resId,
-            "completedOrders",
-          );
-          // Batch to perform both update and move operations atomically
-          const batch = writeBatch(db);
+            const now = Date.now();
+            const timelineField = getTimelineField(updatedStatus);
 
-          if (updatedStatus === "DELIVERED") {
-            // Remove the completed order from `openQueue`
-            const openOrderDocRef = doc(
-              openQueueRef,
-              `${orderId}_${orderToUpdate.customer.uid}`,
-            );
-            batch.delete(openOrderDocRef);
+            transaction.update(orderRef, {
+              "status.current": updatedStatus,
+              "status.history": arrayUnion({
+                status: updatedStatus,
+                timestamp: now,
+                by: "manager",
+              }),
+              [`timeline.${timelineField}`]: now,
+              updatedAt: now,
+            });
+          });
 
-            // Add the completed order to `completedOrders`
-            const completedOrderDocRef = doc(
-              completedOrdersRef,
-              `${orderId}_${orderToUpdate.customer.uid}`,
-            );
-            batch.set(completedOrderDocRef, updatedOrder);
-          } else {
-            // If status is not completed, just update the open queue
-            const openOrderDocRef = doc(
-              openQueueRef,
-              `${orderId}_${orderToUpdate.customer.uid}`,
-            );
-            batch.set(openOrderDocRef, updatedOrder);
-          }
-
-          // Commit the batch
-          await batch.commit();
-
-          console.log(
-            "Order status updated and moved to 'completedOrders' if completed",
-          );
           return { data: null };
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
+          const message = error instanceof Error ? error.message : "Unknown error";
           console.error("Error updating order status:", message);
           return { error: message };
         }
       },
       invalidatesTags: ["Orders"],
     }),
-    setDeleteOrderStatus: builder.mutation({
-      async queryFn({ orders, orderId, resId, cancellationReason }) {
+
+    setCancelOrder: builder.mutation({
+      async queryFn({ orderId }: { orderId: string }) {
         try {
-          // Validate input data
-          if (!orders || orders.length === 0) {
-            throw new Error("Orders array is empty");
-          }
-          if (!orderId) {
-            throw new Error("Order ID is required.");
-          }
-          if (!resId) {
-            throw new Error("Restaurant ID is required.");
-          }
+          if (!orderId) throw new Error("Order ID is required.");
 
-          // Find the specific order to cancel
-          const orderToUpdate = orders.find(
-            (order: OrderType) => order.id === orderId,
-          );
-          if (!orderToUpdate) {
-            throw new Error(`Cannot find order with id "${orderId}"`);
-          }
+          const orderRef = doc(db, "orders", orderId);
 
-          // Create a new canceled order object with updated status
-          const canceledOrder = {
-            ...orderToUpdate,
-            accepted: true,
-            cancelAutoAssign: true,
-            status: {
-              ...orderToUpdate.status,
-              current: "CANCELED",
-              history: { status: "CANCELED", timestamp: Date.now() },
-            },
-            orderTimestamps: {
-              ...orderToUpdate.orderTimestamps,
-              canceledAt: Date.now(),
-            },
-          };
+          await runTransaction(db, async (transaction) => {
+            const orderSnap = await transaction.get(orderRef);
+            if (!orderSnap.exists()) {
+              throw new Error(`Order not found: ${orderId}`);
+            }
 
-          // References to Firestore collections
-          const openQueueRef = collection(db, "orders", resId, "openQueue");
-          const voidedOrdersRef = collection(
-            db,
-            "orders",
-            resId,
-            "voidedOrders",
-          );
+            const order = orderSnap.data() as OrderType;
+            const currentStatus = order.status.current;
 
-          // Batch write to ensure atomicity
-          const batch = writeBatch(db);
+            if (!canTransition(currentStatus, "CANCELED")) {
+              throw new Error(
+                `Cannot cancel order in status: ${currentStatus}`,
+              );
+            }
 
-          // Remove the canceled order from `openQueue`
-          const openOrderDocRef = doc(
-            openQueueRef,
-            `${orderId}_${orderToUpdate.customer.uid}`,
-          );
-          batch.delete(openOrderDocRef);
+            const now = Date.now();
 
-          // Add the canceled order to `voidedOrders`
-          const voidedOrderDocRef = doc(
-            voidedOrdersRef,
-            `${orderId}_${orderToUpdate.customer.uid}`,
-          );
-          batch.set(voidedOrderDocRef, canceledOrder);
+            transaction.update(orderRef, {
+              "status.current": "CANCELED",
+              "status.history": arrayUnion({
+                status: "CANCELED",
+                timestamp: now,
+                by: "manager",
+              }),
+              "timeline.canceledAt": now,
+              updatedAt: now,
+            });
+          });
 
-          // Commit the batch operation
-          await batch.commit();
-
-          console.log("Order canceled and moved to 'voidedOrders'");
           return { data: null };
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Error while canceling order:", message);
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error canceling order:", message);
           return { error: message };
         }
       },
       invalidatesTags: ["Orders"],
     }),
+
     setRestaurantStatus: builder.mutation({
-      async queryFn({
-        resId,
-        status,
-      }: {
-        resId: string;
-        status: RestaurantStatusTypes;
-      }) {
+      async queryFn({ resId, status }: { resId: string; status: RestaurantStatusTypes }) {
         try {
-          // Validate input data
-          if (!status) {
-            throw new Error("Order ID is required.");
-          }
-          if (!resId) {
-            throw new Error("Restaurant ID is required.");
-          }
+          if (!status) throw new Error("Status is required.");
+          if (!resId) throw new Error("Restaurant ID is required.");
 
-          // Perform Firestore update logic here
-          const docRef = doc(db, "businesses", resId);
-
-          await updateDoc(docRef, {
-            ["status"]: status,
-          });
-
-          console.log("Write Operation [setRestaurantStatus]");
+          await updateDoc(doc(db, "businesses", resId), { status });
           return { data: null };
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
+          const message = error instanceof Error ? error.message : "Unknown error";
           console.error("Error updating restaurant status:", message);
           return { error: message };
         }
       },
       invalidatesTags: ["Restaurant"],
     }),
-    setCloseDay: builder.mutation({
-      async queryFn({ resId, orders, summaryData }) {
-        try {
-          // Actions
-          // 1- Delete voided orders docs
-          // 2- Delete completed orders docs
-          // 3- Add current orders to history
-          // 4- Add daily summarization
-          // 5- Set restaurant status to inactive
 
-          const date = summaryData.date;
-          const historyRef = collection(db, "orders", resId, "history");
-          const dailySummarizationRef = collection(
-            db,
-            "orders",
-            resId,
-            "dailySummarization",
-          );
+    setCloseDay: builder.mutation({
+      async queryFn({ resId, summaryData }: { resId: string; summaryData: { date: string; [key: string]: unknown } }) {
+        try {
+          if (!resId) throw new Error("Restaurant ID is required.");
+          if (!summaryData?.date) throw new Error("Summary data with date is required.");
+
+          const dateStr = summaryData.date;
+          const now = Date.now();
 
           const batch = writeBatch(db);
 
-          const voidedOrdersRef = collection(
-            db,
-            "orders",
-            resId,
-            "voidedOrders",
-          );
-          const completedOrdersRef = collection(
-            db,
-            "orders",
-            resId,
-            "completedOrders",
-          );
-
-          const deleteCollectionDocs = async (
-            collectionRef: CollectionReference,
-          ) => {
-            const q = query(collectionRef);
-            const querySnapshot = await getDocs(q);
-            querySnapshot.forEach((doc) => {
-              batch.delete(doc.ref);
-            });
+          // Write the daily report to the new top-level collection
+          const reportRef = getDailyReportRef(db, resId, dateStr);
+          const reportData: DailyReport = {
+            businessId: resId,
+            businessDate: dateStr,
+            createdAt: now,
+            totalOrders: (summaryData.totalOrders as number) || 0,
+            totalRevenue: (summaryData.totalRevenue as number) || 0,
+            totalDiscounts: (summaryData.totalDiscounts as number) || 0,
+            totalDeliveryFees: (summaryData.totalDeliveryFees as number) || 0,
+            itemsAnalytics: (summaryData.itemsAnalytics as DailyReport["itemsAnalytics"]) || [],
+            categoriesAnalytics: (summaryData.categoriesAnalytics as DailyReport["categoriesAnalytics"]) || [],
+            orderDurations: (summaryData.orderDurations as DailyReport["orderDurations"]) || {
+              averagePreparationTime: 0,
+              averageDeliveryTime: 0,
+              averageCompletionTime: 0,
+            },
+            customerInsights: (summaryData.customerInsights as DailyReport["customerInsights"]) || {
+              totalUniqueCustomers: 0,
+              newCustomers: 0,
+              returningCustomers: 0,
+              averageRating: 0,
+              feedbackCount: 0,
+            },
+            paymentMethods: (summaryData.paymentMethods as DailyReport["paymentMethods"]) || {},
+            orderSources: (summaryData.orderSources as DailyReport["orderSources"]) || {},
+            topLocations: (summaryData.topLocations as DailyReport["topLocations"]) || [],
+            cancelledOrders: (summaryData.cancelledOrders as DailyReport["cancelledOrders"]) || {
+              totalCancelled: 0,
+              cancellationRate: 0,
+            },
           };
+          batch.set(reportRef, reportData);
 
-          await deleteCollectionDocs(voidedOrdersRef);
-          await deleteCollectionDocs(completedOrdersRef);
-
-          orders.forEach((order: OrderType, index: number) => {
-            const orderDocRef = doc(historyRef, `${date}_${index}`);
-            batch.set(orderDocRef, order);
-          });
-
-          const dailySummarizationDocRef = doc(dailySummarizationRef, date);
-          batch.set(dailySummarizationDocRef, summaryData);
-
-          const docRef = doc(db, "businesses", resId);
-          batch.update(docRef, {
-            ["status"]: "inactive",
-          });
+          // Set restaurant status to inactive
+          const businessRef = doc(db, "businesses", resId);
+          batch.update(businessRef, { status: "inactive" });
 
           await batch.commit();
 
-          console.log(
-            "Close day data saved and old orders deleted successfully",
-          );
+          console.log("Close day completed. Daily report saved, restaurant set to inactive.");
           return { data: null };
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Error while close the day:", message);
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error closing the day:", message);
           return { error: message };
         }
       },
-      invalidatesTags: [
-        "HistoryOrders",
-        "DailySummarizationOrders",
-        "Restaurant",
-      ],
+      invalidatesTags: ["Restaurant", "DailyReports"],
     }),
+
     setDisplaySettings: builder.mutation({
-      async queryFn({
-        resId,
-        settingName,
-        value,
-      }: {
-        resId: string;
-        settingName: string;
-        value: string;
-      }) {
+      async queryFn({ resId, settingName, value }: { resId: string; settingName: string; value: string }) {
         try {
-          if (!value) {
-            return { data: null };
-          }
+          if (!value) return { data: null };
 
-          const docRef = doc(db, "businesses", resId);
-
-          if (
-            settingName === "promotionalSubtitle" ||
-            settingName === "cover" ||
-            settingName === "icon" ||
-            settingName === "closeMsg"
-          ) {
-            await updateDoc(docRef, {
+          const validFields = ["promotionalSubtitle", "cover", "icon", "closeMsg"];
+          if (validFields.includes(settingName)) {
+            await updateDoc(doc(db, "businesses", resId), {
               [`branding.${settingName}`]: value,
             });
           }
 
-          console.log("Write Operation [setDisplaySettings]");
           return { data: null };
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Error updating restaurant display settings:", message);
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error updating display settings:", message);
           return { error: message };
         }
       },
       invalidatesTags: ["Restaurant"],
     }),
+
     setOrderWorkflowSettings: builder.mutation({
-      async queryFn({
-        resId,
-        settingName,
-        value,
-      }: {
-        resId: string;
-        settingName: string;
-        value: string | boolean;
-      }) {
+      async queryFn({ resId, settingName, value }: { resId: string; settingName: string; value: boolean }) {
         try {
-          if (typeof value !== "boolean") {
-            return { data: null };
-          }
+          if (typeof value !== "boolean") return { data: null };
 
-          const docRef = doc(db, "businesses", resId);
-
-          await updateDoc(docRef, {
+          await updateDoc(doc(db, "businesses", resId), {
             [`settings.${settingName}`]: value,
           });
 
-          console.log("Write Operation [setOrderWorkflowSettings]");
           return { data: null };
         } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error(
-            "Error updating restaurant order work flow settings:",
-            message,
-          );
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error updating workflow settings:", message);
           return { error: message };
         }
       },
       invalidatesTags: ["Restaurant"],
-    }),
-    assignOrderToDriver: builder.mutation({
-      async queryFn({
-        orders,
-        orderId,
-        resId,
-        driverData,
-      }: {
-        orders: OrderType[];
-        orderId: string;
-        resId: string;
-        driverData: Driver;
-      }) {
-        try {
-          // Validate input data
-          if (!orders || orders.length === 0) {
-            throw new Error("Orders array is empty");
-          }
-          if (!orderId) {
-            throw new Error("Order ID is required.");
-          }
-          if (!resId) {
-            throw new Error("Restaurant ID is required.");
-          }
-          if (!driverData) {
-            throw new Error("Driver ID is required.");
-          }
-
-          // Find the specific order to update
-          const orderToUpdate = orders.find(
-            (order: OrderType) => order.id === orderId,
-          );
-          if (!orderToUpdate) {
-            throw new Error(`Cannot find order with id "${orderId}"`);
-          }
-
-          // Update the order fields
-          const updatedOrder = {
-            ...orderToUpdate,
-            delivery: {
-              ...orderToUpdate.delivery,
-              uid: driverData.uid,
-              name: driverData.userInfo.name,
-              phone: driverData.userInfo.phone,
-            },
-            status: {
-              ...orderToUpdate.status,
-              current: "ON_ROUTE",
-              history: { status: "ON_ROUTE", timestamp: Date.now() },
-            },
-            orderTimestamps: {
-              ...orderToUpdate.orderTimestamps,
-              onRouteAt: Date.now(),
-            },
-          };
-
-          // Firestore references for updating the order
-          const openQueueRef = collection(db, "orders", resId, "openQueue");
-          const openOrderDocRef = doc(
-            openQueueRef,
-            `${orderId}_${orderToUpdate.customer.uid}`,
-          );
-
-          // Update the order in Firestore
-          const batch = writeBatch(db);
-          batch.set(openOrderDocRef, updatedOrder);
-
-          // Commit the batch
-          await batch.commit();
-
-          console.log("Order assigned to driver and status updated.");
-          return { data: null };
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Error assigning order to driver:", message);
-          return { error: message };
-        }
-      },
-      invalidatesTags: ["Orders"],
-    }),
-    setDriverDues: builder.mutation({
-      async queryFn({
-        driverId,
-        duesValue,
-      }: {
-        driverId: string;
-        duesValue: number;
-      }) {
-        try {
-          if (!driverId) {
-            throw new Error("Driver ID is required.");
-          }
-
-          const driverRef = doc(db, "drivers", driverId);
-
-          const batch = writeBatch(db);
-
-          batch.update(driverRef, {
-            ["finance.currentCash"]: duesValue ? increment(-duesValue) : 0,
-          });
-
-          await batch.commit();
-
-          console.log("Driver dues has been rested");
-          return { data: null };
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Error assigning order to driver:", message);
-          return { error: message };
-        }
-      },
-      invalidatesTags: ["Drivers"],
-    }),
-    setDriverStatus: builder.mutation({
-      async queryFn({
-        driverId,
-        status,
-      }: {
-        driverId: string;
-        status: boolean;
-      }) {
-        try {
-          const driverRef = doc(db, "drivers", driverId);
-
-          const batch = writeBatch(db);
-
-          batch.update(driverRef, {
-            ["online.byManager"]: status,
-          });
-
-          await batch.commit();
-
-          console.log("Driver status has been updated");
-          return { data: null };
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Error set status to driver:", message);
-          return { error: message };
-        }
-      },
-      invalidatesTags: ["Drivers"],
-    }),
-    deleteDriver: builder.mutation({
-      async queryFn(driverId: string) {
-        try {
-          const driverRef = doc(db, "drivers", driverId);
-
-          const batch = writeBatch(db);
-
-          batch.delete(driverRef);
-
-          await batch.commit();
-
-          return { data: null };
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Error delete driver:", message);
-          return { error: message };
-        }
-      },
-      invalidatesTags: ["Drivers"],
-    }),
-    setNewDriver: builder.mutation({
-      async queryFn({
-        partnerUid,
-        accessToken,
-        email,
-        name,
-        phone,
-        uid,
-      }: {
-        partnerUid: string;
-        accessToken: string;
-        email: string;
-        name: string;
-        phone: string;
-        uid: string;
-      }) {
-        try {
-          const driverRef = doc(db, "drivers", uid);
-
-          const batch = writeBatch(db);
-
-          batch.set(driverRef, {
-            accessToken,
-            partnerUid,
-            joinDate: Date.now(),
-            trackingFeature: true,
-            finance: {
-              currentCash: 0,
-              warningLimit: 350,
-              blockLimit: 500,
-            },
-            online: {
-              byManager: true,
-              byUser: false,
-            },
-            liveLocation: [0, 0],
-            queue: [],
-            sync: "LOCAL",
-            uid,
-            userInfo: {
-              email,
-              name,
-              phone,
-              role: "DRIVER",
-              uid,
-            },
-          });
-
-          await batch.commit();
-
-          return { data: null };
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Error while added nre driver: ", message);
-          return { error: message };
-        }
-      },
-      invalidatesTags: ["Drivers"],
     }),
   }),
 });
 
 export const {
   useFetchUserDataQuery,
-  useFetchOpenOrdersDataQuery,
+  useFetchActiveOrdersQuery,
   useFetchMenuDataQuery,
   useFetchRestaurantDataQuery,
-  useFetchCompletedOrdersDataQuery,
-  useFetchVoidedOrdersDataQuery,
-  useFetchHistoryOrdersDataQuery,
-  useFetchOrdersDailySummarizationDataQuery,
-  useFetchDriversDataQuery,
-
   useSetOrderStatusMutation,
-  useSetDeleteOrderStatusMutation,
+  useSetCancelOrderMutation,
   useSetRestaurantStatusMutation,
   useSetCloseDayMutation,
   useSetDisplaySettingsMutation,
   useSetOrderWorkflowSettingsMutation,
-  useAssignOrderToDriverMutation,
-  useSetDriverDuesMutation,
-  useSetDriverStatusMutation,
-  useDeleteDriverMutation,
-  useSetNewDriverMutation,
 } = firestoreApi;

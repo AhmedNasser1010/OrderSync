@@ -9,20 +9,20 @@ export default function calcOrderDurations(
   const deliveryTimes: number[] = [];
   const completionTimes: number[] = [];
 
-  // Calculate order durations
-  if (order.orderTimestamps.preparedAt && order.orderTimestamps.placedAt) {
+  // Calculate order durations using timeline fields
+  if (order.timeline.preparingAt && order.timeline.placedAt) {
     preparationTimes.push(
-      order.orderTimestamps.preparedAt - order.orderTimestamps.placedAt
+      order.timeline.preparingAt - order.timeline.placedAt
     );
   }
-  if (order.orderTimestamps.deliveredAt && order.orderTimestamps.preparedAt) {
+  if (order.timeline.deliveredAt && order.timeline.preparingAt) {
     completionTimes.push(
-      order.orderTimestamps.deliveredAt - order.orderTimestamps.preparedAt
+      order.timeline.deliveredAt - order.timeline.preparingAt
     );
   }
-  if (order.orderTimestamps.deliveredAt && order.orderTimestamps.placedAt) {
+  if (order.timeline.deliveredAt && order.timeline.placedAt) {
     deliveryTimes.push(
-      order.orderTimestamps.deliveredAt - order.orderTimestamps.placedAt
+      order.timeline.deliveredAt - order.timeline.placedAt
     );
   }
 

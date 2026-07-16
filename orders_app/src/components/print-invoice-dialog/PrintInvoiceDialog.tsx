@@ -28,7 +28,7 @@ export default function PrintInvoiceDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [order, setOrder] = useState<OrderType | undefined>(undefined);
-  const [orderMenu, setOrderMenu] = useState<(ItemType & { quantity: number; selectedSize: string; discountCode: string; })[] | undefined>(undefined);
+  const [orderMenu, setOrderMenu] = useState<(ItemType & { quantity: number; selectedSize: string; discountCode?: string; })[] | undefined>(undefined);
   const { getOrder, getOrderMenu, isLoading } = useOrders();
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
