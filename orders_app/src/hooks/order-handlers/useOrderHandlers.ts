@@ -12,7 +12,7 @@ import { skipToken } from "@reduxjs/toolkit/query";
 import { canTransition, canReverseTransition, getNextStatuses, getPreviousStatuses } from "@ordersync/order-utils";
 
 type OrderHandler = {
-  handleChangeStatus: (orderId: string, nextStatus: OrderStatusType) => void;
+  handleChangeStatus: (orderId: string, nextStatus: OrderStatusType, reason?: string) => void;
   deleteOrder: {
     handleDeleteOrder: (orderId: string | null) => void;
     isLoading: boolean;
@@ -31,7 +31,7 @@ const useOrderHandler = (): OrderHandler => {
   const [setCancelOrder, { isLoading: orderCancellationIsLoading, error: orderCancellationError }] =
     useSetCancelOrderMutation();
 
-  const handleChangeStatus = (orderId: string, nextStatus: OrderStatusType) => {
+  const handleChangeStatus = (orderId: string, nextStatus: OrderStatusType, reason?: string) => {
     if (!orders?.length || !orderId) return;
 
     const orderToUpdate = orders.find((order: OrderType) => order.id === orderId);
@@ -50,7 +50,7 @@ const useOrderHandler = (): OrderHandler => {
     }
 
     if (nextStatus === "CANCELED" || nextStatus === "REJECTED") {
-      setCancelOrder({ orderId });
+      setCancelOrder({ orderId, reason });
     } else {
       setOrderStatus({ orderId, updatedStatus: nextStatus });
     }

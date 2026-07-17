@@ -21,8 +21,6 @@ import {
   isAuthLoadingStatus,
   setIsAuthLoading,
 } from "@/rtk/slices/toggleSlice";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { skipToken } from "@reduxjs/toolkit/query";
 
 interface UseAuthReturn {
@@ -49,14 +47,23 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
 
   // Role enforcement: only BUSINESS_MANAGER allowed in orders_app
   useEffect(() => {
-    if (!userFetchData) return;
+    if (!user) return;
 
-    const role = (userFetchData as { userInfo?: { role?: string } })?.userInfo?.role;
+    let cancelled = false;
 
-    if (role !== "BUSINESS_MANAGER") {
-      firebaseSignOut(auth).then(() => location.reload());
-    }
-  }, [userFetchData]);
+    user.getIdTokenResult().then((tokenResult) => {
+      if (cancelled) return;
+
+      const role = tokenResult.claims.role;
+      if (role !== "BUSINESS_MANAGER") {
+        firebaseSignOut(auth).then(() => location.reload());
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const onSuccessLogin = useCallback(
     (userData?: FirebaseUser | null) => {
@@ -115,22 +122,16 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
         password,
       );
 
-      // Immediately check role before allowing login
-      const userDocRef = doc(db, "users", userCredential.user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data() as {
-          userInfo?: { role?: string };
-        };
-        const role = userData?.userInfo?.role;
-        if (role !== "BUSINESS_MANAGER") {
-          await firebaseSignOut(auth);
-          setUser(null);
-          dispatch(setUserUid(null));
-          throw new Error(
-            "Access denied. Only business managers can access this app.",
-          );
-        }
+      // Immediately check role from custom claim before allowing login
+      const tokenResult = await userCredential.user.getIdTokenResult();
+      const role = tokenResult.claims.role;
+      if (role !== "BUSINESS_MANAGER") {
+        await firebaseSignOut(auth);
+        setUser(null);
+        dispatch(setUserUid(null));
+        throw new Error(
+          "Access denied. Only business managers can access this app.",
+        );
       }
 
       onSuccessLogin(userCredential.user);
@@ -160,22 +161,16 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
 
-      // Immediately check role before allowing sign-in
-      const userDocRef = doc(db, "users", result.user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data() as {
-          userInfo?: { role?: string };
-        };
-        const role = userData?.userInfo?.role;
-        if (role !== "BUSINESS_MANAGER") {
-          await firebaseSignOut(auth);
-          setUser(null);
-          dispatch(setUserUid(null));
-          throw new Error(
-            "Access denied. Only business managers can access this app.",
-          );
-        }
+      // Immediately check role from custom claim before allowing sign-in
+      const tokenResult = await result.user.getIdTokenResult();
+      const role = tokenResult.claims.role;
+      if (role !== "BUSINESS_MANAGER") {
+        await firebaseSignOut(auth);
+        setUser(null);
+        dispatch(setUserUid(null));
+        throw new Error(
+          "Access denied. Only business managers can access this app.",
+        );
       }
 
       onSuccessLogin(result.user);

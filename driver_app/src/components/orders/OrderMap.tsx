@@ -2,17 +2,24 @@
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { FitMapToMarkers } from "./FitMapToMarkers";
-import { driverIcon, orderIcon } from "./mapCustomMarker";
+import { driverIcon, orderIcon, restaurantIcon } from "./mapCustomMarker";
+import type { LiveLocation } from "@ordersync/types";
 import "leaflet/dist/leaflet.css";
 
 interface OrderMapProps {
   orderLocation: [number, number];
-  driverLocation?: [number, number];
+  driverLocation?: LiveLocation | null;
+  restaurantLocation?: [number, number];
 }
 
-export function OrderMap({ orderLocation, driverLocation }: OrderMapProps) {
+export function OrderMap({ orderLocation, driverLocation, restaurantLocation }: OrderMapProps) {
+  const driverLatLng: [number, number] | null = driverLocation
+    ? [driverLocation.lat, driverLocation.lng]
+    : null;
+
   const points: [number, number][] = [orderLocation];
-  if (driverLocation) points.push(driverLocation);
+  if (driverLatLng) points.push(driverLatLng);
+  if (restaurantLocation) points.push(restaurantLocation);
 
   return (
     <div className="h-[300px] w-full rounded-lg overflow-hidden border">
@@ -30,9 +37,14 @@ export function OrderMap({ orderLocation, driverLocation }: OrderMapProps) {
         <Marker position={orderLocation} icon={orderIcon}>
           <Popup>Delivery Location</Popup>
         </Marker>
-        {driverLocation && (
-          <Marker position={driverLocation} icon={driverIcon}>
+        {driverLatLng && (
+          <Marker position={driverLatLng} icon={driverIcon}>
             <Popup>Your Location</Popup>
+          </Marker>
+        )}
+        {restaurantLocation && (
+          <Marker position={restaurantLocation} icon={restaurantIcon}>
+            <Popup>Restaurant</Popup>
           </Marker>
         )}
       </MapContainer>

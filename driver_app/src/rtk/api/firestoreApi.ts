@@ -13,6 +13,8 @@ import {
   arrayRemove,
   orderBy,
   limit,
+  deleteField,
+  updateDoc,
 } from "firebase/firestore";
 import type { Driver, OrderType, OrderStatusType } from "@ordersync/types";
 import { canTransition, getTimelineField, isMarketplaceVisible, isFinalStatus } from "@ordersync/order-utils";
@@ -26,26 +28,35 @@ export const firestoreApi = createApi({
       Pick<Driver, "userInfo" | "online">,
       { uid: string }
     >({
-      queryFn: (user) => {
-        if (!user?.uid) {
-          return { error: { message: "No user", data: "" } };
-        }
-        return new Promise((resolve) => {
-          const unsub = onSnapshot(
-            doc(db, "drivers", user.uid),
-            (docSnap) => {
-              if (docSnap.exists()) {
-                const data = docSnap.data() as Driver;
-                resolve({
-                  data: { userInfo: data.userInfo, online: data.online },
-                });
-              } else {
-                resolve({ error: { message: "Driver not found", data: "" } });
-              }
-              unsub();
+      queryFn: () => ({ data: { userInfo: {} as Driver["userInfo"], online: { byManager: false, byUser: false } } }),
+      async onCacheEntryAdded(
+        user,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
+      ) {
+        if (!user?.uid) return;
+
+        const driverRef = doc(db, "drivers", user.uid);
+
+        await cacheDataLoaded;
+
+        const unsubscribe = onSnapshot(
+          driverRef,
+          (docSnap) => {
+            if (docSnap.exists()) {
+              const data = docSnap.data() as Driver;
+              updateCachedData(() => ({
+                userInfo: data.userInfo,
+                online: data.online,
+              }));
             }
-          );
-        });
+          },
+          (error) => {
+            console.error("Error in user data listener:", error?.message);
+          },
+        );
+
+        await cacheEntryRemoved;
+        unsubscribe();
       },
       providesTags: ["UserData"],
     }),
@@ -175,7 +186,7 @@ export const firestoreApi = createApi({
             if (order.status.current !== "READY") {
               throw new Error(`Order is not READY. Current status: ${order.status.current}`);
             }
-            if (order.assignment.driverUid) {
+            if (order.assignment?.driverUid) {
               throw new Error("Order already claimed by another driver.");
             }
 
@@ -194,10 +205,15 @@ export const firestoreApi = createApi({
               updatedAt: now,
             });
 
+            const driverUpdate: Record<string, unknown> = {};
+            if (order.businessId) {
+              driverUpdate.accessToken = order.businessId;
+            }
             if (customerUid) {
-              transaction.update(driverRef, {
-                trackingCustomerIds: arrayUnion(customerUid),
-              });
+              driverUpdate.trackingCustomerIds = arrayUnion(customerUid);
+            }
+            if (Object.keys(driverUpdate).length > 0) {
+              transaction.update(driverRef, driverUpdate);
             }
           });
 
@@ -228,7 +244,7 @@ export const firestoreApi = createApi({
             if (order.status.current !== "RESERVED") {
               throw new Error(`Order is not RESERVED. Current status: ${order.status.current}`);
             }
-            if (order.assignment.driverUid !== driverUid) {
+            if (order.assignment?.driverUid !== driverUid) {
               throw new Error("You are not assigned to this order.");
             }
 
@@ -274,7 +290,7 @@ export const firestoreApi = createApi({
             if (order.status.current !== "PICKED_UP") {
               throw new Error(`Order is not PICKED_UP. Current status: ${order.status.current}`);
             }
-            if (order.assignment.driverUid !== driverUid) {
+            if (order.assignment?.driverUid !== driverUid) {
               throw new Error("You are not assigned to this order.");
             }
 
@@ -292,11 +308,13 @@ export const firestoreApi = createApi({
               updatedAt: now,
             });
 
+            const driverUpdate: Record<string, unknown> = {
+              accessToken: deleteField(),
+            };
             if (customerUid) {
-              transaction.update(driverRef, {
-                trackingCustomerIds: arrayRemove(customerUid),
-              });
+              driverUpdate.trackingCustomerIds = arrayRemove(customerUid);
             }
+            transaction.update(driverRef, driverUpdate);
           });
 
           return { data: null };
@@ -311,7 +329,7 @@ export const firestoreApi = createApi({
 
     // Transactional: Cancel order (any active status -> CANCELED)
     cancelOrder: builder.mutation({
-      async queryFn({ orderId, driverUid }: { orderId: string; driverUid: string }) {
+      async queryFn({ orderId, driverUid, reason }: { orderId: string; driverUid: string; reason?: string }) {
         try {
           if (!orderId || !driverUid) throw new Error("Order ID and Driver UID required.");
 
@@ -327,7 +345,7 @@ export const firestoreApi = createApi({
             if (!canTransition(order.status.current, "CANCELED")) {
               throw new Error(`Cannot cancel order in status: ${order.status.current}`);
             }
-            if (order.assignment.driverUid !== driverUid) {
+            if (order.assignment?.driverUid !== driverUid) {
               throw new Error("You are not assigned to this order.");
             }
 
@@ -335,7 +353,7 @@ export const firestoreApi = createApi({
             const timelineField = getTimelineField("CANCELED");
             const customerUid = order.customer?.uid;
 
-            transaction.update(orderRef, {
+            const updateData: Record<string, unknown> = {
               "status.current": "CANCELED",
               "status.history": arrayUnion({
                 status: "CANCELED",
@@ -344,13 +362,21 @@ export const firestoreApi = createApi({
               }),
               [`timeline.${timelineField}`]: now,
               updatedAt: now,
-            });
+            };
 
-            if (customerUid) {
-              transaction.update(driverRef, {
-                trackingCustomerIds: arrayRemove(customerUid),
-              });
+            if (reason) {
+              updateData["status.cancellationReason"] = reason;
             }
+
+            transaction.update(orderRef, updateData);
+
+            const driverUpdate: Record<string, unknown> = {
+              accessToken: deleteField(),
+            };
+            if (customerUid) {
+              driverUpdate.trackingCustomerIds = arrayRemove(customerUid);
+            }
+            transaction.update(driverRef, driverUpdate);
           });
 
           return { data: null };
@@ -361,6 +387,27 @@ export const firestoreApi = createApi({
         }
       },
       invalidatesTags: ["MyOrders", "MarketplaceOrders"],
+    }),
+
+    toggleOnlineStatus: builder.mutation<
+      boolean,
+      { uid: string; byUser: boolean }
+    >({
+      queryFn: async ({ uid, byUser }) => {
+        try {
+          if (!uid) throw new Error("Driver UID required.");
+          const driverRef = doc(db, "drivers", uid);
+          await updateDoc(driverRef, {
+            "online.byUser": byUser,
+            updatedAt: Date.now(),
+          });
+          return { data: byUser };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          console.error("Error toggling online status:", message);
+          return { error: { message, data: "" } };
+        }
+      },
     }),
   }),
 });
@@ -376,4 +423,5 @@ export const {
   useStartDeliveryMutation,
   useCompleteDeliveryMutation,
   useCancelOrderMutation,
+  useToggleOnlineStatusMutation,
 } = firestoreApi;

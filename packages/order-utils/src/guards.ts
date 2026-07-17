@@ -37,7 +37,7 @@ export function isCustomerCancelable(order: OrderType): boolean {
   if (!CUSTOMER_CANCELLABLE_STATUSES.includes(order.status.current)) {
     return false;
   }
-  return order.assignment.driverUid === null;
+  return order.assignment?.driverUid === null;
 }
 
 export function isRestaurantCancelable(order: OrderType): boolean {

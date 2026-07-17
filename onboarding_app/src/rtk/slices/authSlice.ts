@@ -102,6 +102,9 @@ export const signUp = createAsyncThunk<
       throw new Error(result.error as string);
     }
 
+    // Refresh token to pick up the custom claim set by createUserDocument
+    await firebaseUser.getIdToken(true);
+
     return {
       uid: firebaseUser.uid,
       email: firebaseUser.email,

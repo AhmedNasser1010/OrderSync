@@ -1,58 +1,69 @@
 import * as yup from 'yup';
 
 const orderYupSchema = yup.object().shape({
-  timestamp: yup.number().required(),
-  accessToken: yup.string().required(),
-  cancelAutoAssign: yup.boolean().required(),
-  status: yup.object().shape({
-    current: yup.string().oneOf(['RECEIVED']).required(),
-    accepted: yup.boolean().required(),
-    history: yup.array().of(
-      yup.object().shape({
-        status: yup.string().required(),
-        timestamp: yup.number().required()
-      })
-    ).min(1).required()
+  customerUid: yup.string().required(),
+
+  business: yup.object().shape({
+    id: yup.string().required(),
+    name: yup.string().required(),
+    phone: yup.string().required(),
+    address: yup.string().required(),
+    latlng: yup.array().of(yup.number()).min(2).max(2).required(),
   }).required(),
-  
-  orderTimestamps: yup.object().shape({
-    placedAt: yup.number().required(),
+
+  assignment: yup.object().shape({
+    driverUid: yup.string().nullable(),
   }).required(),
 
   delivery: yup.object().shape({
-    uid: yup.string().nullable(),
-    name: yup.string().nullable(),
-    phone: yup.string().nullable(),
-    status: yup.string().oneOf(['PENDING']).required()
+    address: yup.string().required(),
+    latlng: yup.array().of(yup.number()).min(2).max(2).required(),
+    note: yup.string().nullable(),
   }).required(),
 
   cart: yup.array().of(
     yup.object().shape({
       id: yup.string().required(),
-      quantity: yup.number().min(1).required()
+      name: yup.string().required(),
+      quantity: yup.number().min(1).required(),
+      selectedSize: yup.string().required(),
+      discountCode: yup.string().nullable(),
     })
   ).min(1).required(),
 
-  cartTotalPrice: yup.object().shape({
+  pricing: yup.object().shape({
+    subtotal: yup.number().min(0).required(),
+    discount: yup.number().min(0).required(),
+    deliveryFees: yup.number().min(0).required(),
     total: yup.number().min(0).required(),
-    discount: yup.number().min(0).required()
   }).required(),
-
-  deliveryFees: yup.number().min(0).required(),
 
   payment: yup.object().shape({
     method: yup.string().oneOf(['CASH']).required(),
-    status: yup.string().oneOf(['COMPLETED']).required()
+    status: yup.string().oneOf(['COMPLETED']).required(),
   }).required(),
 
-  location: yup.object().shape({
-    address: yup.string().required(),
-    latlng: yup.array().of(
-      yup.number().min(-90).max(90) // Latitude
-    ).min(2).max(2).required()
+  finance: yup.object().shape({
+    commissionPercent: yup.number().required(),
+    commissionAmount: yup.number().required(),
+    restaurantShare: yup.number().required(),
+    companyShare: yup.number().required(),
+    cashCollected: yup.number().required(),
   }).required(),
 
-  orderNote: yup.string().nullable(),
+  reconciliation: yup.object().shape({
+    settlementId: yup.string().nullable(),
+    restaurantPaid: yup.boolean().required(),
+  }).required(),
+
+  notes: yup.object().shape({
+    order: yup.string().nullable(),
+  }).required(),
+
+  metadata: yup.object().shape({
+    orderSource: yup.string().required(),
+    cancelAutoAssign: yup.boolean().required(),
+  }).required(),
 
   customer: yup.object().shape({
     uid: yup.string().required(),
@@ -61,15 +72,8 @@ const orderYupSchema = yup.object().shape({
     secondPhone: yup.string().nullable(),
     firstOrderDate: yup.number().required(),
     totalOrders: yup.number().min(0).required(),
-    totalOrdersValue: yup.number().min(0).required()
+    totalOrdersValue: yup.number().min(0).required(),
   }).required(),
-
-  customerFeedback: yup.object().shape({
-    rating: yup.number().nullable().min(0).max(5),
-    comment: yup.string().nullable()
-  }).required(),
-
-  orderSource: yup.string().required()
 });
 
 export default orderYupSchema;

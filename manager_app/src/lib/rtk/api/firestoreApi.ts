@@ -70,19 +70,32 @@ export const firestoreApi = createApi({
     }),
 
     fetchRestaurantData: builder.query<BusinessDocument | undefined, string>({
-      async queryFn(resId) {
-        try {
-          const resRef = doc(db, "businesses", resId);
-          const resSnapshot = await getDoc(resRef);
-          const restaurant = resSnapshot.data() as BusinessDocument | undefined;
-          console.log("Read Operation [fetchRestaurantData]");
-          return { data: restaurant };
-        } catch (error: unknown) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error(message);
-          return { error: message };
-        }
+      queryFn: () => ({ data: {} as BusinessDocument }),
+      async onCacheEntryAdded(
+        resId,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
+      ) {
+        const resRef = doc(db, "businesses", resId);
+
+        await cacheDataLoaded;
+
+        const unsubscribe = onSnapshot(
+          resRef,
+          (docSnapshot) => {
+            if (docSnapshot.exists()) {
+              updateCachedData((draft) => {
+                if (draft) Object.assign(draft, docSnapshot.data());
+              });
+              console.log("Real-time Update [fetchRestaurantData]");
+            }
+          },
+          (error) => {
+            console.error("Error in real-time listener [fetchRestaurantData]:", error?.message);
+          },
+        );
+
+        await cacheEntryRemoved;
+        unsubscribe();
       },
       providesTags: ["Restaurant"],
     }),

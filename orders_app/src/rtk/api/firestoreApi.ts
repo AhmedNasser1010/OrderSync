@@ -12,7 +12,7 @@ import {
   where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { OrderType, OrderStatusType, RestaurantStatusTypes } from "@ordersync/types";
+import type { OrderType, OrderStatusType, RestaurantStatusTypes, BusinessDocument } from "@ordersync/types";
 import type { DailyReport } from "@ordersync/types";
 import { canTransition, canReverseTransition, getTimelineField } from "@ordersync/order-utils";
 import { ordersForDateRange, getDailyReportRef } from "@ordersync/order-utils";
@@ -58,17 +58,32 @@ export const firestoreApi = createApi({
       providesTags: ["Menu"],
     }),
 
-    fetchRestaurantData: builder.query({
-      async queryFn(resId) {
-        try {
-          const resRef = doc(db, "businesses", resId);
-          const resSnapshot = await getDoc(resRef);
-          return { data: resSnapshot.data() };
-        } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
-          console.error(message);
-          return { error: message };
-        }
+    fetchRestaurantData: builder.query<BusinessDocument, string>({
+      queryFn: () => ({ data: {} as BusinessDocument }),
+      async onCacheEntryAdded(
+        resId,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
+      ) {
+        const resRef = doc(db, "businesses", resId);
+
+        await cacheDataLoaded;
+
+        const unsubscribe = onSnapshot(
+          resRef,
+          (docSnapshot) => {
+            if (docSnapshot.exists()) {
+              updateCachedData((draft) => {
+                Object.assign(draft, docSnapshot.data());
+              });
+            }
+          },
+          (error) => {
+            console.error("Error in real-time listener [fetchRestaurantData]:", error?.message);
+          },
+        );
+
+        await cacheEntryRemoved;
+        unsubscribe();
       },
       providesTags: ["Restaurant"],
     }),
@@ -168,7 +183,7 @@ export const firestoreApi = createApi({
     }),
 
     setCancelOrder: builder.mutation({
-      async queryFn({ orderId }: { orderId: string }) {
+      async queryFn({ orderId, reason }: { orderId: string; reason?: string }) {
         try {
           if (!orderId) throw new Error("Order ID is required.");
 
@@ -191,7 +206,7 @@ export const firestoreApi = createApi({
 
             const now = Date.now();
 
-            transaction.update(orderRef, {
+            const updateData: Record<string, unknown> = {
               "status.current": "CANCELED",
               "status.history": arrayUnion({
                 status: "CANCELED",
@@ -200,7 +215,13 @@ export const firestoreApi = createApi({
               }),
               "timeline.canceledAt": now,
               updatedAt: now,
-            });
+            };
+
+            if (reason) {
+              updateData["status.cancellationReason"] = reason;
+            }
+
+            transaction.update(orderRef, updateData);
           });
 
           return { data: null };

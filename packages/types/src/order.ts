@@ -24,6 +24,7 @@ export type OrderType = {
 
   status: {
     current: OrderStatusType;
+    cancellationReason?: string;
     history: {
       status: OrderStatusType;
       timestamp: number;
@@ -88,6 +89,7 @@ export type OrderType = {
 
   cart: {
     id: string;
+    name: string;
     quantity: number;
     selectedSize: string;
     discountCode?: string;

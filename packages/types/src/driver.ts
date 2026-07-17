@@ -1,9 +1,19 @@
+export type LiveLocation = {
+  lat: number;
+  lng: number;
+  heading?: number;
+  speed?: number;
+  accuracy?: number;
+  updatedAt: number;
+};
+
 export type Driver = {
   partnerUid: string;
   createdAt: number;
   updatedAt: number;
-  liveLocation: [number, number];
+  liveLocation: LiveLocation;
   uid: string;
+  accessToken?: string;
   online: {
     byManager: boolean;
     byUser: boolean;

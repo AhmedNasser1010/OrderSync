@@ -25,7 +25,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { setAuthCookie, clearAuthCookie } from "@/lib/auth-cookie";
-import { useFetchUserDataQuery } from "@/rtk/api/firestoreApi";
+import { setUserRoleClaim } from "@/app/actions/setUserRoleClaim";
 
 function toSerializableUser(firebaseUser: FirebaseUser): SerializableUser {
   return {
@@ -47,35 +47,36 @@ export function useAuth(autoNavigate = true) {
 
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
 
-  // Use RTK Query to fetch user data from Firestore
-  const { data: userData } = useFetchUserDataQuery(firebaseUser?.uid ?? "", {
-    skip: !firebaseUser,
-  });
-
-  // Handle role check when user data is fetched via RTK Query
+  // Handle role check using custom claims from the ID token
   useEffect(() => {
-    if (!firebaseUser || !userData) return;
+    if (!firebaseUser) return;
 
-    const data = userData as { userInfo?: { role?: string } };
-    const role = data.userInfo?.role;
-    console.log("userData", userData);
-    console.log(role);
+    let cancelled = false;
 
-    if (role !== "BUSINESSES_CREATOR") {
-      // Role is not BUSINESSES_CREATOR - logout and redirect
-      clearAuthCookie();
-      dispatch(signOutThunk());
-      dispatch(setUser(null));
+    firebaseUser.getIdTokenResult().then((tokenResult) => {
+      if (cancelled) return;
+
+      const role = tokenResult.claims.role;
+
+      if (role !== "BUSINESSES_CREATOR") {
+        clearAuthCookie();
+        dispatch(signOutThunk());
+        dispatch(setUser(null));
+        dispatch(setLoading(false));
+        router.push("/auth/signup");
+        return;
+      }
+
+      dispatch(setUser(toSerializableUser(firebaseUser)));
       dispatch(setLoading(false));
-      router.push("/auth/signup");
-      return;
-    }
+      setAuthCookie(firebaseUser.uid);
+      if (autoNavigate) router.push("/restaurants");
+    });
 
-    dispatch(setUser(toSerializableUser(firebaseUser)));
-    dispatch(setLoading(false));
-    setAuthCookie(firebaseUser.uid);
-    if (autoNavigate) router.push("/restaurants");
-  }, [firebaseUser, userData, dispatch, router, autoNavigate]);
+    return () => {
+      cancelled = true;
+    };
+  }, [firebaseUser, dispatch, router, autoNavigate]);
 
   const onNotLoggedIn = useCallback(() => {
     dispatch(setUser(null));
@@ -158,6 +159,8 @@ export function useAuth(autoNavigate = true) {
             businesses: [],
           },
         });
+        await setUserRoleClaim(firebaseUser.uid, "BUSINESSES_CREATOR");
+        await firebaseUser.getIdToken(true);
       }
 
       setAuthCookie(firebaseUser.uid);

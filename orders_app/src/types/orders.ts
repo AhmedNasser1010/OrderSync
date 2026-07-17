@@ -5,6 +5,7 @@ export type MainTabTypes = "RECEIVED" | "PREPARING" | "DELIVERY" | "COMPLETED" |
 
 export type CartItemType = {
   id: string;
+  name: string;
   quantity: number;
   selectedSize: string;
   discountCode?: string;

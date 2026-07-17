@@ -77,7 +77,7 @@ export const firestoreApi = createApi({
             throw new Error('Order data is required.')
           }
 
-          const restaurantRef = doc(db, 'businesses', orderData.accessToken)
+          const restaurantRef = doc(db, 'businesses', orderData.business.id)
           const restaurantSnap = await getDoc(restaurantRef)
 
           if (!restaurantSnap.exists()) {
@@ -104,7 +104,6 @@ export const firestoreApi = createApi({
 
           const customerRef = doc(db, 'customers', orderData.customer.uid)
 
-          // Write order to the global collection with RECEIVED status
           const batch = writeBatch(db)
 
           const orderRef = doc(collection(db, 'orders'))
@@ -113,14 +112,11 @@ export const firestoreApi = createApi({
 
           const pendingLoyalty = {
             orderId: orderRef.id,
-            restaurant: orderData.accessToken,
-            amount: orderData?.pricing?.discount ?? orderData?.pricing?.total ?? 0,
-            items: Array.isArray(orderData?.cart)
-              ? orderData.cart.reduce((sum, item) => sum + (item?.quantity || 0), 0)
-              : 0,
+            restaurant: orderData.business.id,
+            amount: orderData.pricing.total,
+            items: orderData.cart.reduce((sum, item) => sum + (item.quantity || 0), 0),
             totalOrders: 1,
-            firstOrderTime:
-              orderData?.customer?.firstOrderDate ?? orderData?.createdAt ?? Date.now(),
+            firstOrderTime: orderData.customer.firstOrderDate,
             counted: false
           }
 
@@ -128,23 +124,14 @@ export const firestoreApi = createApi({
             ...orderData,
             id: orderRef.id,
             orderNumber,
-            businessId: orderData.accessToken,
-            pricing: {
-              subtotal: (orderData.cartTotalPrice?.total ?? 0) - (orderData.deliveryFees ?? 0),
-              discount: (orderData.cartTotalPrice?.total ?? 0) - (orderData.cartTotalPrice?.discount ?? 0),
-              deliveryFees: orderData.deliveryFees ?? 0,
-              total: orderData.cartTotalPrice?.discount ?? orderData.cartTotalPrice?.total ?? 0
-            },
+            businessId: orderData.business.id,
             status: {
               current: 'RECEIVED',
               history: [{ status: 'RECEIVED', timestamp: now, by: 'customer' }]
             },
-            timeline: {
-              ...orderData.timeline,
-              placedAt: now
-            },
+            timeline: { placedAt: now },
             createdAt: now,
-            updatedAt: now
+            updatedAt: now,
           }
 
           batch.set(orderRef, newOrder)
@@ -152,7 +139,7 @@ export const firestoreApi = createApi({
             trackedOrder: {
               id: orderRef.id,
               orderNumber,
-              restaurant: orderData.accessToken,
+              restaurant: orderData.business.id,
               pendingLoyalty
             }
           })

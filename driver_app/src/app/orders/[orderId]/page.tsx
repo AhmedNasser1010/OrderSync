@@ -2,13 +2,15 @@
 
 import { use, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { useFetchMyOrdersQuery, useFetchMarketplaceOrdersQuery } from "@/rtk/api/firestoreApi";
 import { useOrderActions } from "@/hooks/useOrderActions";
 import { useAppSelector } from "@/rtk/hooks";
 import { selectUser } from "@/rtk/slices/authSlice";
 import { OrderMap } from "@/components/orders/OrderMap";
 import { ArrowLeft, MapPin, Phone, User } from "lucide-react";
-import type { OrderType } from "@ordersync/types";
+import type { OrderType, LiveLocation } from "@ordersync/types";
 
 export default function OrderDetailPage({
   params,
@@ -34,15 +36,13 @@ export default function OrderDetailPage({
 
   const { claim, start, complete, cancel, isLoading } = useOrderActions();
 
-  const [driverLocation, setDriverLocation] = useState<
-    [number, number] | null
-  >(null);
+  const [driverLocation, setDriverLocation] = useState<LiveLocation | null>(null);
 
   const handleClaim = useCallback(async () => {
     if (!order || !driverUid) return;
     try {
       await claim(order.id, driverUid);
-      router.push("/orders");
+      router.push("/orders/active");
     } catch {
       alert("Failed to claim order");
     }
@@ -61,7 +61,7 @@ export default function OrderDetailPage({
     if (!order || !driverUid) return;
     try {
       await complete(order.id, driverUid);
-      router.push("/orders");
+      router.push("/orders/active");
     } catch {
       alert("Failed to complete delivery");
     }
@@ -71,25 +71,27 @@ export default function OrderDetailPage({
     if (!order || !driverUid) return;
     try {
       await cancel(order.id, driverUid);
-      router.push("/orders");
+      router.push("/orders/active");
     } catch {
       alert("Failed to cancel order");
     }
   }, [order, driverUid, cancel, router]);
 
   useEffect(() => {
-    if (!navigator.geolocation) return;
+    if (!order?.assignment?.driverUid) return;
 
-    const watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        setDriverLocation([position.coords.latitude, position.coords.longitude]);
-      },
-      () => {},
-      { enableHighAccuracy: true },
-    );
+    const driverRef = doc(db, "drivers", order.assignment.driverUid);
+    const unsubscribe = onSnapshot(driverRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        if (data.liveLocation) {
+          setDriverLocation(data.liveLocation as LiveLocation);
+        }
+      }
+    });
 
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, []);
+    return () => unsubscribe();
+  }, [order?.assignment?.driverUid]);
 
   if (!order) {
     return (
@@ -106,7 +108,7 @@ export default function OrderDetailPage({
   const hasOrderLocation =
     orderLocation && orderLocation[0] && orderLocation[1];
   const hasDriverLocation =
-    driverLocation && driverLocation[0] && driverLocation[1];
+    driverLocation && driverLocation.lat && driverLocation.lng;
 
   const currentStatus = order.status?.current;
 
@@ -125,11 +127,19 @@ export default function OrderDetailPage({
       </header>
 
       <main className="flex-1 p-4 flex flex-col gap-4 pb-24">
-        {hasOrderLocation && (
+        {hasOrderLocation ? (
           <OrderMap
             orderLocation={orderLocation}
             driverLocation={hasDriverLocation ? driverLocation : undefined}
+            restaurantLocation={order.business?.latlng}
           />
+        ) : (
+          <section className="border rounded-lg p-4">
+            <h2 className="font-semibold text-sm mb-3">Map</h2>
+            <p className="text-sm text-muted-foreground">
+              No delivery location available
+            </p>
+          </section>
         )}
 
         <section className="border rounded-lg p-4">
@@ -160,7 +170,7 @@ export default function OrderDetailPage({
         <section className="border rounded-lg p-4">
           <h2 className="font-semibold text-sm mb-3">Items</h2>
           <div className="flex flex-col gap-2">
-            {order.cart?.map((item: { id: string; quantity: number; selectedSize?: string }, index: number) => (
+            {order.cart?.map((item: { id: string; name?: string; quantity: number; selectedSize?: string }, index: number) => (
               <div
                 key={`${item.id}-${index}`}
                 className="flex items-center justify-between text-sm"
@@ -169,7 +179,7 @@ export default function OrderDetailPage({
                   <span className="text-muted-foreground">
                     {item.quantity}x
                   </span>
-                  <span>{item.id}</span>
+                  <span>{item.name || item.id}</span>
                   {item.selectedSize && (
                     <span className="text-xs text-muted-foreground">
                       ({item.selectedSize})

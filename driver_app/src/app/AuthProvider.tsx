@@ -7,6 +7,7 @@ import { selectIsInitializing } from "@/rtk/slices/authSlice";
 import { LoaderCircle } from "lucide-react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AccountSetupScreen } from "@/components/approval/AccountSetupScreen";
+import { LocationTracker } from "@/components/LocationTracker";
 
 type Props = {
   children: ReactNode;
@@ -34,5 +35,5 @@ export function AuthProvider({ children }: Props) {
     return <AccountSetupScreen />;
   }
 
-  return <>{children}</>;
+  return <LocationTracker>{children}</LocationTracker>;
 }

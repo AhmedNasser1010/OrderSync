@@ -19,11 +19,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react";
 import Link from "next/link";
-import type { BusinessDocument } from "@ordersync/types";
+import type { BusinessDocument, RestaurantStatusTypes } from "@ordersync/types";
+import { useSetRestaurantStatusMutation } from "@/rtk/api/firestoreApi";
+import { cn } from "@/lib/utils";
 import { DeleteDialog } from "./DeleteDialog";
 import { format } from "date-fns";
+
+const statusOptions: { value: RestaurantStatusTypes; label: string; dotColor: string; badgeClass: string }[] = [
+  { value: "active", label: "Active", dotColor: "bg-green-500", badgeClass: "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/50 dark:text-green-400" },
+  { value: "busy", label: "Busy", dotColor: "bg-yellow-500", badgeClass: "border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-800 dark:bg-yellow-950/50 dark:text-yellow-400" },
+  { value: "pause", label: "Paused", dotColor: "bg-red-500", badgeClass: "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-400" },
+  { value: "inactive", label: "Inactive", dotColor: "bg-gray-400", badgeClass: "border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-400" },
+];
+
+function getStatusConfig(status: RestaurantStatusTypes) {
+  return statusOptions.find((s) => s.value === status) ?? statusOptions[3];
+}
 
 interface RestaurantsTableProps {
   restaurants: BusinessDocument[];
@@ -45,6 +58,20 @@ export function RestaurantsTable({
     open: false,
     accessToken: null,
   });
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [setRestaurantStatus] = useSetRestaurantStatusMutation();
+
+  const handleStatusChange = async (
+    accessToken: string,
+    status: RestaurantStatusTypes,
+  ) => {
+    setUpdatingStatus(accessToken);
+    try {
+      await setRestaurantStatus({ resId: accessToken, status }).unwrap();
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
 
   const handleDeleteConfirm = () => {
     if (deleteDialog.accessToken) {
@@ -147,31 +174,62 @@ export function RestaurantsTable({
                   </Badge>
                 </TableCell>
                 <TableCell className="py-4">
-                  <Badge
-                    variant="outline"
-                    className={`gap-1.5 px-2.5 py-1 capitalize ${
-                      restaurant.status === "active"
-                        ? "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/50 dark:text-green-400"
-                        : restaurant.status === "inactive"
-                        ? "border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-400"
-                        : restaurant.status === "busy"
-                        ? "border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-800 dark:bg-yellow-950/50 dark:text-yellow-400"
-                        : "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-400"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-1.5 w-1.5 rounded-full ${
-                        restaurant.status === "active"
-                          ? "bg-green-500"
-                          : restaurant.status === "inactive"
-                          ? "bg-gray-400"
-                          : restaurant.status === "busy"
-                          ? "bg-yellow-500"
-                          : "bg-red-500"
-                      }`}
-                    />
-                    {restaurant.status}
-                  </Badge>
+                  {updatingStatus === restaurant.accessToken ? (
+                    <Badge
+                      variant="outline"
+                      className="gap-1.5 px-2.5 py-1"
+                    >
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Updating...
+                    </Badge>
+                  ) : (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="cursor-pointer">
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "gap-1.5 px-2.5 py-1 capitalize transition-colors hover:opacity-80",
+                              getStatusConfig(restaurant.status).badgeClass,
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                "inline-block h-1.5 w-1.5 rounded-full",
+                                getStatusConfig(restaurant.status).dotColor,
+                              )}
+                            />
+                            {restaurant.status}
+                          </Badge>
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        {statusOptions.map((option) => (
+                          <DropdownMenuItem
+                            key={option.value}
+                            onClick={() =>
+                              handleStatusChange(
+                                restaurant.accessToken,
+                                option.value,
+                              )
+                            }
+                            className={cn(
+                              restaurant.status === option.value &&
+                                "bg-accent text-accent-foreground",
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                "w-2.5 h-2.5 rounded-full mr-2",
+                                option.dotColor,
+                              )}
+                            />
+                            {option.label}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
                 </TableCell>
                 <TableCell className="py-4 text-sm text-muted-foreground">
                   {format(

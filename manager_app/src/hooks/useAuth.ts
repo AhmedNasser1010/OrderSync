@@ -12,8 +12,6 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import { useFetchUserDataQuery } from "@/lib/rtk/api/firestoreApi";
 import { userUid, setUserUid } from "@/lib/rtk/slices/constantsSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
@@ -45,14 +43,23 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
 
   // Role enforcement: only BUSINESS_MANAGER allowed in manager_app
   useEffect(() => {
-    if (!userFetchData) return;
+    if (!user) return;
 
-    const role = (userFetchData as { userInfo?: { role?: string } })?.userInfo?.role;
+    let cancelled = false;
 
-    if (role !== "BUSINESS_MANAGER") {
-      firebaseSignOut(auth).then(() => location.reload());
-    }
-  }, [userFetchData]);
+    user.getIdTokenResult().then((tokenResult) => {
+      if (cancelled) return;
+
+      const role = tokenResult.claims.role;
+      if (role !== "BUSINESS_MANAGER") {
+        firebaseSignOut(auth).then(() => location.reload());
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const clearAuthError = useCallback(() => {
     setAuthError(null);
@@ -154,20 +161,14 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
-      // Immediately check role before allowing login
-      const userDocRef = doc(db, "users", userCredential.user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data() as {
-          userInfo?: { role?: string };
-        };
-        const role = userData?.userInfo?.role;
-        if (role !== "BUSINESS_MANAGER") {
-          await firebaseSignOut(auth);
-          setUser(null);
-          dispatch(setUserUid(null));
-          throw new Error(t("accessDenied"));
-        }
+      // Immediately check role from custom claim before allowing login
+      const tokenResult = await userCredential.user.getIdTokenResult();
+      const role = tokenResult.claims.role;
+      if (role !== "BUSINESS_MANAGER") {
+        await firebaseSignOut(auth);
+        setUser(null);
+        dispatch(setUserUid(null));
+        throw new Error(t("accessDenied"));
       }
       // Auth state will be updated by the onAuthStateChanged listener
     } catch (err: any) {
@@ -194,20 +195,14 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
 
-      // Immediately check role before allowing sign-in
-      const userDocRef = doc(db, "users", result.user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data() as {
-          userInfo?: { role?: string };
-        };
-        const role = userData?.userInfo?.role;
-        if (role !== "BUSINESS_MANAGER") {
-          await firebaseSignOut(auth);
-          setUser(null);
-          dispatch(setUserUid(null));
-          throw new Error(t("accessDenied"));
-        }
+      // Immediately check role from custom claim before allowing sign-in
+      const tokenResult = await result.user.getIdTokenResult();
+      const role = tokenResult.claims.role;
+      if (role !== "BUSINESS_MANAGER") {
+        await firebaseSignOut(auth);
+        setUser(null);
+        dispatch(setUserUid(null));
+        throw new Error(t("accessDenied"));
       }
       // Auth state will be updated by the onAuthStateChanged listener
     } catch (err: any) {

@@ -21,6 +21,7 @@ import { toggleOrderSidebar } from '../../rtk/slices/toggleSlice'
 import useLanguageDirection from '../../hooks/useLanguageDirection'
 import { restaurantMapIcon, driverMapIcon, personMapIcon } from './mapCustomMarker'
 import useOrder from '../../hooks/useOrder'
+import { useDriverLocation } from '../../hooks/useDriverLocation'
 
 const MapContainerStyled = styled(MapContainer)`
   width: 100%;
@@ -67,16 +68,14 @@ function OrderSidebar() {
   const currentRes = restaurants?.find((res) => res.accessToken === user.trackedOrder.restaurant)
   const { cancelOrder, trackedOrderData } = useOrder()
   const defaultCenter = [29.620106778124843, 31.255811811669496]
-  const fallbackDriverLocation = currentRes?.profile?.latlng
-    ? [currentRes.profile.latlng[0] + 0.0008, currentRes.profile.latlng[1] + 0.0008]
-    : null
-  const driverLocation =
-    trackedOrderData?.delivery?.liveLocation?.[0] && trackedOrderData?.delivery?.liveLocation?.[1]
-      ? trackedOrderData.delivery.liveLocation
-      : fallbackDriverLocation
+  const liveLocation = useDriverLocation(
+    trackedOrderData?.assignment?.driverUid,
+    trackedOrderData?.status?.current
+  )
+  const driverLocation = liveLocation ? [liveLocation.lat, liveLocation.lng] : null
   const mapPoints = [
     currentRes?.profile?.latlng,
-    trackedOrderData?.location?.latlng,
+    trackedOrderData?.delivery?.latlng,
     driverLocation
   ]
 
@@ -203,90 +202,30 @@ function OrderSidebar() {
                 <Popup>{currentRes?.profile?.name || t('Restaurant')}</Popup>
               </Marker>
             )}
-            {trackedOrderData?.location?.latlng && (
-              <Marker position={trackedOrderData?.location?.latlng} icon={personMapIcon}>
+            {trackedOrderData?.delivery?.latlng && (
+              <Marker position={trackedOrderData?.delivery?.latlng} icon={personMapIcon}>
                 <Popup>{t('You')}</Popup>
               </Marker>
             )}
-            {trackedOrderData?.delivery?.liveLocation &&
-              trackedOrderData?.delivery?.liveLocation[0] &&
-              trackedOrderData?.delivery?.liveLocation[1] && (
-                <Marker position={trackedOrderData?.delivery?.liveLocation} icon={driverMapIcon}>
-                  <Popup>
-                    <div className="flex">
-                      <span>{t('Driver')}:</span>
-                      <span>
-                        {t('Name')}: {trackedOrderData?.delivery?.name}
-                      </span>
-                      <span>
-                        {t('Phone')}: {trackedOrderData?.delivery?.phone}
-                      </span>
-                    </div>
-                  </Popup>
-                </Marker>
-              )}
-            {currentRes && !trackedOrderData?.delivery && (
-              <Marker
-                position={[
-                  currentRes?.profile?.latlng[0] + 0.0008,
-                  currentRes?.profile?.latlng[1] + 0.0008
-                ]}
-                icon={driverMapIcon}>
-                <Popup>
-                  <div className="flex">
-                    <span>{t('Driver')}:</span>
-                    <span>
-                      {t('Name')}: {trackedOrderData?.delivery?.name}
-                    </span>
-                    <span>
-                      {t('Phone')}: {trackedOrderData?.delivery?.phone}
-                    </span>
-                  </div>
-                </Popup>
+            {driverLocation && (
+              <Marker position={driverLocation} icon={driverMapIcon}>
+                <Popup>{t('Driver')}</Popup>
               </Marker>
             )}
-            {currentRes?.profile?.latlng &&
-              trackedOrderData?.delivery?.liveLocation &&
-              trackedOrderData?.delivery?.liveLocation[0] &&
-              trackedOrderData?.delivery?.liveLocation[1] && (
-                <Polyline
-                  pathOptions={{ color: 'grey' }}
-                  positions={[
-    currentRes?.profile?.latlng,
-                    trackedOrderData?.delivery?.liveLocation
-                  ]}
-                />
-              )}
-            {currentRes?.profile?.latlng && !trackedOrderData?.delivery && (
+            {currentRes?.profile?.latlng && driverLocation && (
               <Polyline
+                pathOptions={{ color: 'grey' }}
                 positions={[
                   currentRes?.profile?.latlng,
-                  [
-                    currentRes?.profile?.latlng[0] + 0.0008,
-                    currentRes?.profile?.latlng[1] + 0.0008
-                  ]
+                  driverLocation
                 ]}
               />
             )}
-            {trackedOrderData?.location?.latlng &&
-              trackedOrderData?.delivery?.liveLocation &&
-              trackedOrderData?.delivery?.liveLocation[0] &&
-              trackedOrderData?.delivery?.liveLocation[1] && (
-                <Polyline
-                  positions={[
-                    trackedOrderData?.location?.latlng,
-                    trackedOrderData?.delivery?.liveLocation
-                  ]}
-                />
-              )}
-            {              trackedOrderData?.location?.latlng && !trackedOrderData?.delivery && (
+            {trackedOrderData?.delivery?.latlng && driverLocation && (
               <Polyline
                 positions={[
-                  trackedOrderData?.location?.latlng,
-                  [
-                    currentRes?.profile?.latlng[0] + 0.0008,
-                    currentRes?.profile?.latlng[1] + 0.0008
-                  ]
+                  trackedOrderData?.delivery?.latlng,
+                  driverLocation
                 ]}
               />
             )}

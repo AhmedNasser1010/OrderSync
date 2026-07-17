@@ -16,6 +16,7 @@ import {
 import { db } from "@/lib/firebase";
 import { deleteAuthUser } from "@/app/actions/deleteAuthUser";
 import { getUserProvider } from "@/app/actions/getUserProvider";
+import { setUserRoleClaim } from "@/app/actions/setUserRoleClaim";
 import type {
   RestaurantStatusTypes,
   BusinessDocument,
@@ -138,6 +139,7 @@ export const firestoreApi = createApi({
 
           const docRef = doc(db, "users", uid);
           await setDoc(docRef, userData);
+          await setUserRoleClaim(uid, "BUSINESSES_CREATOR");
 
           console.log("Write Operation [createUserDocument]");
           return { data: null };
@@ -257,6 +259,8 @@ export const firestoreApi = createApi({
             };
             transaction.set(managerRef, managerData, { merge: true });
           });
+
+          await setUserRoleClaim(managerUid, "BUSINESS_MANAGER");
 
           console.log("Write Operation [createBusiness]");
           return { data: null };
@@ -552,7 +556,7 @@ export const firestoreApi = createApi({
             partnerUid,
             createdAt: now,
             updatedAt: now,
-            liveLocation: [0, 0],
+            liveLocation: { lat: 0, lng: 0, updatedAt: now },
             online: {
               byManager: false,
               byUser: false,
@@ -569,6 +573,7 @@ export const firestoreApi = createApi({
 
           const docRef = doc(db, "drivers", uid);
           await setDoc(docRef, driverData);
+          await setUserRoleClaim(uid, "DRIVER");
 
           console.log("Write Operation [createDriverDocument]");
           return { data: null };

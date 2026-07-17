@@ -129,54 +129,75 @@ const usePlace = () => {
   }
 
   const orderDataFinalize = (comment) => {
-    const timestamp = Date.now()
     const currentResLoyaltyData = user?.restaurants?.find((res) => res.accessToken === accessToken)
     const orderSource = getUserSource()
-    const filteredCart = cart.items.map((obj) => filterObject(obj, [], true))
+    const filteredCart = cart.items.map((obj) => filterObject(obj, ['discount'], true))
     const cartTotalPrice = getCartTotalPrice()
+    const selectedLocation = user.locations[user.locations.selected]
+
+    const subtotal = cartTotalPrice.total - deliveryFees
+    const discount = cartTotalPrice.total - cartTotalPrice.discount
 
     return {
-      timestamp,
-      accessToken,
-      cancelAutoAssign: false,
-      status: {
-        current: 'RECEIVED',
-        accepted: false,
-        history: [{ status: 'RECEIVED', timestamp }]
+      customerUid: user.uid,
+      business: {
+        id: currentRes.accessToken,
+        name: currentRes.name,
+        phone: currentRes.phone,
+        address: currentRes.profile.address,
+        latlng: currentRes.profile.latlng,
       },
-      orderTimestamps: {
-        placedAt: timestamp,
-      },
+      assignment: { driverUid: null },
       delivery: {
-        uid: null,
-        name: null,
-        phone: null,
-        liveLocation: [0, 0],
-        status: 'PENDING'
+        address: selectedLocation.address,
+        latlng: selectedLocation.latlng,
+        note: comment || undefined,
       },
-      cart: filteredCart,
-      cartTotalPrice,
-      deliveryFees,
+      cart: filteredCart.map((item) => {
+        const menuItem = menuItems?.find((mi) => mi.id === item.id)
+        return {
+          id: item.id,
+          name: menuItem?.title || '',
+          quantity: item.quantity,
+          selectedSize: item.selectedSize,
+          discountCode: item.discount?.code || undefined,
+        }
+      }),
+      pricing: {
+        subtotal,
+        discount,
+        deliveryFees,
+        total: cartTotalPrice.discount,
+      },
       payment: {
         method: 'CASH',
-        status: 'COMPLETED'
+        status: 'COMPLETED',
       },
-      location: user.locations[user.locations.selected],
-      orderNote: comment,
+      finance: {
+        commissionPercent: 0,
+        commissionAmount: 0,
+        restaurantShare: 0,
+        companyShare: 0,
+        cashCollected: 0,
+      },
+      reconciliation: {
+        settlementId: null,
+        restaurantPaid: false,
+      },
+      notes: { order: comment || undefined },
+      metadata: {
+        orderSource,
+        cancelAutoAssign: false,
+      },
       customer: {
         uid: user.uid,
         name: user.userInfo.name,
         phone: user.userInfo.phone,
         secondPhone: user.userInfo.secondPhone,
-        firstOrderDate: currentResLoyaltyData?.firstOrderTime || timestamp,
+        firstOrderDate: currentResLoyaltyData?.firstOrderTime || Date.now(),
         totalOrders: currentResLoyaltyData?.totalOrders || 1,
-        totalOrdersValue: currentResLoyaltyData?.totalAmount || cartTotalPrice.discount
+        totalOrdersValue: currentResLoyaltyData?.totalAmount || cartTotalPrice.discount,
       },
-      customerFeedback: {
-        rating: null,
-        comment: null
-      },
-      orderSource
     }
   }
 

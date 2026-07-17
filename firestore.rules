@@ -46,16 +46,8 @@ service cloud.firestore {
       return isSignedIn() && exists(/databases/$(database)/documents/customers/$(request.auth.uid));
     }
 
-    function hasDriverDoc() {
-      return isSignedIn() && exists(/databases/$(database)/documents/drivers/$(request.auth.uid));
-    }
-
     function getUsersDoc() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
-    }
-
-    function getDriverAccountData() {
-      return get(/databases/$(database)/documents/drivers/$(request.auth.uid)).data;
     }
 
     function getManagerBusiness() {
@@ -67,15 +59,15 @@ service cloud.firestore {
     }
 
     function isManager() {
-      return hasUsersDoc() && getUsersDoc().userInfo.role == 'BUSINESS_MANAGER';
+      return isSignedIn() && request.auth.token.role == 'BUSINESS_MANAGER';
     }
 
     function isPartner() {
-      return hasUsersDoc() && getUsersDoc().userInfo.role == 'BUSINESSES_CREATOR';
+      return isSignedIn() && request.auth.token.role == 'BUSINESSES_CREATOR';
     }
 
     function isRider() {
-      return hasDriverDoc() && getDriverAccountData().userInfo.role == 'DRIVER';
+      return isSignedIn() && request.auth.token.role == 'DRIVER';
     }
 
     function managerAccessToken() {

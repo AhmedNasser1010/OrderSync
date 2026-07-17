@@ -11,7 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -20,10 +19,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Pencil, Trash2, AlertTriangle } from "lucide-react";
+import { Pencil, Trash2, AlertTriangle, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import type { Driver } from "@ordersync/types";
 import { EditDriverDialog } from "./EditDriverDialog";
+import { useUpdateDriverDocumentMutation } from "@/rtk/api/firestoreApi";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface DriversTableProps {
   drivers: Driver[];
@@ -38,9 +40,27 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
     driver: Driver | null;
   }>({ open: false, driver: null });
 
+  const [updateDriver, { isLoading: isUpdating }] =
+    useUpdateDriverDocumentMutation();
+  const [togglingDriver, setTogglingDriver] = useState<string | null>(null);
+
   const handleEdit = (driver: Driver) => {
     setEditDriver(driver);
     setEditOpen(true);
+  };
+
+  const handleToggleByManager = async (driver: Driver) => {
+    setTogglingDriver(driver.uid);
+    try {
+      await updateDriver({
+        uid: driver.uid,
+        updates: {
+          online: { ...driver.online, byManager: !(driver.online?.byManager ?? false) },
+        },
+      }).unwrap();
+    } finally {
+      setTogglingDriver(null);
+    }
   };
 
   const handleDeleteConfirm = () => {
@@ -117,13 +137,41 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
                     {driver.userInfo?.phone || "—"}
                   </TableCell>
                   <TableCell className="py-4">
-                    <Badge
-                      variant={
-                        driver.online?.byManager ? "default" : "secondary"
-                      }
-                    >
-                      {driver.online?.byManager ? "Online" : "Offline"}
-                    </Badge>
+                    {togglingDriver === driver.uid ? (
+                      <Badge
+                        variant="outline"
+                        className="gap-1.5 px-2.5 py-1"
+                      >
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Updating...
+                      </Badge>
+                    ) : (
+                      <button
+                        className="cursor-pointer"
+                        onClick={() => handleToggleByManager(driver)}
+                        disabled={isUpdating}
+                      >
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "gap-1.5 px-2.5 py-1 transition-colors hover:opacity-80",
+                            driver.online?.byManager
+                              ? "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/50 dark:text-green-400"
+                              : "border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-400",
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              "inline-block h-1.5 w-1.5 rounded-full",
+                              driver.online?.byManager
+                                ? "bg-green-500"
+                                : "bg-gray-400",
+                            )}
+                          />
+                          {driver.online?.byManager ? "Online" : "Offline"}
+                        </Badge>
+                      </button>
+                    )}
                   </TableCell>
                   <TableCell className="py-4 text-sm text-muted-foreground">
                     {driver.createdAt

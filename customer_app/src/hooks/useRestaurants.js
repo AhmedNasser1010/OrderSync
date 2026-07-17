@@ -1,15 +1,30 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import { collection, onSnapshot } from 'firebase/firestore'
+import { db } from '../config/firebase'
 import { initRestaurants } from '../rtk/slices/restaurantsSlice'
-import DB_GET_COLLECTION from '../utils/DB_GET_COLLECTION'
 
 const useRestaurants = () => {
   const dispatch = useDispatch()
 
-  const fetchRestaurants = async _ => await DB_GET_COLLECTION('businesses')
-
   useEffect(() => {
-    fetchRestaurants().then(res => dispatch(initRestaurants(res)))
+    const businessesRef = collection(db, 'businesses')
+
+    const unsubscribe = onSnapshot(
+      businessesRef,
+      (snapshot) => {
+        const data = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        dispatch(initRestaurants(data))
+      },
+      (error) => {
+        console.error('Error in real-time listener [businesses]:', error?.message)
+      }
+    )
+
+    return () => unsubscribe()
   }, [])
 }
 
