@@ -28,6 +28,7 @@ const useResStatus = (): UseResStatus => {
   const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
   const { data: resData } = useFetchRestaurantDataQuery(
     userData?.accessToken ?? skipToken,
+    { skip: !userData?.accessToken },
   );
   const currentStatus = resData?.status || "inactive";
   const [setRestaurantStatus, { isLoading, error }] =

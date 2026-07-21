@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useFetchRestaurantDataQuery } from "@/rtk/api/firestoreApi";
 import { accessToken } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
+import { skipToken } from "@reduxjs/toolkit/query";
 import PrintInvoiceDialog from "../print-invoice-dialog/PrintInvoiceDialog";
 import ControlMenu from "./ControlMenu";
 import useOrderHandler from "@/hooks/order-handlers/useOrderHandlers";
@@ -62,7 +63,7 @@ type Props = {
 
 export default function OrderFooter({ id, activeTabValue, status }: Props) {
   const resAccessToken = useAppSelector(accessToken);
-  const { data: restaurant } = useFetchRestaurantDataQuery(resAccessToken);
+  const { data: restaurant } = useFetchRestaurantDataQuery(resAccessToken ?? skipToken, { skip: !resAccessToken });
   const printInvoice = restaurant?.settings?.printInvoice ?? false;
   const { handleChangeStatus, getPossibleNextStatuses, getPossiblePreviousStatuses } = useOrderHandler();
 

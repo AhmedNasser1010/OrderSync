@@ -64,6 +64,8 @@ export const firestoreApi = createApi({
         resId,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
       ) {
+        if (!resId) return;
+
         const resRef = doc(db, "businesses", resId);
 
         await cacheDataLoaded;
