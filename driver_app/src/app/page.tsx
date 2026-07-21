@@ -2,19 +2,19 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
   const router = useRouter();
-  const { user, isLoading } = useAuth();
+  const { user, isAuthLoading } = useAuth();
 
   useEffect(() => {
     if (user) {
       router.push("/orders/active");
-    } else if (!isLoading) {
+    } else if (!isAuthLoading) {
       router.push("/auth/signin");
     }
-  }, [user, isLoading, router]);
+  }, [user, isAuthLoading, router]);
 
   return (
     <div className="flex flex-1 items-center justify-center">

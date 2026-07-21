@@ -26,6 +26,7 @@ import type {
 
 export interface UpdateBusinessInput {
   accessToken: string;
+  partnerUid: string;
   updates: Partial<BusinessDocument>;
 }
 
@@ -252,7 +253,7 @@ export const firestoreApi = createApi({
                 email: normalizedOwner.email || user.email,
                 name: normalizedOwner.name || user.name || "",
                 phone: normalizedOwner.phone || user.phone || "",
-                secondPhone: user.secondPhone ?? undefined,
+                ...(user.secondPhone ? { secondPhone: user.secondPhone } : {}),
                 role: "BUSINESS_MANAGER",
                 provider: managerProvider,
               },
@@ -273,14 +274,64 @@ export const firestoreApi = createApi({
       invalidatesTags: ["User", "Businesses"],
     }),
     updateBusiness: builder.mutation<null, UpdateBusinessInput>({
-      async queryFn({ accessToken, updates }) {
+      async queryFn({ accessToken, partnerUid, updates }) {
         try {
           if (!accessToken) {
             throw new Error("Business access token is required.");
           }
 
           const businessRef = doc(db, "businesses", accessToken);
-          await updateDoc(businessRef, updates);
+          let managerChanged = false;
+          let newManagerUid = "";
+
+          await runTransaction(db, async (transaction) => {
+            const businessSnapshot = await transaction.get(businessRef);
+            if (!businessSnapshot.exists()) {
+              throw new Error("Business not found.");
+            }
+
+            const existingData = businessSnapshot.data() as BusinessDocument;
+            const oldOwnerUid = existingData.owner?.uid ?? "";
+            const incomingOwnerUid = (updates.owner as BusinessDocument["owner"])?.uid ?? oldOwnerUid;
+
+            if (incomingOwnerUid && incomingOwnerUid !== oldOwnerUid) {
+              managerChanged = true;
+              newManagerUid = incomingOwnerUid;
+
+              const now = Date.now();
+              const ownerData = updates.owner as BusinessDocument["owner"];
+              const managerRef = doc(db, "users", newManagerUid);
+              const managerSnapshot = await transaction.get(managerRef);
+
+              const managerData: ManagerUser = {
+                uid: newManagerUid,
+                accessToken,
+                partnerUid,
+                createdAt: managerSnapshot.exists()
+                  ? (managerSnapshot.data() as ManagerUser).createdAt
+                  : now,
+                updatedAt: now,
+                userInfo: {
+                  uid: newManagerUid,
+                  email: ownerData?.email ?? "",
+                  name: ownerData?.name ?? "",
+                  phone: ownerData?.phone ?? "",
+                  ...(ownerData?.secondPhone ? { secondPhone: ownerData.secondPhone } : {}),
+                  role: "BUSINESS_MANAGER",
+                  provider: managerSnapshot.exists()
+                    ? (managerSnapshot.data() as ManagerUser).userInfo?.provider ?? "Email/Password"
+                    : "Email/Password",
+                },
+              };
+              transaction.set(managerRef, managerData, { merge: true });
+            }
+
+            transaction.update(businessRef, { ...updates, updatedAt: Date.now() });
+          });
+
+          if (managerChanged && newManagerUid) {
+            await setUserRoleClaim(newManagerUid, "BUSINESS_MANAGER");
+          }
 
           console.log("Write Operation [updateBusiness]");
           return { data: null };

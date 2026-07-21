@@ -7,8 +7,7 @@ import {
   useUpdateBusinessMutation,
 } from "@/rtk/api/firestoreApi";
 import type { BusinessDocument } from "@ordersync/types";
-import { useAppSelector } from "@/rtk/hooks";
-import { selectUser } from "@/rtk/slices/authSlice";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface ValidationError {
   [key: string]: string;
@@ -16,7 +15,7 @@ export interface ValidationError {
 
 export function useRestaurantForm(initialData?: BusinessDocument) {
   const router = useRouter();
-  const currentUser = useAppSelector(selectUser);
+  const currentUser = useAuth().user;
   const [createBusiness] = useCreateBusinessMutation();
   const [updateBusiness] = useUpdateBusinessMutation();
   const [formData, setFormData] = useState<BusinessDocument>(
@@ -134,6 +133,7 @@ export function useRestaurantForm(initialData?: BusinessDocument) {
       if (initialData?.accessToken) {
         await updateBusiness({
           accessToken: formData.accessToken,
+          partnerUid: initialData.partnerUid,
           updates: { ...formData, updatedAt: now },
         }).unwrap();
       } else {

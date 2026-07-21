@@ -15,15 +15,14 @@ import { Loader2, UserCheck, AlertCircle, Plus } from "lucide-react";
 import { getUserUid } from "@/app/actions/getUserUid";
 import { getUserProvider } from "@/app/actions/getUserProvider";
 import { useCreateDriverDocumentMutation } from "@/rtk/api/firestoreApi";
-import { useAppSelector } from "@/rtk/hooks";
-import { selectUser } from "@/rtk/slices/authSlice";
+import { useAuth } from "@/contexts/AuthContext";
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 export function AddDriverDialog() {
-  const partnerUid = useAppSelector(selectUser)?.uid;
+  const partnerUid = useAuth().user?.uid;
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");

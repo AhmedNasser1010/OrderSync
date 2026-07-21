@@ -3,19 +3,19 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { user, isLoading } = useAuth();
+  const { user, isAuthLoading } = useAuth();
 
   useEffect(() => {
-    if (user && !isLoading) {
+    if (user && !isAuthLoading) {
       router.push("/orders");
     }
-  }, [user, isLoading, router]);
+  }, [user, isAuthLoading, router]);
 
-  if (isLoading) {
+  if (isAuthLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin">

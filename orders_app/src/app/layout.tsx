@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "@/globals.css";
 import StoreProvider from "./StoreProvider";
 import AuthProvider from "./AuthProvider";
+import { AuthProvider as AuthContextProvider } from "@/contexts/AuthContext";
 import PopupProvider from "./PopupProvider";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -40,10 +41,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <AuthProvider>
-              <PopupProvider>{children}</PopupProvider>
-              <Toaster />
-            </AuthProvider>
+            <AuthContextProvider>
+              <AuthProvider>
+                <PopupProvider>{children}</PopupProvider>
+                <Toaster />
+              </AuthProvider>
+            </AuthContextProvider>
           </ThemeProvider>
         </StoreProvider>
       </body>

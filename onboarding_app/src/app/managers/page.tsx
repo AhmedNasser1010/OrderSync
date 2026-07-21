@@ -2,21 +2,20 @@
 
 import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Users } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAppSelector } from "@/rtk/hooks";
-import { selectUser } from "@/rtk/slices/authSlice";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   useFetchManagersQuery,
   useDeleteManagerMutation,
 } from "@/rtk/api/firestoreApi";
 import { ManagersTable } from "@/components/dashboard/ManagersTable";
-import { useMemo, useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 
 const COOLDOWN_DURATION = 5;
 
 export default function ManagersPage() {
-  const authUser = useAppSelector(selectUser);
+  const authUser = useAuth().user;
   const [cooldown, setCooldown] = useState(0);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 

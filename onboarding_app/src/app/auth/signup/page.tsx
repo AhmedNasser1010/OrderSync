@@ -3,20 +3,20 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthLoading } = useAuth();
 
   // Redirect to dashboard if already authenticated
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
+    if (user && !isAuthLoading) {
       router.push("/restaurants");
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [user, isAuthLoading, router]);
 
-  if (isLoading) {
+  if (isAuthLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin">

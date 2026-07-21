@@ -2,18 +2,18 @@
 import { useState, useCallback, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/routing";
-import useAuth from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import useUser from "@/hooks/useUser";
 import AutoLoginLoadingScreen from "@/components/AutoLoginLoadingScreen";
 import { Button } from "@/components/ui/button";
 
-export default function AuthProvider({
+export default function AuthGuard({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const t = useTranslations("Auth.unassigned");
-  const { user, isAuthLoading, logout } = useAuth(false);
+  const { user, isAuthLoading, logout } = useAuth();
   const { user: userData, isLoading: isUserDataLoading } = useUser();
   const router = useRouter();
   const pathname = usePathname();
@@ -56,10 +56,9 @@ export default function AuthProvider({
     return <AutoLoginLoadingScreen />;
   }
 
-  // If user data is loaded but accessToken is empty/missing or role is not BUSINESS_MANAGER, show restricted dialog
+  // If user data is loaded but accessToken is empty/missing, show restricted dialog
   const accessToken = userData?.accessToken;
-  const userRole = userData?.userInfo?.role;
-  const isUnassigned = !accessToken || accessToken.trim() === "" || userRole !== "BUSINESS_MANAGER";
+  const isUnassigned = !accessToken || accessToken.trim() === "";
 
   if (isUnassigned) {
     return (

@@ -1,8 +1,7 @@
 "use client";
 
 import { useToggleOnlineStatusMutation } from "@/rtk/api/firestoreApi";
-import { useAppSelector } from "@/rtk/hooks";
-import { selectUser } from "@/rtk/slices/authSlice";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface OnlineToggleProps {
   byManager: boolean;
@@ -10,8 +9,8 @@ interface OnlineToggleProps {
 }
 
 export function OnlineToggle({ byManager, byUser }: OnlineToggleProps) {
-  const authUser = useAppSelector(selectUser);
-  const driverUid = authUser?.uid ?? "";
+  const { user } = useAuth();
+  const driverUid = user?.uid ?? "";
   const [toggleOnline, { isLoading }] = useToggleOnlineStatusMutation();
 
   const isOnline = byManager && byUser;

@@ -3,8 +3,7 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { useAppSelector } from "@/rtk/hooks";
-import { selectUser } from "@/rtk/slices/authSlice";
+import { useAuth } from "@/contexts/AuthContext";
 import { useFetchMyOrdersQuery } from "@/rtk/api/firestoreApi";
 import type { OrderType, LiveLocation } from "@ordersync/types";
 
@@ -53,8 +52,8 @@ function isOnline(online: { byManager: boolean; byUser: boolean } | undefined): 
 }
 
 export function useDriverLocation(online: { byManager: boolean; byUser: boolean } | undefined) {
-  const authUser = useAppSelector(selectUser);
-  const driverUid = authUser?.uid ?? "";
+  const { user } = useAuth();
+  const driverUid = user?.uid ?? "";
 
   const { data: myOrders } = useFetchMyOrdersQuery(driverUid, {
     skip: !driverUid,

@@ -6,8 +6,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useFetchMyOrdersQuery, useFetchMarketplaceOrdersQuery } from "@/rtk/api/firestoreApi";
 import { useOrderActions } from "@/hooks/useOrderActions";
-import { useAppSelector } from "@/rtk/hooks";
-import { selectUser } from "@/rtk/slices/authSlice";
+import { useAuth } from "@/contexts/AuthContext";
 import { OrderMap } from "@/components/orders/OrderMap";
 import { ArrowLeft, MapPin, Phone, User } from "lucide-react";
 import type { OrderType, LiveLocation } from "@ordersync/types";
@@ -20,8 +19,8 @@ export default function OrderDetailPage({
   const { orderId } = use(params);
   const router = useRouter();
 
-  const authUser = useAppSelector(selectUser);
-  const driverUid = authUser?.uid ?? "";
+  const { user } = useAuth();
+  const driverUid = user?.uid ?? "";
 
   // Check if order is in marketplace (READY) or in my orders (RESERVED, PICKED_UP, etc.)
   const { data: marketplaceOrders } = useFetchMarketplaceOrdersQuery(driverUid, {

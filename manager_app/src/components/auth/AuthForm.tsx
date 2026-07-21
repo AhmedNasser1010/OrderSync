@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import useAuth from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,7 +25,7 @@ interface AuthFormProps {
 export function AuthForm({ mode, onSuccess }: AuthFormProps) {
   const t = useTranslations("Auth.form");
   const { login, signup, signInWithGoogle, isAuthLoading, authErrorMsg } =
-    useAuth(false);
+    useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

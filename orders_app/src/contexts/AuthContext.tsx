@@ -1,10 +1,19 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
-import { useAppSelector, useAppDispatch } from "@/lib/rtk/hooks";
+"use client";
+
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  type ReactNode,
+} from "react";
+import { useRouter } from "next/navigation";
+import { useAppDispatch } from "@/rtk/hooks";
 import { auth } from "@/lib/firebase";
 import {
-  User as FirebaseUser,
+  type User as FirebaseUser,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -12,11 +21,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
-import { useFetchUserDataQuery } from "@/lib/rtk/api/firestoreApi";
-import { userUid, setUserUid } from "@/lib/rtk/slices/constantsSlice";
-import { skipToken } from "@reduxjs/toolkit/query";
+import { setUserUid } from "@/rtk/slices/constantsSlice";
 
-interface UseAuthReturn {
+interface AuthContextValue {
   user: FirebaseUser | null;
   isAuthLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -27,39 +34,19 @@ interface UseAuthReturn {
   authErrorMsg: string | null;
 }
 
-const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
-  const t = useTranslations("Auth.errors");
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const dispatch = useAppDispatch();
+
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
   const [authError, setAuthError] = useState<any>(null);
   const [authErrorMsg, setAuthErrorMsg] = useState<string | null>(null);
-  const uid = useAppSelector(userUid);
+
   const mountedRef = useRef(true);
   const initialCheckDone = useRef(false);
-
-  const { data: userFetchData } = useFetchUserDataQuery(uid ?? skipToken);
-
-  // Role enforcement: only BUSINESS_MANAGER allowed in manager_app
-  useEffect(() => {
-    if (!user) return;
-
-    let cancelled = false;
-
-    user.getIdTokenResult().then((tokenResult) => {
-      if (cancelled) return;
-
-      const role = tokenResult.claims.role;
-      if (role !== "BUSINESS_MANAGER") {
-        firebaseSignOut(auth).then(() => location.reload());
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [user]);
 
   const clearAuthError = useCallback(() => {
     setAuthError(null);
@@ -76,23 +63,23 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
         case "auth/invalid-credential":
         case "auth/user-not-found":
         case "auth/wrong-password":
-          msg = t("invalidCredential");
+          msg = "Invalid credential, Please check your email and password";
           break;
         case "auth/too-many-requests":
-          msg = t("tooManyRequests");
+          msg = "Too many requests. Please try again later.";
           break;
         case "auth/email-already-in-use":
-          msg = t("emailAlreadyInUse");
+          msg = "Email already in use";
           break;
         case "auth/weak-password":
-          msg = t("weakPassword");
+          msg = "Weak password";
           break;
         case "auth/cancelled-popup-request":
         case "auth/popup-closed-by-user":
-          msg = t("googleSignInCanceled");
+          msg = "Google sign in was canceled.";
           break;
         default:
-          msg = t("anErrorOccurred");
+          msg = "An error occurred";
           console.error("An error occurred: ", error);
           break;
       }
@@ -100,41 +87,48 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
     setAuthErrorMsg(msg);
   }, []);
 
-  // Single onAuthStateChanged listener on mount - the source of truth
+  // Single onAuthStateChanged listener — the source of truth
   useEffect(() => {
     mountedRef.current = true;
 
     const unsubscribe = onAuthStateChanged(
       auth,
-      (currentUser) => {
+      async (currentUser) => {
         if (!mountedRef.current) return;
 
         if (currentUser) {
-          const uid = currentUser.uid;
-          dispatch(setUserUid(uid));
+          const tokenResult = await currentUser.getIdTokenResult();
+          const role = tokenResult.claims.role;
+
+          if (role !== "BUSINESS_MANAGER") {
+            await firebaseSignOut(auth);
+            dispatch(setUserUid(null));
+            setUser(null);
+            setIsAuthLoading(false);
+            if (!initialCheckDone.current) {
+              initialCheckDone.current = true;
+              router.push("/login");
+            }
+            return;
+          }
+
+          dispatch(setUserUid(currentUser.uid));
           setUser(currentUser);
           setIsAuthLoading(false);
 
-          // Only navigate on initial auth check, not on every callback
           if (!initialCheckDone.current) {
             initialCheckDone.current = true;
-            if (autoNavigate) {
-              router.push("/");
-            }
+            router.push("/");
           }
         } else {
-          setUser(null);
           dispatch(setUserUid(null));
+          setUser(null);
           setIsAuthLoading(false);
 
           if (!initialCheckDone.current) {
             initialCheckDone.current = true;
-            // Only redirect to login on initial load if autoNavigate is true (protected pages)
-            if (autoNavigate) {
-              router.push("/login");
-            }
+            router.push("/login");
           } else {
-            // User session ended during the session - redirect to login
             router.push("/login");
           }
         }
@@ -143,9 +137,7 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
         if (!mountedRef.current) return;
         setIsAuthLoading(false);
         setAuthError(error);
-        if (autoNavigate) {
-          router.push("/login");
-        }
+        router.push("/login");
       },
     );
 
@@ -153,25 +145,35 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
       mountedRef.current = false;
       unsubscribe();
     };
-  }, [autoNavigate, router, dispatch]);
+  }, [router, dispatch]);
 
   const login = async (email: string, password: string): Promise<void> => {
     clearAuthError();
     setIsAuthLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
 
-      // Immediately check role from custom claim before allowing login
       const tokenResult = await userCredential.user.getIdTokenResult();
       const role = tokenResult.claims.role;
       if (role !== "BUSINESS_MANAGER") {
         await firebaseSignOut(auth);
         setUser(null);
         dispatch(setUserUid(null));
-        throw new Error(t("accessDenied"));
+        throw new Error(
+          "Access denied. Only business managers can access this app.",
+        );
       }
-      // Auth state will be updated by the onAuthStateChanged listener
     } catch (err: any) {
+      if (err?.message?.includes("Access denied")) {
+        setIsAuthLoading(false);
+        setAuthError(err);
+        setAuthErrorMsg(err.message);
+        throw err;
+      }
       onFailedLogin(err);
       throw err;
     }
@@ -181,10 +183,31 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
     clearAuthError();
     setIsAuthLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      // Auth state will be updated by the onAuthStateChanged listener
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+
+      const tokenResult = await userCredential.user.getIdTokenResult();
+      const role = tokenResult.claims.role;
+      if (role !== "BUSINESS_MANAGER") {
+        await firebaseSignOut(auth);
+        setUser(null);
+        dispatch(setUserUid(null));
+        throw new Error(
+          "Access denied. Only business managers can access this app.",
+        );
+      }
     } catch (err: any) {
+      if (err?.message?.includes("Access denied")) {
+        setIsAuthLoading(false);
+        setAuthError(err);
+        setAuthErrorMsg(err.message);
+        throw err;
+      }
       onFailedLogin(err);
+      throw err;
     }
   };
 
@@ -195,18 +218,31 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
 
-      // Immediately check role from custom claim before allowing sign-in
       const tokenResult = await result.user.getIdTokenResult();
       const role = tokenResult.claims.role;
       if (role !== "BUSINESS_MANAGER") {
         await firebaseSignOut(auth);
         setUser(null);
         dispatch(setUserUid(null));
-        throw new Error(t("accessDenied"));
+        throw new Error(
+          "Access denied. Only business managers can access this app.",
+        );
       }
-      // Auth state will be updated by the onAuthStateChanged listener
     } catch (err: any) {
-      onFailedLogin(err);
+      if (err?.message?.includes("Access denied")) {
+        setIsAuthLoading(false);
+        setAuthError(err);
+        setAuthErrorMsg(err.message);
+        throw err;
+      }
+
+      const firebaseError = err as { message?: string; code?: string };
+      const friendlyMessage =
+        firebaseError.code === "auth/cancelled-popup-request" ||
+        firebaseError.code === "auth/popup-closed-by-user"
+          ? "Google sign in was canceled."
+          : firebaseError.message || "Google sign in failed";
+      onFailedLogin(new Error(friendlyMessage));
       throw err;
     }
   };
@@ -214,22 +250,35 @@ const useAuth = (autoNavigate: boolean = true): UseAuthReturn => {
   const logout = async (): Promise<void> => {
     try {
       await firebaseSignOut(auth);
-      // Auth state will be updated by the onAuthStateChanged listener
+      location.reload();
     } catch (err) {
+      location.reload();
       throw err;
     }
   };
 
-  return {
-    user,
-    isAuthLoading,
-    login,
-    signup,
-    signInWithGoogle: signInWithGoogleFn,
-    logout,
-    authError,
-    authErrorMsg,
-  };
-};
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthLoading,
+        login,
+        signup,
+        signInWithGoogle: signInWithGoogleFn,
+        logout,
+        authError,
+        authErrorMsg,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
 
-export default useAuth;
+export function useAuth(): AuthContextValue {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}

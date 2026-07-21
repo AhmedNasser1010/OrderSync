@@ -2,13 +2,11 @@ import { configureStore } from '@reduxjs/toolkit';
 import { firestoreApi } from './api/firestoreApi';
 import constantsSlice from './slices/constantsSlice';
 import uiSlice from './slices/uiSlice';
-import authSlice from './slices/authSlice';
 
 export const makeStore = () => {
   return configureStore({
     devTools: true,
     reducer: {
-      auth: authSlice,
       constants: constantsSlice,
       ui: uiSlice,
       [firestoreApi.reducerPath]: firestoreApi.reducer,

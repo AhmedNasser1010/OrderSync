@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useAppSelector } from "@/rtk/hooks";
-import { selectUser } from "@/rtk/slices/authSlice";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   useFetchDriverProfileQuery,
   useFetchMarketplaceOrdersQuery,
@@ -10,8 +9,8 @@ import {
 } from "@/rtk/api/firestoreApi";
 
 export function useMarketplaceOrders() {
-  const authUser = useAppSelector(selectUser);
-  const driverUid = authUser?.uid ?? "";
+  const { user } = useAuth();
+  const driverUid = user?.uid ?? "";
 
   const { data: orders, isLoading, error } = useFetchMarketplaceOrdersQuery(
     driverUid,
@@ -31,8 +30,8 @@ export function useMarketplaceOrders() {
 }
 
 export function useMyOrders() {
-  const authUser = useAppSelector(selectUser);
-  const driverUid = authUser?.uid ?? "";
+  const { user } = useAuth();
+  const driverUid = user?.uid ?? "";
 
   const { data: orders, isLoading, error } = useFetchMyOrdersQuery(
     driverUid,

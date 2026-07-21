@@ -2,7 +2,7 @@
 
 import { ChevronRight, Menu, X, Utensils, Users, Truck, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
@@ -13,7 +13,7 @@ export function Sidebar({
   isOpen: boolean;
   onToggle: () => void;
 }) {
-  const { user, signOut } = useAuth(false);
+  const { user, logout } = useAuth();
   const pathname = usePathname();
 
   const navigationItems = [
@@ -109,7 +109,7 @@ export function Sidebar({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => signOut()}
+                onClick={() => logout()}
                 className="h-8 w-8 flex-shrink-0"
                 title="Sign out"
               >

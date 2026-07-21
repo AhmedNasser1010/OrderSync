@@ -1,7 +1,7 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import useAuth from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import useUser from "@/hooks/useUser";
 import AutoLoginLoadingScreen from "@/components/AutoLoginLoadingScreen";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ export default function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isAuthLoading, logout, authListener } = useAuth(false);
+  const { user, isAuthLoading, logout } = useAuth();
   const { user: userData, isLoading: isUserDataLoading } = useUser();
   const router = useRouter();
   const pathname = usePathname();
@@ -28,10 +28,6 @@ export default function AuthProvider({
 
   const isAuthPage =
     pathname?.startsWith("/login") || pathname?.startsWith("/signup");
-
-  useEffect(() => {
-    authListener();
-  }, [authListener]);
 
   // Redirect unauthenticated users to login on protected pages
   useEffect(() => {
@@ -58,10 +54,9 @@ export default function AuthProvider({
     return <AutoLoginLoadingScreen />;
   }
 
-  // If user data is loaded but accessToken is empty/missing or role is not BUSINESS_MANAGER, show restricted dialog
+  // If user has no accessToken (business ID), show restricted dialog
   const accessToken = userData?.accessToken;
-  const userRole = userData?.userInfo?.role;
-  const isUnassigned = !accessToken || accessToken.trim() === "" || userRole !== "BUSINESS_MANAGER";
+  const isUnassigned = !accessToken || accessToken.trim() === "";
 
   if (isUnassigned) {
     return (
@@ -71,7 +66,7 @@ export default function AuthProvider({
             Access Restricted
           </h2>
           <p className="text-sm text-muted-foreground text-center pt-2">
-            You aren't assigned to any businesses yet
+            You aren&apos;t assigned to any businesses yet
             <br />
             Signed in as <strong>{user.email || "unknown@email.com"}</strong>
           </p>

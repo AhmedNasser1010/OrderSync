@@ -5,14 +5,13 @@ import {
   useFetchDriverUsersQuery,
   useDeleteDriverDocumentMutation,
 } from "@/rtk/api/firestoreApi";
-import { useAppSelector } from "@/rtk/hooks";
-import { selectUser } from "@/rtk/slices/authSlice";
+import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 import { DriversTable } from "@/components/dashboard/DriversTable";
 import { AddDriverDialog } from "@/components/dashboard/AddDriverDialog";
 
 export default function DriversPage() {
-  const partnerUid = useAppSelector(selectUser)?.uid ?? "";
+  const partnerUid = useAuth().user?.uid ?? "";
   const {
     data: drivers,
     isLoading,

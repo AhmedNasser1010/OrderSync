@@ -1,11 +1,11 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import useUser from "@/hooks/useUser";
 import { LocationProvider } from "./LocationProvider";
 
 export function LocationTracker({ children }: { children: ReactNode }) {
-  const { userData } = useAuth();
+  const { userData } = useUser();
   return (
     <LocationProvider online={userData?.online}>
       {children}

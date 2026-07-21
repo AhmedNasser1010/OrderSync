@@ -29,7 +29,6 @@ type Toggle = {
   };
   activeTab: MainTabTypes;
   optionsMenuView: boolean;
-  isAuthLoading: boolean;
 };
 
 const initialState: Toggle = {
@@ -59,7 +58,6 @@ const initialState: Toggle = {
   },
   activeTab: "RECEIVED",
   optionsMenuView: false,
-  isAuthLoading: true
 };
 
 export const toggleSlice = createSlice({
@@ -77,9 +75,6 @@ export const toggleSlice = createSlice({
     },
     setOptionsMenuView(state, { payload }) {
       state.optionsMenuView = payload;
-    },
-    setIsAuthLoading(state, { payload }) {
-      state.isAuthLoading = payload;
     }
   },
 });
@@ -89,13 +84,11 @@ export const {
   setCloseDayPopup,
   setActiveTab,
   setOptionsMenuView,
-  setIsAuthLoading
 } = toggleSlice.actions;
 
 export const deletePopup = (state: RootState) => state.toggle.deletePopup;
 export const closeDayPopup = (state: RootState) => state.toggle.closeDayPopup;
 export const activeTab = (state: RootState) => state.toggle.activeTab;
 export const optionMenuView = (state: RootState) => state.toggle.optionsMenuView;
-export const isAuthLoadingStatus = (state: RootState) => state.toggle.isAuthLoading;
 
 export default toggleSlice.reducer;

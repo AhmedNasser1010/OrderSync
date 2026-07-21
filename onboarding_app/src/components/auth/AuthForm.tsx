@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,11 +23,11 @@ interface AuthFormProps {
 
 export function AuthForm({ mode, onSuccess }: AuthFormProps) {
   const {
-    signIn,
-    signUp,
+    login,
+    signup,
     signInWithGoogle,
-    isLoading,
-    error: contextError,
+    isAuthLoading,
+    authErrorMsg,
   } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,14 +43,14 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
 
     try {
       if (isSignIn) {
-        await signIn(email, password);
+        await login(email, password);
       } else {
         // Validate password confirmation
         if (password !== confirmPassword) {
           setError("Passwords do not match");
           return;
         }
-        await signUp(email, password);
+        await signup(email, password);
       }
       onSuccess?.();
     } catch (err) {
@@ -59,7 +59,7 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
     }
   };
 
-  const displayError = error || contextError;
+  const displayError = error || authErrorMsg;
 
   const handleGoogleSignIn = async () => {
     setError(null);
@@ -117,7 +117,7 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
             variant="outline"
             className="w-full"
             onClick={handleGoogleSignIn}
-            disabled={isLoading}
+            disabled={isAuthLoading}
           >
             <svg
               className="mr-2 h-4 w-4"
@@ -158,7 +158,7 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
               placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
+              disabled={isAuthLoading}
               required
             />
           </div>
@@ -173,7 +173,7 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
               }
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
+              disabled={isAuthLoading}
               required
             />
           </div>
@@ -187,7 +187,7 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={isLoading}
+                disabled={isAuthLoading}
                 required
               />
             </div>
@@ -196,10 +196,10 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
           <Button
             type="submit"
             className="w-full"
-            disabled={isLoading}
+            disabled={isAuthLoading}
             size="lg"
           >
-            {isLoading ? "Loading..." : isSignIn ? "Sign In" : "Create Account"}
+            {isAuthLoading ? "Loading..." : isSignIn ? "Sign In" : "Create Account"}
           </Button>
         </form>
       </CardContent>

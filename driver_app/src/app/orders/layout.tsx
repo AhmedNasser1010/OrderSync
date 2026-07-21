@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import useUser from "@/hooks/useUser";
 import { useGeoPermission } from "@/components/LocationProvider";
 import { OnlineToggle } from "@/components/OnlineToggle";
 import { LocationPermissionBanner } from "@/components/LocationPermissionBanner";
@@ -9,7 +9,7 @@ import { BottomNav } from "@/components/orders/BottomNav";
 import { MapPin, MapPinOff } from "lucide-react";
 
 export default function OrdersLayout({ children }: { children: ReactNode }) {
-  const { userData } = useAuth();
+  const { userData } = useUser();
   const permissionState = useGeoPermission();
 
   const online = userData?.online ?? { byManager: false, byUser: false };

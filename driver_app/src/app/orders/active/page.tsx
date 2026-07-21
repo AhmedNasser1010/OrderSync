@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useMyOrders } from "@/hooks/useOrders";
 import { useOrderActions } from "@/hooks/useOrderActions";
-import { useAppSelector } from "@/rtk/hooks";
-import { selectUser } from "@/rtk/slices/authSlice";
+import { useAuth } from "@/contexts/AuthContext";
 import type { OrderType, OrderStatusType } from "@ordersync/types";
 import { MapPin, Package, Phone, ChevronRight } from "lucide-react";
 import { useCallback } from "react";
@@ -201,8 +200,8 @@ function ActiveOrderCard({
 }
 
 export default function ActiveOrdersPage() {
-  const authUser = useAppSelector(selectUser);
-  const driverUid = authUser?.uid ?? "";
+  const { user } = useAuth();
+  const driverUid = user?.uid ?? "";
   const { orders, isLoading, error } = useMyOrders();
   const actions = useOrderActions();
 

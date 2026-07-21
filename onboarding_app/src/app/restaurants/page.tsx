@@ -9,7 +9,7 @@ import { Plus, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/rtk/hooks";
-import { selectUser } from "@/rtk/slices/authSlice";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   useFetchUserDataQuery,
   useFetchBusinessesQuery,
@@ -20,7 +20,7 @@ const COOLDOWN_DURATION = 5; // seconds
 
 export default function RestaurantsPage() {
   const searchTerm = useAppSelector((state) => state.ui.searchTerm);
-  const authUser = useAppSelector(selectUser);
+  const authUser = useAuth().user;
   const [industryFilter, setIndustryFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [cooldown, setCooldown] = useState(0);

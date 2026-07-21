@@ -3,11 +3,11 @@
 import { useEffect } from "react";
 import { useRouter } from "@/i18n/routing";
 import { AuthForm } from "@/components/auth/AuthForm";
-import useAuth from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { user, isAuthLoading } = useAuth(false);
+  const { user, isAuthLoading } = useAuth();
 
   useEffect(() => {
     if (user && !isAuthLoading) {

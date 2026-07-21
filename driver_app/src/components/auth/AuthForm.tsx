@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,8 +25,8 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
   const {
     signIn,
     signInWithGoogle,
-    isLoading,
-    error: contextError,
+    isAuthLoading: isLoading,
+    authErrorMsg: contextError,
   } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

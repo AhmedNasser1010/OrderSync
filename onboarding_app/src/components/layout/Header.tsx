@@ -14,13 +14,13 @@ import {
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { setSearchTerm, toggleTheme } from "@/rtk/slices/uiSlice";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function Header({ sidebarOpen }: { sidebarOpen: boolean }) {
   const dispatch = useAppDispatch();
   const searchTerm = useAppSelector((state) => state.ui.searchTerm);
   const isDark = useAppSelector((state) => state.ui.isDark);
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
 
   // Apply theme on load and whenever it changes
   useEffect(() => {
@@ -100,7 +100,7 @@ export function Header({ sidebarOpen }: { sidebarOpen: boolean }) {
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-destructive"
-              onClick={() => signOut()}
+              onClick={() => logout()}
             >
               <LogOut className="mr-2 h-4 w-4" />
               <span>Logout</span>

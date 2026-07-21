@@ -1,9 +1,7 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { useAppSelector } from "@/rtk/hooks";
-import { selectIsInitializing } from "@/rtk/slices/authSlice";
+import { useAuth } from "@/contexts/AuthContext";
 import { LoaderCircle } from "lucide-react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AccountSetupScreen } from "@/components/approval/AccountSetupScreen";
@@ -13,9 +11,8 @@ type Props = {
   children: ReactNode;
 };
 
-export function AuthProvider({ children }: Props) {
-  const { isOnboarded, user } = useAuth();
-  const isInitializing = useAppSelector(selectIsInitializing);
+export function AuthGuard({ children }: Props) {
+  const { isOnboarded, user, isInitializing } = useAuth();
 
   if (isInitializing) {
     return (

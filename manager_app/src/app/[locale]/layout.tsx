@@ -5,7 +5,8 @@ import localFont from "next/font/local";
 import "../globals.css";
 
 import StoreProvider from "../StoreProvider";
-import AuthProvider from "../AuthProvider";
+import { AuthProvider } from "@/contexts/AuthContext";
+import AuthGuard from "../AuthProvider";
 import PopupProvider from "../PopupProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { HtmlAttributes } from "@/components/HtmlAttributes";
@@ -54,7 +55,9 @@ export default async function LocaleLayout({
         <StoreProvider>
           <ThemeProvider>
             <AuthProvider>
-              <PopupProvider>{children}</PopupProvider>
+              <AuthGuard>
+                <PopupProvider>{children}</PopupProvider>
+              </AuthGuard>
             </AuthProvider>
           </ThemeProvider>
         </StoreProvider>
