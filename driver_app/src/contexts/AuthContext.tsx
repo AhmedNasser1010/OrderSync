@@ -14,6 +14,7 @@ import { auth, db } from "@/lib/firebase";
 import {
   type User as FirebaseUser,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   onAuthStateChanged,
   signOut as firebaseSignOut,
   GoogleAuthProvider,
@@ -21,6 +22,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { setAuthCookie, clearAuthCookie } from "@/lib/auth-cookie";
+import { setUserRoleClaim } from "@/app/actions/setUserRoleClaim";
 
 interface AuthContextValue {
   user: FirebaseUser | null;
@@ -28,6 +30,7 @@ interface AuthContextValue {
   isInitializing: boolean;
   isOnboarded: boolean;
   signIn: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   authError: Error | null;
@@ -48,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const mountedRef = useRef(true);
   const initialCheckDone = useRef(false);
+  const isSigningUp = useRef(false);
 
   const clearAuthError = useCallback(() => {
     setAuthError(null);
@@ -115,15 +119,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const role = tokenResult.claims.role;
 
           if (role !== "DRIVER") {
-            await firebaseSignOut(auth);
-            clearAuthCookie();
-            setUser(null);
-            setIsOnboarded(false);
-            setIsAuthLoading(false);
-            setIsInitializing(false);
-            if (!initialCheckDone.current) {
-              initialCheckDone.current = true;
-              router.push("/auth/signin");
+            if (!isSigningUp.current) {
+              await firebaseSignOut(auth);
+              clearAuthCookie();
+              setUser(null);
+              setIsOnboarded(false);
+              setIsAuthLoading(false);
+              setIsInitializing(false);
+              if (!initialCheckDone.current) {
+                initialCheckDone.current = true;
+                router.push("/auth/signin");
+              }
             }
             return;
           }
@@ -208,15 +214,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signInWithGoogleFn = async (): Promise<void> => {
+  const signup = async (email: string, password: string): Promise<void> => {
     clearAuthError();
     setIsAuthLoading(true);
+    isSigningUp.current = true;
     try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      const firebaseUser = userCredential.user;
+      const uid = firebaseUser.uid;
 
-      const tokenResult = await result.user.getIdTokenResult();
+      const result = await setUserRoleClaim(uid, "DRIVER");
+      if (!result.success) {
+        throw new Error(result.error || "Failed to set role claim");
+      }
+
+      await firebaseUser.getIdToken(true);
+
+      const tokenResult = await firebaseUser.getIdTokenResult();
       const role = tokenResult.claims.role;
+
       if (role !== "DRIVER") {
         await firebaseSignOut(auth);
         clearAuthCookie();
@@ -225,6 +245,96 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error(
           "Access denied. Only drivers can access this app.",
         );
+      }
+
+      const onboarded = await fetchDriverProfile(uid);
+      setAuthCookie(firebaseUser.uid);
+      setUser(firebaseUser);
+      setIsOnboarded(onboarded);
+      setIsAuthLoading(false);
+      setIsInitializing(false);
+      initialCheckDone.current = true;
+      if (onboarded) {
+        router.push("/orders/active");
+      }
+    } catch (err: unknown) {
+      const firebaseErr = err as { message?: string; code?: string };
+      if (firebaseErr?.message?.includes("Access denied")) {
+        setIsAuthLoading(false);
+        setAuthError(err as Error);
+        setAuthErrorMsg(firebaseErr.message);
+        throw err;
+      }
+      onFailedLogin(firebaseErr);
+      throw err;
+    } finally {
+      isSigningUp.current = false;
+    }
+  };
+
+  const signInWithGoogleFn = async (): Promise<void> => {
+    clearAuthError();
+    setIsAuthLoading(true);
+    isSigningUp.current = true;
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const googleUser = result.user;
+      const userDocRef = doc(db, "drivers", googleUser.uid);
+      const docSnapshot = await getDoc(userDocRef);
+
+      if (!docSnapshot.exists()) {
+        const claimResult = await setUserRoleClaim(
+          googleUser.uid,
+          "DRIVER",
+        );
+        if (!claimResult.success) {
+          throw new Error(claimResult.error || "Failed to set role claim");
+        }
+
+        await googleUser.getIdToken(true);
+
+        const tokenResult = await googleUser.getIdTokenResult();
+        const role = tokenResult.claims.role;
+
+        if (role !== "DRIVER") {
+          await firebaseSignOut(auth);
+          clearAuthCookie();
+          setUser(null);
+          setIsAuthLoading(false);
+          throw new Error(
+            "Access denied. Only drivers can access this app.",
+          );
+        }
+
+        const onboarded = await fetchDriverProfile(googleUser.uid);
+        setAuthCookie(googleUser.uid);
+        setUser(googleUser);
+        setIsOnboarded(onboarded);
+        setIsAuthLoading(false);
+        setIsInitializing(false);
+        initialCheckDone.current = true;
+      } else {
+        const tokenResult = await googleUser.getIdTokenResult();
+        const role = tokenResult.claims.role;
+
+        if (role !== "DRIVER") {
+          await firebaseSignOut(auth);
+          clearAuthCookie();
+          setUser(null);
+          setIsAuthLoading(false);
+          throw new Error(
+            "Access denied. Only drivers can access this app.",
+          );
+        }
+
+        const onboarded = await fetchDriverProfile(googleUser.uid);
+        setAuthCookie(googleUser.uid);
+        setUser(googleUser);
+        setIsOnboarded(onboarded);
+        setIsAuthLoading(false);
+        setIsInitializing(false);
+        initialCheckDone.current = true;
       }
     } catch (err: unknown) {
       const firebaseErr = err as { message?: string; code?: string };
@@ -242,6 +352,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           : firebaseErr.message || "Google sign in failed";
       onFailedLogin(new Error(friendlyMessage));
       throw err;
+    } finally {
+      isSigningUp.current = false;
     }
   };
 
@@ -262,6 +374,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isInitializing,
         isOnboarded,
         signIn,
+        signup,
         signInWithGoogle: signInWithGoogleFn,
         logout,
         authError,

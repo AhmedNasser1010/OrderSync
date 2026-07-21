@@ -24,6 +24,7 @@ interface AuthFormProps {
 export function AuthForm({ mode, onSuccess }: AuthFormProps) {
   const {
     signIn,
+    signup,
     signInWithGoogle,
     isAuthLoading: isLoading,
     authErrorMsg: contextError,
@@ -48,7 +49,7 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
           setError("Passwords do not match");
           return;
         }
-        await signIn(email, password);
+        await signup(email, password);
       }
       onSuccess?.();
     } catch (err) {

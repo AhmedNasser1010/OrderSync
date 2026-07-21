@@ -11,7 +11,7 @@ import {
 } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/rtk/hooks";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 import {
   type User as FirebaseUser,
   signInWithEmailAndPassword,
@@ -21,7 +21,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { setUserUid } from "@/rtk/slices/constantsSlice";
+import { setUserRoleClaim } from "@/app/actions/setUserRoleClaim";
 
 interface AuthContextValue {
   user: FirebaseUser | null;
@@ -47,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const mountedRef = useRef(true);
   const initialCheckDone = useRef(false);
+  const isSigningUp = useRef(false);
 
   const clearAuthError = useCallback(() => {
     setAuthError(null);
@@ -87,7 +90,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setAuthErrorMsg(msg);
   }, []);
 
-  // Single onAuthStateChanged listener — the source of truth
   useEffect(() => {
     mountedRef.current = true;
 
@@ -101,13 +103,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const role = tokenResult.claims.role;
 
           if (role !== "BUSINESS_MANAGER") {
-            await firebaseSignOut(auth);
-            dispatch(setUserUid(null));
-            setUser(null);
-            setIsAuthLoading(false);
-            if (!initialCheckDone.current) {
-              initialCheckDone.current = true;
-              router.push("/login");
+            if (!isSigningUp.current) {
+              await firebaseSignOut(auth);
+              dispatch(setUserUid(null));
+              setUser(null);
+              setIsAuthLoading(false);
+              if (!initialCheckDone.current) {
+                initialCheckDone.current = true;
+                router.push("/login");
+              }
             }
             return;
           }
@@ -182,15 +186,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = async (email: string, password: string): Promise<void> => {
     clearAuthError();
     setIsAuthLoading(true);
+    isSigningUp.current = true;
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
         password,
       );
+      const firebaseUser = userCredential.user;
+      const uid = firebaseUser.uid;
 
-      const tokenResult = await userCredential.user.getIdTokenResult();
+      const result = await setUserRoleClaim(uid, "BUSINESS_MANAGER");
+      if (!result.success) {
+        throw new Error(result.error || "Failed to set role claim");
+      }
+
+      await firebaseUser.getIdToken(true);
+
+      const tokenResult = await firebaseUser.getIdTokenResult();
       const role = tokenResult.claims.role;
+
       if (role !== "BUSINESS_MANAGER") {
         await firebaseSignOut(auth);
         setUser(null);
@@ -199,6 +214,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           "Access denied. Only business managers can access this app.",
         );
       }
+
+      dispatch(setUserUid(firebaseUser.uid));
+      setUser(firebaseUser);
+      setIsAuthLoading(false);
+      initialCheckDone.current = true;
+      router.push("/");
     } catch (err: any) {
       if (err?.message?.includes("Access denied")) {
         setIsAuthLoading(false);
@@ -208,25 +229,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       onFailedLogin(err);
       throw err;
+    } finally {
+      isSigningUp.current = false;
     }
   };
 
   const signInWithGoogleFn = async (): Promise<void> => {
     clearAuthError();
     setIsAuthLoading(true);
+    isSigningUp.current = true;
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
+      const googleUser = result.user;
+      const userDocRef = doc(db, "users", googleUser.uid);
+      const docSnapshot = await getDoc(userDocRef);
 
-      const tokenResult = await result.user.getIdTokenResult();
-      const role = tokenResult.claims.role;
-      if (role !== "BUSINESS_MANAGER") {
-        await firebaseSignOut(auth);
-        setUser(null);
-        dispatch(setUserUid(null));
-        throw new Error(
-          "Access denied. Only business managers can access this app.",
+      if (!docSnapshot.exists()) {
+        const claimResult = await setUserRoleClaim(
+          googleUser.uid,
+          "BUSINESS_MANAGER",
         );
+        if (!claimResult.success) {
+          throw new Error(claimResult.error || "Failed to set role claim");
+        }
+
+        await googleUser.getIdToken(true);
+
+        const tokenResult = await googleUser.getIdTokenResult();
+        const role = tokenResult.claims.role;
+
+        if (role !== "BUSINESS_MANAGER") {
+          await firebaseSignOut(auth);
+          setUser(null);
+          dispatch(setUserUid(null));
+          throw new Error(
+            "Access denied. Only business managers can access this app.",
+          );
+        }
+      } else {
+        const tokenResult = await googleUser.getIdTokenResult();
+        const role = tokenResult.claims.role;
+
+        if (role !== "BUSINESS_MANAGER") {
+          await firebaseSignOut(auth);
+          setUser(null);
+          dispatch(setUserUid(null));
+          throw new Error(
+            "Access denied. Only business managers can access this app.",
+          );
+        }
       }
     } catch (err: any) {
       if (err?.message?.includes("Access denied")) {
@@ -244,6 +296,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           : firebaseError.message || "Google sign in failed";
       onFailedLogin(new Error(friendlyMessage));
       throw err;
+    } finally {
+      isSigningUp.current = false;
     }
   };
 

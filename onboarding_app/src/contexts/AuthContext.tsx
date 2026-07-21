@@ -50,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const mountedRef = useRef(true);
   const initialCheckDone = useRef(false);
+  const isSigningUp = useRef(false);
 
   const clearAuthError = useCallback(() => {
     setAuthError(null);
@@ -103,14 +104,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const role = tokenResult.claims.role;
 
           if (role !== "BUSINESSES_CREATOR") {
-            await firebaseSignOut(auth);
-            dispatch(setUserUid(null));
-            clearAuthCookie();
-            setUser(null);
-            setIsAuthLoading(false);
-            if (!initialCheckDone.current) {
-              initialCheckDone.current = true;
-              router.push("/auth/signup");
+            if (!isSigningUp.current) {
+              await firebaseSignOut(auth);
+              dispatch(setUserUid(null));
+              clearAuthCookie();
+              setUser(null);
+              setIsAuthLoading(false);
+              if (!initialCheckDone.current) {
+                initialCheckDone.current = true;
+                router.push("/auth/signup");
+              }
             }
             return;
           }
@@ -189,6 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = async (email: string, password: string): Promise<void> => {
     clearAuthError();
     setIsAuthLoading(true);
+    isSigningUp.current = true;
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -228,6 +232,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           "Access denied. Only businesses creators can access this app.",
         );
       }
+
+      dispatch(setUserUid(firebaseUser.uid));
+      setAuthCookie(firebaseUser.uid);
+      setUser(firebaseUser);
+      setIsAuthLoading(false);
+      initialCheckDone.current = true;
+      router.push("/restaurants");
     } catch (err: unknown) {
       const firebaseErr = err as { message?: string; code?: string };
       if (firebaseErr?.message?.includes("Access denied")) {
@@ -238,12 +249,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       onFailedLogin(firebaseErr);
       throw err;
+    } finally {
+      isSigningUp.current = false;
     }
   };
 
   const signInWithGoogleFn = async (): Promise<void> => {
     clearAuthError();
     setIsAuthLoading(true);
+    isSigningUp.current = true;
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
@@ -283,6 +297,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           "Access denied. Only businesses creators can access this app.",
         );
       }
+
+      dispatch(setUserUid(googleUser.uid));
+      setAuthCookie(googleUser.uid);
+      setUser(googleUser);
+      setIsAuthLoading(false);
+      initialCheckDone.current = true;
+      router.push("/restaurants");
     } catch (err: unknown) {
       const firebaseErr = err as { message?: string; code?: string };
       if (firebaseErr?.message?.includes("Access denied")) {
@@ -299,6 +320,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           : firebaseErr.message || "Google sign in failed";
       onFailedLogin(new Error(friendlyMessage));
       throw err;
+    } finally {
+      isSigningUp.current = false;
     }
   };
 
