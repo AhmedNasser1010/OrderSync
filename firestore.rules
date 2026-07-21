@@ -59,15 +59,15 @@ service cloud.firestore {
     }
 
     function isManager() {
-      return isSignedIn() && request.auth.token.role == 'BUSINESS_MANAGER';
+      return hasUsersDoc() && getUsersDoc().userInfo.role == 'BUSINESS_MANAGER';
     }
 
     function isPartner() {
-      return isSignedIn() && request.auth.token.role == 'BUSINESSES_CREATOR';
+      return hasUsersDoc() && getUsersDoc().userInfo.role == 'BUSINESSES_CREATOR';
     }
 
     function isRider() {
-      return isSignedIn() && request.auth.token.role == 'DRIVER';
+      return isSignedIn() && exists(/databases/$(database)/documents/drivers/$(request.auth.uid));
     }
 
     function managerAccessToken() {
@@ -197,6 +197,7 @@ service cloud.firestore {
 
       // Drivers can read orders assigned to them.
       allow read: if isRider()
+        && resourceData().assignment != null
         && resourceData().assignment.driverUid == request.auth.uid;
 
       // --- CREATE permissions ---
