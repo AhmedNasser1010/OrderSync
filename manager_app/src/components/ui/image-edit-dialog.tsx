@@ -36,7 +36,7 @@ export function ImageEditDialog({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-end md:items-center justify-center z-[60]">
       <div className="w-full md:w-96 bg-card border border-border rounded-t-lg md:rounded-lg p-6 shadow-lg">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">{t("title")}</h2>
