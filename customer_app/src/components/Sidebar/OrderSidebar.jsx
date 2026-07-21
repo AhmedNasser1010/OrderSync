@@ -1,27 +1,29 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet'
 import { latLngBounds } from 'leaflet'
 import styled from 'styled-components'
 import { IoIosCloseCircleOutline } from 'react-icons/io'
-import { IoSend } from 'react-icons/io5'
+import { IoSend, IoCheckmarkCircle, IoCheckmarkDone } from 'react-icons/io5'
 import { GiCook } from 'react-icons/gi'
 import { MdDeliveryDining } from 'react-icons/md'
 import { useTranslation } from 'react-i18next'
-
-import Timeline from '@mui/lab/Timeline'
-import TimelineItem from '@mui/lab/TimelineItem'
-import TimelineSeparator from '@mui/lab/TimelineSeparator'
-import TimelineConnector from '@mui/lab/TimelineConnector'
-import TimelineContent from '@mui/lab/TimelineContent'
-import TimelineDot from '@mui/lab/TimelineDot'
-import Typography from '@mui/material/Typography'
 
 import { toggleOrderSidebar } from '../../rtk/slices/toggleSlice'
 import useLanguageDirection from '../../hooks/useLanguageDirection'
 import { restaurantMapIcon, driverMapIcon, personMapIcon } from './mapCustomMarker'
 import useOrder from '../../hooks/useOrder'
 import { useDriverLocation } from '../../hooks/useDriverLocation'
+
+const STEPS = [
+  { key: 'placed', statuses: ['RECEIVED'], icon: IoSend, label: 'Placed', sublabel: 'Order placed successfully' },
+  { key: 'confirmed', statuses: ['ACCEPTED'], icon: IoCheckmarkCircle, label: 'Confirmed', sublabel: 'Restaurant accepted' },
+  { key: 'preparing', statuses: ['PREPARING'], icon: GiCook, label: 'Preparing', sublabel: 'Being prepared' },
+  { key: 'ontheway', statuses: ['READY', 'RESERVED', 'PICKED_UP', 'ON_ROUTE'], icon: MdDeliveryDining, label: 'On the Way', sublabel: 'On its way to you' },
+  { key: 'delivered', statuses: ['DELIVERED', 'GIVEN_FEEDBACK'], icon: IoCheckmarkDone, label: 'Delivered', sublabel: 'Arrived at your door' },
+]
+
+const ERROR_STATUSES = ['CANCELED', 'REJECTED', 'VOIDED']
 
 const MapContainerStyled = styled(MapContainer)`
   width: 100%;
@@ -58,6 +60,82 @@ function FitMapToMarkers({ points }) {
   return null
 }
 
+function StepIndicator({ step, index, currentStepIndex, totalSteps }) {
+  const { t } = useTranslation()
+  const isCompleted = index < currentStepIndex
+  const isActive = index === currentStepIndex
+  const isPending = index > currentStepIndex
+  const isLast = index === totalSteps - 1
+
+  return (
+    <div className="flex items-stretch gap-3">
+      <div className="flex flex-col items-center">
+        <div
+          className={`
+            relative flex items-center justify-center rounded-full transition-all duration-500
+            ${isCompleted ? 'w-7 h-7 bg-color-11' : ''}
+            ${isActive ? 'w-8 h-8 bg-color-2 order-pulse' : ''}
+            ${isPending ? 'w-7 h-7 border-2 border-color-7 bg-white' : ''}
+          `}
+        >
+          {isCompleted && <IoCheckmarkDone className="text-white text-sm" />}
+          {isActive && <step.icon className="text-white text-sm" />}
+          {isPending && <step.icon className="text-color-7 text-xs" />}
+        </div>
+        {!isLast && (
+          <div
+            className={`
+              w-0.5 flex-1 min-h-[32px] transition-all duration-500
+              ${isCompleted ? 'bg-color-11' : ''}
+              ${isActive ? 'bg-gradient-to-b from-color-2 to-color-7' : ''}
+              ${isPending ? 'bg-color-7 opacity-40' : ''}
+            `}
+          />
+        )}
+      </div>
+
+      <div className={`pb-6 ${isLast ? 'pb-0' : ''}`}>
+        <p
+          className={`
+            text-sm leading-tight transition-all duration-300
+            ${isCompleted ? 'text-color-1 font-ProximaNovaSemiBold' : ''}
+            ${isActive ? 'text-color-2 font-ProximaNovaBold text-base' : ''}
+            ${isPending ? 'text-color-5 font-ProximaNovaMed' : ''}
+          `}
+        >
+          {t(step.label)}
+        </p>
+        {(isCompleted || isActive) && (
+          <p className="text-xs text-color-5 font-ProximaNovaThin mt-0.5 leading-tight">
+            {t(step.sublabel)}
+          </p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function ErrorBanner({ status, reason, t }) {
+  const labels = {
+    CANCELED: 'Order Canceled',
+    REJECTED: 'Order Rejected',
+    VOIDED: 'Order Voided'
+  }
+
+  return (
+    <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-5">
+      <p className="text-red-600 font-ProximaNovaSemiBold text-sm">
+        {t(labels[status] || 'Order Ended')}
+      </p>
+      {reason && (
+        <p className="text-red-400 font-ProximaNovaThin text-xs mt-1">
+          {t(reason)}
+        </p>
+      )}
+    </div>
+  )
+}
+
 function OrderSidebar() {
   const dispatch = useDispatch()
   const direction = useLanguageDirection()
@@ -79,6 +157,17 @@ function OrderSidebar() {
     driverLocation
   ]
 
+  const currentStatus = trackedOrderData?.status?.current
+
+  const currentStepIndex = useMemo(() => {
+    if (!currentStatus) return 0
+    const idx = STEPS.findIndex((step) => step.statuses.includes(currentStatus))
+    return idx >= 0 ? idx : 0
+  }, [currentStatus])
+
+  const isError = ERROR_STATUSES.includes(currentStatus)
+  const isMapLive = ['READY', 'RESERVED', 'PICKED_UP', 'ON_ROUTE'].includes(currentStatus)
+
   const handleCloseSidebar = () => {
     dispatch(toggleOrderSidebar())
     document.body.classList.remove('overflow-hidden')
@@ -96,102 +185,34 @@ function OrderSidebar() {
           {t('Order Tracking')}
         </h2>
 
-        <div>
-          <Timeline position="alternate" style={{ direction: 'ltr' }}>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot color="primary">
-                  <IoSend />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: '12px', px: 2 }}>
-                <Typography
-                  variant="h6"
-                  component="span"
-                  style={{ fontFamily: 'ProximaNova Condensed Med !important' }}>
-                  {t('Dispatched')}
-                </Typography>
-                <Typography
-                  style={{
-                    fontFamily: 'ProximaNova Condensed Thin',
-                    lineHeight: '20px',
-                    color: 'gray'
-                  }}>
-                  {t('Successfully dispatched')}
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot
-                  color={
-                    trackedOrderData?.status?.current === 'PREPARING' ||
-                    trackedOrderData?.status?.current === 'PICK_UP' ||
-                    trackedOrderData?.status?.current === 'ON_ROUTE'
-                      ? 'primary'
-                      : 'grey'
-                  }>
-                  <GiCook />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: '12px', px: 2 }}>
-                <Typography
-                  variant="h6"
-                  component="span"
-                  style={{ fontFamily: 'ProximaNova Condensed Med !important' }}>
-                  {t('Preparation')}
-                </Typography>
-                <Typography
-                  style={{
-                    fontFamily: 'ProximaNova Condensed Thin',
-                    lineHeight: '20px',
-                    color: 'gray'
-                  }}>
-                  {t('Currently being prepared')}
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-            <TimelineItem>
-              <TimelineSeparator>
-                <TimelineConnector />
-                <TimelineDot
-                  color={
-                    trackedOrderData?.status?.current === 'PICK_UP' ||
-                    trackedOrderData?.status?.current === 'ON_ROUTE'
-                      ? 'primary'
-                      : 'grey'
-                  }>
-                  <MdDeliveryDining />
-                </TimelineDot>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineContent sx={{ py: '12px', px: 2 }}>
-                <Typography
-                  variant="h6"
-                  component="span"
-                  style={{ fontFamily: 'ProximaNova Condensed Med !important' }}>
-                  {t('Delivery')}
-                </Typography>
-                <Typography
-                  style={{
-                    fontFamily: 'ProximaNova Condensed Thin',
-                    lineHeight: '20px',
-                    color: 'gray'
-                  }}>
-                  {t('On its way to you')}
-                </Typography>
-              </TimelineContent>
-            </TimelineItem>
-          </Timeline>
+        {isError && trackedOrderData && (
+          <ErrorBanner
+            status={currentStatus}
+            reason={trackedOrderData?.status?.cancellationReason}
+            t={t}
+          />
+        )}
 
+        {!isError && (
+          <div className="mb-5 px-1">
+            {STEPS.map((step, index) => (
+              <StepIndicator
+                key={step.key}
+                step={step}
+                index={index}
+                currentStepIndex={currentStepIndex}
+                totalSteps={STEPS.length}
+              />
+            ))}
+          </div>
+        )}
+
+        <div className="relative mb-4">
           <MapContainerStyled
             center={user?.locations?.home?.latlng || defaultCenter}
             zoom={13}
-            scrollWheelZoom={true}>
+            scrollWheelZoom={isMapLive}
+            className={!isMapLive ? 'blur-sm pointer-events-none' : ''}>
             <FitMapToMarkers points={mapPoints} />
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -230,26 +251,37 @@ function OrderSidebar() {
               />
             )}
           </MapContainerStyled>
+          {!isMapLive && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2.5 shadow-md">
+                <p className="text-color-1 font-ProximaNovaSemiBold text-sm text-center">
+                  {t('Live tracking available soon')}
+                </p>
+                <p className="text-color-5 font-ProximaNovaThin text-xs text-center mt-0.5">
+                  {t("You'll see your driver in real time")}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
 
-          <div className="flex relative mt-10 mb-10">
-            {trackedOrderData?.status?.current === 'RECEIVED' ? (
-              <>
-                {/*<button onMouseUp={handleOrderEdit} className='w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-color-11'>{t('Edit Items')}</button>*/}
-                <button
-                  onMouseUp={cancelOrder}
-                  className="w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-red-500">
-                  {t('Order Cancel')}
-                </button>
-              </>
-            ) : (
-              <button className="w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-gray-500">
-                {t('Cancellations and modifications')}
-                <br />
-                {currentRes?.business?.contactNumbers &&
-                  currentRes?.business?.contactNumbers[0].slice(2)}
+        <div className="flex relative mt-10 mb-10">
+          {currentStatus === 'RECEIVED' ? (
+            <>
+              <button
+                onMouseUp={cancelOrder}
+                className="w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-red-500 rounded-xl">
+                {t('Order Cancel')}
               </button>
-            )}
-          </div>
+            </>
+          ) : (
+            <button className="w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-color-5 rounded-xl">
+              {t('Cancellations and modifications')}
+              <br />
+              {currentRes?.business?.contactNumbers &&
+                currentRes?.business?.contactNumbers[0].slice(2)}
+            </button>
+          )}
         </div>
       </div>
 

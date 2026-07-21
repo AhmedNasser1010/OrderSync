@@ -234,3 +234,19 @@ body[dir="ltr"] {
 .warning-placeholder::placeholder {
     color: #F59E0B;
 }
+
+@keyframes order-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(252, 128, 25, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(252, 128, 25, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(252, 128, 25, 0);
+  }
+}
+
+.order-pulse {
+  animation: order-pulse 2s ease-in-out infinite;
+}
