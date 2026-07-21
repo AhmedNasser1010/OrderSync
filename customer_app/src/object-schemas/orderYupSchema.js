@@ -26,7 +26,7 @@ const orderYupSchema = yup.object().shape({
       id: yup.string().required(),
       name: yup.string().required(),
       quantity: yup.number().min(1).required(),
-      selectedSize: yup.string().required(),
+      selectedSize: yup.string().nullable(),
       discountCode: yup.string().nullable(),
     })
   ).min(1).required(),

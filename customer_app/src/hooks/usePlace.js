@@ -142,8 +142,8 @@ const usePlace = () => {
       customerUid: user.uid,
       business: {
         id: currentRes.accessToken,
-        name: currentRes.name,
-        phone: currentRes.phone,
+        name: currentRes.profile.name,
+        phone: currentRes.owner.phone,
         address: currentRes.profile.address,
         latlng: currentRes.profile.latlng,
       },
@@ -159,7 +159,7 @@ const usePlace = () => {
           id: item.id,
           name: menuItem?.title || '',
           quantity: item.quantity,
-          selectedSize: item.selectedSize,
+          selectedSize: item.selectedSize || null,
           discountCode: item.discount?.code || undefined,
         }
       }),
