@@ -50,7 +50,7 @@ export function ActionsMenu({ items, className = "" }: ActionsMenuProps) {
       </button>
 
       {open && (
-        <div className="absolute left-0 mt-2 w-48 bg-card border border-border rounded-md shadow-lg z-50">
+        <div className="absolute end-0 mt-2 w-48 bg-card border border-border rounded-md shadow-lg z-50">
           <div role="menu" className="flex flex-col py-1">
             {items.map((it) => (
               <button
@@ -59,7 +59,7 @@ export function ActionsMenu({ items, className = "" }: ActionsMenuProps) {
                   it.onClick();
                   setOpen(false);
                 }}
-                className={`w-full text-left px-3 py-2 text-sm hover:bg-muted/60 flex items-center gap-2 ${
+                className={`w-full text-start px-3 py-2 text-sm hover:bg-muted/60 flex items-center gap-2 ${
                   it.destructive ? "text-destructive" : "text-foreground"
                 }`}
                 role="menuitem"

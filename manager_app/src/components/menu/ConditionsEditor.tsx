@@ -118,16 +118,14 @@ export function ConditionsEditor({ conditions, onChange }: ConditionsEditorProps
             className="w-20"
           />
 
-          {conditions.rules.length > 1 && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-xs"
-              onClick={() => removeRule(index)}
-            >
-              <Trash2 size={14} />
-            </Button>
-          )}
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            onClick={() => removeRule(index)}
+          >
+            <Trash2 size={14} />
+          </Button>
         </div>
       ))}
 
@@ -138,7 +136,7 @@ export function ConditionsEditor({ conditions, onChange }: ConditionsEditorProps
         onClick={addRule}
         className="w-full"
       >
-        <Plus size={14} className="mr-1" />
+        <Plus size={14} className="me-1" />
         {t("addCondition")}
       </Button>
     </div>

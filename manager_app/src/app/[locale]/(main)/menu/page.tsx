@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Plus, Cloud, UtensilsCrossed, Percent, Trash2 } from "lucide-react";
+import { Plus, Cloud, UtensilsCrossed, Percent, Trash2, RotateCcw } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMenuData } from "@/hooks/useMenuData";
 import { CategoryHeader } from "@/components/menu/category-header";
@@ -35,6 +35,8 @@ export default function MenuManagementPage() {
     menuData,
     isSyncing,
     syncMessage,
+    hasChanges,
+    revertChanges,
     updateCategory,
     updateMenuItem,
     toggleItemVisibility,
@@ -169,6 +171,26 @@ export default function MenuManagementPage() {
     setDiscountDialogOpen(true);
   };
 
+  const handleDiscountDelete = () => {
+    if (!discountContext || !editingDiscount) return;
+
+    switch (discountContext.type) {
+      case "item":
+        if (discountContext.itemId) {
+          dispatch(removeItemDiscount({ itemId: discountContext.itemId }));
+        }
+        break;
+      case "category":
+        if (discountContext.categoryId) {
+          dispatch(removeCategoryDiscount({ categoryId: discountContext.categoryId }));
+        }
+        break;
+      case "order":
+        dispatch(removeOrderDiscount({ id: editingDiscount.id }));
+        break;
+    }
+  };
+
   const handleDiscountSubmit = (discount: DiscountObject) => {
     if (!discountContext) return;
 
@@ -246,16 +268,27 @@ export default function MenuManagementPage() {
 
           <Button
             onClick={syncToCloud}
-            disabled={isSyncing}
+            disabled={isSyncing || !hasChanges}
             className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
           >
             <Cloud size={18} />
             <span>{isSyncing ? t("syncing") : t("sync")}</span>
           </Button>
+
+          {hasChanges && (
+            <Button
+              onClick={revertChanges}
+              variant="outline"
+              className="w-full gap-2"
+            >
+              <RotateCcw size={18} />
+              <span>{t("revertChanges")}</span>
+            </Button>
+          )}
         </div>
 
         {syncMessage && (
-          <div className="mb-6 p-3 bg-accent/20 border border-accent rounded-md text-sm text-accent">
+          <div className="mb-6 p-3 bg-accent/20 border border-accent rounded-md text-sm text-foreground">
             {syncMessage}
           </div>
         )}
@@ -370,7 +403,7 @@ export default function MenuManagementPage() {
                 />
 
                 {expandedCategories.has(category.id) && (
-                  <div className="pl-2 sm:pl-4 space-y-3">
+                  <div className="ps-2 sm:ps-4 space-y-3">
                     {category.items.length === 0 ? (
                       <div className="p-4 bg-card/30 border border-border rounded-lg text-center">
                         <p className="text-sm text-muted-foreground mb-3">
@@ -504,6 +537,7 @@ export default function MenuManagementPage() {
         open={discountDialogOpen}
         onOpenChange={setDiscountDialogOpen}
         onSubmit={handleDiscountSubmit}
+        onDelete={editingDiscount ? handleDiscountDelete : undefined}
         level={discountDialogLevel}
         initialData={editingDiscount}
         isEditing={!!editingDiscount}

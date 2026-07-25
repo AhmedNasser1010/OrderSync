@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { X } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WidgetHelp } from "@/components/ui/widget-help";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ interface DiscountDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (discount: DiscountObject) => void;
+  onDelete?: () => void;
   level: DiscountLevel;
   initialData?: DiscountObject;
   isEditing?: boolean;
@@ -36,12 +37,12 @@ export function DiscountDialog({
   open,
   onOpenChange,
   onSubmit,
+  onDelete,
   level,
   initialData,
   isEditing = false,
 }: DiscountDialogProps) {
   const t = useTranslations("DiscountDialog");
-  const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
   const [discountType, setDiscountType] = useState<DiscountType>("P");
   const [value, setValue] = useState<number>(0);
@@ -60,7 +61,6 @@ export function DiscountDialog({
 
   useEffect(() => {
     if (initialData) {
-      setCode(initialData.code);
       setMessage(initialData.message);
       setDiscountType(initialData.type);
       setValue(initialData.value);
@@ -92,7 +92,6 @@ export function DiscountDialog({
   }, [initialData, open]);
 
   const resetForm = () => {
-    setCode("");
     setMessage("");
     setDiscountType("P");
     setValue(0);
@@ -146,11 +145,11 @@ export function DiscountDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!code.trim() || value <= 0) return;
+    if (value <= 0) return;
 
     const discount: DiscountObject = {
       id: initialData?.id ?? crypto.randomUUID(),
-      code: code.trim().toUpperCase(),
+      code: `${discountType}-${value}`.toUpperCase(),
       message: message.trim(),
       level,
       type: discountType,
@@ -207,27 +206,13 @@ export function DiscountDialog({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
-              {t("codeLabel")}
-              <WidgetHelp widgetKey="discountCodeHelp" />
-            </label>
-            <Input
-              type="text"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder={t("codePlaceholder")}
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
               {t("messageLabel")}
               <WidgetHelp widgetKey="discountMessageHelp" />
               {value > 0 && (
                 <button
                   type="button"
                   onClick={generateAutoMessage}
-                  className="ml-auto text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+                  className="ms-auto text-xs text-primary hover:text-primary/80 font-medium transition-colors"
                 >
                   {t("autoFillButton")}
                 </button>
@@ -355,7 +340,7 @@ export function DiscountDialog({
             </div>
 
             {timeRulesEnabled && (
-              <div className="space-y-2 pl-6">
+              <div className="space-y-2 ps-6">
                 <div className="flex gap-1">
                   {DAY_KEYS.map((day, i) => (
                     <button
@@ -488,6 +473,20 @@ export function DiscountDialog({
               {t("cancel")}
             </Button>
           </div>
+          {isEditing && onDelete && (
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => {
+                onDelete();
+                onOpenChange(false);
+              }}
+              className="w-full"
+            >
+              <Trash2 size={14} className="me-1.5" />
+              {t("deleteDiscount")}
+            </Button>
+          )}
         </form>
       </div>
     </div>

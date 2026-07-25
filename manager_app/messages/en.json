@@ -179,10 +179,6 @@
         "title": "Target Segments",
         "description": "Choose which customer groups this discount applies to. Leave empty to apply to all customers. Segments include: New (registered < 30 days), Active (ordered within 14 days), Inactive (no order in 30 days), VIP (high spenders or frequent buyers), and At Risk (previously active but haven't ordered in 21+ days)."
       },
-      "discountCodeHelp": {
-        "title": "Discount Code",
-        "description": "A unique code that identifies this discount. Use the format TYPE-VALUE, e.g. P-20 for 20% off, FIXED-10 for $10 off. This code is used internally and for promo codes that customers enter at checkout."
-      },
       "discountMessageHelp": {
         "title": "Message",
         "description": "The text displayed to customers when this discount is applied. Keep it short and clear, e.g. '20% off for new customers!' or 'Summer sale — 15% off all items'."
@@ -238,6 +234,7 @@
       "addCategory": "Category",
       "sync": "Sync",
       "syncing": "Syncing...",
+      "revertChanges": "Revert Changes",
       "noCategories": "No categories yet",
       "createFirstCategory": "Create First Category",
       "noItems": "No items in this category",
@@ -246,7 +243,9 @@
       "lastSynced": "Last synced:",
       "orderDiscounts": "Order Discounts",
       "addOrderDiscount": "Add Order Discount",
-      "noOrderDiscounts": "No order discounts yet"
+      "noOrderDiscounts": "No order discounts yet",
+      "editDiscount": "Edit Discount",
+      "removeDiscount": "Remove Discount"
     },
     "categoryForm": {
       "editTitle": "Edit Category",
@@ -324,8 +323,6 @@
   "DiscountDialog": {
     "addTitle": "Add Discount",
     "editTitle": "Edit Discount",
-    "codeLabel": "Discount Code",
-    "codePlaceholder": "e.g. P-20 or FIXED-15",
     "messageLabel": "Message",
     "messagePlaceholder": "e.g. 20% off your order!",
     "typeLabel": "Type",
@@ -347,6 +344,7 @@
     "saveChanges": "Save Changes",
     "addDiscount": "Add Discount",
     "cancel": "Cancel",
+    "deleteDiscount": "Delete Discount",
     "autoFillButton": "Auto Fill",
     "autoFill": {
       "off": "off",

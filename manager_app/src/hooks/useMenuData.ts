@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import type { MenuData, MenuCategory } from "@/lib/types/types";
-import type { ItemType, MainMenuType } from "@ordersync/types";
+import type { ItemType, MainMenuType, DiscountObject } from "@ordersync/types";
 import { useAppDispatch, useAppSelector } from "@/lib/rtk/hooks";
 import { userUid } from "@/lib/rtk/slices/constantsSlice";
 import {
@@ -35,6 +35,7 @@ interface RawMenuCategory {
   visibility?: boolean;
   visible?: boolean;
   topMenu?: boolean;
+  discount?: DiscountObject;
   createdAt?: number | string;
   updatedAt?: number | string;
   timestamp?: number | string;
@@ -54,6 +55,7 @@ interface RawMenuItem {
   visibility?: boolean;
   visible?: boolean;
   topMenu?: boolean;
+  discount?: DiscountObject;
   createdAt?: number | string;
   updatedAt?: number | string;
   timestamp?: number | string;
@@ -66,6 +68,7 @@ interface RawMenuItem {
 interface RawMenuData {
   categories?: RawMenuCategory[];
   items?: RawMenuItem[];
+  orderDiscounts?: DiscountObject[];
   lastSynced?: string;
 }
 
@@ -164,6 +167,7 @@ function normalizeMenuData(rawData?: RawMenuData): MenuData {
         description: category.description ?? "",
         visibility: category.visibility ?? category.visible ?? true,
         topMenu: !!category.topMenu,
+        discount: category.discount,
         backgrounds: extractBackgrounds(category),
         createdAt: ts,
         updatedAt: ts,
@@ -202,6 +206,7 @@ function normalizeMenuData(rawData?: RawMenuData): MenuData {
         category: categoryId,
         visibility: item.visibility ?? item.visible ?? true,
         topMenu: !!item.topMenu,
+        discount: item.discount,
         backgrounds: extractBackgrounds(item),
         sizes: normalizeSizes(item.sizes),
         createdAt: ts,
@@ -217,6 +222,7 @@ function normalizeMenuData(rawData?: RawMenuData): MenuData {
 
   return {
     categories,
+    orderDiscounts: rawData.orderDiscounts,
     lastSynced: rawData.lastSynced ?? emptyMenuData.lastSynced,
   };
 }
@@ -234,6 +240,7 @@ function createFirestoreMenuData(
     updatedAt: now,
     categories: menuData.categories.map(({ items, ...category }) => category),
     items: menuData.categories.flatMap((category) => category.items),
+    orderDiscounts: menuData.orderDiscounts,
   };
 
   return stripUndefined(firestoreMenuData);
@@ -252,6 +259,7 @@ export function useMenuData() {
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncMessage, setSyncMessage] = useState<string | null>(null);
+  const lastSyncedRef = useRef<MenuData | null>(null);
 
   const saveToLocalStorage = useCallback((data: MenuData) => {
     try {
@@ -266,6 +274,7 @@ export function useMenuData() {
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as MenuData;
+        lastSyncedRef.current = parsed;
         dispatch(addMenu(parsed));
       } catch (e) {
         console.error("[v0] Failed to parse menu data:", e);
@@ -279,6 +288,7 @@ export function useMenuData() {
     }
 
     const normalized = normalizeMenuData(menuDataDB as RawMenuData);
+    lastSyncedRef.current = normalized;
     dispatch(addMenu(normalized));
   }, [menuDataDB, dispatch]);
 
@@ -346,6 +356,7 @@ export function useMenuData() {
       const firestoreMenuData = createFirestoreMenuData(syncedMenuData, resId, partnerUid);
 
       await syncMenuData({ resId, menu: firestoreMenuData }).unwrap();
+      lastSyncedRef.current = syncedMenuData;
       dispatch(setLastSynced(syncedMenuData.lastSynced));
 
       setSyncMessage(t("success"));
@@ -435,10 +446,23 @@ export function useMenuData() {
     [dispatch],
   );
 
+  const hasChanges = useMemo(() => {
+    if (!lastSyncedRef.current) return true;
+    return JSON.stringify(menuData) !== JSON.stringify(lastSyncedRef.current);
+  }, [menuData]);
+
+  const revertChanges = useCallback(() => {
+    if (lastSyncedRef.current) {
+      dispatch(addMenu(lastSyncedRef.current));
+    }
+  }, [dispatch]);
+
   return {
     menuData,
     isSyncing,
     syncMessage,
+    hasChanges,
+    revertChanges,
     updateCategory,
     updateMenuItem,
     toggleItemVisibility,
