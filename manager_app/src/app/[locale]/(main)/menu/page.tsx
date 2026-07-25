@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Plus, Cloud, UtensilsCrossed, Percent, Trash2, RotateCcw, Power } from "lucide-react";
+import { Plus, Cloud, UtensilsCrossed, Percent, Trash2, Power, Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMenuData } from "@/hooks/useMenuData";
 import { CategoryHeader } from "@/components/menu/category-header";
@@ -272,34 +272,50 @@ export default function MenuManagementPage() {
       />
 
       <main className="max-w-5xl mx-auto px-4 py-6 pb-24">
-        <div className="flex flex-col gap-2 mb-6">
-          <Button
-            onClick={() => setShowCategoryForm(true)}
-            className="w-full bg-accent hover:bg-accent/90 text-accent-foreground gap-2"
-          >
-            <Plus size={18} />
-            <span>{t("addCategory")}</span>
-          </Button>
-
-          <Button
-            onClick={syncToCloud}
-            disabled={isSyncing || !hasChanges}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
-          >
-            <Cloud size={18} />
-            <span>{isSyncing ? t("syncing") : t("sync")}</span>
-          </Button>
-
+        <div className="mb-6">
           {hasChanges && (
-            <Button
-              onClick={revertChanges}
-              variant="outline"
-              className="w-full gap-2"
-            >
-              <RotateCcw size={18} />
-              <span>{t("revertChanges")}</span>
-            </Button>
+            <div className="flex items-center justify-between mb-3 px-1">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {t("unsavedChanges")}
+                </span>
+              </div>
+              <button
+                onClick={revertChanges}
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {t("revertChanges")}
+              </button>
+            </div>
           )}
+
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowCategoryForm(true)}
+              variant="outline"
+              className="flex-1 gap-2"
+            >
+              <Plus size={16} />
+              <span>{t("addCategory")}</span>
+            </Button>
+
+            <Button
+              onClick={syncToCloud}
+              disabled={isSyncing || !hasChanges}
+              className="flex-1 gap-2"
+            >
+              {isSyncing ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Cloud size={16} />
+              )}
+              <span>{isSyncing ? t("syncing") : t("sync")}</span>
+            </Button>
+          </div>
         </div>
 
         {syncMessage && (

@@ -207,6 +207,14 @@
       "discountConditionsHelp": {
         "title": "Conditions",
         "description": "Set rules that must be met before a customer can use this discount. Use AND to require all conditions, or OR to require at least one. Available conditions: First Purchase (never ordered before), Total Spent (minimum amount spent), Total Items (minimum items purchased), Total Orders (minimum orders placed), Account Age (days since registration), and Days Since Last Order (days of inactivity)."
+      },
+      "minOrderTotalHelp": {
+        "title": "Min Order Total",
+        "description": "The minimum order subtotal (before tax and delivery) required for this discount to apply. For example, setting this to 50 means the customer must spend at least 50 to qualify. Leave at 0 for no minimum."
+      },
+      "minCartItemsHelp": {
+        "title": "Min Cart Items",
+        "description": "The minimum number of items in the cart required for this discount to apply. For example, setting this to 3 means the customer must have at least 3 items. Leave at 0 for no minimum."
       }
     },
     "businessScore": {
@@ -232,10 +240,11 @@
     "page": {
       "title": "Restaurant Menu",
       "subtitle": "Manage categories, items, and promotions",
-      "addCategory": "Category",
+      "addCategory": "Add Category",
       "sync": "Sync",
       "syncing": "Syncing...",
-      "revertChanges": "Revert Changes",
+      "unsavedChanges": "Unsaved changes",
+      "revertChanges": "Revert",
       "noCategories": "No categories yet",
       "createFirstCategory": "Create First Category",
       "noItems": "No items in this category",
