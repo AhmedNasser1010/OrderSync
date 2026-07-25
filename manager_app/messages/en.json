@@ -303,6 +303,11 @@
     "timeRules": "Time-Based Rules",
     "startTime": "Start Time",
     "endTime": "End Time",
+    "targetSegments": "Target Segments",
+    "segmentsAll": "Applies to all customers",
+    "segmentsCount": "{count} segment(s) selected",
+    "stackingMode": "Stacking Mode",
+    "priorityLabel": "Priority",
     "saveChanges": "Save Changes",
     "addDiscount": "Add Discount",
     "cancel": "Cancel",
@@ -314,6 +319,20 @@
       "thu": "Thu",
       "fri": "Fri",
       "sat": "Sat"
+    },
+    "segments": {
+      "new": "New",
+      "active": "Active",
+      "inactive": "Inactive",
+      "vip": "VIP",
+      "at_risk": "At Risk"
+    },
+    "stacking": {
+      "highest": "Highest",
+      "lowest": "Lowest",
+      "stack": "Stack",
+      "priority": "Priority",
+      "exclusive": "Exclusive"
     }
   },
   "ConditionsEditor": {

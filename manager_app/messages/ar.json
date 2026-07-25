@@ -303,6 +303,11 @@
     "timeRules": "قواعد مبنية على الوقت",
     "startTime": "وقت البدء",
     "endTime": "وقت الانتهاء",
+    "targetSegments": "شرائح العملاء المستهدفة",
+    "segmentsAll": "ينطبق على جميع العملاء",
+    "segmentsCount": "{count} شريحة محددة",
+    "stackingMode": "وضع التراكم",
+    "priorityLabel": "الأولوية",
     "saveChanges": "حفظ التغييرات",
     "addDiscount": "إضافة خصم",
     "cancel": "إلغاء",
@@ -314,6 +319,20 @@
       "thu": "خمي",
       "fri": "جمع",
       "sat": "سبت"
+    },
+    "segments": {
+      "new": "جديد",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "vip": "مميز",
+      "at_risk": "معرض للخطر"
+    },
+    "stacking": {
+      "highest": "الأعلى",
+      "lowest": "الأدنى",
+      "stack": "تجميع",
+      "priority": "الأولوية",
+      "exclusive": "حصري"
     }
   },
   "ConditionsEditor": {
