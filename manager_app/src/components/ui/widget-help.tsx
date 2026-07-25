@@ -22,7 +22,11 @@ export function WidgetHelp({ widgetKey }: WidgetHelpProps) {
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        type="button"
+        onClick={() => {
+          document.activeElement instanceof HTMLElement && document.activeElement.blur();
+          setOpen(true);
+        }}
         className="text-muted-foreground hover:text-foreground transition-colors shrink-0"
       >
         <CircleHelp className="w-3.5 h-3.5" />

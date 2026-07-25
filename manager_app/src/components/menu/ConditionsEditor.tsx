@@ -3,6 +3,7 @@
 import { Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { WidgetHelp } from "@/components/ui/widget-help";
 import {
   Select,
   SelectContent,
@@ -75,7 +76,9 @@ export function ConditionsEditor({ conditions, onChange }: ConditionsEditorProps
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-foreground">{t("title")}</label>
+        <label className="text-sm font-medium text-foreground flex items-center gap-1.5">{t("title")}
+          <WidgetHelp widgetKey="discountConditionsHelp" />
+        </label>
         {conditions.rules.length > 1 && (
           <button
             type="button"

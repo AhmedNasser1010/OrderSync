@@ -64,13 +64,13 @@ function DialogContent({
       onClick={() => onOpenChange?.(false)}
     >
       <div
-        className={`w-full max-w-md bg-card border border-border rounded-lg p-6 shadow-lg mx-4 ${className}`}
+        className={`relative w-full max-w-md bg-card border border-border rounded-lg p-6 shadow-lg mx-4 ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         {!hideCloseButton && onOpenChange && (
           <button
             onClick={() => onOpenChange(false)}
-            className="absolute top-4 right-4 p-1 hover:bg-muted rounded-md transition-colors"
+            className="absolute top-4 end-4 p-1 hover:bg-muted rounded-md transition-colors"
           >
             <X size={18} />
           </button>

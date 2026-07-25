@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { WidgetHelp } from "@/components/ui/widget-help";
 import { Input } from "@/components/ui/input";
 import { ConditionsEditor } from "./ConditionsEditor";
 import type {
@@ -177,8 +178,9 @@ export function DiscountDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
+            <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
               {t("codeLabel")}
+              <WidgetHelp widgetKey="discountCodeHelp" />
             </label>
             <Input
               type="text"
@@ -190,8 +192,9 @@ export function DiscountDialog({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">
+            <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
               {t("messageLabel")}
+              <WidgetHelp widgetKey="discountMessageHelp" />
             </label>
             <Input
               type="text"
@@ -204,8 +207,9 @@ export function DiscountDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
                 {t("typeLabel")}
+                <WidgetHelp widgetKey="discountTypeHelp" />
               </label>
               <select
                 value={discountType}
@@ -217,8 +221,9 @@ export function DiscountDialog({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
                 {t("valueLabel")}
+                <WidgetHelp widgetKey="discountValueHelp" />
               </label>
               <Input
                 type="number"
@@ -269,8 +274,9 @@ export function DiscountDialog({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
                 {t("startDate")}
+                <WidgetHelp widgetKey="discountDateHelp" />
               </label>
               <Input
                 type="datetime-local"
@@ -280,8 +286,9 @@ export function DiscountDialog({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
                 {t("endDate")}
+                <WidgetHelp widgetKey="discountDateHelp" />
               </label>
               <Input
                 type="datetime-local"
@@ -303,9 +310,10 @@ export function DiscountDialog({
               />
               <label
                 htmlFor="timeRules"
-                className="text-sm font-medium text-foreground"
+                className="text-sm font-medium text-foreground flex items-center gap-1.5"
               >
                 {t("timeRules")}
+                <WidgetHelp widgetKey="discountTimeRulesHelp" />
               </label>
             </div>
 
@@ -357,8 +365,9 @@ export function DiscountDialog({
 
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
                 {t("targetSegments")}
+                <WidgetHelp widgetKey="targetSegmentsHelp" />
               </label>
               <div className="flex flex-wrap gap-1.5">
                 {(["new", "active", "inactive", "vip", "at_risk"] as const).map(
@@ -394,8 +403,9 @@ export function DiscountDialog({
 
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
                 {t("stackingMode")}
+                <WidgetHelp widgetKey="discountStackingHelp" />
               </label>
               <select
                 value={stackingMode}
