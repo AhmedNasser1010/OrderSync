@@ -8,7 +8,7 @@ import { userUid } from "@/lib/rtk/slices/constantsSlice";
 import { timeRange, customDateRange } from "@/lib/rtk/slices/toggleSlice";
 import filterDataByDateRange from "@/utilities/filterDataByDateRange";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { calculateMetrics } from "@/utilities/analytics/calculateMetrics";
 import { calculatePercentageChange } from "@/utilities/analytics/calculatePercentageChange";
 import { generateDashboardData } from "@/utilities/analytics/generateDashboardData";
@@ -28,6 +28,24 @@ const useAnalytics = () => {
 
   const timeRangeValue = useAppSelector(timeRange);
   const customRange = useAppSelector(customDateRange);
+
+  const [filterLoading, setFilterLoading] = useState(false);
+  const prevTimeRangeRef = useRef(timeRangeValue);
+  const prevCustomRangeRef = useRef(customRange);
+
+  useEffect(() => {
+    if (
+      prevTimeRangeRef.current !== timeRangeValue ||
+      prevCustomRangeRef.current.start !== customRange.start ||
+      prevCustomRangeRef.current.end !== customRange.end
+    ) {
+      setFilterLoading(true);
+      prevTimeRangeRef.current = timeRangeValue;
+      prevCustomRangeRef.current = customRange;
+      const id = requestAnimationFrame(() => setFilterLoading(false));
+      return () => cancelAnimationFrame(id);
+    }
+  }, [timeRangeValue, customRange]);
 
   const currentPeriodData = useMemo(() => {
     if (!dailyReportsData) return [];
@@ -154,7 +172,7 @@ const useAnalytics = () => {
     data: currentPeriodData,
     previousData: previousPeriodData,
     dashboardData,
-    loading: !dailyReportsData,
+    loading: !dailyReportsData || filterLoading,
     hasData: currentPeriodData.length > 0,
   };
 };

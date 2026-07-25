@@ -16,6 +16,7 @@ import {
 import type { RootState, AppDispatch } from "@/lib/rtk/store";
 import { fetchDiscountAnalytics } from "@/lib/rtk/slices/discountAnalyticsSlice";
 import type { DiscountAnalyticsData } from "@/lib/types/analytics";
+import { DiscountAnalyticsSkeleton } from "./discount-analytics-skeleton";
 
 interface DiscountAnalyticsProps {
   restaurantId: string;
@@ -63,11 +64,7 @@ export function DiscountAnalytics({ restaurantId }: DiscountAnalyticsProps) {
     totalImpressions > 0 ? (totalRedemptions / totalImpressions) * 100 : 0;
 
   if (loading) {
-    return (
-      <div className="bg-card border border-border rounded-2xl p-6 text-center">
-        <p className="text-muted-foreground text-sm">Loading analytics...</p>
-      </div>
-    );
+    return <DiscountAnalyticsSkeleton />;
   }
 
   if (error) {

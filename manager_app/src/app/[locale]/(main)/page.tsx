@@ -38,9 +38,10 @@ import {
   customDateRange,
 } from "@/lib/rtk/slices/toggleSlice";
 import useAnalytics from "@/hooks/useAnalytics";
+import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton";
 
 export default function Component() {
-  const { dashboardData, hasData } = useAnalytics();
+  const { dashboardData, hasData, loading } = useAnalytics();
   const t = useTranslations("Dashboard.header");
   const tNoData = useTranslations("Dashboard.noData");
   const dispatch = useAppDispatch();
@@ -148,7 +149,9 @@ export default function Component() {
             </Popover>
           )}
         </div>
-        {!hasData ? (
+        {loading ? (
+          <DashboardSkeleton />
+        ) : !hasData ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
             <Inbox className="w-12 h-12 text-muted-foreground mb-4" />
             <h2 className="text-lg font-semibold text-foreground mb-2">
