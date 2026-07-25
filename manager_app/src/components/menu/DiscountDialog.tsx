@@ -110,6 +110,34 @@ export function DiscountDialog({
     setSegments([]);
   };
 
+  const generateAutoMessage = () => {
+    const parts: string[] = [];
+    const valueFormatted = discountType === "P" ? `${value}%` : `${value} ${t("autoFill.currency")}`;
+    parts.push(`${valueFormatted} ${t("autoFill.off")}`);
+
+    if (level === "order") {
+      parts.push(t("autoFill.yourOrder"));
+      if (minOrderTotal > 0) {
+        parts.push(`${t("autoFill.onOrdersOver")}${minOrderTotal} ${t("autoFill.currency")}`);
+      }
+      if (minCartItems > 0) {
+        parts.push(`${t("autoFill.withMinItems")}${minCartItems}${t("autoFill.items")}`);
+      }
+    }
+
+    if (segments.length > 0) {
+      const segmentLabels = segments.map((s) => t(`segments.${s}`)).join(", ");
+      parts.push(`${t("autoFill.for")} ${segmentLabels}`);
+    }
+
+    if (timeRulesEnabled && timeRulesDays.length > 0) {
+      const dayLabels = timeRulesDays.map((d) => t(`days.${DAY_KEYS[d]}`)).join(", ");
+      parts.push(`${t("autoFill.during")} ${dayLabels}`);
+    }
+
+    setMessage(parts.join(" ").trim());
+  };
+
   const toggleDay = (day: number) => {
     setTimeRulesDays((prev) =>
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day].sort()
@@ -195,6 +223,15 @@ export function DiscountDialog({
             <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
               {t("messageLabel")}
               <WidgetHelp widgetKey="discountMessageHelp" />
+              {value > 0 && (
+                <button
+                  type="button"
+                  onClick={generateAutoMessage}
+                  className="ml-auto text-xs text-primary hover:text-primary/80 font-medium transition-colors"
+                >
+                  {t("autoFillButton")}
+                </button>
+              )}
             </label>
             <Input
               type="text"
@@ -438,7 +475,7 @@ export function DiscountDialog({
           <div className="flex gap-2 pt-4">
             <Button
               type="submit"
-              className="flex-1 bg-accent hover:bg-accent/90"
+              className="flex-1"
             >
               {isEditing ? t("saveChanges") : t("addDiscount")}
             </Button>

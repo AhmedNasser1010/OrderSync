@@ -347,6 +347,17 @@
     "saveChanges": "حفظ التغييرات",
     "addDiscount": "إضافة خصم",
     "cancel": "إلغاء",
+    "autoFillButton": "ملء تلقائي",
+    "autoFill": {
+      "off": "خصم",
+      "yourOrder": "على طلبك",
+      "onOrdersOver": "على الطلبات فوق $",
+      "withMinItems": "مع ",
+      "items": "+ عنصر",
+      "for": "لـ",
+      "during": "خلال",
+      "currency": "جنيه"
+    },
     "days": {
       "sun": "أحد",
       "mon": "إثن",

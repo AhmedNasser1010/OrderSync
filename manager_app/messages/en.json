@@ -347,6 +347,17 @@
     "saveChanges": "Save Changes",
     "addDiscount": "Add Discount",
     "cancel": "Cancel",
+    "autoFillButton": "Auto Fill",
+    "autoFill": {
+      "off": "off",
+      "yourOrder": "your order",
+      "onOrdersOver": "on orders over $",
+      "withMinItems": "with ",
+      "items": "+ items",
+      "for": "for",
+      "during": "during",
+      "currency": "EGP"
+    },
     "days": {
       "sun": "Sun",
       "mon": "Mon",
