@@ -293,7 +293,7 @@ export default function MenuManagementPage() {
           </div>
         )}
 
-        {/* Order Discounts Section */}
+        {/* Cart Discounts Section */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-foreground">
