@@ -3,6 +3,7 @@ import type { User, PriceAfterDiscountResult } from "./types";
 import { evaluateConditions } from "./evaluateConditions";
 import { isWithinTimeRules } from "./evaluateTimeRules";
 import { isDiscountActive } from "./isDiscountActive";
+import { evaluateSegments } from "./evaluateSegments";
 
 export const priceAfterDiscount = (
   price: number,
@@ -44,6 +45,10 @@ export const priceAfterDiscount = (
 
   if (!user.restaurants) {
     isAvailableForUser = true;
+  }
+
+  if (isAvailableForUser && !evaluateSegments(discount.segments ?? [], user, resId)) {
+    isAvailableForUser = false;
   }
 
   return { finalPrice, isAvailableForUser };

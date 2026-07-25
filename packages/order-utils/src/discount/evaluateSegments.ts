@@ -10,14 +10,14 @@ const isNew = (user: User): boolean => {
 };
 
 const isActive = (currentRes: UserRestaurantHistory | undefined): boolean => {
-  if (!currentRes?.lastOrderAt) return false;
-  const daysSinceLastOrder = (Date.now() - currentRes.lastOrderAt) / DAYS_MS;
+  if (!currentRes?.lastOrderTime) return false;
+  const daysSinceLastOrder = (Date.now() - currentRes.lastOrderTime) / DAYS_MS;
   return daysSinceLastOrder <= 14;
 };
 
 const isInactive = (currentRes: UserRestaurantHistory | undefined): boolean => {
-  if (!currentRes?.lastOrderAt) return true;
-  const daysSinceLastOrder = (Date.now() - currentRes.lastOrderAt) / DAYS_MS;
+  if (!currentRes?.lastOrderTime) return true;
+  const daysSinceLastOrder = (Date.now() - currentRes.lastOrderTime) / DAYS_MS;
   return daysSinceLastOrder > 30;
 };
 
@@ -27,8 +27,8 @@ const isVip = (currentRes: UserRestaurantHistory | undefined): boolean => {
 };
 
 const isAtRisk = (currentRes: UserRestaurantHistory | undefined): boolean => {
-  if (!currentRes?.lastOrderAt) return false;
-  const daysSinceLastOrder = (Date.now() - currentRes.lastOrderAt) / DAYS_MS;
+  if (!currentRes?.lastOrderTime) return false;
+  const daysSinceLastOrder = (Date.now() - currentRes.lastOrderTime) / DAYS_MS;
   return daysSinceLastOrder > 21 && daysSinceLastOrder <= 60;
 };
 

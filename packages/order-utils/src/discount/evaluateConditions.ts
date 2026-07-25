@@ -39,9 +39,9 @@ const lastOrder = (
   value: number,
   currentRes: UserRestaurantHistory | undefined
 ): boolean => {
-  if (!currentRes?.lastOrderAt) return false;
+  if (!currentRes?.lastOrderTime) return false;
   const daysSinceLastOrder =
-    (Date.now() - currentRes.lastOrderAt) / (1000 * 60 * 60 * 24);
+    (Date.now() - currentRes.lastOrderTime) / (1000 * 60 * 60 * 24);
   return daysSinceLastOrder >= value;
 };
 

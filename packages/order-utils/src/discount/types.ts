@@ -19,7 +19,7 @@ export interface UserRestaurantHistory {
   totalAmount?: number;
   totalItems?: number;
   totalOrders?: number;
-  lastOrderAt?: number;
+  lastOrderTime?: number;
 }
 
 export interface User {

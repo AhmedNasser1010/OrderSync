@@ -1,4 +1,5 @@
 import generateDiscountObj from './generateDiscountObj'
+import { evaluateSegments } from '@ordersync/order-utils'
 
 const firstBuy = (user, conditionValue, currentRes) => {
 	return currentRes === undefined
@@ -73,6 +74,10 @@ const priceAfterDiscount = (price, discount, user, resId) => {
 
 	// If the user isnt logged in display all discounts
 	if (!user.restaurants) isAvailableForUser = true
+
+	if (isAvailableForUser && !evaluateSegments(discount.segments ?? [], user, resId)) {
+		isAvailableForUser = false
+	}
 
 	return { finalPrice, isAvailableForUser }
 }

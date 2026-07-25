@@ -4,6 +4,7 @@ import { isDiscountActive } from "./isDiscountActive";
 import { evaluateConditions } from "./evaluateConditions";
 import { isWithinTimeRules } from "./evaluateTimeRules";
 import { applyStackingRules } from "./applyStackingRules";
+import { evaluateSegments } from "./evaluateSegments";
 
 interface CartItem {
   price: number;
@@ -29,6 +30,7 @@ export const applyOrderDiscounts = (
     if (discount.minOrderTotal && cartTotal < discount.minOrderTotal) return false;
     if (discount.minCartItems && cartItemCount < discount.minCartItems) return false;
     if (!evaluateConditions(discount.conditions, user, resId)) return false;
+    if (!evaluateSegments(discount.segments ?? [], user, resId)) return false;
     return true;
   });
 
