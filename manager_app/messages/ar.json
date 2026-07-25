@@ -241,9 +241,9 @@
       "addFirstItem": "إضافة أول عنصر",
       "addItem": "+ إضافة عنصر",
       "lastSynced": "آخر مزامنة:",
-      "orderDiscounts": "خصومات الطلب",
-      "addOrderDiscount": "إضافة خصم على الطلب",
-      "noOrderDiscounts": "لا توجد خصومات على الطلب بعد",
+      "orderDiscounts": "خصومات السلة",
+      "addOrderDiscount": "إضافة خصم على السلة",
+      "noOrderDiscounts": "لا توجد خصومات على السلة بعد",
       "editDiscount": "تعديل الخصم",
       "removeDiscount": "إزالة الخصم"
     },

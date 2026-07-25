@@ -241,9 +241,9 @@
       "addFirstItem": "Add First Item",
       "addItem": "+ Add Item",
       "lastSynced": "Last synced:",
-      "orderDiscounts": "Order Discounts",
-      "addOrderDiscount": "Add Order Discount",
-      "noOrderDiscounts": "No order discounts yet",
+      "orderDiscounts": "Cart Discounts",
+      "addOrderDiscount": "Add Cart Discount",
+      "noOrderDiscounts": "No cart discounts yet",
       "editDiscount": "Edit Discount",
       "removeDiscount": "Remove Discount"
     },
