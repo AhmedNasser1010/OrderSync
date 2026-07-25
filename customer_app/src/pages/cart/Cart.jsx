@@ -11,7 +11,7 @@ import { quantityHandle, clearCart, handleAddDiscount } from '../../rtk/slices/c
 import { addCheckout, clearCheckout } from '../../rtk/slices/checkoutSlice'
 import { toggleLoginSidebar, toggleOrderSidebar } from '../../rtk/slices/toggleSlice'
 
-import { priceAfterDiscount, resolveItemDiscount } from '@ordersync/order-utils'
+import { priceAfterDiscount, resolveItemDiscount, applyOrderDiscounts } from '@ordersync/order-utils'
 import generateDiscountObj from '../../utils/generateDiscountObj'
 import randomOrderNumber from '../../utils/randomOrderId'
 import DB_ARRAY_UNION from '../../utils/DB_ARRAY_UNION'
@@ -113,6 +113,7 @@ const Cart = () => {
   const cartRestaurantID = useSelector((state) => state.cart.restaurant)
   const menuItems = useSelector((state) => state.menu.items)
   const categories = useSelector((state) => state.menu.categories)
+  const orderDiscounts = useSelector((state) => state.menu.orderDiscounts || [])
   const restaurants = useSelector((state) => state.restaurants)
   const checkout = useSelector((state) => state.checkout)
   const accessToken = useSelector((state) => state.cart.restaurant)
@@ -191,8 +192,14 @@ const Cart = () => {
     }
   }, [resInfo, user, services.deliveryFees])
 
+  const autoOrderDiscount = useMemo(() => {
+    if (!selectedItems?.length || !orderDiscounts?.length) return null
+    const eligible = applyOrderDiscounts(selectedItems, orderDiscounts, user, cartRestaurantID)
+    return eligible[0] || null
+  }, [selectedItems, orderDiscounts, user, cartRestaurantID])
+
   const cartTotalPrice = useMemo(() => {
-    return selectedItems?.reduce(
+    const result = selectedItems?.reduce(
       (accumulator, item) => {
         const { price } = item?.selectedSize ? item?.sizes?.find((itemSize) => itemSize.size === item?.selectedSize) : { price: item.price }
         const category = categories?.find((cat) => cat.id === item.category)
@@ -215,7 +222,17 @@ const Cart = () => {
       },
       { total: deliveryFees, discount: deliveryFees }
     )
-  }, [cartItems, deliveryFees, selectedItems, categories])
+
+    if (autoOrderDiscount && result) {
+      const itemSubtotal = result.discount - deliveryFees
+      const orderDiscountAmount = autoOrderDiscount.type === 'P'
+        ? itemSubtotal * (autoOrderDiscount.value / 100)
+        : Math.min(autoOrderDiscount.value, itemSubtotal)
+      result.discount = Math.max(0, result.discount - orderDiscountAmount)
+    }
+
+    return result
+  }, [cartItems, deliveryFees, selectedItems, categories, autoOrderDiscount])
 
   useEffect(() => {
     if (selectedItems.length) {
@@ -575,6 +592,18 @@ const Cart = () => {
                       <span className="egp font-ProximaNovaSemiBold">{cartTotalPrice.total}</span>
                     </div>
                   </div>
+                  {autoOrderDiscount && (
+                    <div className="flex justify-between bg-green-600 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
+                      <div>
+                        <h3 className="font-ProximaNovaSemiBold">{autoOrderDiscount.message || autoOrderDiscount.code}</h3>
+                      </div>
+                      <div>
+                        <span className="egp font-ProximaNovaSemiBold">
+                          {autoOrderDiscount.type === 'P' ? `-${autoOrderDiscount.value}%` : `-${autoOrderDiscount.value}LE`}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                   <div className="flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
                     <div>
                       <h3 className="font-ProximaNovaSemiBold">{t('Total Price Discounted')}</h3>

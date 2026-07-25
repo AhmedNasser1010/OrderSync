@@ -18,6 +18,7 @@
   "see restaurants near you": "شوف المطاعم القريبة منك",
   "Total Price": "السعر الكلي",
   "Total Price Dsicounted": "السعر الكلي بعد الخصم",
+  "Total Price Discounted": "السعر الكلي بعد الخصم",
   "Place Order": "اعمل طلب",
   "Clear All": "امسح الكل",
   "Your order has been received. The delivery captain will contact you when it's ready.": "طلبك اتسجل. عامل التوصيل هيتصل بيك لما يبقى جاهز.",
@@ -136,5 +137,13 @@
   "Rate this Restaurant!": "قيّم المطعم ده!",
   "We appreciate your feedback and will use it to improve our services.": "بنقدّر رأيك وهنستخدمه عشان نحسّن خدماتنا.",
   "Submit Feedback": "أرسل تقييمك",
-  "Leave a comment": "سيب تعليق"
+  "Leave a comment": "سيب تعليق",
+  "Live tracking available soon": "التتبع المباشر هيكون متاح قريب",
+  "You'll see your driver in real time": "هتشوف السواق بتاعك في الوقت الحقيقي",
+  "Placed": "تم الطلب",
+  "Order placed successfully": "تم تقديم الطلب بنجاح",
+  "Confirmed": "تم التأكيد",
+  "Preparing": "جاري التحضير",
+  "On the Way": "في الطريق",
+  "Delivered": "تم التوصيل"
 }

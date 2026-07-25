@@ -18,6 +18,10 @@ const nextConfig = {
         port: '',
         pathname: '/swiggy/image/upload/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
     ],
   },
 };

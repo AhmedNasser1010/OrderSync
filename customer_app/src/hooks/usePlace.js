@@ -5,7 +5,7 @@ import toast from 'react-hot-toast'
 
 import filterObject from '../utils/filterObject'
 import getUserSource from '../utils/getUserSource'
-import { priceAfterDiscount, resolveItemDiscount } from '@ordersync/order-utils'
+import { priceAfterDiscount, resolveItemDiscount, applyOrderDiscounts } from '@ordersync/order-utils'
 import getDeliveryFees from '../utils/getDeliveryFees'
 import getDistanceFromLatlngInKm from '../utils/getDistanceFromLatlngInKm'
 import orderYupSchema from '../object-schemas/orderYupSchema'
@@ -23,7 +23,7 @@ const usePlace = () => {
   const categories = useSelector((state) => state.menu.categories)
   const restaurants = useSelector((state) => state.restaurants)
   const services = useSelector((state) => state.services)
-  const appliedOrderDiscount = useSelector((state) => state.cart.appliedOrderDiscount)
+  const orderDiscounts = useSelector((state) => state.menu.orderDiscounts || [])
   const currentRes = restaurants?.find((restaurant) => restaurant.accessToken === cart.restaurant)
   const userDistanceFromRes =
     user?.locations?.selected &&
@@ -128,11 +128,19 @@ const usePlace = () => {
       { total: deliveryFees, discount: deliveryFees }
     )
 
-    if (appliedOrderDiscount && result) {
-      const orderDiscountAmount = appliedOrderDiscount.type === 'P'
-        ? result.discount * (appliedOrderDiscount.value / 100)
-        : Math.min(appliedOrderDiscount.value, result.discount)
-      result.discount = Math.max(0, result.discount - orderDiscountAmount)
+    if (result) {
+      const eligibleDiscounts = applyOrderDiscounts(selectedItems, orderDiscounts, user, accessToken)
+      const autoDiscount = eligibleDiscounts[0] || null
+
+      if (autoDiscount) {
+        const itemSubtotal = result.discount - deliveryFees
+        const orderDiscountAmount = autoDiscount.type === 'P'
+          ? itemSubtotal * (autoDiscount.value / 100)
+          : Math.min(autoDiscount.value, itemSubtotal)
+        result.discount = Math.max(0, result.discount - orderDiscountAmount)
+      }
+
+      result.appliedOrderDiscount = autoDiscount
     }
 
     return result
@@ -144,6 +152,7 @@ const usePlace = () => {
     const filteredCart = cart.items.map((obj) => filterObject(obj, ['discount'], true))
     const cartTotalPrice = getCartTotalPrice()
     const selectedLocation = user.locations[user.locations.selected]
+    const autoDiscount = cartTotalPrice.appliedOrderDiscount
 
     const subtotal = cartTotalPrice.total - deliveryFees
     const discount = cartTotalPrice.total - cartTotalPrice.discount
@@ -178,12 +187,12 @@ const usePlace = () => {
         discount,
         deliveryFees,
         total: cartTotalPrice.discount,
-        promoCode: appliedOrderDiscount?.code || undefined,
-        promoDiscount: appliedOrderDiscount
-          ? (appliedOrderDiscount.type === 'P'
-              ? subtotal * (appliedOrderDiscount.value / 100)
-              : Math.min(appliedOrderDiscount.value, subtotal))
-          : 0,
+        ...(autoDiscount && {
+          promoCode: autoDiscount.code,
+          promoDiscount: autoDiscount.type === 'P'
+            ? subtotal * (autoDiscount.value / 100)
+            : Math.min(autoDiscount.value, subtotal),
+        }),
       },
       payment: {
         method: 'CASH',
