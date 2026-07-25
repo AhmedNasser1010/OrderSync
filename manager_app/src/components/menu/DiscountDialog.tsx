@@ -6,6 +6,7 @@ import { X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { WidgetHelp } from "@/components/ui/widget-help";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { ConditionsEditor } from "./ConditionsEditor";
 import type {
   DiscountObject,
@@ -58,6 +59,7 @@ export function DiscountDialog({
   const [stackingMode, setStackingMode] = useState<StackingMode>("highest");
   const [priority, setPriority] = useState<number>(0);
   const [segments, setSegments] = useState<CustomerSegment[]>([]);
+  const [active, setActive] = useState(true);
 
   useEffect(() => {
     if (initialData) {
@@ -86,6 +88,7 @@ export function DiscountDialog({
       setStackingMode(initialData.stackingMode ?? "highest");
       setPriority(initialData.priority ?? 0);
       setSegments(initialData.segments ?? []);
+      setActive(initialData.active ?? true);
     } else {
       resetForm();
     }
@@ -107,6 +110,7 @@ export function DiscountDialog({
     setStackingMode("highest");
     setPriority(0);
     setSegments([]);
+    setActive(true);
   };
 
   const generateAutoMessage = () => {
@@ -172,7 +176,7 @@ export function DiscountDialog({
       stackingMode,
       priority: priority || undefined,
       segments: segments.length > 0 ? segments : undefined,
-      active: initialData?.active ?? true,
+      active,
     };
 
     onSubmit(discount);
@@ -204,6 +208,16 @@ export function DiscountDialog({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-foreground">
+              {t("enabled")}
+            </label>
+            <Switch
+              checked={active}
+              onCheckedChange={setActive}
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
               {t("messageLabel")}

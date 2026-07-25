@@ -11,6 +11,7 @@ import {
   Trash,
   Percent,
   Tag,
+  Power,
 } from "lucide-react";
 import { ActionsMenu } from "@/components/ui/actions-menu";
 import { ImageEditDialog } from "@/components/ui/image-edit-dialog";
@@ -26,6 +27,7 @@ interface MenuItemCardProps {
   onUpdateBackgrounds?: (backgrounds: string[]) => void;
   onAddDiscount?: () => void;
   onRemoveDiscount?: () => void;
+  onToggleDiscountActive?: () => void;
 }
 
 export function MenuItemCard({
@@ -38,6 +40,7 @@ export function MenuItemCard({
   onUpdateBackgrounds,
   onAddDiscount,
   onRemoveDiscount,
+  onToggleDiscountActive,
 }: MenuItemCardProps) {
   const t = useTranslations("Menu.itemCard");
   const common = useTranslations("Common");
@@ -76,11 +79,18 @@ export function MenuItemCard({
                 </span>
               )}
               {item.discount && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 px-2 py-0.5 text-xs font-medium">
+                <span
+                  className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${
+                    item.discount.active
+                      ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20"
+                      : "bg-muted text-muted-foreground border-border opacity-60"
+                  }`}
+                >
                   <Percent size={12} />
                   {item.discount.type === "P"
                     ? `${item.discount.value}% OFF`
                     : `$${item.discount.value} OFF`}
+                  {!item.discount.active && ` · ${common("disabled")}`}
                 </span>
               )}
             </div>
@@ -125,6 +135,12 @@ export function MenuItemCard({
               },
               ...(item.discount
                 ? [
+                    {
+                      key: "toggleDiscountActive",
+                      label: item.discount.active ? t("disableDiscount") : t("enableDiscount"),
+                      onClick: () => onToggleDiscountActive && onToggleDiscountActive(),
+                      icon: <Power size={14} />,
+                    },
                     {
                       key: "removeDiscount",
                       label: t("removeDiscount"),

@@ -19,7 +19,7 @@ const ItemInfoSide = ({ item, resID }) => {
     <div className="md:w-auto w-3/5">
       <ItemAvailability />
       <ItemTitle title={item?.title} discountIncluded={discountIncluded} />
-      <DiscountMsg discountMsg={item?.discount?.message} discountIncluded={discountIncluded} />
+      <DiscountMsg discountMsg={discountIncluded ? item?.discount?.message : null} discountIncluded={discountIncluded} />
       <ItemPrice price={itemPrice} finalPrice={afterDiscount?.finalPrice} discountIncluded={discountIncluded} />
       <ItemDescription description={item?.description} />
       <ItemSizesBar

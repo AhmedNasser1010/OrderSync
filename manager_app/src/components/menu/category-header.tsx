@@ -9,6 +9,7 @@ import {
   ArrowDown,
   Percent,
   Tag,
+  Power,
 } from "lucide-react";
 import { Trash } from "lucide-react";
 import { useState } from "react";
@@ -29,6 +30,7 @@ interface CategoryHeaderProps {
   onUpdateBackgrounds?: (backgrounds: string[]) => void;
   onAddDiscount?: () => void;
   onRemoveDiscount?: () => void;
+  onToggleDiscountActive?: () => void;
 }
 
 export function CategoryHeader({
@@ -43,6 +45,7 @@ export function CategoryHeader({
   onUpdateBackgrounds,
   onAddDiscount,
   onRemoveDiscount,
+  onToggleDiscountActive,
 }: CategoryHeaderProps) {
   const t = useTranslations("Menu.categoryHeader");
   const common = useTranslations("Common");
@@ -91,11 +94,18 @@ export function CategoryHeader({
               </span>
             )}
             {category.discount && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 px-2 py-0.5 text-xs font-medium">
+              <span
+                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${
+                  category.discount.active
+                    ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20"
+                    : "bg-muted text-muted-foreground border-border opacity-60"
+                }`}
+              >
                 <Percent size={12} />
                 {category.discount.type === "P"
                   ? `${category.discount.value}% OFF`
                   : `$${category.discount.value} OFF`}
+                {!category.discount.active && ` · ${common("disabled")}`}
               </span>
             )}
           </div>
@@ -143,6 +153,12 @@ export function CategoryHeader({
             },
             ...(category.discount
               ? [
+                  {
+                    key: "toggleDiscountActive",
+                    label: category.discount.active ? t("disableDiscount") : t("enableDiscount"),
+                    onClick: () => onToggleDiscountActive && onToggleDiscountActive(),
+                    icon: <Power size={14} />,
+                  },
                   {
                     key: "removeDiscount",
                     label: t("removeDiscount"),

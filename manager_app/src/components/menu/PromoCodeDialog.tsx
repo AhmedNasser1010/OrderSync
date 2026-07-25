@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { ConditionsEditor } from "./ConditionsEditor";
 import type {
   PromoCode,
@@ -44,6 +45,7 @@ export function PromoCodeDialog({
   const [expireAt, setExpireAt] = useState("");
   const [usageLimit, setUsageLimit] = useState<number>(0);
   const [perUserLimit, setPerUserLimit] = useState<number>(1);
+  const [active, setActive] = useState(true);
 
   useEffect(() => {
     if (initialData) {
@@ -66,6 +68,7 @@ export function PromoCodeDialog({
       );
       setUsageLimit(initialData.usageLimit ?? 0);
       setPerUserLimit(initialData.perUserLimit ?? 1);
+      setActive(initialData.active ?? true);
     } else {
       resetForm();
     }
@@ -83,6 +86,7 @@ export function PromoCodeDialog({
     setExpireAt("");
     setUsageLimit(0);
     setPerUserLimit(1);
+    setActive(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -105,7 +109,7 @@ export function PromoCodeDialog({
       usageLimit: usageLimit > 0 ? usageLimit : null,
       usageCount: initialData?.usageCount ?? 0,
       perUserLimit: perUserLimit > 0 ? perUserLimit : undefined,
-      active: initialData?.active ?? true,
+      active,
     };
 
     onSubmit(promoCode);
@@ -137,6 +141,16 @@ export function PromoCodeDialog({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-foreground">
+              Enabled
+            </label>
+            <Switch
+              checked={active}
+              onCheckedChange={setActive}
+            />
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-foreground mb-1.5">
               Promo Code

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Plus, Cloud, UtensilsCrossed, Percent, Trash2, RotateCcw } from "lucide-react";
+import { Plus, Cloud, UtensilsCrossed, Percent, Trash2, RotateCcw, Power } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMenuData } from "@/hooks/useMenuData";
 import { CategoryHeader } from "@/components/menu/category-header";
@@ -23,6 +23,9 @@ import {
   addOrderDiscount,
   updateOrderDiscount,
   removeOrderDiscount,
+  toggleItemDiscountActive,
+  toggleCategoryDiscountActive,
+  toggleOrderDiscountActive,
 } from "@/lib/rtk/slices/menuSlice";
 
 export default function MenuManagementPage() {
@@ -240,6 +243,18 @@ export default function MenuManagementPage() {
     dispatch(removeOrderDiscount({ id: discountId }));
   };
 
+  const handleToggleItemDiscountActive = (itemId: string) => {
+    dispatch(toggleItemDiscountActive({ itemId }));
+  };
+
+  const handleToggleCategoryDiscountActive = (categoryId: string) => {
+    dispatch(toggleCategoryDiscountActive({ categoryId }));
+  };
+
+  const handleToggleOrderDiscountActive = (discountId: string) => {
+    dispatch(toggleOrderDiscountActive({ id: discountId }));
+  };
+
   const sortedCategories = useMemo(() => {
     return [...menuData.categories];
   }, [menuData.categories]);
@@ -318,11 +333,18 @@ export default function MenuManagementPage() {
                   className="flex items-center justify-between p-3 bg-card/50 border border-border rounded-lg"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 px-2 py-0.5 text-xs font-medium shrink-0">
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium shrink-0 ${
+                        discount.active
+                          ? "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20"
+                          : "bg-muted text-muted-foreground border-border opacity-60"
+                      }`}
+                    >
                       <Percent size={12} />
                       {discount.type === "P"
                         ? `${discount.value}% OFF`
                         : `$${discount.value} OFF`}
+                      {!discount.active && ` · ${t("disabled")}`}
                     </span>
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">
@@ -343,6 +365,12 @@ export default function MenuManagementPage() {
                         label: t("editDiscount"),
                         onClick: () => openEditOrderDiscountDialog(discount),
                         icon: <Percent size={14} />,
+                      },
+                      {
+                        key: "toggleActive",
+                        label: discount.active ? t("disableDiscount") : t("enableDiscount"),
+                        onClick: () => handleToggleOrderDiscountActive(discount.id),
+                        icon: <Power size={14} />,
                       },
                       {
                         key: "remove",
@@ -400,6 +428,9 @@ export default function MenuManagementPage() {
                   onRemoveDiscount={() =>
                     handleRemoveCategoryDiscount(category.id)
                   }
+                  onToggleDiscountActive={() =>
+                    handleToggleCategoryDiscountActive(category.id)
+                  }
                 />
 
                 {expandedCategories.has(category.id) && (
@@ -437,6 +468,9 @@ export default function MenuManagementPage() {
                           }
                           onRemoveDiscount={() =>
                             handleRemoveItemDiscount(item.id)
+                          }
+                          onToggleDiscountActive={() =>
+                            handleToggleItemDiscountActive(item.id)
                           }
                         />
                       ))

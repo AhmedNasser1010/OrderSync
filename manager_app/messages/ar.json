@@ -6,6 +6,7 @@
     "noImage": "لا توجد صورة",
     "noBackground": "لا توجد خلفية",
     "hidden": "مخفي",
+    "disabled": "معطل",
     "actions": "إجراءات",
     "editBackgrounds": "تعديل الخلفيات"
   },
@@ -245,6 +246,9 @@
       "addOrderDiscount": "إضافة خصم على السلة",
       "noOrderDiscounts": "لا توجد خصومات على السلة بعد",
       "editDiscount": "تعديل الخصم",
+      "enableDiscount": "تفعيل الخصم",
+      "disableDiscount": "تعطيل الخصم",
+      "disabled": "معطل",
       "removeDiscount": "إزالة الخصم"
     },
     "categoryForm": {
@@ -284,6 +288,8 @@
       "items": "عناصر",
       "addDiscount": "إضافة خصم",
       "editDiscount": "تعديل الخصم",
+      "enableDiscount": "تفعيل الخصم",
+      "disableDiscount": "تعطيل الخصم",
       "removeDiscount": "إزالة الخصم"
     },
     "itemCard": {
@@ -295,6 +301,8 @@
       "delete": "حذف العنصر",
       "addDiscount": "إضافة خصم",
       "editDiscount": "تعديل الخصم",
+      "enableDiscount": "تفعيل الخصم",
+      "disableDiscount": "تعطيل الخصم",
       "removeDiscount": "إزالة الخصم"
     },
     "sync": {
@@ -323,6 +331,7 @@
   "DiscountDialog": {
     "addTitle": "إضافة خصم",
     "editTitle": "تعديل الخصم",
+    "enabled": "مفعّل",
     "messageLabel": "الرسالة",
     "messagePlaceholder": "مثال: خصم 20% على طلبك!",
     "typeLabel": "النوع",

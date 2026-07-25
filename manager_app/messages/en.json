@@ -6,6 +6,7 @@
     "noImage": "No image",
     "noBackground": "No background",
     "hidden": "Hidden",
+    "disabled": "Disabled",
     "actions": "Actions",
     "editBackgrounds": "Edit backgrounds"
   },
@@ -245,6 +246,9 @@
       "addOrderDiscount": "Add Cart Discount",
       "noOrderDiscounts": "No cart discounts yet",
       "editDiscount": "Edit Discount",
+      "enableDiscount": "Enable Discount",
+      "disableDiscount": "Disable Discount",
+      "disabled": "Disabled",
       "removeDiscount": "Remove Discount"
     },
     "categoryForm": {
@@ -284,6 +288,8 @@
       "items": "items",
       "addDiscount": "Add Discount",
       "editDiscount": "Edit Discount",
+      "enableDiscount": "Enable Discount",
+      "disableDiscount": "Disable Discount",
       "removeDiscount": "Remove Discount"
     },
     "itemCard": {
@@ -295,6 +301,8 @@
       "delete": "Delete item",
       "addDiscount": "Add Discount",
       "editDiscount": "Edit Discount",
+      "enableDiscount": "Enable Discount",
+      "disableDiscount": "Disable Discount",
       "removeDiscount": "Remove Discount"
     },
     "sync": {
@@ -323,6 +331,7 @@
   "DiscountDialog": {
     "addTitle": "Add Discount",
     "editTitle": "Edit Discount",
+    "enabled": "Enabled",
     "messageLabel": "Message",
     "messagePlaceholder": "e.g. 20% off your order!",
     "typeLabel": "Type",

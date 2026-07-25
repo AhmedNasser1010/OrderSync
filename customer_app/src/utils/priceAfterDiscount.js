@@ -19,7 +19,10 @@ const totalOrders = (user, conditionValue, currentRes) => {
 const priceAfterDiscount = (price, discount, user, resId) => {
 	// If not discount available return default data
 	if (!discount) return { finalPrice: price, isAvailableForUser: false }
-		
+
+	// If discount is disabled, treat as no discount
+	if (discount.active === false) return { finalPrice: price, isAvailableForUser: false }
+
 	const discountObj = generateDiscountObj(discount)
 	let finalPrice = price
 	let isAvailableForUser = false

@@ -283,6 +283,37 @@ export const menuSlice = createSlice({
         (d) => d.id !== payload.id,
       );
     },
+    toggleItemDiscountActive: (
+      state,
+      { payload }: PayloadAction<{ itemId: string }>,
+    ) => {
+      state.categories.forEach((category) => {
+        category.items = category.items.map((item) =>
+          item.id === payload.itemId && item.discount
+            ? { ...item, discount: { ...item.discount, active: !item.discount.active } }
+            : item,
+        );
+      });
+    },
+    toggleCategoryDiscountActive: (
+      state,
+      { payload }: PayloadAction<{ categoryId: string }>,
+    ) => {
+      state.categories = state.categories.map((category) =>
+        category.id === payload.categoryId && category.discount
+          ? { ...category, discount: { ...category.discount, active: !category.discount.active } }
+          : category,
+      );
+    },
+    toggleOrderDiscountActive: (
+      state,
+      { payload }: PayloadAction<{ id: string }>,
+    ) => {
+      if (!state.orderDiscounts) return;
+      state.orderDiscounts = state.orderDiscounts.map((d) =>
+        d.id === payload.id ? { ...d, active: !d.active } : d,
+      );
+    },
   },
 });
 
@@ -316,6 +347,9 @@ export const {
   addOrderDiscount,
   updateOrderDiscount,
   removeOrderDiscount,
+  toggleItemDiscountActive,
+  toggleCategoryDiscountActive,
+  toggleOrderDiscountActive,
 } = menuSlice.actions;
 
 export default menuSlice.reducer;
