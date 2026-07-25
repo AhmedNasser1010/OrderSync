@@ -1,4 +1,4 @@
-import type { CategoryType, ItemType } from "@ordersync/types";
+import type { CategoryType, ItemType, DiscountObject } from "@ordersync/types";
 
 export type StatusType = "good" | "warning" | "alert";
 
@@ -124,6 +124,7 @@ export interface MenuCategory extends CategoryType {
 
 export interface MenuData {
   categories: MenuCategory[];
+  orderDiscounts?: DiscountObject[];
   lastSynced: string;
 }
 

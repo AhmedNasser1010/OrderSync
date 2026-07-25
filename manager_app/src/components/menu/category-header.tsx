@@ -7,6 +7,8 @@ import {
   Edit,
   ArrowUp,
   ArrowDown,
+  Percent,
+  Tag,
 } from "lucide-react";
 import { Trash } from "lucide-react";
 import { useState } from "react";
@@ -25,6 +27,8 @@ interface CategoryHeaderProps {
   onEdit: () => void;
   onDelete?: () => void;
   onUpdateBackgrounds?: (backgrounds: string[]) => void;
+  onAddDiscount?: () => void;
+  onRemoveDiscount?: () => void;
 }
 
 export function CategoryHeader({
@@ -37,6 +41,8 @@ export function CategoryHeader({
   onEdit,
   onDelete,
   onUpdateBackgrounds,
+  onAddDiscount,
+  onRemoveDiscount,
 }: CategoryHeaderProps) {
   const t = useTranslations("Menu.categoryHeader");
   const common = useTranslations("Common");
@@ -84,6 +90,14 @@ export function CategoryHeader({
                 {common("hidden")}
               </span>
             )}
+            {category.discount && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 px-2 py-0.5 text-xs font-medium">
+                <Percent size={12} />
+                {category.discount.type === "P"
+                  ? `${category.discount.value}% OFF`
+                  : `$${category.discount.value} OFF`}
+              </span>
+            )}
           </div>
           <p className="text-sm text-muted-foreground line-clamp-2">
             {category.description}
@@ -121,6 +135,23 @@ export function CategoryHeader({
               onClick: onEdit,
               icon: <Edit size={14} />,
             },
+            {
+              key: "addDiscount",
+              label: category.discount ? t("editDiscount") : t("addDiscount"),
+              onClick: () => onAddDiscount && onAddDiscount(),
+              icon: <Percent size={14} />,
+            },
+            ...(category.discount
+              ? [
+                  {
+                    key: "removeDiscount",
+                    label: t("removeDiscount"),
+                    onClick: () => onRemoveDiscount && onRemoveDiscount(),
+                    icon: <Tag size={14} />,
+                    destructive: true,
+                  },
+                ]
+              : []),
             {
               key: "delete",
               label: t("delete"),

@@ -78,7 +78,9 @@ import toast from "react-hot-toast";
 // Load initial state from localStorage if available
 const loadStateFromLocalStorage = () => {
   const savedCart = localStorage.getItem("cartState");
-  return savedCart ? JSON.parse(savedCart) : { items: [], restaurant: "" };
+  return savedCart
+    ? { ...JSON.parse(savedCart), appliedOrderDiscount: null }
+    : { items: [], restaurant: "", appliedOrderDiscount: null };
 };
 
 // Save state to localStorage whenever changes occur
@@ -142,6 +144,14 @@ export const cartSlice = createSlice({
       );
       saveStateToLocalStorage(state);
     },
+    applyOrderDiscount: (state, { payload }) => {
+      state.appliedOrderDiscount = payload;
+      saveStateToLocalStorage(state);
+    },
+    removeOrderDiscount: (state) => {
+      state.appliedOrderDiscount = null;
+      saveStateToLocalStorage(state);
+    },
   },
 });
 
@@ -152,6 +162,8 @@ export const {
   quantityHandle,
   setRestaurant,
   handleAddDiscount,
+  applyOrderDiscount,
+  removeOrderDiscount,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

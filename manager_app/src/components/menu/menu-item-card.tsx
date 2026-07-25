@@ -9,10 +9,12 @@ import {
   ArrowUp,
   ArrowDown,
   Trash,
+  Percent,
+  Tag,
 } from "lucide-react";
 import { ActionsMenu } from "@/components/ui/actions-menu";
 import { ImageEditDialog } from "@/components/ui/image-edit-dialog";
-import type { ItemType } from "@ordersync/types";
+import type { ItemType, DiscountObject } from "@ordersync/types";
 
 interface MenuItemCardProps {
   item: ItemType;
@@ -22,6 +24,8 @@ interface MenuItemCardProps {
   onEdit: () => void;
   onDelete?: () => void;
   onUpdateBackgrounds?: (backgrounds: string[]) => void;
+  onAddDiscount?: () => void;
+  onRemoveDiscount?: () => void;
 }
 
 export function MenuItemCard({
@@ -32,6 +36,8 @@ export function MenuItemCard({
   onEdit,
   onDelete,
   onUpdateBackgrounds,
+  onAddDiscount,
+  onRemoveDiscount,
 }: MenuItemCardProps) {
   const t = useTranslations("Menu.itemCard");
   const common = useTranslations("Common");
@@ -69,6 +75,14 @@ export function MenuItemCard({
                   {common("hidden")}
                 </span>
               )}
+              {item.discount && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 px-2 py-0.5 text-xs font-medium">
+                  <Percent size={12} />
+                  {item.discount.type === "P"
+                    ? `${item.discount.value}% OFF`
+                    : `$${item.discount.value} OFF`}
+                </span>
+              )}
             </div>
             <p className="text-sm text-muted-foreground line-clamp-2">
               {item.description}
@@ -103,6 +117,23 @@ export function MenuItemCard({
                 onClick: onToggleVisibility,
                 icon: item.visibility ? <Eye size={14} /> : <EyeOff size={14} />,
               },
+              {
+                key: "addDiscount",
+                label: item.discount ? t("editDiscount") : t("addDiscount"),
+                onClick: () => onAddDiscount && onAddDiscount(),
+                icon: <Percent size={14} />,
+              },
+              ...(item.discount
+                ? [
+                    {
+                      key: "removeDiscount",
+                      label: t("removeDiscount"),
+                      onClick: () => onRemoveDiscount && onRemoveDiscount(),
+                      icon: <Tag size={14} />,
+                      destructive: true,
+                    },
+                  ]
+                : []),
               {
                 key: "delete",
                 label: t("delete"),

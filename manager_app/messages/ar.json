@@ -207,7 +207,10 @@
       "noItems": "لا توجد عناصر في هذه الفئة",
       "addFirstItem": "إضافة أول عنصر",
       "addItem": "+ إضافة عنصر",
-      "lastSynced": "آخر مزامنة:"
+      "lastSynced": "آخر مزامنة:",
+      "orderDiscounts": "خصومات الطلب",
+      "addOrderDiscount": "إضافة خصم على الطلب",
+      "noOrderDiscounts": "لا توجد خصومات على الطلب بعد"
     },
     "categoryForm": {
       "editTitle": "تعديل الفئة",
@@ -243,7 +246,10 @@
       "moveDown": "نقل الفئة لأسفل",
       "edit": "تعديل الفئة",
       "delete": "حذف الفئة",
-      "items": "عناصر"
+      "items": "عناصر",
+      "addDiscount": "إضافة خصم",
+      "editDiscount": "تعديل الخصم",
+      "removeDiscount": "إزالة الخصم"
     },
     "itemCard": {
       "moveUp": "نقل العنصر لأعلى",
@@ -251,7 +257,10 @@
       "edit": "تعديل العنصر",
       "hideFromMenu": "إخفاء من القائمة",
       "showInMenu": "إظهار في القائمة",
-      "delete": "حذف العنصر"
+      "delete": "حذف العنصر",
+      "addDiscount": "إضافة خصم",
+      "editDiscount": "تعديل الخصم",
+      "removeDiscount": "إزالة الخصم"
     },
     "sync": {
       "success": "تمت مزامنة القائمة بنجاح!",
@@ -275,5 +284,47 @@
   "Metadata": {
     "title": "أوردرسينك | الرئيسية",
     "description": "تتبع أداء مطعمك وتحليلاته"
+  },
+  "DiscountDialog": {
+    "addTitle": "إضافة خصم",
+    "editTitle": "تعديل الخصم",
+    "codeLabel": "كود الخصم",
+    "codePlaceholder": "مثال: P-20 أو FIXED-15",
+    "messageLabel": "الرسالة",
+    "messagePlaceholder": "مثال: خصم 20% على طلبك!",
+    "typeLabel": "النوع",
+    "typePercentage": "نسبة مئوية (%)",
+    "typeFixed": "مبلغ ثابت",
+    "valueLabel": "القيمة",
+    "minOrderTotal": "الحد الأدنى لمبلغ الطلب",
+    "minCartItems": "الحد الأدنى لعناصر السلة",
+    "startDate": "تاريخ البدء",
+    "endDate": "تاريخ الانتهاء",
+    "timeRules": "قواعد مبنية على الوقت",
+    "startTime": "وقت البدء",
+    "endTime": "وقت الانتهاء",
+    "saveChanges": "حفظ التغييرات",
+    "addDiscount": "إضافة خصم",
+    "cancel": "إلغاء",
+    "days": {
+      "sun": "أحد",
+      "mon": "إثن",
+      "tue": "ثلا",
+      "wed": "أرب",
+      "thu": "خمي",
+      "fri": "جمع",
+      "sat": "سبت"
+    }
+  },
+  "ConditionsEditor": {
+    "title": "الشروط",
+    "firstPurchase": "الشراء الأول",
+    "totalSpent": "إجمالي المشتريات (>=)",
+    "totalItems": "إجمالي العناصر (>=)",
+    "totalOrders": "إجمالي الطلبات (>=)",
+    "accountAge": "عمر الحساب (أيام >=)",
+    "daysSinceLastOrder": "الأيام منذ آخر طلب (>=)",
+    "valuePlaceholder": "القيمة",
+    "addCondition": "إضافة شرط"
   }
 }

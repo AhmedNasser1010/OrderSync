@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { ItemType } from "@ordersync/types";
+import type { ItemType, DiscountObject } from "@ordersync/types";
 import type { MenuCategory, MenuData } from "@/lib/types/types";
 
 const initialState: MenuData = {
@@ -210,6 +210,79 @@ export const menuSlice = createSlice({
     setLastSynced: (state, { payload }: PayloadAction<string>) => {
       state.lastSynced = payload;
     },
+    setItemDiscount: (
+      state,
+      { payload }: PayloadAction<{ itemId: string; discount: DiscountObject }>,
+    ) => {
+      state.categories.forEach((category) => {
+        category.items = category.items.map((item) =>
+          item.id === payload.itemId
+            ? { ...item, discount: payload.discount }
+            : item,
+        );
+      });
+    },
+    removeItemDiscount: (
+      state,
+      { payload }: PayloadAction<{ itemId: string }>,
+    ) => {
+      state.categories.forEach((category) => {
+        category.items = category.items.map((item) =>
+          item.id === payload.itemId
+            ? { ...item, discount: undefined }
+            : item,
+        );
+      });
+    },
+    setCategoryDiscount: (
+      state,
+      {
+        payload,
+      }: PayloadAction<{ categoryId: string; discount: DiscountObject }>,
+    ) => {
+      state.categories = state.categories.map((category) =>
+        category.id === payload.categoryId
+          ? { ...category, discount: payload.discount }
+          : category,
+      );
+    },
+    removeCategoryDiscount: (
+      state,
+      { payload }: PayloadAction<{ categoryId: string }>,
+    ) => {
+      state.categories = state.categories.map((category) =>
+        category.id === payload.categoryId
+          ? { ...category, discount: undefined }
+          : category,
+      );
+    },
+    addOrderDiscount: (
+      state,
+      { payload }: PayloadAction<DiscountObject>,
+    ) => {
+      if (!state.orderDiscounts) {
+        state.orderDiscounts = [];
+      }
+      state.orderDiscounts.push(payload);
+    },
+    updateOrderDiscount: (
+      state,
+      { payload }: PayloadAction<{ id: string; updates: Partial<DiscountObject> }>,
+    ) => {
+      if (!state.orderDiscounts) return;
+      state.orderDiscounts = state.orderDiscounts.map((d) =>
+        d.id === payload.id ? { ...d, ...payload.updates } : d,
+      );
+    },
+    removeOrderDiscount: (
+      state,
+      { payload }: PayloadAction<{ id: string }>,
+    ) => {
+      if (!state.orderDiscounts) return;
+      state.orderDiscounts = state.orderDiscounts.filter(
+        (d) => d.id !== payload.id,
+      );
+    },
   },
 });
 
@@ -236,6 +309,13 @@ export const {
   moveCategory,
   moveItem,
   setLastSynced,
+  setItemDiscount,
+  removeItemDiscount,
+  setCategoryDiscount,
+  removeCategoryDiscount,
+  addOrderDiscount,
+  updateOrderDiscount,
+  removeOrderDiscount,
 } = menuSlice.actions;
 
 export default menuSlice.reducer;

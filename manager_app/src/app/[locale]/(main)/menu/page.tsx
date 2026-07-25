@@ -2,16 +2,35 @@
 
 import { useState, useMemo } from "react";
 import { useTranslations } from "next-intl";
-import { Plus, Cloud, UtensilsCrossed } from "lucide-react";
+import { Plus, Cloud, UtensilsCrossed, Percent, Trash2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 import { useMenuData } from "@/hooks/useMenuData";
 import { CategoryHeader } from "@/components/menu/category-header";
 import { MenuItemCard } from "@/components/menu/menu-item-card";
 import { CategoryForm } from "@/components/menu/category-form";
 import { MenuItemForm } from "@/components/menu/menu-item-form";
+import { DiscountDialog } from "@/components/menu/DiscountDialog";
 import { Button } from "@/components/ui/button";
+import { ActionsMenu } from "@/components/ui/actions-menu";
 import { AppHeader } from "@/components/dashboard/app-header";
+import type { DiscountObject, DiscountLevel } from "@ordersync/types";
+import type { RootState } from "@/lib/rtk/store";
+import {
+  setItemDiscount,
+  removeItemDiscount,
+  setCategoryDiscount,
+  removeCategoryDiscount,
+  addOrderDiscount,
+  updateOrderDiscount,
+  removeOrderDiscount,
+} from "@/lib/rtk/slices/menuSlice";
 
 export default function MenuManagementPage() {
+  const dispatch = useDispatch();
+  const orderDiscounts = useSelector(
+    (state: RootState) => state.menu.orderDiscounts ?? [],
+  );
+
   const {
     menuData,
     isSyncing,
@@ -41,9 +60,21 @@ export default function MenuManagementPage() {
     string | null
   >(null);
   const t = useTranslations("Menu.page");
-  const common = useTranslations("Common");
 
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
+
+  // Discount dialog state
+  const [discountDialogOpen, setDiscountDialogOpen] = useState(false);
+  const [discountDialogLevel, setDiscountDialogLevel] =
+    useState<DiscountLevel>("item");
+  const [editingDiscount, setEditingDiscount] = useState<
+    DiscountObject | undefined
+  >(undefined);
+  const [discountContext, setDiscountContext] = useState<{
+    type: "item" | "category" | "order";
+    itemId?: string;
+    categoryId?: string;
+  } | null>(null);
 
   const toggleCategoryExpand = (categoryId: string) => {
     const newExpanded = new Set(expandedCategories);
@@ -105,6 +136,88 @@ export default function MenuManagementPage() {
     setShowItemForm(true);
   };
 
+  // Discount handlers
+  const openItemDiscountDialog = (itemId: string) => {
+    const item = menuData.categories
+      .flatMap((c) => c.items)
+      .find((i) => i.id === itemId);
+    setDiscountDialogLevel("item");
+    setDiscountContext({ type: "item", itemId });
+    setEditingDiscount(item?.discount);
+    setDiscountDialogOpen(true);
+  };
+
+  const openCategoryDiscountDialog = (categoryId: string) => {
+    const category = menuData.categories.find((c) => c.id === categoryId);
+    setDiscountDialogLevel("category");
+    setDiscountContext({ type: "category", categoryId });
+    setEditingDiscount(category?.discount);
+    setDiscountDialogOpen(true);
+  };
+
+  const openOrderDiscountDialog = () => {
+    setDiscountDialogLevel("order");
+    setDiscountContext({ type: "order" });
+    setEditingDiscount(undefined);
+    setDiscountDialogOpen(true);
+  };
+
+  const openEditOrderDiscountDialog = (discount: DiscountObject) => {
+    setDiscountDialogLevel("order");
+    setDiscountContext({ type: "order" });
+    setEditingDiscount(discount);
+    setDiscountDialogOpen(true);
+  };
+
+  const handleDiscountSubmit = (discount: DiscountObject) => {
+    if (!discountContext) return;
+
+    switch (discountContext.type) {
+      case "item":
+        if (discountContext.itemId) {
+          dispatch(
+            setItemDiscount({ itemId: discountContext.itemId, discount }),
+          );
+        }
+        break;
+      case "category":
+        if (discountContext.categoryId) {
+          dispatch(
+            setCategoryDiscount({
+              categoryId: discountContext.categoryId,
+              discount,
+            }),
+          );
+        }
+        break;
+      case "order":
+        if (editingDiscount) {
+          dispatch(
+            updateOrderDiscount({ id: editingDiscount.id, updates: discount }),
+          );
+        } else {
+          dispatch(addOrderDiscount(discount));
+        }
+        break;
+    }
+
+    setDiscountDialogOpen(false);
+    setDiscountContext(null);
+    setEditingDiscount(undefined);
+  };
+
+  const handleRemoveItemDiscount = (itemId: string) => {
+    dispatch(removeItemDiscount({ itemId }));
+  };
+
+  const handleRemoveCategoryDiscount = (categoryId: string) => {
+    dispatch(removeCategoryDiscount({ categoryId }));
+  };
+
+  const handleRemoveOrderDiscount = (discountId: string) => {
+    dispatch(removeOrderDiscount({ id: discountId }));
+  };
+
   const sortedCategories = useMemo(() => {
     return [...menuData.categories];
   }, [menuData.categories]);
@@ -146,6 +259,78 @@ export default function MenuManagementPage() {
             {syncMessage}
           </div>
         )}
+
+        {/* Order Discounts Section */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-foreground">
+              {t("orderDiscounts")}
+            </h3>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={openOrderDiscountDialog}
+              className="gap-1"
+            >
+              <Plus size={14} />
+              {t("addOrderDiscount")}
+            </Button>
+          </div>
+
+          {orderDiscounts.length > 0 ? (
+            <div className="space-y-2">
+              {orderDiscounts.map((discount) => (
+                <div
+                  key={discount.id}
+                  className="flex items-center justify-between p-3 bg-card/50 border border-border rounded-lg"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 px-2 py-0.5 text-xs font-medium shrink-0">
+                      <Percent size={12} />
+                      {discount.type === "P"
+                        ? `${discount.value}% OFF`
+                        : `$${discount.value} OFF`}
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">
+                        {discount.message}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {discount.code}
+                        {discount.minOrderTotal
+                          ? ` · Min $${discount.minOrderTotal}`
+                          : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <ActionsMenu
+                    items={[
+                      {
+                        key: "edit",
+                        label: t("editDiscount"),
+                        onClick: () => openEditOrderDiscountDialog(discount),
+                        icon: <Percent size={14} />,
+                      },
+                      {
+                        key: "remove",
+                        label: t("removeDiscount"),
+                        onClick: () => handleRemoveOrderDiscount(discount.id),
+                        icon: <Trash2 size={14} />,
+                        destructive: true,
+                      },
+                    ]}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-muted-foreground text-center py-3 bg-card/30 border border-border rounded-lg">
+              {t("noOrderDiscounts")}
+            </p>
+          )}
+        </div>
+
+        {/* Categories */}
         <div className="space-y-4">
           {sortedCategories.length === 0 ? (
             <div className="text-center py-12">
@@ -175,6 +360,12 @@ export default function MenuManagementPage() {
                   }}
                   onUpdateBackgrounds={(backgrounds) =>
                     updateCategory(category.id, { backgrounds })
+                  }
+                  onAddDiscount={() =>
+                    openCategoryDiscountDialog(category.id)
+                  }
+                  onRemoveDiscount={() =>
+                    handleRemoveCategoryDiscount(category.id)
                   }
                 />
 
@@ -207,6 +398,12 @@ export default function MenuManagementPage() {
                           onDelete={() => deleteItem(item.id)}
                           onUpdateBackgrounds={(backgrounds) =>
                             updateMenuItem(item.id, { backgrounds })
+                          }
+                          onAddDiscount={() =>
+                            openItemDiscountDialog(item.id)
+                          }
+                          onRemoveDiscount={() =>
+                            handleRemoveItemDiscount(item.id)
                           }
                         />
                       ))
@@ -302,6 +499,15 @@ export default function MenuManagementPage() {
           submitLabel="Save Item"
         />
       )}
+
+      <DiscountDialog
+        open={discountDialogOpen}
+        onOpenChange={setDiscountDialogOpen}
+        onSubmit={handleDiscountSubmit}
+        level={discountDialogLevel}
+        initialData={editingDiscount}
+        isEditing={!!editingDiscount}
+      />
     </div>
   );
 }

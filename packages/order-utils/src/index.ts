@@ -38,3 +38,19 @@ export {
   ordersForDateRange,
   getDailyReportRef,
 } from "./queries";
+
+export {
+  isDiscountActive,
+  evaluateConditions,
+  isWithinTimeRules,
+  generateDiscountObj,
+  priceAfterDiscount,
+  applyOrderDiscounts,
+  calculateOrderDiscount,
+  applyStackingRules,
+  applyStackedDiscounts,
+  resolveItemDiscount,
+  evaluateSegment,
+  evaluateSegments,
+  getUserSegments,
+} from "./discount";

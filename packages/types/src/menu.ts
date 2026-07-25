@@ -1,3 +1,5 @@
+import type { DiscountObject } from "./discount";
+
 export type CategoryType = {
   id: string;
   title: string;
@@ -5,6 +7,7 @@ export type CategoryType = {
   topMenu: boolean;
   visibility: boolean;
   backgrounds?: string[];
+  discount?: DiscountObject;
   createdAt: number;
   updatedAt: number;
 };
@@ -24,6 +27,7 @@ export type ItemType = {
   category: string;
   backgrounds: string[];
   sizes?: SizeType[];
+  discount?: DiscountObject;
   createdAt: number;
   updatedAt: number;
 };
@@ -35,4 +39,5 @@ export type MainMenuType = {
   updatedAt: number;
   categories: CategoryType[];
   items: ItemType[];
+  orderDiscounts?: DiscountObject[];
 };

@@ -11,7 +11,7 @@ import { quantityHandle, clearCart, handleAddDiscount } from '../../rtk/slices/c
 import { addCheckout, clearCheckout } from '../../rtk/slices/checkoutSlice'
 import { toggleLoginSidebar, toggleOrderSidebar } from '../../rtk/slices/toggleSlice'
 
-import priceAfterDiscount from '../../utils/priceAfterDiscount'
+import { priceAfterDiscount, resolveItemDiscount } from '@ordersync/order-utils'
 import generateDiscountObj from '../../utils/generateDiscountObj'
 import randomOrderNumber from '../../utils/randomOrderId'
 import DB_ARRAY_UNION from '../../utils/DB_ARRAY_UNION'
@@ -112,6 +112,7 @@ const Cart = () => {
   const cartItems = useSelector((state) => state.cart.items)
   const cartRestaurantID = useSelector((state) => state.cart.restaurant)
   const menuItems = useSelector((state) => state.menu.items)
+  const categories = useSelector((state) => state.menu.categories)
   const restaurants = useSelector((state) => state.restaurants)
   const checkout = useSelector((state) => state.checkout)
   const accessToken = useSelector((state) => state.cart.restaurant)
@@ -194,12 +195,11 @@ const Cart = () => {
     return selectedItems?.reduce(
       (accumulator, item) => {
         const { price } = item?.selectedSize ? item?.sizes?.find((itemSize) => itemSize.size === item?.selectedSize) : { price: item.price }
-        const { finalPrice, isAvailableForUser } = priceAfterDiscount(
-          price,
-          item.discount,
-          user,
-          cartRestaurantID
-        )
+        const category = categories?.find((cat) => cat.id === item.category)
+        const effectiveDiscount = resolveItemDiscount(item, category)
+        const { finalPrice, isAvailableForUser } = effectiveDiscount
+          ? priceAfterDiscount(price, effectiveDiscount, user, cartRestaurantID)
+          : { finalPrice: price, isAvailableForUser: false }
         const discountIncluded = isAvailableForUser && price !== finalPrice
         if (discountIncluded) {
           return {
@@ -215,16 +215,18 @@ const Cart = () => {
       },
       { total: deliveryFees, discount: deliveryFees }
     )
-  }, [cartItems, deliveryFees, selectedItems])
+  }, [cartItems, deliveryFees, selectedItems, categories])
 
   useEffect(() => {
     if (selectedItems.length) {
       selectedItems.map((item) => {
-        const discountObj = item?.discount?.code ? generateDiscountObj(item?.discount) : null
+        const category = categories?.find((cat) => cat.id === item.category)
+        const effectiveDiscount = resolveItemDiscount(item, category)
+        const discountObj = effectiveDiscount?.code ? generateDiscountObj(effectiveDiscount) : null
         if (discountObj) {
           const { finalPrice, isAvailableForUser } = priceAfterDiscount(
             item.price,
-            item.discount,
+            effectiveDiscount,
             user,
             cartRestaurantID
           )
@@ -513,8 +515,10 @@ const Cart = () => {
               </div>
               {selectedItems?.map((item) => {
                 const { size, price } = item?.selectedSize ? item?.sizes?.find((itemSize) => itemSize.size === item?.selectedSize) : { size: null, price: item.price }
-                const { finalPrice, isAvailableForUser } = item?.discount?.code
-                  ? priceAfterDiscount(price ?? item?.price, item.discount, user, resInfo.id)
+                const category = categories?.find((cat) => cat.id === item.category)
+                const effectiveDiscount = resolveItemDiscount(item, category)
+                const { finalPrice, isAvailableForUser } = effectiveDiscount
+                  ? priceAfterDiscount(price ?? item?.price, effectiveDiscount, user, resInfo.id)
                   : { finalPrice: price ?? item?.price, isAvailableForUser: false }
                 const discountIncluded = isAvailableForUser && price !== finalPrice
                 return (
@@ -523,7 +527,7 @@ const Cart = () => {
                       <ItemAvailability />
                       <ItemTitle title={item?.title} discountIncluded={discountIncluded} />
                       <DiscountMsg
-                        discountMsg={item?.discount?.message}
+                        discountMsg={effectiveDiscount?.message}
                         discountIncluded={discountIncluded}
                       />
                       <ItemPrice

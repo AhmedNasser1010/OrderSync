@@ -4,8 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { addCheckout, clearCheckout } from '../../rtk/slices/checkoutSlice'
-import { clearCart } from '../../rtk/slices/cartSlice'
-import priceAfterDiscount from '../../utils/priceAfterDiscount'
+import { clearCart, applyOrderDiscount, removeOrderDiscount } from '../../rtk/slices/cartSlice'
+import { priceAfterDiscount, resolveItemDiscount } from '@ordersync/order-utils'
+import { trackDiscountRedemption } from '../../utils/trackDiscountRedemption'
 import { useNavigate } from 'react-router-dom'
 import toast from "react-hot-toast"
 import { useTranslation } from 'react-i18next'
@@ -19,6 +20,41 @@ import PopupWindow from './PopupWindow'
 import usePlaceOrder from '../../hooks/usePlaceOrder'
 
 const Payment = styled.div``
+const PromoSection = styled.div`
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	margin: 16px 0;
+`
+const PromoInput = styled.input`
+	flex: 1;
+	padding: 10px 12px;
+	border: 1px solid #979797;
+	border-radius: 6px;
+	font-size: 14px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	&:focus {
+		outline: none;
+		border-color: #2196F3;
+	}
+`
+const PromoButton = styled.button`
+	padding: 10px 16px;
+	background-color: ${props => props.applied ? '#F44336' : '#4CAF50'};
+	color: white;
+	border: none;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+`
+const PromoMessage = styled.p`
+	font-size: 12px;
+	color: ${props => props.error ? '#F44336' : '#4CAF50'};
+	margin: 4px 0 0 0;
+`
 const RadioFormWrapper = styled.div`
 	display: flex;
 	row-gap: 1rem;
@@ -97,12 +133,20 @@ function CheckoutUserPayment({ handleCurrentState, res }) {
 	const placeOrder = usePlaceOrder()
 	const cart = useSelector(state => state.checkout.cart)
 	const menuItems = useSelector(state => state.menu.items)
+	const categories = useSelector(state => state.menu.categories)
+	const orderDiscounts = useSelector(state => state.menu.orderDiscounts || [])
+	const appliedOrderDiscount = useSelector(state => state.cart.appliedOrderDiscount)
+	const user = useSelector(state => state.user)
+	const accessToken = useSelector(state => state.cart.restaurant)
 	const checkout = useSelector(state => state.checkout)
 	const [paymentMethod, setPaymentMethod] = useState('CASH')
 	const [total, setTotal] = useState(0)
 	const [totalWithDiscount, setTotalWithDiscount] = useState(0)
 	const [buttonIsDisable, setButtonIsDisable] = useState(false)
 	const [windowIsOpen, setWindowIsOpen] = useState(false)
+	const [promoCodeInput, setPromoCodeInput] = useState('')
+	const [promoError, setPromoError] = useState('')
+	const [promoSuccess, setPromoSuccess] = useState('')
 
 	const handleOnRadioChange = (e) => {
 		setPaymentMethod(e.target.value)
@@ -117,8 +161,19 @@ function CheckoutUserPayment({ handleCurrentState, res }) {
 	const handlePlaceOrder = () => {
 		setButtonIsDisable(true)
 		toast.promise(
-			placeOrder(checkout, res?.accessToken).then(res => {
-				if(res) {
+			placeOrder(checkout, res?.accessToken).then(result => {
+				if(result) {
+					if (appliedOrderDiscount) {
+						trackDiscountRedemption({
+							discountId: appliedOrderDiscount.id,
+							restaurantId: accessToken,
+							userId: user?.uid || '',
+							orderId: `order_${Date.now()}`,
+							amount: appliedOrderDiscount.type === 'P'
+								? totalWithDiscount * (appliedOrderDiscount.value / 100)
+								: Math.min(appliedOrderDiscount.value, totalWithDiscount),
+						})
+					}
 					setTimeout(() => navigate('/'), 3500)
 					return true
 				}
@@ -146,6 +201,69 @@ function CheckoutUserPayment({ handleCurrentState, res }) {
 		navigate('/')
 	}
 
+	const handleApplyPromoCode = () => {
+		setPromoError('')
+		setPromoSuccess('')
+
+		if (!promoCodeInput.trim()) {
+			setPromoError('Please enter a promo code')
+			return
+		}
+
+		const code = promoCodeInput.trim().toUpperCase()
+		const foundDiscount = orderDiscounts.find(
+			d => d.code.toUpperCase() === code && d.active
+		)
+
+		if (!foundDiscount) {
+			setPromoError('Invalid promo code')
+			return
+		}
+
+		if (foundDiscount.expireAt && Date.now() > foundDiscount.expireAt) {
+			setPromoError('This promo code has expired')
+			return
+		}
+
+		if (foundDiscount.startAt && Date.now() < foundDiscount.startAt) {
+			setPromoError('This promo code is not active yet')
+			return
+		}
+
+		if (foundDiscount.usageLimit != null && foundDiscount.usageCount >= foundDiscount.usageLimit) {
+			setPromoError('This promo code has reached its usage limit')
+			return
+		}
+
+		const cartSubtotal = cart?.reduce((sum, cartItem) => {
+			const menuItem = menuItems?.find(mi => mi.id === cartItem.id)
+			return sum + (menuItem?.price || 0) * cartItem.quantity
+		}, 0) || 0
+
+		if (foundDiscount.minOrderTotal && cartSubtotal < foundDiscount.minOrderTotal) {
+			setPromoError(`Minimum order total is ${foundDiscount.minOrderTotal}LE`)
+			return
+		}
+
+		if (foundDiscount.minCartItems) {
+			const totalItems = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0
+			if (totalItems < foundDiscount.minCartItems) {
+				setPromoError(`Minimum ${foundDiscount.minCartItems} items required`)
+				return
+			}
+		}
+
+		dispatch(applyOrderDiscount(foundDiscount))
+		setPromoSuccess(`Code "${foundDiscount.code}" applied! ${foundDiscount.message}`)
+		setPromoCodeInput('')
+	}
+
+	const handleRemovePromoCode = () => {
+		dispatch(removeOrderDiscount())
+		setPromoSuccess('')
+		setPromoError('')
+	}
+
 	useEffect(() => {
 		dispatch(addCheckout({ payment: { method: 'CASH' } }))
 
@@ -156,7 +274,11 @@ function CheckoutUserPayment({ handleCurrentState, res }) {
 			menuItems.map(menuItem => {
 				if (cartItem.id === menuItem.id) {
 					let subtotal = menuItem.price * cartItem.quantity
-					let subTotalDiscounted = menuItem.discount ? priceAfterDiscount(menuItem.price, menuItem.discount.code) * cartItem.quantity : subtotal
+					const category = categories?.find(cat => cat.id === menuItem.category)
+					const effectiveDiscount = resolveItemDiscount(menuItem, category)
+					let subTotalDiscounted = effectiveDiscount
+						? priceAfterDiscount(menuItem.price, effectiveDiscount, user, accessToken).finalPrice * cartItem.quantity
+						: subtotal
 
 					total += subtotal
 					totalWithDiscount += subTotalDiscounted
@@ -164,9 +286,17 @@ function CheckoutUserPayment({ handleCurrentState, res }) {
 			})
 		})
 
+		let finalTotal = totalWithDiscount + res?.operations?.deliveryTax?.max
+		if (appliedOrderDiscount) {
+			const orderDiscountAmount = appliedOrderDiscount.type === 'P'
+				? totalWithDiscount * (appliedOrderDiscount.value / 100)
+				: Math.min(appliedOrderDiscount.value, totalWithDiscount)
+			finalTotal = Math.max(0, totalWithDiscount - orderDiscountAmount) + res?.operations?.deliveryTax?.max
+		}
+
 		setTotal(total + res?.operations?.deliveryTax?.max)
-		setTotalWithDiscount(totalWithDiscount + res?.operations?.deliveryTax?.max)
-	}, [])
+		setTotalWithDiscount(finalTotal)
+	}, [appliedOrderDiscount])
 
 	return (
 
@@ -204,6 +334,31 @@ function CheckoutUserPayment({ handleCurrentState, res }) {
 			</RadioFormWrapper>
 			<Divider />
 			<Tip message={`Delivery Tax Will Be Included ${res?.deliveryTax?.max}LE + Total Price`} icon={<FontAwesomeIcon icon={faCircleExclamation} />} />
+			{!appliedOrderDiscount && (
+				<PromoSection>
+					<PromoInput
+						type="text"
+						value={promoCodeInput}
+						onChange={(e) => setPromoCodeInput(e.target.value)}
+						placeholder="Enter promo code"
+						onKeyDown={(e) => e.key === 'Enter' && handleApplyPromoCode()}
+					/>
+					<PromoButton onClick={handleApplyPromoCode}>Apply</PromoButton>
+				</PromoSection>
+			)}
+			{appliedOrderDiscount && (
+				<PromoSection>
+					<PromoInput
+						type="text"
+						value={appliedOrderDiscount.code}
+						disabled
+						style={{ backgroundColor: '#f5f5f5', color: '#4CAF50', fontWeight: 600 }}
+					/>
+					<PromoButton applied onClick={handleRemovePromoCode}>Remove</PromoButton>
+				</PromoSection>
+			)}
+			{promoError && <PromoMessage error>{promoError}</PromoMessage>}
+			{promoSuccess && <PromoMessage>{promoSuccess}</PromoMessage>}
 			<TotalPrice>
 				<span>Total</span>
 				{ !totalWithDiscount && <span>{ total }LE</span> }

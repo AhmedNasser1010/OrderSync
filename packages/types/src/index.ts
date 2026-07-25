@@ -6,3 +6,18 @@ export type { CategoryType, SizeType, ItemType, MainMenuType } from "./menu";
 export type { OrderStatusType, OrderType } from "./order";
 export type { ManagerUser, PartnerUser } from "./user";
 export type { DailyReport } from "./dailyReport";
+export type {
+  DiscountLevel,
+  DiscountType,
+  ConditionOperator,
+  ConditionType,
+  StackingMode,
+  CustomerSegment,
+  DiscountCondition,
+  DiscountConditions,
+  TimeRules,
+  DiscountObject,
+  PromoCode,
+  DiscountRedemption,
+  PromoCodeValidationResult,
+} from "./discount";

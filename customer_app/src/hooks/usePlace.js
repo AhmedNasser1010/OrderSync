@@ -5,7 +5,7 @@ import toast from 'react-hot-toast'
 
 import filterObject from '../utils/filterObject'
 import getUserSource from '../utils/getUserSource'
-import priceAfterDiscount from '../utils/priceAfterDiscount'
+import { priceAfterDiscount, resolveItemDiscount } from '@ordersync/order-utils'
 import getDeliveryFees from '../utils/getDeliveryFees'
 import getDistanceFromLatlngInKm from '../utils/getDistanceFromLatlngInKm'
 import orderYupSchema from '../object-schemas/orderYupSchema'
@@ -20,8 +20,10 @@ const usePlace = () => {
   const cart = useSelector((state) => state.cart)
   const accessToken = cart.restaurant
   const menuItems = useSelector((state) => state.menu.items)
+  const categories = useSelector((state) => state.menu.categories)
   const restaurants = useSelector((state) => state.restaurants)
   const services = useSelector((state) => state.services)
+  const appliedOrderDiscount = useSelector((state) => state.cart.appliedOrderDiscount)
   const currentRes = restaurants?.find((restaurant) => restaurant.accessToken === cart.restaurant)
   const userDistanceFromRes =
     user?.locations?.selected &&
@@ -100,17 +102,16 @@ const usePlace = () => {
 
   const getCartTotalPrice = () => {
     const selectedItems = getCartFromMenu()
-    return selectedItems?.reduce(
+    const result = selectedItems?.reduce(
       (accumulator, item) => {
         const { price } = item?.selectedSize
           ? item?.sizes?.find((itemSize) => itemSize.size === item?.selectedSize)
           : { price: item.price }
-        const { finalPrice, isAvailableForUser } = priceAfterDiscount(
-          price,
-          item.discount,
-          user,
-          accessToken
-        )
+        const category = categories?.find((cat) => cat.id === item.category)
+        const effectiveDiscount = resolveItemDiscount(item, category)
+        const { finalPrice, isAvailableForUser } = effectiveDiscount
+          ? priceAfterDiscount(price, effectiveDiscount, user, accessToken)
+          : { finalPrice: price, isAvailableForUser: false }
         const discountIncluded = isAvailableForUser && price !== finalPrice
         if (discountIncluded) {
           return {
@@ -126,6 +127,15 @@ const usePlace = () => {
       },
       { total: deliveryFees, discount: deliveryFees }
     )
+
+    if (appliedOrderDiscount && result) {
+      const orderDiscountAmount = appliedOrderDiscount.type === 'P'
+        ? result.discount * (appliedOrderDiscount.value / 100)
+        : Math.min(appliedOrderDiscount.value, result.discount)
+      result.discount = Math.max(0, result.discount - orderDiscountAmount)
+    }
+
+    return result
   }
 
   const orderDataFinalize = (comment) => {
@@ -168,6 +178,12 @@ const usePlace = () => {
         discount,
         deliveryFees,
         total: cartTotalPrice.discount,
+        promoCode: appliedOrderDiscount?.code || undefined,
+        promoDiscount: appliedOrderDiscount
+          ? (appliedOrderDiscount.type === 'P'
+              ? subtotal * (appliedOrderDiscount.value / 100)
+              : Math.min(appliedOrderDiscount.value, subtotal))
+          : 0,
       },
       payment: {
         method: 'CASH',

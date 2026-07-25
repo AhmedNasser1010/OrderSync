@@ -207,7 +207,10 @@
       "noItems": "No items in this category",
       "addFirstItem": "Add First Item",
       "addItem": "+ Add Item",
-      "lastSynced": "Last synced:"
+      "lastSynced": "Last synced:",
+      "orderDiscounts": "Order Discounts",
+      "addOrderDiscount": "Add Order Discount",
+      "noOrderDiscounts": "No order discounts yet"
     },
     "categoryForm": {
       "editTitle": "Edit Category",
@@ -243,7 +246,10 @@
       "moveDown": "Move category down",
       "edit": "Edit category",
       "delete": "Delete category",
-      "items": "items"
+      "items": "items",
+      "addDiscount": "Add Discount",
+      "editDiscount": "Edit Discount",
+      "removeDiscount": "Remove Discount"
     },
     "itemCard": {
       "moveUp": "Move item up",
@@ -251,7 +257,10 @@
       "edit": "Edit item",
       "hideFromMenu": "Hide from menu",
       "showInMenu": "Show in menu",
-      "delete": "Delete item"
+      "delete": "Delete item",
+      "addDiscount": "Add Discount",
+      "editDiscount": "Edit Discount",
+      "removeDiscount": "Remove Discount"
     },
     "sync": {
       "success": "Menu synced successfully!",
@@ -275,5 +284,47 @@
   "Metadata": {
     "title": "OrderSync | Home",
     "description": "Track your restaurant performance and analytics"
+  },
+  "DiscountDialog": {
+    "addTitle": "Add Discount",
+    "editTitle": "Edit Discount",
+    "codeLabel": "Discount Code",
+    "codePlaceholder": "e.g. P-20 or FIXED-15",
+    "messageLabel": "Message",
+    "messagePlaceholder": "e.g. 20% off your order!",
+    "typeLabel": "Type",
+    "typePercentage": "Percentage (%)",
+    "typeFixed": "Fixed Amount",
+    "valueLabel": "Value",
+    "minOrderTotal": "Min Order Total",
+    "minCartItems": "Min Cart Items",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "timeRules": "Time-Based Rules",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "saveChanges": "Save Changes",
+    "addDiscount": "Add Discount",
+    "cancel": "Cancel",
+    "days": {
+      "sun": "Sun",
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat"
+    }
+  },
+  "ConditionsEditor": {
+    "title": "Conditions",
+    "firstPurchase": "First Purchase",
+    "totalSpent": "Total Spent (>=)",
+    "totalItems": "Total Items (>=)",
+    "totalOrders": "Total Orders (>=)",
+    "accountAge": "Account Age (days >=)",
+    "daysSinceLastOrder": "Days Since Last Order (>=)",
+    "valuePlaceholder": "Value",
+    "addCondition": "Add Condition"
   }
 }
