@@ -3,10 +3,11 @@
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/routing";
-import { BarChart3, UtensilsCrossed, Settings } from "lucide-react";
+import { BarChart3, Calendar, UtensilsCrossed, Settings } from "lucide-react";
 
 const tabs = [
   { id: "analytics", labelKey: "analytics", icon: BarChart3, href: "/" },
+  { id: "today", labelKey: "today", icon: Calendar, href: "/today" },
   { id: "menu", labelKey: "menu", icon: UtensilsCrossed, href: "/menu" },
   { id: "settings", labelKey: "settings", icon: Settings, href: "/settings" },
 ] as const;
@@ -19,6 +20,7 @@ export function NavigationBar() {
   const active = useMemo(() => {
     if (pathname?.startsWith("/menu")) return "menu";
     if (pathname?.startsWith("/settings")) return "settings";
+    if (pathname?.startsWith("/today")) return "today";
     return "analytics";
   }, [pathname]);
 

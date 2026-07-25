@@ -118,6 +118,35 @@ export interface DashboardData {
   businessHealth: BusinessHealthData;
 }
 
+export interface BalanceSummary {
+  paid: number;
+  unpaid: number;
+  paidCount: number;
+  unpaidCount: number;
+}
+
+export interface TodayData {
+  date: string;
+  totalRevenue: number;
+  totalOrders: number;
+  avgOrderValue: number;
+  cancellationRate: number;
+  balance: BalanceSummary;
+  activeOrders: number;
+  statusBreakdown: Record<string, number>;
+  paymentMethods: Record<string, number>;
+  topItems: { name: string; quantity: number; revenue: number }[];
+  customerInsights: {
+    totalCustomers: number;
+    returningCustomers: number;
+    newCustomers: number;
+  };
+  operations: {
+    avgPrepTime: number;
+    avgDeliveryTime: number;
+  };
+}
+
 export interface MenuCategory extends CategoryType {
   items: ItemType[];
 }

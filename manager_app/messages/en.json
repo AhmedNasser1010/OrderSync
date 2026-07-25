@@ -79,6 +79,7 @@
     },
     "bottomNav": {
       "analytics": "Analytics",
+      "today": "Today",
       "menu": "Menu",
       "settings": "Settings"
     },
@@ -234,6 +235,26 @@
       "lowCompletion": "Order completion rate is below target.",
       "slowPrepTime": "Preparation time is slower than expected.",
       "weakCategory": "{category} contributes only {percentage}% of revenue."
+    },
+    "today": {
+      "title": "Today's Overview",
+      "welcome": "Real-time overview of today's activity",
+      "revenue": "Today's Revenue",
+      "orders": "Today's Orders",
+      "avgOrderValue": "Avg Order Value",
+      "cancellationRate": "Cancellation Rate",
+      "balance": {
+        "title": "Balance",
+        "paid": "Paid",
+        "unpaid": "Unpaid",
+        "orders": "orders"
+      },
+      "activeOrders": "Active Orders",
+      "statusBreakdown": "Order Status Breakdown",
+      "noData": {
+        "title": "No orders today",
+        "description": "There are no orders for today yet. Orders will appear here in real-time."
+      }
     }
   },
   "Menu": {

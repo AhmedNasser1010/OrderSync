@@ -79,6 +79,7 @@
     },
     "bottomNav": {
       "analytics": "التحليلات",
+      "today": "اليوم",
       "menu": "القائمة",
       "settings": "الإعدادات"
     },
@@ -234,6 +235,26 @@
       "lowCompletion": "معدل إتمام الطلبات أقل من المستهدف.",
       "slowPrepTime": "وقت التحضير أبطأ من المتوقع.",
       "weakCategory": "{category} يساهم فقط بنسبة {percentage}% من الإيرادات."
+    },
+    "today": {
+      "title": "نظرة عامة على اليوم",
+      "welcome": "نظرة عامة في الوقت الفعلي على نشاط اليوم",
+      "revenue": "إيرادات اليوم",
+      "orders": "طلبات اليوم",
+      "avgOrderValue": "متوسط قيمة الطلب",
+      "cancellationRate": "معدل الإلغاء",
+      "balance": {
+        "title": "الرصيد",
+        "paid": "مدفوع",
+        "unpaid": "غير مدفوع",
+        "orders": "طلب"
+      },
+      "activeOrders": "الطلبات النشطة",
+      "statusBreakdown": "توزيع حالات الطلبات",
+      "noData": {
+        "title": "لا توجد طلبات اليوم",
+        "description": "لا توجد طلبات لليوم بعد. ستظهر الطلبات هنا في الوقت الفعلي."
+      }
     }
   },
   "Menu": {
