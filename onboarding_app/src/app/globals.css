@@ -128,3 +128,19 @@
     @apply font-sans;
   }
 }
+
+/* Leaflet popup overrides for dark mode */
+.dark .leaflet-popup-content-wrapper {
+  background: oklch(0.205 0 0);
+  color: oklch(0.985 0 0);
+  border-radius: 0.5rem;
+}
+.dark .leaflet-popup-tip {
+  background: oklch(0.205 0 0);
+}
+.dark .leaflet-popup-close-button {
+  color: oklch(0.708 0 0);
+}
+.dark .leaflet-popup-close-button:hover {
+  color: oklch(0.985 0 0);
+}

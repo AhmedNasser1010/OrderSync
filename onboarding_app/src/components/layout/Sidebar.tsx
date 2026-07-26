@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronRight, Menu, X, Utensils, Users, Truck, UserCircle, Star, LogOut } from "lucide-react";
+import { ChevronRight, Menu, X, Utensils, Users, Truck, UserCircle, Star, Map, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePathname } from "next/navigation";
@@ -22,6 +22,7 @@ export function Sidebar({
     { icon: Truck, label: "Drivers", href: "/drivers" },
     { icon: UserCircle, label: "Customers", href: "/customers" },
     { icon: Star, label: "Reviews", href: "/reviews" },
+    { icon: Map, label: "Live Map", href: "/map" },
   ];
 
   return (

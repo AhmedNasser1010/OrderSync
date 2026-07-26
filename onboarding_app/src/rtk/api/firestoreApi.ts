@@ -25,6 +25,8 @@ import type {
   ManagerUser,
   Driver,
   CustomerFeedbackType,
+  CustomerType,
+  OrderType,
 } from "@ordersync/types";
 
 export interface UpdateBusinessInput {
@@ -46,7 +48,7 @@ function getErrorMessage(error: unknown): string {
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["User", "Businesses", "Drivers", "Customers", "Reviews"],
+  tagTypes: ["User", "Businesses", "Drivers", "Customers", "Reviews", "Orders"],
   endpoints: (builder) => ({
     // Query Endpoints
     fetchUserData: builder.query({
@@ -606,6 +608,55 @@ export const firestoreApi = createApi({
       },
       providesTags: ["Customers"],
     }),
+    fetchActiveOrders: builder.query<OrderType[], string[]>({
+      async queryFn(accessTokens) {
+        try {
+          if (!accessTokens?.length) {
+            return { data: [] };
+          }
+
+          const terminalStatuses = new Set([
+            "DELIVERED",
+            "GIVEN_FEEDBACK",
+            "CANCELED",
+            "REJECTED",
+            "VOIDED",
+          ]);
+
+          const chunks: string[][] = [];
+          for (let i = 0; i < accessTokens.length; i += 10) {
+            chunks.push(accessTokens.slice(i, i + 10));
+          }
+
+          const snapshots = await Promise.all(
+            chunks.map(async (chunk) => {
+              const ref = collection(db, "orders");
+              const q = query(ref, where("businessId", "in", chunk));
+              return getDocs(q);
+            })
+          );
+
+          const orders = snapshots
+            .flatMap((snap) =>
+              snap.docs
+                .map((docSnap) => ({
+                  id: docSnap.id,
+                  ...docSnap.data(),
+                })) as OrderType[]
+            )
+            .filter((order) => !terminalStatuses.has(order.status?.current))
+            .sort((a, b) => b.createdAt - a.createdAt);
+
+          console.log("Read Operation [fetchActiveOrders]");
+          return { data: orders };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
+        }
+      },
+      providesTags: ["Orders"],
+    }),
     fetchReviews: builder.query<
       CustomerFeedbackType[],
       { partnerUid: string; fetchLimit?: number }
@@ -813,6 +864,7 @@ export const {
   useFetchManagersQuery,
   useFetchDriverUsersQuery,
   useFetchCustomersQuery,
+  useFetchActiveOrdersQuery,
   useFetchReviewsQuery,
 
   useCreateUserDocumentMutation,
