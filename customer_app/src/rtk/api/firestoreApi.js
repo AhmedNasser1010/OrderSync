@@ -29,6 +29,11 @@ export const firestoreApi = createApi({
       ) {
         await cacheDataLoaded
 
+        if (!orderId) {
+          await cacheEntryRemoved
+          return
+        }
+
         // Listen to the single order document in the global collection
         const orderRef = doc(db, 'orders', orderId)
 

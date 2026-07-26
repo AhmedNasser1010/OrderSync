@@ -98,7 +98,7 @@ const useOrder = () => {
       const uid = user.uid
       const resId = user?.trackedOrder?.restaurant
       const orderData = trackedOrderData
-      setOrderFeedbackMutation({ orderData, uid, feedback, resId })
+      setOrderFeedbackMutation({ orderId: orderData?.id, uid, feedback, resId })
     }
   }
 

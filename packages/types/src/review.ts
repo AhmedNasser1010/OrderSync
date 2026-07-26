@@ -1,4 +1,5 @@
 export type CustomerFeedbackType = {
+  orderId: string;
   customerId: string;
   restaurantId: string;
   rating: number;

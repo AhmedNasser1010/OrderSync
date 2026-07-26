@@ -24,7 +24,7 @@ import type {
   BusinessDocument,
   ManagerUser,
   Driver,
-  CustomerType,
+  CustomerFeedbackType,
 } from "@ordersync/types";
 
 export interface UpdateBusinessInput {
@@ -46,7 +46,7 @@ function getErrorMessage(error: unknown): string {
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["User", "Businesses", "Drivers", "Customers"],
+  tagTypes: ["User", "Businesses", "Drivers", "Customers", "Reviews"],
   endpoints: (builder) => ({
     // Query Endpoints
     fetchUserData: builder.query({
@@ -606,6 +606,66 @@ export const firestoreApi = createApi({
       },
       providesTags: ["Customers"],
     }),
+    fetchReviews: builder.query<
+      CustomerFeedbackType[],
+      { partnerUid: string; fetchLimit?: number }
+    >({
+      async queryFn({ partnerUid, fetchLimit = 100 }) {
+        try {
+          if (!partnerUid) {
+            return { data: [] };
+          }
+
+          const userRef = doc(db, "users", partnerUid);
+          const userSnap = await getDoc(userRef);
+          const accessTokens: string[] =
+            userSnap.data()?.data?.businesses ?? [];
+
+          if (accessTokens.length === 0) {
+            return { data: [] };
+          }
+
+          const chunks: string[][] = [];
+          for (let i = 0; i < accessTokens.length; i += 10) {
+            chunks.push(accessTokens.slice(i, i + 10));
+          }
+
+          const snapshots = await Promise.all(
+            chunks.map(async (chunk) => {
+              const ref = collection(db, "reviews");
+              const q = query(
+                ref,
+                where("restaurantId", "in", chunk),
+                orderBy("createdAt", "desc"),
+                limit(fetchLimit),
+              );
+              return getDocs(q);
+            }),
+          );
+
+          const reviews = snapshots
+            .flatMap((snap) =>
+              snap.docs.map(
+                (docSnap) =>
+                  ({
+                    orderId: docSnap.id,
+                    ...docSnap.data(),
+                  }) as CustomerFeedbackType,
+              ),
+            )
+            .sort((a, b) => b.createdAt - a.createdAt)
+            .slice(0, fetchLimit);
+
+          console.log("Read Operation [fetchReviews]");
+          return { data: reviews };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
+        }
+      },
+      providesTags: ["Reviews"],
+    }),
     updateCustomerDocument: builder.mutation<
       null,
       { uid: string; updates: Partial<CustomerType> }
@@ -753,6 +813,7 @@ export const {
   useFetchManagersQuery,
   useFetchDriverUsersQuery,
   useFetchCustomersQuery,
+  useFetchReviewsQuery,
 
   useCreateUserDocumentMutation,
   useCreateBusinessMutation,
