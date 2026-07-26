@@ -3,6 +3,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   collection,
   where,
@@ -657,6 +658,67 @@ export const firestoreApi = createApi({
       },
       providesTags: ["Orders"],
     }),
+    fetchReceivedOrders: builder.query<OrderType[], string[]>({
+      queryFn: () => ({ data: [] }),
+      async onCacheEntryAdded(
+        accessTokens,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
+      ) {
+        if (!accessTokens?.length) return;
+
+        const chunks: string[][] = [];
+        for (let i = 0; i < accessTokens.length; i += 10) {
+          chunks.push(accessTokens.slice(i, i + 10));
+        }
+
+        await cacheDataLoaded;
+
+        const unsubscribes = chunks.map((chunk) => {
+          const chunkBusinessIds = new Set(chunk);
+
+          const ref = collection(db, "orders");
+          const q = query(
+            ref,
+            where("businessId", "in", chunk),
+            where("status.current", "==", "RECEIVED"),
+            limit(100),
+          );
+
+          return onSnapshot(
+            q,
+            (snapshot) => {
+              updateCachedData((draft: OrderType[]) => {
+                const incomingOrders = snapshot.docs.map(
+                  (docSnap) =>
+                    ({
+                      id: docSnap.id,
+                      ...docSnap.data(),
+                    }) as OrderType,
+                );
+
+                const remaining = draft.filter(
+                  (o) => !chunkBusinessIds.has(o.businessId),
+                );
+
+                draft.length = 0;
+                draft.push(...remaining, ...incomingOrders);
+                draft.sort((a, b) => b.createdAt - a.createdAt);
+              });
+            },
+            (error) => {
+              console.error(
+                "Error in real-time listener [fetchReceivedOrders]:",
+                error?.message,
+              );
+            },
+          );
+        });
+
+        await cacheEntryRemoved;
+        unsubscribes.forEach((unsub) => unsub());
+      },
+      providesTags: ["Orders"],
+    }),
     fetchReviews: builder.query<
       CustomerFeedbackType[],
       { partnerUid: string; fetchLimit?: number }
@@ -865,6 +927,7 @@ export const {
   useFetchDriverUsersQuery,
   useFetchCustomersQuery,
   useFetchActiveOrdersQuery,
+  useFetchReceivedOrdersQuery,
   useFetchReviewsQuery,
 
   useCreateUserDocumentMutation,
