@@ -102,7 +102,7 @@ export const firestoreApi = createApi({
           const snapshots = await Promise.all(
             chunks.map(async (chunk) => {
               const ref = collection(db, "businesses");
-              const q = query(ref, where("accessToken", "in", chunk));
+              const q = query(ref, where("accessToken", "in", chunk), limit(100));
               return getDocs(q);
             }),
           );
@@ -500,7 +500,7 @@ export const firestoreApi = createApi({
             return { data: [] };
           }
           const ref = collection(db, "users");
-          const q = query(ref, where("partnerUid", "==", partnerUid));
+          const q = query(ref, where("partnerUid", "==", partnerUid), limit(100));
           const snapshot = await getDocs(q);
           const managers: ManagerUser[] = snapshot.docs.map((doc) => ({
             uid: doc.id,
@@ -552,7 +552,7 @@ export const firestoreApi = createApi({
             return { data: [] };
           }
           const ref = collection(db, "drivers");
-          const q = query(ref, where("partnerUid", "==", partnerUid));
+          const q = query(ref, where("partnerUid", "==", partnerUid), limit(100));
           const snapshot = await getDocs(q);
           const drivers = snapshot.docs.map((docSnap) => {
             const data = docSnap.data();
@@ -591,7 +591,7 @@ export const firestoreApi = createApi({
             ref,
             where("partnerUid", "==", partnerUid),
             orderBy("createdAt", "desc"),
-            limit(50),
+            limit(100),
           );
 
           const snapshot = await getDocs(q);

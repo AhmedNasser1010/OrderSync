@@ -14,6 +14,7 @@ import { subDays, subYears } from "date-fns";
 import type { ExportColumn } from "@/lib/export-utils";
 
 const COOLDOWN_DURATION = 5;
+const PAGE_SIZE = 15;
 
 const customerColumns: ExportColumn[] = [
   { header: "UID", accessor: "uid" },
@@ -59,6 +60,7 @@ export default function CustomersPage() {
   const [search, setSearch] = useState("");
   const [city, setCity] = useState("");
   const [dateRange, setDateRange] = useState("all");
+  const [page, setPage] = useState(1);
 
   const {
     data: allCustomers = [],
@@ -106,6 +108,21 @@ export default function CustomersPage() {
     };
   }, [cooldown]);
 
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    setPage(1);
+  }, []);
+
+  const handleCityChange = useCallback((value: string) => {
+    setCity(value);
+    setPage(1);
+  }, []);
+
+  const handleDateRangeChange = useCallback((value: string) => {
+    setDateRange(value);
+    setPage(1);
+  }, []);
+
   // Client-side filtering
   const filteredCustomers = useMemo(() => {
     return allCustomers.filter((customer) => {
@@ -127,6 +144,13 @@ export default function CustomersPage() {
       return matchesSearch && matchesCity && matchesDate;
     });
   }, [allCustomers, search, city, dateRange]);
+
+  const totalPages = Math.ceil(filteredCustomers.length / PAGE_SIZE);
+  const safePage = Math.min(page, totalPages || 1);
+  const paginatedCustomers = filteredCustomers.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
 
   return (
     <MainLayout>
@@ -167,9 +191,9 @@ export default function CustomersPage() {
         {/* Filters */}
         <CustomerFilters
           customers={allCustomers}
-          onSearchChange={setSearch}
-          onCityChange={setCity}
-          onDateRangeChange={setDateRange}
+          onSearchChange={handleSearchChange}
+          onCityChange={handleCityChange}
+          onDateRangeChange={handleDateRangeChange}
         />
 
         {/* Results count */}
@@ -179,10 +203,40 @@ export default function CustomersPage() {
 
         {/* Customers Table */}
         <CustomersTable
-          customers={filteredCustomers}
+          customers={paginatedCustomers}
           isLoading={isLoading}
           isError={isError}
         />
+
+        {/* Pagination */}
+        {filteredCustomers.length > 0 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Showing{" "}
+              {(safePage - 1) * PAGE_SIZE + 1}–
+              {Math.min(safePage * PAGE_SIZE, filteredCustomers.length)} of{" "}
+              {filteredCustomers.length} customers
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage >= totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </MainLayout>
   );

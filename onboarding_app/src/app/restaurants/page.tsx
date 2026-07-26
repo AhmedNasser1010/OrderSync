@@ -18,7 +18,8 @@ import {
 } from "@/rtk/api/firestoreApi";
 import type { ExportColumn } from "@/lib/export-utils";
 
-const COOLDOWN_DURATION = 5; // seconds
+const COOLDOWN_DURATION = 5;
+const PAGE_SIZE = 15;
 
 const restaurantColumns: ExportColumn[] = [
   { header: "Access Token", accessor: "accessToken" },
@@ -43,6 +44,7 @@ export default function RestaurantsPage() {
   const authUser = useAuth().user;
   const [industryFilter, setIndustryFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("");
+  const [page, setPage] = useState(1);
   const [cooldown, setCooldown] = useState(0);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -96,6 +98,22 @@ export default function RestaurantsPage() {
   }, [cooldown]);
   const [deleteBusiness] = useDeleteBusinessMutation();
 
+  const handleIndustryChange = useCallback((value: string) => {
+    setIndustryFilter(value);
+    setPage(1);
+  }, []);
+
+  const handleStatusChange = useCallback((value: string) => {
+    setStatusFilter(value);
+    setPage(1);
+  }, []);
+
+  const [prevSearchTerm, setPrevSearchTerm] = useState(searchTerm);
+  if (prevSearchTerm !== searchTerm) {
+    setPrevSearchTerm(searchTerm);
+    setPage(1);
+  }
+
   const filteredRestaurants = useMemo(() => {
     return businesses.filter((restaurant) => {
       const matchesSearch =
@@ -111,6 +129,13 @@ export default function RestaurantsPage() {
       return matchesSearch && matchesIndustry && matchesStatus;
     });
   }, [businesses, searchTerm, industryFilter, statusFilter]);
+
+  const totalPages = Math.ceil(filteredRestaurants.length / PAGE_SIZE);
+  const safePage = Math.min(page, totalPages || 1);
+  const paginatedRestaurants = filteredRestaurants.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
 
   const handleDelete = async (accessToken: string) => {
     if (!authUser) return;
@@ -161,17 +186,52 @@ export default function RestaurantsPage() {
 
         {/* Filters */}
         <RestaurantFilters
-          onIndustryChange={setIndustryFilter}
-          onStatusChange={setStatusFilter}
+          onIndustryChange={handleIndustryChange}
+          onStatusChange={handleStatusChange}
         />
+
+        {/* Results count */}
+        <div className="text-sm text-muted-foreground">
+          Showing {filteredRestaurants.length} of {businesses.length} restaurants
+        </div>
 
         {/* Restaurants Table */}
         <RestaurantsTable
-          restaurants={filteredRestaurants}
+          restaurants={paginatedRestaurants}
           onDelete={handleDelete}
           isLoading={isLoading}
           isError={isError}
         />
+
+        {/* Pagination */}
+        {filteredRestaurants.length > 0 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Showing{" "}
+              {(safePage - 1) * PAGE_SIZE + 1}–
+              {Math.min(safePage * PAGE_SIZE, filteredRestaurants.length)} of{" "}
+              {filteredRestaurants.length} restaurants
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage >= totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </MainLayout>
   );

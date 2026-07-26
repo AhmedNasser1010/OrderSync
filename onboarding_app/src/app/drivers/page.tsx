@@ -6,13 +6,18 @@ import {
   useDeleteDriverDocumentMutation,
 } from "@/rtk/api/firestoreApi";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import { DriversTable } from "@/components/dashboard/DriversTable";
 import { DriversFilters } from "@/components/dashboard/DriversFilters";
 import { AddDriverDialog } from "@/components/dashboard/AddDriverDialog";
 import { ExportButton } from "@/components/dashboard/ExportButton";
-import { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import type { ExportColumn } from "@/lib/export-utils";
+
+const COOLDOWN_DURATION = 5;
+const PAGE_SIZE = 15;
 
 const driverColumns: ExportColumn[] = [
   { header: "UID", accessor: "uid" },
@@ -35,16 +40,68 @@ const driverColumns: ExportColumn[] = [
 
 export default function DriversPage() {
   const partnerUid = useAuth().user?.uid ?? "";
+  const [cooldown, setCooldown] = useState(0);
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const {
     data: drivers = [],
     isLoading,
-    error,
+    isError,
+    isFetching,
+    refetch,
   } = useFetchDriverUsersQuery(partnerUid, { skip: !partnerUid });
 
   const [deleteDriver] = useDeleteDriverDocumentMutation();
 
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [page, setPage] = useState(1);
+
+  const handleRefetch = useCallback(() => {
+    if (cooldown > 0 || isFetching) return;
+    refetch();
+    setCooldown(COOLDOWN_DURATION);
+  }, [cooldown, isFetching, refetch]);
+
+  useEffect(() => {
+    if (cooldown <= 0) {
+      if (cooldownRef.current) {
+        clearInterval(cooldownRef.current);
+        cooldownRef.current = null;
+      }
+      return;
+    }
+    if (!cooldownRef.current) {
+      cooldownRef.current = setInterval(() => {
+        setCooldown((prev) => {
+          if (prev <= 1) {
+            if (cooldownRef.current) {
+              clearInterval(cooldownRef.current);
+              cooldownRef.current = null;
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (cooldownRef.current) {
+        clearInterval(cooldownRef.current);
+        cooldownRef.current = null;
+      }
+    };
+  }, [cooldown]);
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    setPage(1);
+  }, []);
+
+  const handleStatusChange = useCallback((value: string) => {
+    setStatus(value);
+    setPage(1);
+  }, []);
 
   const filteredDrivers = useMemo(() => {
     return drivers.filter((driver) => {
@@ -67,6 +124,13 @@ export default function DriversPage() {
     });
   }, [drivers, search, status]);
 
+  const totalPages = Math.ceil(filteredDrivers.length / PAGE_SIZE);
+  const safePage = Math.min(page, totalPages || 1);
+  const paginatedDrivers = filteredDrivers.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
+
   return (
     <MainLayout>
       <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -84,18 +148,33 @@ export default function DriversPage() {
               filename="drivers"
               sheetName="Drivers"
             />
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={handleRefetch}
+              disabled={cooldown > 0 || isFetching}
+            >
+              <RefreshCw
+                className={cn("h-4 w-4", isFetching && "animate-spin")}
+              />
+              {isFetching
+                ? "Refetching..."
+                : cooldown > 0
+                  ? `Refetch (${cooldown}s)`
+                  : "Refetch"}
+            </Button>
             <AddDriverDialog />
           </div>
         </div>
 
         {/* Filters */}
         <DriversFilters
-          onSearchChange={setSearch}
-          onStatusChange={setStatus}
+          onSearchChange={handleSearchChange}
+          onStatusChange={handleStatusChange}
         />
 
         {/* Results count */}
-        {!isLoading && !error && (
+        {!isLoading && !isError && (
           <div className="text-sm text-muted-foreground">
             Showing {filteredDrivers.length} of {drivers.length} drivers
           </div>
@@ -105,17 +184,47 @@ export default function DriversPage() {
           <div className="flex justify-center items-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
-        ) : error ? (
+        ) : isError ? (
           <div className="flex justify-center items-center h-64">
             <p className="text-destructive">Failed to load drivers</p>
           </div>
         ) : (
           <DriversTable
-            drivers={filteredDrivers}
+            drivers={paginatedDrivers}
             onDelete={async (uid) => {
               await deleteDriver(uid);
             }}
           />
+        )}
+
+        {/* Pagination */}
+        {filteredDrivers.length > 0 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Showing{" "}
+              {(safePage - 1) * PAGE_SIZE + 1}–
+              {Math.min(safePage * PAGE_SIZE, filteredDrivers.length)} of{" "}
+              {filteredDrivers.length} drivers
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage >= totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
         )}
       </div>
     </MainLayout>

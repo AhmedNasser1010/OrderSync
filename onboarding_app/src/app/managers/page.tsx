@@ -16,6 +16,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import type { ExportColumn } from "@/lib/export-utils";
 
 const COOLDOWN_DURATION = 5;
+const PAGE_SIZE = 15;
 
 const managerColumns: ExportColumn[] = [
   { header: "UID", accessor: "uid" },
@@ -36,6 +37,7 @@ export default function ManagersPage() {
 
   const [search, setSearch] = useState("");
   const [role, setRole] = useState("");
+  const [page, setPage] = useState(1);
 
   const {
     data: managers = [],
@@ -85,6 +87,16 @@ export default function ManagersPage() {
     };
   }, [cooldown]);
 
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    setPage(1);
+  }, []);
+
+  const handleRoleChange = useCallback((value: string) => {
+    setRole(value);
+    setPage(1);
+  }, []);
+
   const filteredManagers = useMemo(() => {
     return managers.filter((manager) => {
       const searchLower = search.toLowerCase();
@@ -100,6 +112,13 @@ export default function ManagersPage() {
       return matchesSearch && matchesRole;
     });
   }, [managers, search, role]);
+
+  const totalPages = Math.ceil(filteredManagers.length / PAGE_SIZE);
+  const safePage = Math.min(page, totalPages || 1);
+  const paginatedManagers = filteredManagers.slice(
+    (safePage - 1) * PAGE_SIZE,
+    safePage * PAGE_SIZE,
+  );
 
   const handleDelete = async (uid: string) => {
     await deleteManager(uid).unwrap();
@@ -143,8 +162,8 @@ export default function ManagersPage() {
 
         {/* Filters */}
         <ManagersFilters
-          onSearchChange={setSearch}
-          onRoleChange={setRole}
+          onSearchChange={handleSearchChange}
+          onRoleChange={handleRoleChange}
         />
 
         {/* Results count */}
@@ -154,11 +173,41 @@ export default function ManagersPage() {
 
         {/* Managers Table */}
         <ManagersTable
-          managers={filteredManagers}
+          managers={paginatedManagers}
           onDelete={handleDelete}
           isLoading={isLoading}
           isError={isError}
         />
+
+        {/* Pagination */}
+        {filteredManagers.length > 0 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Showing{" "}
+              {(safePage - 1) * PAGE_SIZE + 1}–
+              {Math.min(safePage * PAGE_SIZE, filteredManagers.length)} of{" "}
+              {filteredManagers.length} managers
+            </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={safePage <= 1}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={safePage >= totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </MainLayout>
   );

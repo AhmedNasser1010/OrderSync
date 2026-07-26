@@ -231,6 +231,11 @@ export default function ReviewsPage() {
           onSearchChange={handleSearchChange}
         />
 
+        {/* Results count */}
+        <div className="text-sm text-muted-foreground">
+          Showing {filteredReviews.length} of {allReviews.length} reviews
+        </div>
+
         {/* Reviews Table */}
         <ReviewsTable
           reviews={paginatedReviews}
