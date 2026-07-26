@@ -5,7 +5,7 @@ export const restaurantsSlice = createSlice({
   initialState: [],
   reducers: {
     initRestaurants: (state, { payload }) => {
-      return payload
+      return payload.filter(r => r.status !== 'hidden')
     },
     clearRestaurants: (state, { payload }) => {
       return []

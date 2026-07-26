@@ -19,12 +19,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Edit, Trash2, Loader2 } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Loader2, EyeOff } from "lucide-react";
 import Link from "next/link";
 import type { BusinessDocument, RestaurantStatusTypes } from "@ordersync/types";
 import { useSetRestaurantStatusMutation } from "@/rtk/api/firestoreApi";
 import { cn } from "@/lib/utils";
 import { DeleteDialog } from "./DeleteDialog";
+import { HideDialog } from "./HideDialog";
 import { format } from "date-fns";
 
 const statusOptions: { value: RestaurantStatusTypes; label: string; dotColor: string; badgeClass: string }[] = [
@@ -32,6 +33,7 @@ const statusOptions: { value: RestaurantStatusTypes; label: string; dotColor: st
   { value: "busy", label: "Busy", dotColor: "bg-yellow-500", badgeClass: "border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-800 dark:bg-yellow-950/50 dark:text-yellow-400" },
   { value: "pause", label: "Paused", dotColor: "bg-red-500", badgeClass: "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-400" },
   { value: "inactive", label: "Inactive", dotColor: "bg-gray-400", badgeClass: "border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-gray-900/50 dark:text-gray-400" },
+  { value: "hidden", label: "Hidden", dotColor: "bg-slate-500", badgeClass: "border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-400" },
 ];
 
 function getStatusConfig(status: RestaurantStatusTypes) {
@@ -58,18 +60,51 @@ export function RestaurantsTable({
     open: false,
     accessToken: null,
   });
+  const [hideDialog, setHideDialog] = useState<{
+    open: boolean;
+    accessToken: string | null;
+    name: string;
+  }>({
+    open: false,
+    accessToken: null,
+    name: "",
+  });
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [setRestaurantStatus] = useSetRestaurantStatusMutation();
 
   const handleStatusChange = async (
     accessToken: string,
     status: RestaurantStatusTypes,
+    restaurantName: string,
   ) => {
+    if (status === "hidden") {
+      setHideDialog({
+        open: true,
+        accessToken,
+        name: restaurantName,
+      });
+      return;
+    }
     setUpdatingStatus(accessToken);
     try {
       await setRestaurantStatus({ resId: accessToken, status }).unwrap();
     } finally {
       setUpdatingStatus(null);
+    }
+  };
+
+  const handleHideConfirm = async () => {
+    if (hideDialog.accessToken) {
+      setUpdatingStatus(hideDialog.accessToken);
+      try {
+        await setRestaurantStatus({
+          resId: hideDialog.accessToken,
+          status: "hidden",
+        }).unwrap();
+      } finally {
+        setUpdatingStatus(null);
+        setHideDialog({ open: false, accessToken: null, name: "" });
+      }
     }
   };
 
@@ -149,9 +184,14 @@ export function RestaurantsTable({
                       </span>
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">
-                        {restaurant.profile.name}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-foreground">
+                          {restaurant.profile.name}
+                        </p>
+                        {restaurant.status === "hidden" && (
+                          <EyeOff className="h-4 w-4 text-slate-500" />
+                        )}
+                      </div>
                       <p className="text-xs text-muted-foreground">
                         {restaurant.profile.nameInAr}
                       </p>
@@ -211,6 +251,7 @@ export function RestaurantsTable({
                               handleStatusChange(
                                 restaurant.accessToken,
                                 option.value,
+                                restaurant.profile.name,
                               )
                             }
                             className={cn(
@@ -282,6 +323,20 @@ export function RestaurantsTable({
           setDeleteDialog({ open, accessToken: deleteDialog.accessToken })
         }
         onConfirm={handleDeleteConfirm}
+      />
+
+      {/* Hide Dialog */}
+      <HideDialog
+        open={hideDialog.open}
+        onOpenChange={(open) =>
+          setHideDialog({
+            open,
+            accessToken: hideDialog.accessToken,
+            name: hideDialog.name,
+          })
+        }
+        onConfirm={handleHideConfirm}
+        restaurantName={hideDialog.name}
       />
     </>
   );

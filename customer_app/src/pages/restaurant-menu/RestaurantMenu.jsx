@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 import SEO from '../../components/SEO'
@@ -17,6 +17,7 @@ const pauseMsg = "This restaurant is temporarily paused, so we can't take any or
 
 const RestaurantMenu = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { t } = useTranslation()
   const { i18n } = useTranslation()
   const lang = i18n?.language || 'ar'
@@ -28,6 +29,12 @@ const RestaurantMenu = () => {
   const res = useMemo(() => {
     return restaurants.filter((res) => res.profile.name === resId.split('-').join(' '))[0]
   }, [resId, restaurants])
+
+  useEffect(() => {
+    if (!res) {
+      navigate('/')
+    }
+  }, [res, navigate])
 
   const resName = lang === 'ar' ? res?.profile?.nameInAr : res?.profile?.name
   const status = res?.status || 'pause'

@@ -1,4 +1,4 @@
-export type RestaurantStatusTypes = "active" | "inactive" | "busy" | "pause";
+export type RestaurantStatusTypes = "active" | "inactive" | "busy" | "pause" | "hidden";
 
 export type BusinessDocument = {
   accessToken: string;
