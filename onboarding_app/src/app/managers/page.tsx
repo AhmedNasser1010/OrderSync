@@ -2,6 +2,7 @@
 
 import { MainLayout } from "@/components/layout/MainLayout";
 import { ExportButton } from "@/components/dashboard/ExportButton";
+import { ManagersFilters } from "@/components/dashboard/ManagersFilters";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,7 +12,7 @@ import {
   useDeleteManagerMutation,
 } from "@/rtk/api/firestoreApi";
 import { ManagersTable } from "@/components/dashboard/ManagersTable";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import type { ExportColumn } from "@/lib/export-utils";
 
 const COOLDOWN_DURATION = 5;
@@ -32,6 +33,9 @@ export default function ManagersPage() {
   const authUser = useAuth().user;
   const [cooldown, setCooldown] = useState(0);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const [search, setSearch] = useState("");
+  const [role, setRole] = useState("");
 
   const {
     data: managers = [],
@@ -81,6 +85,22 @@ export default function ManagersPage() {
     };
   }, [cooldown]);
 
+  const filteredManagers = useMemo(() => {
+    return managers.filter((manager) => {
+      const searchLower = search.toLowerCase();
+      const matchesSearch =
+        !search ||
+        manager.userInfo?.name?.toLowerCase().includes(searchLower) ||
+        manager.userInfo?.email?.toLowerCase().includes(searchLower) ||
+        manager.userInfo?.phone?.includes(search);
+
+      const matchesRole =
+        !role || role === "all" || manager.userInfo?.role === role;
+
+      return matchesSearch && matchesRole;
+    });
+  }, [managers, search, role]);
+
   const handleDelete = async (uid: string) => {
     await deleteManager(uid).unwrap();
   };
@@ -98,7 +118,7 @@ export default function ManagersPage() {
           </div>
           <div className="flex items-center gap-2">
             <ExportButton
-              data={managers as unknown as Record<string, unknown>[]}
+              data={filteredManagers as unknown as Record<string, unknown>[]}
               columns={managerColumns}
               filename="managers"
               sheetName="Managers"
@@ -121,9 +141,20 @@ export default function ManagersPage() {
           </div>
         </div>
 
+        {/* Filters */}
+        <ManagersFilters
+          onSearchChange={setSearch}
+          onRoleChange={setRole}
+        />
+
+        {/* Results count */}
+        <div className="text-sm text-muted-foreground">
+          Showing {filteredManagers.length} of {managers.length} managers
+        </div>
+
         {/* Managers Table */}
         <ManagersTable
-          managers={managers}
+          managers={filteredManagers}
           onDelete={handleDelete}
           isLoading={isLoading}
           isError={isError}

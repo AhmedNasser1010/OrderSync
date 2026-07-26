@@ -8,8 +8,10 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 import { DriversTable } from "@/components/dashboard/DriversTable";
+import { DriversFilters } from "@/components/dashboard/DriversFilters";
 import { AddDriverDialog } from "@/components/dashboard/AddDriverDialog";
 import { ExportButton } from "@/components/dashboard/ExportButton";
+import { useState, useMemo } from "react";
 import type { ExportColumn } from "@/lib/export-utils";
 
 const driverColumns: ExportColumn[] = [
@@ -34,12 +36,36 @@ const driverColumns: ExportColumn[] = [
 export default function DriversPage() {
   const partnerUid = useAuth().user?.uid ?? "";
   const {
-    data: drivers,
+    data: drivers = [],
     isLoading,
     error,
   } = useFetchDriverUsersQuery(partnerUid, { skip: !partnerUid });
 
   const [deleteDriver] = useDeleteDriverDocumentMutation();
+
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
+
+  const filteredDrivers = useMemo(() => {
+    return drivers.filter((driver) => {
+      const searchLower = search.toLowerCase();
+      const matchesSearch =
+        !search ||
+        driver.userInfo?.name?.toLowerCase().includes(searchLower) ||
+        driver.userInfo?.email?.toLowerCase().includes(searchLower) ||
+        driver.userInfo?.phone?.includes(search);
+
+      let matchesStatus = true;
+      if (status && status !== "all") {
+        const isOnline = driver.online?.byManager ?? false;
+        matchesStatus =
+          (status === "online" && isOnline) ||
+          (status === "offline" && !isOnline);
+      }
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [drivers, search, status]);
 
   return (
     <MainLayout>
@@ -53,7 +79,7 @@ export default function DriversPage() {
           </div>
           <div className="flex items-center gap-2">
             <ExportButton
-              data={(drivers ?? []) as unknown as Record<string, unknown>[]}
+              data={filteredDrivers as unknown as Record<string, unknown>[]}
               columns={driverColumns}
               filename="drivers"
               sheetName="Drivers"
@@ -61,6 +87,19 @@ export default function DriversPage() {
             <AddDriverDialog />
           </div>
         </div>
+
+        {/* Filters */}
+        <DriversFilters
+          onSearchChange={setSearch}
+          onStatusChange={setStatus}
+        />
+
+        {/* Results count */}
+        {!isLoading && !error && (
+          <div className="text-sm text-muted-foreground">
+            Showing {filteredDrivers.length} of {drivers.length} drivers
+          </div>
+        )}
 
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
@@ -70,12 +109,13 @@ export default function DriversPage() {
           <div className="flex justify-center items-center h-64">
             <p className="text-destructive">Failed to load drivers</p>
           </div>
-        ) : !drivers || drivers.length === 0 ? (
-          <div className="flex justify-center items-center h-64">
-            <p className="text-muted-foreground">No drivers found</p>
-          </div>
         ) : (
-          <DriversTable drivers={drivers} onDelete={async (uid) => { await deleteDriver(uid); }} />
+          <DriversTable
+            drivers={filteredDrivers}
+            onDelete={async (uid) => {
+              await deleteDriver(uid);
+            }}
+          />
         )}
       </div>
     </MainLayout>
