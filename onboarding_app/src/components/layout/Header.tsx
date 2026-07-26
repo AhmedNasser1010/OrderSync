@@ -1,9 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { Search, Moon, Sun, LogOut } from "lucide-react";
+import { Moon, Sun, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,13 +12,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
-import { setSearchTerm, toggleTheme } from "@/rtk/slices/uiSlice";
+import { toggleTheme } from "@/rtk/slices/uiSlice";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHydrationSafeTheme } from "@/hooks/useHydrationSafeTheme";
 
 export function Header({ sidebarOpen }: { sidebarOpen: boolean }) {
   const dispatch = useAppDispatch();
-  const searchTerm = useAppSelector((state) => state.ui.searchTerm);
   const isDarkRedux = useAppSelector((state) => state.ui.isDark);
   const { user, logout } = useAuth();
   const isDark = useHydrationSafeTheme();
@@ -39,19 +37,6 @@ export function Header({ sidebarOpen }: { sidebarOpen: boolean }) {
         sidebarOpen ? "md:left-64" : "md:left-20"
       }`}
     >
-      {/* Search Bar */}
-      <div className="flex-1 max-w-md">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search restaurants..."
-            className="pl-10 h-9 bg-secondary border-border"
-            value={searchTerm}
-            onChange={(e) => dispatch(setSearchTerm(e.target.value))}
-          />
-        </div>
-      </div>
-
       {/* Right Actions */}
       <div className="flex items-center gap-2 ml-auto">
         {/* Theme Toggle */}
