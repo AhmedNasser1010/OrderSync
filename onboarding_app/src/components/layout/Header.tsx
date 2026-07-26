@@ -15,21 +15,23 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { setSearchTerm, toggleTheme } from "@/rtk/slices/uiSlice";
 import { useAuth } from "@/contexts/AuthContext";
+import { useHydrationSafeTheme } from "@/hooks/useHydrationSafeTheme";
 
 export function Header({ sidebarOpen }: { sidebarOpen: boolean }) {
   const dispatch = useAppDispatch();
   const searchTerm = useAppSelector((state) => state.ui.searchTerm);
-  const isDark = useAppSelector((state) => state.ui.isDark);
+  const isDarkRedux = useAppSelector((state) => state.ui.isDark);
   const { user, logout } = useAuth();
+  const isDark = useHydrationSafeTheme();
 
   // Apply theme on load and whenever it changes
   useEffect(() => {
-    if (isDark) {
+    if (isDarkRedux) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [isDark]);
+  }, [isDarkRedux]);
 
   return (
     <header

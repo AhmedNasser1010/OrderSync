@@ -141,7 +141,8 @@ service cloud.firestore {
     // /customers/{userId}
     // =====================================================================
     match /customers/{userId} {
-      allow read: if isOwner(userId);
+      allow get: if isOwner(userId);
+      allow list: if isPartner();
       allow create: if isOwner(userId)
         && incomingData().userInfo.role == 'CUSTOMER';
       allow update: if isCustomer() && isOwner(userId);

@@ -11,6 +11,8 @@ import {
   deleteDoc,
   writeBatch,
   runTransaction,
+  limit,
+  orderBy,
   FirestoreError,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -22,6 +24,7 @@ import type {
   BusinessDocument,
   ManagerUser,
   Driver,
+  CustomerType,
 } from "@ordersync/types";
 
 export interface UpdateBusinessInput {
@@ -43,7 +46,7 @@ function getErrorMessage(error: unknown): string {
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["User", "Businesses", "Drivers"],
+  tagTypes: ["User", "Businesses", "Drivers", "Customers"],
   endpoints: (builder) => ({
     // Query Endpoints
     fetchUserData: builder.query({
@@ -573,6 +576,36 @@ export const firestoreApi = createApi({
       },
       providesTags: ["Drivers"],
     }),
+    fetchCustomers: builder.query<CustomerType[], string>({
+      async queryFn(partnerUid: string) {
+        try {
+          if (!partnerUid) {
+            return { data: [] };
+          }
+
+          const ref = collection(db, "customers");
+          const q = query(
+            ref,
+            where("partnerUid", "==", partnerUid),
+            orderBy("createdAt", "desc"),
+            limit(50),
+          );
+
+          const snapshot = await getDocs(q);
+          const customers: CustomerType[] = snapshot.docs.map(
+            (docSnap) => docSnap.data() as CustomerType,
+          );
+
+          console.log("Read Operation [fetchCustomers]");
+          return { data: customers };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
+        }
+      },
+      providesTags: ["Customers"],
+    }),
     createDriverDocument: builder.mutation<
       null,
       {
@@ -695,6 +728,7 @@ export const {
   useFetchBusinessesQuery,
   useFetchManagersQuery,
   useFetchDriverUsersQuery,
+  useFetchCustomersQuery,
 
   useCreateUserDocumentMutation,
   useCreateBusinessMutation,
