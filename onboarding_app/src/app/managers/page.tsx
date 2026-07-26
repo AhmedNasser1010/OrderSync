@@ -1,6 +1,7 @@
 "use client";
 
 import { MainLayout } from "@/components/layout/MainLayout";
+import { ExportButton } from "@/components/dashboard/ExportButton";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,8 +12,21 @@ import {
 } from "@/rtk/api/firestoreApi";
 import { ManagersTable } from "@/components/dashboard/ManagersTable";
 import { useState, useCallback, useEffect, useRef } from "react";
+import type { ExportColumn } from "@/lib/export-utils";
 
 const COOLDOWN_DURATION = 5;
+
+const managerColumns: ExportColumn[] = [
+  { header: "UID", accessor: "uid" },
+  { header: "Name", accessor: "userInfo.name" },
+  { header: "Email", accessor: "userInfo.email" },
+  { header: "Phone", accessor: "userInfo.phone" },
+  { header: "Second Phone", accessor: "userInfo.secondPhone" },
+  { header: "Access Token", accessor: "accessToken" },
+  { header: "Provider", accessor: "userInfo.provider" },
+  { header: "Created At", accessor: "createdAt" },
+  { header: "Updated At", accessor: "updatedAt" },
+];
 
 export default function ManagersPage() {
   const authUser = useAuth().user;
@@ -83,6 +97,12 @@ export default function ManagersPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <ExportButton
+              data={managers as unknown as Record<string, unknown>[]}
+              columns={managerColumns}
+              filename="managers"
+              sheetName="Managers"
+            />
             <Button
               variant="outline"
               className="gap-2"

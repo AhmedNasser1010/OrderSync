@@ -4,6 +4,7 @@ import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { RestaurantsTable } from "@/components/dashboard/RestaurantsTable";
 import { RestaurantFilters } from "@/components/dashboard/RestaurantFilters";
+import { ExportButton } from "@/components/dashboard/ExportButton";
 import { Button } from "@/components/ui/button";
 import { Plus, RefreshCw } from "lucide-react";
 import Link from "next/link";
@@ -15,8 +16,27 @@ import {
   useFetchBusinessesQuery,
   useDeleteBusinessMutation,
 } from "@/rtk/api/firestoreApi";
+import type { ExportColumn } from "@/lib/export-utils";
 
 const COOLDOWN_DURATION = 5; // seconds
+
+const restaurantColumns: ExportColumn[] = [
+  { header: "Access Token", accessor: "accessToken" },
+  { header: "Name", accessor: "profile.name" },
+  { header: "Name (Arabic)", accessor: "profile.nameInAr" },
+  { header: "Industry", accessor: "profile.industry" },
+  { header: "Address", accessor: "profile.address" },
+  { header: "Status", accessor: "status" },
+  { header: "Owner Name", accessor: "owner.name" },
+  { header: "Owner Email", accessor: "owner.email" },
+  { header: "Owner Phone", accessor: "owner.phone" },
+  { header: "Cuisines", accessor: "profile.cuisines" },
+  { header: "Print Invoice", accessor: "settings.printInvoice" },
+  { header: "Average Rating", accessor: "reviewSummary.averageRating" },
+  { header: "Total Reviews", accessor: "reviewSummary.totalReviews" },
+  { header: "Created At", accessor: "createdAt" },
+  { header: "Updated At", accessor: "updatedAt" },
+];
 
 export default function RestaurantsPage() {
   const searchTerm = useAppSelector((state) => state.ui.searchTerm);
@@ -109,6 +129,12 @@ export default function RestaurantsPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <ExportButton
+              data={filteredRestaurants as unknown as Record<string, unknown>[]}
+              columns={restaurantColumns}
+              filename="restaurants"
+              sheetName="Restaurants"
+            />
             <Button
               variant="outline"
               className="gap-2"

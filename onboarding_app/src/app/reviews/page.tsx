@@ -4,6 +4,7 @@ import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { ReviewsTable } from "@/components/dashboard/ReviewsTable";
 import { ReviewsFilters } from "@/components/dashboard/ReviewsFilters";
+import { ExportButton } from "@/components/dashboard/ExportButton";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,10 +15,23 @@ import {
   useFetchReviewsQuery,
   useFetchCustomersQuery,
 } from "@/rtk/api/firestoreApi";
+import type { ExportColumn } from "@/lib/export-utils";
 
 const COOLDOWN_DURATION = 5;
 const PAGE_SIZE = 15;
 const FETCH_LIMIT = 100;
+
+const reviewColumns: ExportColumn[] = [
+  { header: "Order ID", accessor: "orderId" },
+  { header: "Customer ID", accessor: "customerId" },
+  { header: "Customer Name", accessor: "customerName" },
+  { header: "Restaurant ID", accessor: "restaurantId" },
+  { header: "Restaurant Name", accessor: "restaurantName" },
+  { header: "Rating", accessor: "rating" },
+  { header: "Comment", accessor: "comment" },
+  { header: "Created At", accessor: "createdAt" },
+  { header: "Updated At", accessor: "updatedAt" },
+];
 
 export default function ReviewsPage() {
   const authUser = useAuth().user;
@@ -158,6 +172,14 @@ export default function ReviewsPage() {
     safePage * PAGE_SIZE,
   );
 
+  const exportData = useMemo(() => {
+    return filteredReviews.map((review) => ({
+      ...review,
+      customerName: customerNameMap[review.customerId] || "",
+      restaurantName: restaurantNameMap[review.restaurantId] || "",
+    }));
+  }, [filteredReviews, customerNameMap, restaurantNameMap]);
+
   return (
     <MainLayout>
       <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -172,6 +194,12 @@ export default function ReviewsPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <ExportButton
+              data={exportData as unknown as Record<string, unknown>[]}
+              columns={reviewColumns}
+              filename="reviews"
+              sheetName="Reviews"
+            />
             <Button
               variant="outline"
               className="gap-2"

@@ -9,6 +9,27 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 import { DriversTable } from "@/components/dashboard/DriversTable";
 import { AddDriverDialog } from "@/components/dashboard/AddDriverDialog";
+import { ExportButton } from "@/components/dashboard/ExportButton";
+import type { ExportColumn } from "@/lib/export-utils";
+
+const driverColumns: ExportColumn[] = [
+  { header: "UID", accessor: "uid" },
+  { header: "Name", accessor: "userInfo.name" },
+  { header: "Email", accessor: "userInfo.email" },
+  { header: "Phone", accessor: "userInfo.phone" },
+  { header: "Second Phone", accessor: "userInfo.secondPhone" },
+  { header: "License Plate Letters", accessor: "licensePlate.letters" },
+  { header: "License Plate Numbers", accessor: "licensePlate.numbers" },
+  { header: "Online (Manager)", accessor: "online.byManager" },
+  { header: "Online (User)", accessor: "online.byUser" },
+  { header: "Current Cash", accessor: "finance.currentCash" },
+  { header: "Warning Limit", accessor: "finance.warningLimit" },
+  { header: "Block Limit", accessor: "finance.blockLimit" },
+  { header: "Live Location Lat", accessor: "liveLocation.lat" },
+  { header: "Live Location Lng", accessor: "liveLocation.lng" },
+  { header: "Created At", accessor: "createdAt" },
+  { header: "Updated At", accessor: "updatedAt" },
+];
 
 export default function DriversPage() {
   const partnerUid = useAuth().user?.uid ?? "";
@@ -30,7 +51,15 @@ export default function DriversPage() {
               Manage your drivers
             </p>
           </div>
-          <AddDriverDialog />
+          <div className="flex items-center gap-2">
+            <ExportButton
+              data={(drivers ?? []) as unknown as Record<string, unknown>[]}
+              columns={driverColumns}
+              filename="drivers"
+              sheetName="Drivers"
+            />
+            <AddDriverDialog />
+          </div>
         </div>
 
         {isLoading ? (

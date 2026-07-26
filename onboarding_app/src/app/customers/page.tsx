@@ -4,14 +4,35 @@ import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { CustomersTable } from "@/components/dashboard/CustomersTable";
 import { CustomerFilters } from "@/components/dashboard/CustomerFilters";
+import { ExportButton } from "@/components/dashboard/ExportButton";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFetchCustomersQuery } from "@/rtk/api/firestoreApi";
 import { subDays, subYears } from "date-fns";
+import type { ExportColumn } from "@/lib/export-utils";
 
 const COOLDOWN_DURATION = 5;
+
+const customerColumns: ExportColumn[] = [
+  { header: "UID", accessor: "uid" },
+  { header: "Name", accessor: "userInfo.name" },
+  { header: "Email", accessor: "userInfo.email" },
+  { header: "Phone", accessor: "userInfo.phone" },
+  { header: "Second Phone", accessor: "userInfo.secondPhone" },
+  { header: "Avatar", accessor: "userInfo.avatar" },
+  { header: "City", accessor: "locations.city" },
+  { header: "Home Address", accessor: "locations.home.address" },
+  { header: "Home Latitude", accessor: "locations.home.latlang[0]" },
+  { header: "Home Longitude", accessor: "locations.home.latlang[1]" },
+  { header: "Is Active", accessor: "isActive" },
+  { header: "Is First Order", accessor: "referral.isFirstOrder" },
+  { header: "Referred By", accessor: "referral.referredBy" },
+  { header: "Total Restaurants", accessor: "restaurants.length" },
+  { header: "Created At", accessor: "createdAt" },
+  { header: "Updated At", accessor: "updatedAt" },
+];
 
 function getDateRangeMs(dateRange: string): number | null {
   const now = Date.now();
@@ -119,6 +140,12 @@ export default function CustomersPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <ExportButton
+              data={filteredCustomers as unknown as Record<string, unknown>[]}
+              columns={customerColumns}
+              filename="customers"
+              sheetName="Customers"
+            />
             <Button
               variant="outline"
               className="gap-2"
