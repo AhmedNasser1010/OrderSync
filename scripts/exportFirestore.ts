@@ -5,7 +5,11 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { productionDb } from "./firebaseAdmin.js";
+import { emulatorDb } from "./firebaseAdminEmulator.js";
 import { serialize } from "./serializer.js";
+
+const useEmulator = process.argv.includes("--emulator");
+const db = useEmulator ? emulatorDb : productionDb;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -18,7 +22,7 @@ async function exportCollection(
   lines: string[],
   documentCountRef: { current: number },
 ) {
-  const snapshot = await productionDb.collection(path).get();
+  const snapshot = await db.collection(path).get();
 
   for (const doc of snapshot.docs) {
     lines.push(
@@ -44,7 +48,7 @@ export async function exportFirestore() {
 
   await mkdir(OUTPUT_DIR, { recursive: true });
 
-  const collections = await productionDb.listCollections();
+  const collections = await db.listCollections();
 
   for (const collection of collections) {
     console.log(`Exporting ${collection.id}...`);
@@ -73,5 +77,7 @@ if (
   process.argv[1] &&
   resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 ) {
+  const source = useEmulator ? "emulator" : "production";
+  console.log(`Exporting Firestore from ${source}...\n`);
   exportFirestore().catch(console.error);
 }

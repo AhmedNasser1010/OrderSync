@@ -11,11 +11,8 @@ import { getAuth } from "firebase-admin/auth";
 
 import serviceAccount from "./serviceAccount.json";
 
-function configureFirestoreEnvironment() {
-  process.env.FIRESTORE_EMULATOR_HOST ??= "127.0.0.1:8080";
-}
-
-configureFirestoreEnvironment();
+process.env.FIRESTORE_EMULATOR_HOST ??= "127.0.0.1:8080";
+process.env.FIREBASE_AUTH_EMULATOR_HOST ??= "127.0.0.1:9099";
 
 if (!getApps().length) {
   initializeApp({
@@ -24,5 +21,5 @@ if (!getApps().length) {
   });
 }
 
-export const productionDb = getFirestore();
-export const productionAuth = getAuth();
+export const emulatorDb = getFirestore();
+export const emulatorAuth = getAuth();

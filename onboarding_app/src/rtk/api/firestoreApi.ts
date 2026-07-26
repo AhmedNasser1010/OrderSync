@@ -606,6 +606,30 @@ export const firestoreApi = createApi({
       },
       providesTags: ["Customers"],
     }),
+    updateCustomerDocument: builder.mutation<
+      null,
+      { uid: string; updates: Partial<CustomerType> }
+    >({
+      async queryFn({ uid, updates }) {
+        try {
+          if (!uid) throw new Error("Customer UID is required.");
+
+          const customerRef = doc(db, "customers", uid);
+          await updateDoc(customerRef, {
+            ...updates,
+            updatedAt: Date.now(),
+          });
+
+          console.log("Write Operation [updateCustomerDocument]");
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error updating customer document:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Customers"],
+    }),
     createDriverDocument: builder.mutation<
       null,
       {
@@ -739,4 +763,5 @@ export const {
   useCreateDriverDocumentMutation,
   useUpdateDriverDocumentMutation,
   useDeleteDriverDocumentMutation,
+  useUpdateCustomerDocumentMutation,
 } = firestoreApi;

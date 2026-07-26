@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "export": "tsx exportFirestore.ts",
+    "export:emulator:firestore": "tsx exportFirestore.ts --emulator",
+    "export:emulator:auth": "tsx exportAuth.ts --emulator",
     "import": "tsx importFirestore.ts",
     "export:auth": "tsx exportAuth.ts",
     "import:auth": "tsx importAuth.ts",

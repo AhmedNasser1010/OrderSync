@@ -326,6 +326,15 @@ const Cart = () => {
   const handlePayment = () => {
     setDisableSubmit(true)
 
+    if (user?.isActive === false) {
+      toast.error(t('Your account has been suspended. Please contact support for assistance.'), {
+        className: 'font-ProximaNovaSemiBold',
+        position: 'top-center',
+        duration: 4000
+      })
+      return false
+    }
+
     if (user?.trackedOrder?.id) {
       toast.error(t('You already have an a order in progress'), {
         className: 'font-ProximaNovaSemiBold',

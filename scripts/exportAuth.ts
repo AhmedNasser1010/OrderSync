@@ -5,10 +5,14 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { productionAuth } from "./firebaseAdmin.js";
+import { emulatorAuth } from "./firebaseAdminEmulator.js";
 import { Buffer } from "node:buffer";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+const useEmulator = process.argv.includes("--emulator");
+const auth = useEmulator ? emulatorAuth : productionAuth;
 
 const OUTPUT_DIR = join(__dirname, "clone-data");
 const OUTPUT_FILE = join(OUTPUT_DIR, "auth.jsonl");
@@ -20,10 +24,11 @@ export async function exportAuth() {
   let pageToken: string | undefined;
   let total = 0;
 
-  console.log("Exporting Auth users from production...\n");
+  const source = useEmulator ? "emulator" : "production";
+  console.log(`Exporting Auth users from ${source}...\n`);
 
   do {
-    const result = await productionAuth.listUsers(1000, pageToken);
+    const result = await auth.listUsers(1000, pageToken);
     const users = result.users;
 
     for (const user of users) {

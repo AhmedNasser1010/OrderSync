@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -10,7 +11,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { useUpdateCustomerDocumentMutation } from "@/rtk/api/firestoreApi";
 import type { CustomerType } from "@ordersync/types";
 
 interface CustomersTableProps {
@@ -29,6 +33,22 @@ export function CustomersTable({
   isLoading = false,
   isError = false,
 }: CustomersTableProps) {
+  const [updateCustomer, { isLoading: isUpdating }] =
+    useUpdateCustomerDocumentMutation();
+  const [togglingCustomer, setTogglingCustomer] = useState<string | null>(null);
+
+  const handleToggleActive = async (customer: CustomerType) => {
+    setTogglingCustomer(customer.uid);
+    try {
+      await updateCustomer({
+        uid: customer.uid,
+        updates: { isActive: !(customer.isActive ?? true) },
+      }).unwrap();
+    } finally {
+      setTogglingCustomer(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <Card className="p-12 bg-card border-border text-center">
@@ -144,13 +164,41 @@ export function CustomersTable({
                     : "—"}
                 </TableCell>
                 <TableCell className="py-4">
-                  <Badge
-                    variant="outline"
-                    className="gap-1.5 px-2.5 py-1 border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/50 dark:text-green-400"
-                  >
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-500" />
-                    Active
-                  </Badge>
+                  {togglingCustomer === customer.uid ? (
+                    <Badge
+                      variant="outline"
+                      className="gap-1.5 px-2.5 py-1"
+                    >
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Updating...
+                    </Badge>
+                  ) : (
+                    <button
+                      className="cursor-pointer"
+                      onClick={() => handleToggleActive(customer)}
+                      disabled={isUpdating}
+                    >
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "gap-1.5 px-2.5 py-1 transition-colors hover:opacity-80",
+                          (customer.isActive ?? true)
+                            ? "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/50 dark:text-green-400"
+                            : "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-400",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "inline-block h-1.5 w-1.5 rounded-full",
+                            (customer.isActive ?? true)
+                              ? "bg-green-500"
+                              : "bg-red-500",
+                          )}
+                        />
+                        {(customer.isActive ?? true) ? "Active" : "Banned"}
+                      </Badge>
+                    </button>
+                  )}
                 </TableCell>
               </TableRow>
             );

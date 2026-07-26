@@ -85,6 +85,14 @@ const usePlace = () => {
     return false
   }
 
+  const checkIfUserIsActive = () => {
+    if (user?.isActive === false) {
+      showError('Your account has been suspended. Please contact support for assistance.')
+      return false
+    }
+    return true
+  }
+
   const getCartFromMenu = () => {
     return cart.items
       .map((cartItem) => {
@@ -263,6 +271,7 @@ const usePlace = () => {
     return new Promise((resolve, reject) => {
       if (
         checkIfUserIsLoggedIn() &&
+        checkIfUserIsActive() &&
         checkUserInformation() &&
         checkIfUserHasLocation() &&
         checkIfUserHasCart() &&

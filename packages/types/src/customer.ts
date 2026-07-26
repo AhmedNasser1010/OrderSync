@@ -12,6 +12,7 @@ export type CustomerType = {
   uid: string;
   createdAt: number;
   updatedAt: number;
+  isActive: boolean;
   locations: {
     city: string;
     selected: string;

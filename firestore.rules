@@ -146,6 +146,7 @@ service cloud.firestore {
       allow create: if isOwner(userId)
         && incomingData().userInfo.role == 'CUSTOMER';
       allow update: if isCustomer() && isOwner(userId);
+      allow update: if isPartner() && resourceData().partnerUid == request.auth.uid;
       allow delete: if false;
     }
 

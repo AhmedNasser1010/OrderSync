@@ -3,6 +3,7 @@ const customerSchema = ({ uid, name, email, phone, referredBy, avatar, provider 
 		partnerUid: import.meta.env.VITE_PARTNER_ID || null,
 		uid: uid,
 		createdAt: Date.now(),
+		isActive: true,
 		restaurants: [],
 		locations: {
 			home: {
