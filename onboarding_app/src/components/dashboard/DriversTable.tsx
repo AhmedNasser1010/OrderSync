@@ -97,6 +97,9 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
                 Status
               </TableHead>
               <TableHead className="text-foreground font-semibold">
+                Cash
+              </TableHead>
+              <TableHead className="text-foreground font-semibold">
                 Created
               </TableHead>
               <TableHead className="text-foreground font-semibold text-right">
@@ -172,6 +175,9 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
                         </Badge>
                       </button>
                     )}
+                  </TableCell>
+                  <TableCell className="py-4 text-sm text-muted-foreground">
+                    {driver.finance?.currentCash?.toLocaleString() ?? "0"}
                   </TableCell>
                   <TableCell className="py-4 text-sm text-muted-foreground">
                     {driver.createdAt
