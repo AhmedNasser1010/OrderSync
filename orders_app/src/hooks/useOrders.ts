@@ -126,6 +126,7 @@ const useOrders = (): UseOrders => {
           .map((item) => `${item?.quantity}x ${item?.title}`)
           .join(", "),
         placedAt: order.timeline.placedAt,
+        isFirstOrder: order.customer.totalOrders === 1,
       })) || null
     );
   }, [filteredOrders, getOrderMenu]);

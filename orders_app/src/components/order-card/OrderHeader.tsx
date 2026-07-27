@@ -10,6 +10,7 @@ import {
   Truck,
   Star,
   PackageCheck,
+  Sparkles,
 } from "lucide-react";
 import type { OrderStatusType } from "@ordersync/types";
 import { useEffect, useState } from "react";
@@ -74,10 +75,12 @@ export default function OrderHeader({
   orderNumber,
   status,
   placedAt,
+  isFirstOrder,
 }: {
   orderNumber: number;
   status: OrderStatusType;
   placedAt: number;
+  isFirstOrder?: boolean;
 }) {
   const [timeAgo, setTimeAgo] = useState(() => getTimeAgo(placedAt));
 
@@ -94,15 +97,26 @@ export default function OrderHeader({
         <span className="text-sm font-semibold">#{orderNumber}</span>
         <span className="text-xs text-muted-foreground">{timeAgo}</span>
       </div>
-      <Badge
-        variant={getStatusVariant(status)}
-        className="flex items-center gap-1 text-xs"
-      >
-        {getStatusIcon(status)}
-        <span className="capitalize">
-          {status.toLowerCase().replace("_", " ")}
-        </span>
-      </Badge>
+      <div className="flex items-center gap-1.5">
+        {isFirstOrder && (
+          <Badge
+            variant="outline"
+            className="flex items-center gap-1 text-xs border-amber-300 text-amber-600"
+          >
+            <Sparkles className="h-3 w-3" />
+            <span>First Order</span>
+          </Badge>
+        )}
+        <Badge
+          variant={getStatusVariant(status)}
+          className="flex items-center gap-1 text-xs"
+        >
+          {getStatusIcon(status)}
+          <span className="capitalize">
+            {status.toLowerCase().replace("_", " ")}
+          </span>
+        </Badge>
+      </div>
     </div>
   );
 }

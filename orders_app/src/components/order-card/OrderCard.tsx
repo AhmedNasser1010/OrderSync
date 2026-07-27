@@ -27,6 +27,7 @@ const OrderCard = ({
         orderNumber={order.orderNumber}
         status={order.status}
         placedAt={order.placedAt}
+        isFirstOrder={order.isFirstOrder}
       />
       <OrderContent
         total={order.total}
