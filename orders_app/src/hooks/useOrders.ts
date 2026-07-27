@@ -65,7 +65,7 @@ const useOrders = (): UseOrders => {
   );
 
   const isLoading = isUserDataLoading || activeOrdersIsLoading || menuIsLoading;
-  const isError = activeOrdersIsError ?? false;
+  const isError = activeOrdersIsError;
 
   const getOrder = useCallback(
     (id: string) => activeOrdersData?.find((order) => order.id === id),
