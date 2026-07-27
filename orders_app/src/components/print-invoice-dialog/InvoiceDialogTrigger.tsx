@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import type { MainTabTypes } from "@/types/orders";
 import { Printer } from "lucide-react";
@@ -8,6 +11,8 @@ export default function InvoiceDialogTrigger({
 }: {
   activeTabValue: MainTabTypes;
 }) {
+  const ct = useTranslations("Common");
+
   return (
     activeTabValue !== "RECEIVED" && (
       <DialogTrigger asChild className="disabled-click-1">
@@ -17,7 +22,7 @@ export default function InvoiceDialogTrigger({
           className="disabled-click-1 flex items-center"
         >
           <Printer className="mr-2 h-4 w-4" />
-          Print Invoice
+          {ct("printInvoice")}
         </Button>
       </DialogTrigger>
     )

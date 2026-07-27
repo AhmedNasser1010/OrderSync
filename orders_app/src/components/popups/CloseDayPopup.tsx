@@ -1,4 +1,7 @@
+"use client";
+
 import { useEffect } from 'react'
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -14,6 +17,8 @@ import { closeDayPopup, setCloseDayPopup } from "@/rtk/slices/toggleSlice";
 import useCloseDay from '@/hooks/useCloseDay'
 
 export default function CloseDayPopup() {
+  const t = useTranslations("Settings.closeDay");
+  const ct = useTranslations("Common");
   const dispatch = useAppDispatch()
   const closeDayPopupValues = useAppSelector(closeDayPopup);
   const { closeDay, isPassed, isLoading } = useCloseDay()
@@ -57,9 +62,9 @@ export default function CloseDayPopup() {
           <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-red-500/10 text-red-500 mb-2">
             <KeyRound className="w-6 h-6" />
           </div>
-          <DialogTitle className="text-lg font-semibold">Close Day</DialogTitle>
+          <DialogTitle className="text-lg font-semibold">{t("popupTitle")}</DialogTitle>
           <DialogDescription className="text-sm text-muted-foreground">
-            This will end today&apos;s operations and reset order queues.
+            {t("popupDescription")}
           </DialogDescription>
         </DialogHeader>
 
@@ -67,13 +72,13 @@ export default function CloseDayPopup() {
           {isLoading && (
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-muted text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin shrink-0" />
-              <span>Checking orders...</span>
+              <span>{t("checking")}</span>
             </div>
           )}
           {!closeDayPopupValues?.errors?.noQueue.isPassed && (
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 text-sm text-red-500">
               <AlertCircle className="h-4 w-4 shrink-0" />
-              <span>{closeDayPopupValues?.errors?.noQueue.text}</span>
+              <span>{closeDayPopupValues?.errors?.noQueue.text || t("hasActiveOrders")}</span>
             </div>
           )}
           {!closeDayPopupValues?.errors?.hasCompletedOrders.isPassed && (
@@ -85,19 +90,19 @@ export default function CloseDayPopup() {
           {ordersIsPassed && !isLoading && (
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-green-500/10 text-sm text-green-600 dark:text-green-500">
               <ShieldCheck className="h-4 w-4 shrink-0" />
-              <span>Everything is passed, you can confirm now!</span>
+              <span>{t("allPassed")}</span>
             </div>
           )}
           {closeDayPopupValues.result.type === "success" && (
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-green-500/10 text-sm text-green-600 dark:text-green-500">
               <ShieldCheck className="h-4 w-4 shrink-0" />
-              <span>{closeDayPopupValues.result.text}</span>
+              <span>{t("success")}</span>
             </div>
           )}
           {closeDayPopupValues.result.type === "error" && (
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 text-sm text-red-500">
               <AlertCircle className="h-4 w-4 shrink-0" />
-              <span>{closeDayPopupValues.result.text}</span>
+              <span>{closeDayPopupValues.result.text || t("failed")}</span>
             </div>
           )}
         </div>
@@ -109,7 +114,7 @@ export default function CloseDayPopup() {
             onClick={handleClose}
             className="w-full sm:w-auto"
           >
-            Cancel
+            {ct("cancel")}
           </Button>
           <Button
             type="button"
@@ -118,7 +123,7 @@ export default function CloseDayPopup() {
             disabled={!ordersIsPassed || isLoading || closeDayPopupValues.result.type === "success"}
             className="w-full sm:w-auto"
           >
-            Confirm
+            {t("confirm")}
           </Button>
         </DialogFooter>
       </DialogContent>

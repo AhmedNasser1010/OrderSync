@@ -128,7 +128,7 @@ const useOrders = (): UseOrders => {
         id: order.id,
         orderNumber: order.orderNumber,
         customer: order.customer.name,
-        total: `$${order.pricing.total.toFixed(2)}`,
+        total: order.pricing.total.toFixed(2),
         status: order.status.current,
         items: getOrderMenu(order.cart)
           .map((item) => `${item?.quantity}x ${item?.title}`)

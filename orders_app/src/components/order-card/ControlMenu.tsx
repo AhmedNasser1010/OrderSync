@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { OrderStatusType, BusinessDocument } from "@ordersync/types";
 import type { MainTabTypes } from "@/types/orders";
 import {
@@ -53,6 +54,9 @@ export default function ControlMenu({
   showPrintInvoice,
   restaurant,
 }: Props) {
+  const ct = useTranslations("Common");
+  const ot = useTranslations("Orders.controlMenu");
+  const st = useTranslations("Orders.statuses");
   const [printOpen, setPrintOpen] = useState(false);
   const [order, setOrder] = useState<OrderType | undefined>(undefined);
   const [orderMenu, setOrderMenu] = useState<
@@ -106,7 +110,7 @@ export default function ControlMenu({
               }}
             >
               <Printer className="mr-2 h-4 w-4" />
-              <span>Print Invoice</span>
+              <span>{ct("printInvoice")}</span>
             </DropdownMenuItem>
           )}
           {showPrintInvoice && (overflowStatuses.length > 0 || previousStatuses.length > 0 || destructiveStatuses.length > 0) && (
@@ -121,7 +125,7 @@ export default function ControlMenu({
               }}
             >
               <ArrowUpCircle className="mr-2 h-4 w-4" />
-              <span>Move to {nextStatus.replace("_", " ")}</span>
+              <span>{ot("moveTo", { status: st(nextStatus) })}</span>
             </DropdownMenuItem>
           ))}
           {previousStatuses.length > 0 && (
@@ -136,7 +140,7 @@ export default function ControlMenu({
                   }}
                 >
                   <ArrowDownCircle className="mr-2 h-4 w-4" />
-                  <span>Move back to {prevStatus.replace("_", " ")}</span>
+                  <span>{ot("moveBackTo", { status: st(prevStatus) })}</span>
                 </DropdownMenuItem>
               ))}
             </>
@@ -162,10 +166,10 @@ export default function ControlMenu({
                   )}
                   <span>
                     {nextStatus === "CANCELED"
-                      ? "Cancel Order"
+                      ? ot("cancelOrder")
                       : nextStatus === "REJECTED"
-                        ? "Reject Order"
-                        : "Void Order"}
+                        ? ot("rejectOrder")
+                        : ot("voidOrder")}
                   </span>
                 </DropdownMenuItem>
               ))}
@@ -177,7 +181,7 @@ export default function ControlMenu({
       <Dialog open={printOpen} onOpenChange={setPrintOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Print Invoice</DialogTitle>
+            <DialogTitle>{ct("printInvoice")}</DialogTitle>
           </DialogHeader>
           <ScrollArea className="h-[500px] rounded-md border border-border">
             <Invoice
@@ -189,7 +193,7 @@ export default function ControlMenu({
           </ScrollArea>
           <Button onClick={reactToPrintFn}>
             <Printer className="mr-2 h-4 w-4" />
-            Print Invoice
+            {ct("printInvoice")}
           </Button>
         </DialogContent>
       </Dialog>

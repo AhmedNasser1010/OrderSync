@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { RestaurantStatusTypes } from '@ordersync/types';
 import useResStatus from "@/hooks/useResStatus";
 
@@ -19,6 +20,7 @@ const getStatusColor = (status: RestaurantStatusTypes) => {
 };
 
 function ResStatus() {
+  const t = useTranslations("ResStatus");
   const { currentStatus } = useResStatus();
 
   return (
@@ -27,7 +29,7 @@ function ResStatus() {
         className={`w-3 h-3 rounded-full ${getStatusColor(currentStatus)}`}
         title={`Status: ${currentStatus}`}
       />
-      <span className="text-sm font-medium capitalize">{currentStatus}</span>
+      <span className="text-sm font-medium capitalize">{t(currentStatus)}</span>
     </div>
   );
 }

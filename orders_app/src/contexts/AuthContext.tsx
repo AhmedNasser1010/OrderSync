@@ -9,7 +9,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { useAppDispatch } from "@/rtk/hooks";
 import { auth, db } from "@/lib/firebase";
 import {

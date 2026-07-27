@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle,
@@ -13,15 +16,15 @@ import {
   Sparkles,
 } from "lucide-react";
 import type { OrderStatusType } from "@ordersync/types";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
-function getTimeAgo(timestamp: number): string {
+function getTimeAgo(timestamp: number, t: (key: string, params?: Record<string, string | number>) => string): string {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
 
-  if (seconds < 60) return "just now";
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  return `${Math.floor(seconds / 86400)}d ago`;
+  if (seconds < 60) return t("justNow");
+  if (seconds < 3600) return t("minutesAgo", { m: Math.floor(seconds / 60) });
+  if (seconds < 86400) return t("hoursAgo", { h: Math.floor(seconds / 3600) });
+  return t("daysAgo", { d: Math.floor(seconds / 86400) });
 }
 
 const getStatusIcon = (status: OrderStatusType) => {
@@ -82,15 +85,20 @@ export default function OrderHeader({
   placedAt: number;
   isFirstOrder?: boolean;
 }) {
-  const [timeAgo, setTimeAgo] = useState(() => getTimeAgo(placedAt));
+  const t = useTranslations("Orders.header");
+  const st = useTranslations("Orders.statuses");
+  const [timeAgo, setTimeAgo] = useState(() => getTimeAgo(placedAt, t));
+
+  const updateTimeAgo = useCallback(() => {
+    setTimeAgo(getTimeAgo(placedAt, t));
+  }, [placedAt, t]);
 
   useEffect(() => {
+    updateTimeAgo();
     const intervalMs = status === "RECEIVED" ? 10_000 : 60_000;
-    const interval = setInterval(() => {
-      setTimeAgo(getTimeAgo(placedAt));
-    }, intervalMs);
+    const interval = setInterval(updateTimeAgo, intervalMs);
     return () => clearInterval(interval);
-  }, [placedAt, status]);
+  }, [placedAt, status, updateTimeAgo]);
 
   return (
     <div className="flex items-center justify-between px-4 pt-3 pb-1">
@@ -105,7 +113,7 @@ export default function OrderHeader({
             className="flex items-center gap-1 text-xs border-amber-300 text-amber-600"
           >
             <Sparkles className="h-3 w-3" />
-            <span>First Order</span>
+            <span>{t("firstOrder")}</span>
           </Badge>
         )}
         <Badge
@@ -114,7 +122,7 @@ export default function OrderHeader({
         >
           {getStatusIcon(status)}
           <span className="capitalize">
-            {status.toLowerCase().replace("_", " ")}
+            {st(status)}
           </span>
         </Badge>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { usePathname } from "@/i18n/routing";
 import ResStatusBtn from "./ResStatusBtn";
 import useOrders from "@/hooks/useOrders";
 import { useAppSelector } from "@/rtk/hooks";
@@ -24,14 +25,16 @@ const tabIcons: Record<MainTabTypes, React.ElementType> = {
 };
 
 const tabCountsLabel: Record<MainTabTypes, string> = {
-  RECEIVED: "new orders waiting",
-  PREPARING: "orders in progress",
-  DELIVERY: "orders out for delivery",
-  COMPLETED: "orders fulfilled",
-  VOIDED: "orders cancelled",
+  RECEIVED: "newOrders",
+  PREPARING: "preparingOrders",
+  DELIVERY: "deliveryOrders",
+  COMPLETED: "completedOrders",
+  VOIDED: "voidedOrders",
 };
 
 export default function MainHeader() {
+  const t = useTranslations("Orders.header");
+  const st = useTranslations("Settings.header");
   const pathname = usePathname();
   const isSettings = pathname === "/settings";
 
@@ -46,10 +49,10 @@ export default function MainHeader() {
               </div>
               <div className="min-w-0">
                 <h1 className="text-lg font-semibold text-foreground truncate">
-                  Settings
+                  {st("title")}
                 </h1>
                 <p className="text-xs text-muted-foreground truncate">
-                  Manage your preferences
+                  {st("subtitle")}
                 </p>
               </div>
             </div>
@@ -66,6 +69,7 @@ export default function MainHeader() {
 }
 
 function HomeHeader() {
+  const t = useTranslations("Orders.header");
   const { counts } = useOrders();
   const activeTabValue = useAppSelector(activeTab);
   const ActiveIcon = tabIcons[activeTabValue];
@@ -80,10 +84,10 @@ function HomeHeader() {
             </div>
             <div className="min-w-0">
               <h1 className="text-lg font-semibold text-foreground truncate">
-                Orders
+                {t("title")}
               </h1>
               <p className="text-xs text-muted-foreground truncate">
-                {counts[activeTabValue]} {tabCountsLabel[activeTabValue]}
+                {counts[activeTabValue]} {t(tabCountsLabel[activeTabValue])}
               </p>
             </div>
           </div>

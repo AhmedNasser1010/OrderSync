@@ -1,4 +1,5 @@
 "use client";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -26,6 +27,7 @@ export default function PrintInvoiceDialog({
   activeTabValue: MainTabTypes;
   restaurant: BusinessDocument | undefined;
 }) {
+  const ct = useTranslations("Common");
   const [open, setOpen] = useState(false);
   const [order, setOrder] = useState<OrderType | undefined>(undefined);
   const [orderMenu, setOrderMenu] = useState<(ItemType & { quantity: number; selectedSize: string; discountCode?: string; })[] | undefined>(undefined);
@@ -53,7 +55,7 @@ export default function PrintInvoiceDialog({
       <InvoiceDialogTrigger activeTabValue={activeTabValue} />
       <DialogContent className="disabled-click-1 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Print Invoice</DialogTitle>
+          <DialogTitle>{ct("printInvoice")}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="h-[500px] rounded-md border border-border">
           <Invoice
@@ -65,7 +67,7 @@ export default function PrintInvoiceDialog({
         </ScrollArea>
         <Button onClick={reactToPrintFn}>
           <Printer className="mr-2 h-4 w-4" />
-          Print Invoice
+          {ct("printInvoice")}
         </Button>
       </DialogContent>
     </Dialog>

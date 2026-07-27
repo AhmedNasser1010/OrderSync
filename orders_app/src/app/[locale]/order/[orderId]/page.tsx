@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useRef, useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import {
   ArrowLeft,
   MapPin,
@@ -14,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TypographyH3 } from "@/components/ui/typography";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import Page from "@/components/Page";
 import type { OrderType, OrderStatusType } from "@ordersync/types";
 import type { ItemType, BusinessDocument } from "@ordersync/types";
@@ -39,6 +40,10 @@ export default function OrderDetails({
 }: {
   params: Promise<{ orderId: string }>;
 }) {
+  const t = useTranslations("OrderDetails");
+  const ct = useTranslations("Common");
+  const st = useTranslations("Orders.statuses");
+  const locale = useLocale();
   const { orderId } = use(params);
   const { getOrder, getOrderMenu, isLoading } = useOrders();
   const resAccessToken = useAppSelector(accessToken);
@@ -105,7 +110,7 @@ export default function OrderDetails({
   };
 
   if (!order) {
-    return <h3>Loading...</h3>;
+    return <h3>{t("loading")}</h3>;
   }
 
   return (
@@ -115,7 +120,7 @@ export default function OrderDetails({
           <Link href="/" passHref>
             <Button variant="ghost" className="mr-4">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              {ct("back")}
             </Button>
           </Link>
         </div>
@@ -124,7 +129,7 @@ export default function OrderDetails({
             variant="outline"
             className={`${getStatusColor(order.status.current)} text-white`}
           >
-            {order.status.current.charAt(0).toUpperCase() + order.status.current.slice(1)}
+            {st(order.status.current)}
           </Badge>
           <Badge variant="outline">{order.payment.method}</Badge>
           <Button
@@ -134,17 +139,17 @@ export default function OrderDetails({
             disabled={!orderCart || !restaurant}
           >
             <Printer className="mr-2 h-4 w-4" />
-            Print
+            {ct("print")}
           </Button>
         </div>
       </div>
       <TypographyH3 className="mb-4">
-        Order #{order.orderNumber}
+        {t("title", { number: order.orderNumber })}
       </TypographyH3>
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Customer Information</CardTitle>
+            <CardTitle>{t("customerInfo")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -160,7 +165,7 @@ export default function OrderDetails({
                   className="w-[105px]"
                 >
                   <ExternalLink className="mr-2 h-4 w-4" />
-                  Open Map
+                  {t("openMap")}
                 </Button>
               </div>
               <div className="flex items-center justify-between">
@@ -175,7 +180,7 @@ export default function OrderDetails({
                   className="w-[105px]"
                 >
                   <PhoneOutgoing className="mr-2 h-4 w-4" />
-                  Call
+                  {t("call")}
                 </Button>
               </div>
             </div>
@@ -184,7 +189,7 @@ export default function OrderDetails({
       </div>
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle>Order Items</CardTitle>
+          <CardTitle>{t("orderItems")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -203,12 +208,12 @@ export default function OrderDetails({
                       <span className="font-medium block">{item.title}</span>
                       {item?.selectedSize && (
                         <Badge variant="outline">
-                          {getSizeName[item?.selectedSize]}
+                          {item.selectedSize === "S" ? t("sizeSmall") : item.selectedSize === "M" ? t("sizeMedium") : t("sizeLarge")}
                         </Badge>
                       )}
                     </div>
                     <span>
-                      {item.quantity} x ${item.price}
+                      {item.quantity} x {locale === "ar" ? `${item.price} ${ct("currency")}` : `${ct("currency")}${item.price}`}
                     </span>
                   </div>
                 </div>
@@ -220,21 +225,21 @@ export default function OrderDetails({
       <Card className="mt-6">
         <CardContent>
           <div className="flex justify-between items-center py-2">
-            <span>Subtotal</span>
-            <span>${order.pricing.subtotal.toFixed(2)}</span>
+            <span>{t("subtotal")}</span>
+            <span>{locale === "ar" ? `${order.pricing.subtotal.toFixed(2)} ${ct("currency")}` : `${ct("currency")}${order.pricing.subtotal.toFixed(2)}`}</span>
           </div>
           <div className="flex justify-between items-center py-2">
-            <span>Discount</span>
-            <span>${order.pricing.discount.toFixed(2)}</span>
+            <span>{t("discount")}</span>
+            <span>{locale === "ar" ? `${order.pricing.discount.toFixed(2)} ${ct("currency")}` : `${ct("currency")}${order.pricing.discount.toFixed(2)}`}</span>
           </div>
           <div className="flex justify-between items-center py-2">
-            <span>Delivery Fees</span>
-            <span>${order.pricing.deliveryFees.toFixed(2)}</span>
+            <span>{t("deliveryFees")}</span>
+            <span>{locale === "ar" ? `${order.pricing.deliveryFees.toFixed(2)} ${ct("currency")}` : `${ct("currency")}${order.pricing.deliveryFees.toFixed(2)}`}</span>
           </div>
           <Separator className="my-2" />
           <div className="flex justify-between items-center py-2 font-bold">
-            <span>Total</span>
-            <span>${order.pricing.total.toFixed(2)}</span>
+            <span>{t("total")}</span>
+            <span>{locale === "ar" ? `${order.pricing.total.toFixed(2)} ${ct("currency")}` : `${ct("currency")}${order.pricing.total.toFixed(2)}`}</span>
           </div>
         </CardContent>
       </Card>

@@ -1,8 +1,13 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Moon } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { ModeToggle } from "@/components/ui/ModeToggle";
 
 export default function Themes() {
+  const t = useTranslations("Settings.appearance");
+
   return (
     <section className="bg-card border border-border rounded-2xl overflow-hidden">
       <div className="flex items-center gap-3 px-4 pt-4 pb-2">
@@ -10,13 +15,13 @@ export default function Themes() {
           <Moon className="w-5 h-5" />
         </div>
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold text-foreground">Appearance</h2>
-          <p className="text-xs text-muted-foreground">Theme preferences</p>
+          <h2 className="text-sm font-semibold text-foreground">{t("title")}</h2>
+          <p className="text-xs text-muted-foreground">{t("description")}</p>
         </div>
       </div>
       <div className="px-4 pb-4 pt-2">
         <div className="flex items-center justify-between py-3 border-t border-border">
-          <Label htmlFor="dark-mode" className="text-sm text-foreground">Dark Mode</Label>
+          <Label htmlFor="dark-mode" className="text-sm text-foreground">{t("darkMode")}</Label>
           <ModeToggle />
         </div>
       </div>

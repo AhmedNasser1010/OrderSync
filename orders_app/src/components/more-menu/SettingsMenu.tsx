@@ -1,7 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import {
   Sheet,
   SheetContent,
@@ -21,6 +22,7 @@ import {
 import MenuCard from "./MenuCard";
 
 function SettingsMenu() {
+  const t = useTranslations("MoreMenu");
   const router = useRouter();
   const dispatch = useAppDispatch();
   const optionMenuViewValue = useAppSelector(optionMenuView);
@@ -38,13 +40,13 @@ function SettingsMenu() {
       <SheetTrigger asChild>
         <Button variant="outline" size="icon" className="h-[32px] w-[32px]">
           <Settings className="h-[1.2rem] w-[1.2rem]" />
-          <span className="sr-only">Open settings menu</span>
+          <span className="sr-only">{t("openSettings")}</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="bottom" className="rounded-t-lg min-h-[50vh] border border-border">
         <SheetHeader>
-          <SheetTitle>More</SheetTitle>
-          <SheetDescription>More Settings</SheetDescription>
+          <SheetTitle>{t("title")}</SheetTitle>
+          <SheetDescription>{t("description")}</SheetDescription>
         </SheetHeader>
         <div className="grid grid-cols-2 gap-4 py-4">
           <MenuCard
@@ -53,12 +55,12 @@ function SettingsMenu() {
                 dispatch(setCloseDayPopup({ isOpen: true })),
               )
             }
-            title="Close the Day"
+            title={t("closeDay")}
             icon={<KeyRound className="h-8 w-8 mb-2" />}
           />
           <MenuCard
             callback={() => afterTriggerAction(() => router.push("/settings"))}
-            title="Settings"
+            title={t("settings")}
             icon={<Cog className="h-8 w-8 mb-2" />}
           />
         </div>

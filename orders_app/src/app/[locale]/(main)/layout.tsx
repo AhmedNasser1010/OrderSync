@@ -1,7 +1,7 @@
 "use client";
 
-import MainHeader from "../MainHeader";
-import OrdersTabs from "../OrdersTabs";
+import MainHeader from "@/app/MainHeader";
+import OrdersTabs from "@/app/OrdersTabs";
 import useOrders from "@/hooks/useOrders";
 import { useMemo } from "react";
 import { getPreparingAgeUrgency } from "@/lib/orderAge";

@@ -1,0 +1,217 @@
+{
+  "Common": {
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "back": "Back",
+    "print": "Print",
+    "printInvoice": "Print Invoice",
+    "toggleTheme": "Toggle theme",
+    "currency": "$"
+  },
+  "Auth": {
+    "layout": {
+      "title": "Orders",
+      "tagline": "Manage your orders with ease",
+      "copyright": "\u00a9 2025 Orders. All rights reserved."
+    },
+    "form": {
+      "signIn": "Sign In",
+      "createAccount": "Create Account",
+      "dontHaveAccount": "Don't have an account?",
+      "signUpLink": "Sign up",
+      "alreadyHaveAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "continueWithGoogle": "Continue with Google",
+      "or": "or",
+      "email": "Email",
+      "emailPlaceholder": "name@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "passwordSignupPlaceholder": "At least 6 characters",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "signInButton": "Sign In",
+      "createAccountButton": "Create Account",
+      "anErrorOccurred": "An error occurred",
+      "loading": "Loading..."
+    },
+    "errors": {
+      "invalidCredential": "Invalid credential. Please check your email and password",
+      "tooManyRequests": "Too many requests. Please try again later.",
+      "emailAlreadyInUse": "This email is already in use.",
+      "weakPassword": "Password should be at least 6 characters.",
+      "googleSignInCanceled": "Google sign in was canceled.",
+      "anErrorOccurred": "An error occurred"
+    },
+    "unassigned": {
+      "title": "Access Restricted",
+      "description": "You aren't assigned to any businesses yet",
+      "signedInAs": "Signed in as",
+      "logout": "Logout",
+      "loggingOut": "Logging out..."
+    },
+    "notFound": {
+      "title": "Auth Not Found",
+      "description": "Please try again later."
+    },
+    "autoLogin": {
+      "title": "Logging you in...",
+      "description": "Please wait while we securely log you into your account."
+    }
+  },
+  "Orders": {
+    "header": {
+      "title": "Orders",
+      "newOrders": "new orders waiting",
+      "preparingOrders": "orders in progress",
+      "deliveryOrders": "orders out for delivery",
+      "completedOrders": "orders fulfilled",
+      "voidedOrders": "orders cancelled",
+      "firstOrder": "First Order",
+      "justNow": "just now",
+      "minutesAgo": "{m}m ago",
+      "hoursAgo": "{h}h ago",
+      "daysAgo": "{d}d ago"
+    },
+    "tabs": {
+      "received": "Received",
+      "preparing": "Preparing",
+      "delivery": "Delivery",
+      "completed": "Completed",
+      "voided": "Voided",
+      "more": "More",
+      "settings": "Settings"
+    },
+    "view": {
+      "failedToLoad": "Failed to load orders",
+      "noOrdersFound": "No Orders Found",
+      "noOrdersReceived": "No new orders have come in yet.",
+      "noOrdersPreparing": "No orders are currently being prepared.",
+      "noOrdersDelivery": "No orders are out for delivery.",
+      "noOrdersCompleted": "No orders have been fulfilled yet.",
+      "noOrdersVoided": "No voided orders.",
+      "acceptAll": "Accept & Prepare All ({count})"
+    },
+    "footer": {
+      "start": "Start",
+      "accept": "Accept",
+      "prepare": "Prepare",
+      "ready": "Ready",
+      "pickedUp": "Picked Up",
+      "startRoute": "Start Route",
+      "delivered": "Delivered",
+      "waitingForDriver": "Waiting for driver"
+    },
+    "controlMenu": {
+      "moveTo": "Move to {status}",
+      "moveBackTo": "Move back to {status}",
+      "cancelOrder": "Cancel Order",
+      "rejectOrder": "Reject Order",
+      "voidOrder": "Void Order"
+    },
+    "statuses": {
+      "RECEIVED": "Received",
+      "ACCEPTED": "Accepted",
+      "PREPARING": "Preparing",
+      "READY": "Ready",
+      "RESERVED": "Reserved",
+      "PICKED_UP": "Picked Up",
+      "ON_ROUTE": "On Route",
+      "DELIVERED": "Delivered",
+      "GIVEN_FEEDBACK": "Given Feedback",
+      "REJECTED": "Rejected",
+      "CANCELED": "Canceled",
+      "VOIDED": "Voided"
+    }
+  },
+  "OrderDetails": {
+    "title": "Order #{number}",
+    "customerInfo": "Customer Information",
+    "openMap": "Open Map",
+    "call": "Call",
+    "orderItems": "Order Items",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "deliveryFees": "Delivery Fees",
+    "total": "Total",
+    "sizeSmall": "Small",
+    "sizeMedium": "Medium",
+    "sizeLarge": "Large",
+    "loading": "Loading..."
+  },
+  "Settings": {
+    "header": {
+      "title": "Settings",
+      "subtitle": "Manage your preferences"
+    },
+    "closeDay": {
+      "title": "Close Day",
+      "description": "End-of-day operations",
+      "button": "Close Day",
+      "popupTitle": "Close Day",
+      "popupDescription": "This will end today's operations and reset order queues.",
+      "checking": "Checking orders...",
+      "allPassed": "Everything is passed, you can confirm now!",
+      "hasActiveOrders": "There are active orders. Wait for them to complete before closing the day.",
+      "success": "Day closed successfully.",
+      "failed": "Failed to close day.",
+      "confirm": "Confirm"
+    },
+    "profile": {
+      "title": "Profile & Language",
+      "description": "Edit your profile and app language",
+      "language": "Language",
+      "selectLanguage": "Select language"
+    },
+    "display": {
+      "title": "Display Settings",
+      "description": "Manage your brand icon, cover & subtitles",
+      "promotionalSubtitle": "Promotional Subtitle",
+      "brandLogoUrl": "Brand Logo URL",
+      "brandCoverUrl": "Brand Cover URL",
+      "pauseMessage": "Temporary Pause Message",
+      "pausePlaceholder": "Type your message here."
+    },
+    "workflow": {
+      "title": "Order Workflow",
+      "description": "Customize order processing",
+      "printInvoice": "Print Invoice"
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Theme preferences",
+      "darkMode": "Dark Mode"
+    },
+    "logout": {
+      "title": "Logout",
+      "description": "Sign out of your account",
+      "button": "Logout"
+    }
+  },
+  "MoreMenu": {
+    "title": "More",
+    "description": "More Settings",
+    "closeDay": "Close the Day",
+    "settings": "Settings",
+    "openSettings": "Open settings menu"
+  },
+  "DeleteOrder": {
+    "title": "Delete Order",
+    "description": "Please provide a reason for deleting the order or leave it empty and click delete.",
+    "reasonPlaceholder": "Type the reason of delete",
+    "orderIdNotFound": "Order Id Not Found",
+    "button": "Delete Order"
+  },
+  "ResStatus": {
+    "active": "Active",
+    "busy": "Busy",
+    "paused": "Paused",
+    "inactive": "Inactive"
+  },
+  "Metadata": {
+    "title": "Orders | OrderSync",
+    "description": "Manage your incoming orders in real-time"
+  }
+}

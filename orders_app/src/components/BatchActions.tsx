@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { useSetOrderStatusMutation } from "@/rtk/api/firestoreApi";
 import type { OrderType } from "@ordersync/types";
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export default function BatchActions({ receivedOrders }: Props) {
+  const t = useTranslations("Orders.view");
   const [setOrderStatus, { isLoading }] = useSetOrderStatusMutation();
   const count = receivedOrders.length;
 
@@ -35,7 +37,7 @@ export default function BatchActions({ receivedOrders }: Props) {
       ) : (
         <CheckCheck className="mr-2 h-4 w-4" />
       )}
-      Accept &amp; Prepare All ({count})
+      {t("acceptAll", { count })}
     </Button>
   );
 }

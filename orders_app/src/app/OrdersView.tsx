@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import OrderCard from "../components/order-card/OrderCard";
 import useOrders from "@/hooks/useOrders";
 import { useAppSelector } from "@/rtk/hooks";
@@ -11,16 +12,18 @@ import { RefreshCw } from "lucide-react";
 import BatchActions from "@/components/BatchActions";
 
 export default function OrdersView() {
+  const t = useTranslations("Orders.view");
+  const ct = useTranslations("Common");
   const { formattedOrders, receivedOrders, isLoading, isError } = useOrders();
   const activeTabValue = useAppSelector(activeTab);
 
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-muted-foreground mb-4">Failed to load orders</p>
+        <p className="text-muted-foreground mb-4">{t("failedToLoad")}</p>
         <Button variant="outline" onClick={() => window.location.reload()}>
           <RefreshCw className="mr-2 h-4 w-4" />
-          Retry
+          {ct("retry")}
         </Button>
       </div>
     );

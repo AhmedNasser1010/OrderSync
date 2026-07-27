@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Printer } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -11,6 +14,7 @@ import { userUid } from "@/rtk/slices/constantsSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function OrderWorkflow() {
+  const t = useTranslations("Settings.workflow");
   const uid = useAppSelector(userUid);
   const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
   const { data: resData } = useFetchRestaurantDataQuery(
@@ -37,13 +41,13 @@ export default function OrderWorkflow() {
           <Printer className="w-5 h-5" />
         </div>
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold text-foreground">Order Workflow</h2>
-          <p className="text-xs text-muted-foreground">Customize order processing</p>
+          <h2 className="text-sm font-semibold text-foreground">{t("title")}</h2>
+          <p className="text-xs text-muted-foreground">{t("description")}</p>
         </div>
       </div>
       <div className="px-4 pb-4 pt-2">
         <div className="flex items-center justify-between py-3 border-t border-border">
-          <Label htmlFor="print-invoice" className="text-sm text-foreground">Print Invoice</Label>
+          <Label htmlFor="print-invoice" className="text-sm text-foreground">{t("printInvoice")}</Label>
           <Switch
             id="print-invoice"
             defaultChecked={printInvoice}

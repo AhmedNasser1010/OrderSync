@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import useAuth from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
@@ -11,6 +12,7 @@ import Themes from "@/app/settings/Themes";
 import CloseDay from "@/app/settings/CloseDay";
 
 export default function SettingsPage() {
+  const t = useTranslations("Settings.logout");
   const { logout } = useAuth();
 
   return (
@@ -27,8 +29,8 @@ export default function SettingsPage() {
             <LogOut className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-sm font-semibold text-foreground">Logout</h2>
-            <p className="text-xs text-muted-foreground">Sign out of your account</p>
+            <h2 className="text-sm font-semibold text-foreground">{t("title")}</h2>
+            <p className="text-xs text-muted-foreground">{t("description")}</p>
           </div>
         </div>
         <div className="px-4 pb-4 pt-2">
@@ -37,7 +39,7 @@ export default function SettingsPage() {
             className="w-full justify-between border-red-500/20 text-red-500 hover:bg-red-500/10 hover:text-red-600"
             onClick={logout}
           >
-            <span>Logout</span>
+            <span>{t("button")}</span>
             <LogOut className="h-4 w-4" />
           </Button>
         </div>

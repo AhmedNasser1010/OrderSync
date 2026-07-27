@@ -1,10 +1,11 @@
 "use client";
 import { useState, useCallback, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/routing";
 import { useAuth } from "@/contexts/AuthContext";
 import useUser from "@/hooks/useUser";
 import AutoLoginLoadingScreen from "@/components/AutoLoginLoadingScreen";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 export default function AuthProvider({
   children,
@@ -16,6 +17,7 @@ export default function AuthProvider({
   const router = useRouter();
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const t = useTranslations("Auth.unassigned");
 
   const handleLogout = useCallback(async () => {
     setIsLoggingOut(true);
@@ -63,12 +65,12 @@ export default function AuthProvider({
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
         <div className="bg-card border border-border rounded-lg p-6 shadow-lg mx-4 max-w-md w-full">
           <h2 className="text-lg font-semibold text-foreground text-center">
-            Access Restricted
+            {t("title")}
           </h2>
           <p className="text-sm text-muted-foreground text-center pt-2">
-            You aren&apos;t assigned to any businesses yet
+            {t("description")}
             <br />
-            Signed in as <strong>{user.email || "unknown@email.com"}</strong>
+            {t("signedInAs")} <strong>{user.email || "unknown@email.com"}</strong>
           </p>
           <div className="flex items-center justify-center mt-6 pt-4 border-t border-border">
             <Button
@@ -77,7 +79,7 @@ export default function AuthProvider({
               disabled={isLoggingOut}
               className="w-full sm:w-auto"
             >
-              {isLoggingOut ? "Logging out..." : "Logout"}
+              {isLoggingOut ? t("loggingOut") : t("logout")}
             </Button>
           </div>
         </div>

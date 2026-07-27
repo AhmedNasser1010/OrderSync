@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Palette } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -12,6 +15,7 @@ import { userUid } from "@/rtk/slices/constantsSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
 
 export default function DisplaySettings() {
+  const t = useTranslations("Settings.display");
   const uid = useAppSelector(userUid);
   const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
   const { data: resData } = useFetchRestaurantDataQuery(
@@ -39,13 +43,13 @@ export default function DisplaySettings() {
           <Palette className="w-5 h-5" />
         </div>
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold text-foreground">Display Settings</h2>
-          <p className="text-xs text-muted-foreground">Manage your brand icon, cover & subtitles</p>
+          <h2 className="text-sm font-semibold text-foreground">{t("title")}</h2>
+          <p className="text-xs text-muted-foreground">{t("description")}</p>
         </div>
       </div>
       <div className="px-4 pb-4 pt-2 space-y-0">
         <div className="flex flex-col gap-1.5 py-3 border-t border-border">
-          <Label htmlFor="promotional-subtitle" className="text-sm text-foreground">Promotional Subtitle</Label>
+          <Label htmlFor="promotional-subtitle" className="text-sm text-foreground">{t("promotionalSubtitle")}</Label>
           <Input
             id="promotional-subtitle"
             type="text"
@@ -56,7 +60,7 @@ export default function DisplaySettings() {
           />
         </div>
         <div className="flex flex-col gap-1.5 py-3 border-t border-border">
-          <Label htmlFor="brand-logo" className="text-sm text-foreground">Brand Logo URL</Label>
+          <Label htmlFor="brand-logo" className="text-sm text-foreground">{t("brandLogoUrl")}</Label>
           <Input
             id="brand-logo"
             type="text"
@@ -67,7 +71,7 @@ export default function DisplaySettings() {
           />
         </div>
         <div className="flex flex-col gap-1.5 py-3 border-t border-border">
-          <Label htmlFor="brand-cover" className="text-sm text-foreground">Brand Cover URL</Label>
+          <Label htmlFor="brand-cover" className="text-sm text-foreground">{t("brandCoverUrl")}</Label>
           <Input
             id="brand-cover"
             type="text"
@@ -78,9 +82,9 @@ export default function DisplaySettings() {
           />
         </div>
         <div className="flex flex-col gap-1.5 py-3 border-t border-border">
-          <Label htmlFor="message" className="text-sm text-foreground">Temporary Pause Message</Label>
+          <Label htmlFor="message" className="text-sm text-foreground">{t("pauseMessage")}</Label>
           <Textarea
-            placeholder="Type your message here."
+            placeholder={t("pausePlaceholder")}
             id="message"
             defaultValue={resData?.branding?.closeMsg}
             name="closeMsg"

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,14 +13,15 @@ import useResStatus from "@/hooks/useResStatus";
 import type { RestaurantStatusTypes } from "@ordersync/types";
 import { cn } from "@/lib/utils";
 
-const statuses: { value: RestaurantStatusTypes; label: string; color: string }[] = [
-  { value: "active", label: "Active", color: "bg-green-500" },
-  { value: "busy", label: "Busy", color: "bg-yellow-500" },
-  { value: "pause", label: "Paused", color: "bg-red-500" },
-  { value: "inactive", label: "Inactive", color: "bg-gray-500" },
+const statuses: { value: RestaurantStatusTypes; labelKey: string; color: string }[] = [
+  { value: "active", labelKey: "active", color: "bg-green-500" },
+  { value: "busy", labelKey: "busy", color: "bg-yellow-500" },
+  { value: "pause", labelKey: "paused", color: "bg-red-500" },
+  { value: "inactive", labelKey: "inactive", color: "bg-gray-500" },
 ];
 
 function ResStatusBtn() {
+  const t = useTranslations("ResStatus");
   const { setResStatus, isLoading, currentStatus } = useResStatus();
   const current = statuses.find((s) => s.value === currentStatus) ?? statuses[3];
 
@@ -32,7 +34,7 @@ function ResStatusBtn() {
           ) : (
             <div className={cn("w-2.5 h-2.5 rounded-full mr-2", current.color)} />
           )}
-          <span className="capitalize">{current.label}</span>
+          <span className="capitalize">{t(current.labelKey)}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -45,7 +47,7 @@ function ResStatusBtn() {
             )}
           >
             <div className={cn("w-2.5 h-2.5 rounded-full mr-2", status.color)} />
-            {status.label}
+            {t(status.labelKey)}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

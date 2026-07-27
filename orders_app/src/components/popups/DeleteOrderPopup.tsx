@@ -1,4 +1,7 @@
+"use client";
+
 import { useEffect } from "react"
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -16,6 +19,8 @@ import { setDeletePopup } from "@/rtk/slices/toggleSlice";
 import useOrderHandler from '@/hooks/order-handlers/useOrderHandlers'
 
 export default function DeleteOrderPopup() {
+  const t = useTranslations("DeleteOrder");
+  const ct = useTranslations("Common");
   const dispatch = useAppDispatch()
   const deletePopupValue = useAppSelector(deletePopup);
   const { deleteOrder } = useOrderHandler()
@@ -25,10 +30,10 @@ export default function DeleteOrderPopup() {
       if (deletePopupValue.orderId) {
         dispatch(setDeletePopup({ error: null }))
       } else {
-        dispatch(setDeletePopup({ error: 'Order Id Not Found' }))
+        dispatch(setDeletePopup({ error: t("orderIdNotFound") }))
       }
     }
-  }, [dispatch, deletePopupValue.orderId, deletePopupValue.isOpen])
+  }, [dispatch, deletePopupValue.orderId, deletePopupValue.isOpen, t])
 
   const handleClose = () => {
     dispatch(setDeletePopup({
@@ -58,14 +63,14 @@ export default function DeleteOrderPopup() {
     <Dialog open={deletePopupValue.isOpen} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Order</DialogTitle>
+          <DialogTitle>{t("title")}</DialogTitle>
           <DialogDescription>
-            Please provide a reason for deleting the order or leave it empty and click delete.
+            {t("description")}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <Input
-            placeholder="Type the reason of delete"
+            placeholder={t("reasonPlaceholder")}
             value={deletePopupValue.cancellationReason || ''}
             onChange={(e) => handleInputChange(e.target.value)}
             className="col-span-3"
@@ -84,7 +89,7 @@ export default function DeleteOrderPopup() {
             onClick={handleDelete}
             disabled={deletePopupValue?.error || deleteOrder.isLoading ? true : false}
           >
-            Delete Order
+            {t("button")}
           </Button>
           <Button
             type="button"
@@ -92,7 +97,7 @@ export default function DeleteOrderPopup() {
             onClick={handleClose}
             className="mb-2.5"
           >
-            Cancel
+            {ct("cancel")}
           </Button>
         </DialogFooter>
       </DialogContent>

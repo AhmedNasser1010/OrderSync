@@ -1,22 +1,23 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { MainTabTypes } from "@/types/orders";
 import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
 import { activeTab, setActiveTab } from "@/rtk/slices/toggleSlice";
 import { cn } from "@/lib/utils";
 import { SquareArrowDown, CookingPot, Bike, MoreHorizontal, CheckCircle, XCircle, Cog } from "lucide-react";
 import { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "@/i18n/routing";
 
-const mainTabs: { value: MainTabTypes; label: string; icon: React.ElementType }[] = [
-  { value: "RECEIVED", label: "Received", icon: SquareArrowDown },
-  { value: "PREPARING", label: "Preparing", icon: CookingPot },
-  { value: "DELIVERY", label: "Delivery", icon: Bike },
+const mainTabs: { value: MainTabTypes; labelKey: string; icon: React.ElementType }[] = [
+  { value: "RECEIVED", labelKey: "received", icon: SquareArrowDown },
+  { value: "PREPARING", labelKey: "preparing", icon: CookingPot },
+  { value: "DELIVERY", labelKey: "delivery", icon: Bike },
 ];
 
-const moreTabs: { value: MainTabTypes; label: string; icon: React.ElementType }[] = [
-  { value: "COMPLETED", label: "Completed", icon: CheckCircle },
-  { value: "VOIDED", label: "Voided", icon: XCircle },
+const moreTabs: { value: MainTabTypes; labelKey: string; icon: React.ElementType }[] = [
+  { value: "COMPLETED", labelKey: "completed", icon: CheckCircle },
+  { value: "VOIDED", labelKey: "voided", icon: XCircle },
 ];
 
 export default function OrdersTabs({
@@ -26,6 +27,7 @@ export default function OrdersTabs({
   counts: Record<MainTabTypes, number>;
   hasPreparingUrgency: boolean;
 }) {
+  const t = useTranslations("Orders.tabs");
   const dispatch = useAppDispatch();
   const activeTabValue = useAppSelector(activeTab);
   const [showMore, setShowMore] = useState(false);
@@ -62,7 +64,7 @@ export default function OrdersTabs({
             : "opacity-0 translate-y-2 pointer-events-none"
         )}
       >
-        {moreTabs.map(({ value, label, icon: Icon }) => {
+        {moreTabs.map(({ value, labelKey, icon: Icon }) => {
           const isActive = activeTabValue === value;
           const count = counts[value];
 
@@ -87,7 +89,7 @@ export default function OrdersTabs({
                   isActive ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                {label}
+                {t(labelKey)}
               </span>
               {count > 0 && (
                 <span
@@ -120,7 +122,7 @@ export default function OrdersTabs({
             "text-[9px] font-medium transition-colors duration-200",
             pathname === "/settings" ? "text-primary" : "text-muted-foreground"
           )}>
-            Settings
+            {t("settings")}
           </span>
           {pathname === "/settings" && (
             <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
@@ -130,7 +132,7 @@ export default function OrdersTabs({
 
       {/* Main dock — Received, Preparing, Delivery, More */}
       <div className="flex items-center justify-around px-2 py-1.5 bg-background/80 dark:bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl shadow-lg shadow-black/5">
-        {mainTabs.map(({ value, label, icon: Icon }) => {
+        {mainTabs.map(({ value, labelKey, icon: Icon }) => {
           const isActive = activeTabValue === value;
           const count = counts[value];
 
@@ -165,7 +167,7 @@ export default function OrdersTabs({
                   isActive ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                {label}
+                {t(labelKey)}
               </span>
               {count > 0 && (
                 <span
@@ -205,7 +207,7 @@ export default function OrdersTabs({
               showMore ? "text-primary" : "text-muted-foreground"
             )}
           >
-            More
+            {t("more")}
           </span>
           {showMore && (
             <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
