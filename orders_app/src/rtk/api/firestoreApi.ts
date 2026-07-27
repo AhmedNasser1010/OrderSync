@@ -14,7 +14,7 @@ import {
 import { db } from "@/lib/firebase";
 import type { OrderType, OrderStatusType, RestaurantStatusTypes, BusinessDocument } from "@ordersync/types";
 import type { DailyReport } from "@ordersync/types";
-import { canTransition, canReverseTransition, getTimelineField } from "@ordersync/order-utils";
+import { canTransition, canReverseTransition, getTimelineField, isDriverOwned } from "@ordersync/order-utils";
 import { ordersForDateRange, getDailyReportRef } from "@ordersync/order-utils";
 
 export const firestoreApi = createApi({
@@ -146,6 +146,12 @@ export const firestoreApi = createApi({
             const order = orderSnap.data() as OrderType;
             const currentStatus = order.status.current;
 
+            if (isDriverOwned(order)) {
+              throw new Error(
+                `Order is claimed by a driver and cannot be updated from the orders app`,
+              );
+            }
+
             if (!canTransition(currentStatus, updatedStatus) && !canReverseTransition(currentStatus, updatedStatus)) {
               throw new Error(
                 `Invalid transition: ${currentStatus} -> ${updatedStatus}`,
@@ -198,6 +204,12 @@ export const firestoreApi = createApi({
 
             const order = orderSnap.data() as OrderType;
             const currentStatus = order.status.current;
+
+            if (isDriverOwned(order)) {
+              throw new Error(
+                `Order is claimed by a driver and cannot be canceled from the orders app`,
+              );
+            }
 
             if (!canTransition(currentStatus, "CANCELED")) {
               throw new Error(

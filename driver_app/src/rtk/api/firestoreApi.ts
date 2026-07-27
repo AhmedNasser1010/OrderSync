@@ -244,6 +244,9 @@ export const firestoreApi = createApi({
             if (order.status.current !== "RESERVED") {
               throw new Error(`Order is not RESERVED. Current status: ${order.status.current}`);
             }
+            if (!canTransition(order.status.current, "PICKED_UP")) {
+              throw new Error(`Cannot start delivery from status: ${order.status.current}`);
+            }
             if (order.assignment?.driverUid !== driverUid) {
               throw new Error("You are not assigned to this order.");
             }
@@ -272,7 +275,55 @@ export const firestoreApi = createApi({
       invalidatesTags: ["MyOrders"],
     }),
 
-    // Transactional: Complete delivery (PICKED_UP -> DELIVERED)
+    // Transactional: Start route (PICKED_UP -> ON_ROUTE)
+    startRoute: builder.mutation({
+      async queryFn({ orderId, driverUid }: { orderId: string; driverUid: string }) {
+        try {
+          if (!orderId || !driverUid) throw new Error("Order ID and Driver UID required.");
+
+          const orderRef = doc(db, "orders", orderId);
+
+          await runTransaction(db, async (transaction) => {
+            const orderSnap = await transaction.get(orderRef);
+            if (!orderSnap.exists()) throw new Error(`Order not found: ${orderId}`);
+
+            const order = orderSnap.data() as OrderType;
+
+            if (order.status.current !== "PICKED_UP") {
+              throw new Error(`Order is not PICKED_UP. Current status: ${order.status.current}`);
+            }
+            if (!canTransition(order.status.current, "ON_ROUTE")) {
+              throw new Error(`Cannot start route from status: ${order.status.current}`);
+            }
+            if (order.assignment?.driverUid !== driverUid) {
+              throw new Error("You are not assigned to this order.");
+            }
+
+            const now = Date.now();
+
+            transaction.update(orderRef, {
+              "status.current": "ON_ROUTE",
+              "status.history": arrayUnion({
+                status: "ON_ROUTE",
+                timestamp: now,
+                by: `driver:${driverUid}`,
+              }),
+              "timeline.onRouteAt": now,
+              updatedAt: now,
+            });
+          });
+
+          return { data: null };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          console.error("Error starting route:", message);
+          return { error: { message, data: "" } };
+        }
+      },
+      invalidatesTags: ["MyOrders"],
+    }),
+
+    // Transactional: Complete delivery (ON_ROUTE -> DELIVERED)
     completeDelivery: builder.mutation({
       async queryFn({ orderId, driverUid }: { orderId: string; driverUid: string }) {
         try {
@@ -287,8 +338,11 @@ export const firestoreApi = createApi({
 
             const order = orderSnap.data() as OrderType;
 
-            if (order.status.current !== "PICKED_UP") {
-              throw new Error(`Order is not PICKED_UP. Current status: ${order.status.current}`);
+            if (order.status.current !== "ON_ROUTE") {
+              throw new Error(`Order is not ON_ROUTE. Current status: ${order.status.current}`);
+            }
+            if (!canTransition(order.status.current, "DELIVERED")) {
+              throw new Error(`Cannot complete delivery from status: ${order.status.current}`);
             }
             if (order.assignment?.driverUid !== driverUid) {
               throw new Error("You are not assigned to this order.");
@@ -422,6 +476,7 @@ export const {
   useClaimOrderMutation,
   useStartDeliveryMutation,
   useCompleteDeliveryMutation,
+  useStartRouteMutation,
   useCancelOrderMutation,
   useToggleOnlineStatusMutation,
 } = firestoreApi;

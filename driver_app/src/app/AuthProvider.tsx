@@ -6,6 +6,7 @@ import { LoaderCircle } from "lucide-react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AccountSetupScreen } from "@/components/approval/AccountSetupScreen";
 import { LocationTracker } from "@/components/LocationTracker";
+import { usePathname } from "next/navigation";
 
 type Props = {
   children: ReactNode;
@@ -13,6 +14,9 @@ type Props = {
 
 export function AuthGuard({ children }: Props) {
   const { isOnboarded, user, isInitializing } = useAuth();
+  const pathname = usePathname();
+
+  const isAuthPage = pathname.startsWith("/auth");
 
   if (isInitializing) {
     return (
@@ -22,6 +26,10 @@ export function AuthGuard({ children }: Props) {
         </div>
       </div>
     );
+  }
+
+  if (isAuthPage) {
+    return <>{children}</>;
   }
 
   if (!user) {

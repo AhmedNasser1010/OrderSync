@@ -29,6 +29,10 @@ export function isDriverOwned(order: OrderType): boolean {
   return DRIVER_OWNED_STATUSES.includes(order.status.current);
 }
 
+export function isClaimedByDriver(order: OrderType): boolean {
+  return order.assignment?.driverUid != null;
+}
+
 export function isRestaurantActive(order: OrderType): boolean {
   return RESTAURANT_ACTIVE_STATUSES.includes(order.status.current);
 }

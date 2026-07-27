@@ -164,6 +164,36 @@ function ActiveOrderCard({
               </a>
               <button
                 onClick={(e) =>
+                  handleAction(e, () => actions.startRoute(order.id, driverUid))
+                }
+                disabled={actions.isLoading}
+                className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg text-xs font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 active:scale-[0.98]"
+              >
+                Start Route
+              </button>
+              <button
+                onClick={(e) =>
+                  handleAction(e, () => actions.cancel(order.id, driverUid))
+                }
+                disabled={actions.isLoading}
+                className="px-3 py-2 rounded-lg text-xs font-semibold border border-destructive text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50 active:scale-[0.98]"
+              >
+                Cancel
+              </button>
+            </>
+          )}
+          {status === "ON_ROUTE" && (
+            <>
+              <a
+                href={`tel:${customerPhone}`}
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border border-border hover:bg-accent transition-colors"
+              >
+                <Phone className="h-3.5 w-3.5" />
+                Call
+              </a>
+              <button
+                onClick={(e) =>
                   handleAction(e, () => actions.complete(order.id, driverUid))
                 }
                 disabled={actions.isLoading}
@@ -181,17 +211,6 @@ function ActiveOrderCard({
                 Cancel
               </button>
             </>
-          )}
-          {status === "ON_ROUTE" && (
-            <button
-              onClick={(e) =>
-                handleAction(e, () => actions.complete(order.id, driverUid))
-              }
-              disabled={actions.isLoading}
-              className="flex-1 bg-green-600 text-white py-2 rounded-lg text-xs font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 active:scale-[0.98]"
-            >
-              Complete Delivery
-            </button>
           )}
         </div>
       </div>

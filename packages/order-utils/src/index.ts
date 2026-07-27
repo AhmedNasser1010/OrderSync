@@ -17,6 +17,7 @@ export {
   isFinalStatus,
   isMarketplaceVisible,
   isDriverOwned,
+  isClaimedByDriver,
   isRestaurantActive,
   isCustomerCancelable,
   isRestaurantCancelable,

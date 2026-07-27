@@ -9,7 +9,7 @@ import { userUid } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
 import type { OrderType, OrderStatusType } from "@ordersync/types";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { canTransition, canReverseTransition, getNextStatuses, getPreviousStatuses } from "@ordersync/order-utils";
+import { canTransition, canReverseTransition, getNextStatuses, getPreviousStatuses, isDriverOwned } from "@ordersync/order-utils";
 
 type OrderHandler = {
   handleChangeStatus: (orderId: string, nextStatus: OrderStatusType, reason?: string) => void;
@@ -41,6 +41,12 @@ const useOrderHandler = (): OrderHandler => {
     }
 
     const currentStatus = orderToUpdate.status.current;
+
+    if (isDriverOwned(orderToUpdate)) {
+      console.error(`Order ${orderId} is claimed by a driver and cannot be updated from the orders app`);
+      return;
+    }
+
     const isValidForward = canTransition(currentStatus, nextStatus);
     const isValidReverse = canReverseTransition(currentStatus, nextStatus);
 
@@ -59,12 +65,16 @@ const useOrderHandler = (): OrderHandler => {
   const getPossibleNextStatuses = (orderId: string): OrderStatusType[] => {
     const order = orders?.find((o) => o.id === orderId);
     if (!order) return [];
+    if (isDriverOwned(order)) {
+      return [];
+    }
     return getNextStatuses(order.status.current);
   };
 
   const getPossiblePreviousStatuses = (orderId: string): OrderStatusType[] => {
     const order = orders?.find((o) => o.id === orderId);
     if (!order) return [];
+    if (isDriverOwned(order)) return [];
     return getPreviousStatuses(order.status.current);
   };
 

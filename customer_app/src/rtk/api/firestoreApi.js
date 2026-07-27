@@ -15,6 +15,7 @@ import {
 import { db } from '../../config/firebase'
 import { canTransition, getTimelineField } from '@ordersync/order-utils'
 import randomOrderNumber from '../../utils/randomOrderId'
+import { setRateIsOpen } from '../slices/toggleSlice'
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
@@ -49,6 +50,9 @@ export const firestoreApi = createApi({
                 type: 'toggle/setHasOrder',
                 payload: true
               })
+              if (data.status?.current === 'DELIVERED') {
+                dispatch(setRateIsOpen(true))
+              }
             } else {
               updateCachedData((draft) => {
                 Object.assign(draft, {})

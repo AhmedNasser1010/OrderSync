@@ -223,9 +223,12 @@ service cloud.firestore {
         && incomingData().diff(resourceData()).affectedKeys()
             .hasOnly(['status', 'timeline', 'updatedAt']);
 
-      // Managers can update status and timeline for their business orders.
+      // Managers can update their business orders.
+      // Once a driver claims the order (RESERVED, PICKED_UP, ON_ROUTE),
+      // the manager cannot make any changes.
       allow update: if isManager()
         && resourceData().businessId == managerAccessToken()
+        && !(resourceData().status.current in ['RESERVED', 'PICKED_UP', 'ON_ROUTE'])
         && incomingData().diff(resourceData()).affectedKeys()
             .hasOnly(['status', 'timeline', 'updatedAt']);
 

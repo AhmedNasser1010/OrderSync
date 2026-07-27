@@ -5,6 +5,7 @@ import {
   useClaimOrderMutation,
   useStartDeliveryMutation,
   useCompleteDeliveryMutation,
+  useStartRouteMutation,
   useCancelOrderMutation,
 } from "@/rtk/api/firestoreApi";
 
@@ -12,6 +13,7 @@ export function useOrderActions() {
   const [claimOrder, { isLoading: isClaiming }] = useClaimOrderMutation();
   const [startDelivery, { isLoading: isStarting }] = useStartDeliveryMutation();
   const [completeDelivery, { isLoading: isCompleting }] = useCompleteDeliveryMutation();
+  const [startRouteMutation, { isLoading: isStartingRoute }] = useStartRouteMutation();
   const [cancelOrder, { isLoading: isCanceling }] = useCancelOrderMutation();
 
   const claim = useCallback(
@@ -28,6 +30,14 @@ export function useOrderActions() {
       if ("error" in result) throw new Error("Failed to start delivery");
     },
     [startDelivery],
+  );
+
+  const startRoute = useCallback(
+    async (orderId: string, driverUid: string) => {
+      const result = await startRouteMutation({ orderId, driverUid });
+      if ("error" in result) throw new Error("Failed to start route");
+    },
+    [startRouteMutation],
   );
 
   const complete = useCallback(
@@ -49,8 +59,9 @@ export function useOrderActions() {
   return {
     claim,
     start,
+    startRoute,
     complete,
     cancel,
-    isLoading: isClaiming || isStarting || isCompleting || isCanceling,
+    isLoading: isClaiming || isStarting || isCompleting || isStartingRoute || isCanceling,
   };
 }

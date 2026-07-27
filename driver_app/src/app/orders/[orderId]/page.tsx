@@ -33,7 +33,7 @@ export default function OrderDetailPage({
   const allOrders = [...(marketplaceOrders ?? []), ...(myOrders ?? [])];
   const order = allOrders.find((o) => o.id === orderId);
 
-  const { claim, start, complete, cancel, isLoading } = useOrderActions();
+  const { claim, start, startRoute, complete, cancel, isLoading } = useOrderActions();
 
   const [driverLocation, setDriverLocation] = useState<LiveLocation | null>(null);
 
@@ -55,6 +55,15 @@ export default function OrderDetailPage({
       alert("Failed to start delivery");
     }
   }, [order, driverUid, start]);
+
+  const handleStartRoute = useCallback(async () => {
+    if (!order || !driverUid) return;
+    try {
+      await startRoute(order.id, driverUid);
+    } catch {
+      alert("Failed to start route");
+    }
+  }, [order, driverUid, startRoute]);
 
   const handleCompleteDelivery = useCallback(async () => {
     if (!order || !driverUid) return;
@@ -225,14 +234,23 @@ export default function OrderDetailPage({
         )}
         {currentStatus === "PICKED_UP" && (
           <button
-            onClick={handleCompleteDelivery}
+            onClick={handleStartRoute}
             disabled={isLoading}
             className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+          >
+            {isLoading ? "Starting Route..." : "Start Route"}
+          </button>
+        )}
+        {currentStatus === "ON_ROUTE" && (
+          <button
+            onClick={handleCompleteDelivery}
+            disabled={isLoading}
+            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
           >
             {isLoading ? "Completing..." : "Complete Delivery"}
           </button>
         )}
-        {(currentStatus === "RESERVED" || currentStatus === "PICKED_UP") && (
+        {(currentStatus === "RESERVED" || currentStatus === "PICKED_UP" || currentStatus === "ON_ROUTE") && (
           <button
             onClick={handleCancel}
             disabled={isLoading}
