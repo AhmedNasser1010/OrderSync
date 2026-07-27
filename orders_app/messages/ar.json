@@ -92,6 +92,11 @@
       "noOrdersDelivery": "لا توجد طلبات قيد التوصيل.",
       "noOrdersCompleted": "لم يتم إتمام أي طلبات بعد.",
       "noOrdersVoided": "لا توجد طلبات ملغية.",
+      "noSearchResultsTitle": "لا توجد طلبات مطابقة",
+      "noSearchResultsDescription": "جرّب رقم طلب أو اسم عميل أو صنف أو حالة أخرى.",
+      "searchPlaceholder": "ابحث في الطلبات برقم الطلب أو اسم العميل أو الصنف أو الحالة",
+      "searchResults": "عرض {shown} من أصل {total} طلب",
+      "clearSearch": "مسح البحث",
       "acceptAll": "قبول وتجهيز الكل ({count})"
     },
     "footer": {

@@ -28,11 +28,11 @@ function ResStatusBtn() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" disabled={isLoading}>
+        <Button variant="outline" size="sm" disabled={isLoading} className="gap-2">
           {isLoading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <div className={cn("w-2.5 h-2.5 rounded-full mr-2", current.color)} />
+            <div className={cn("h-2.5 w-2.5 shrink-0 rounded-full", current.color)} />
           )}
           <span className="capitalize">{t(current.labelKey)}</span>
         </Button>
@@ -46,7 +46,7 @@ function ResStatusBtn() {
               currentStatus === status.value && "bg-accent text-accent-foreground"
             )}
           >
-            <div className={cn("w-2.5 h-2.5 rounded-full mr-2", status.color)} />
+            <div className={cn("h-2.5 w-2.5 shrink-0 rounded-full", status.color)} />
             {t(status.labelKey)}
           </DropdownMenuItem>
         ))}

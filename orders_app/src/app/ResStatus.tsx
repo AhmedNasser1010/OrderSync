@@ -24,9 +24,9 @@ function ResStatus() {
   const { currentStatus } = useResStatus();
 
   return (
-    <div className="flex items-center space-x-1">
+    <div className="flex items-center gap-1">
       <div
-        className={`w-3 h-3 rounded-full ${getStatusColor(currentStatus)}`}
+        className={`w-3 h-3 shrink-0 rounded-full ${getStatusColor(currentStatus)}`}
         title={`Status: ${currentStatus}`}
       />
       <span className="text-sm font-medium capitalize">{t(currentStatus)}</span>

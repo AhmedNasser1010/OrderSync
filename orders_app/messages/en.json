@@ -92,6 +92,11 @@
       "noOrdersDelivery": "No orders are out for delivery.",
       "noOrdersCompleted": "No orders have been fulfilled yet.",
       "noOrdersVoided": "No voided orders.",
+      "noSearchResultsTitle": "No matching orders",
+      "noSearchResultsDescription": "Try a different order number, customer name, item, or status.",
+      "searchPlaceholder": "Search orders by number, customer, item, or status",
+      "searchResults": "Showing {shown} of {total} orders",
+      "clearSearch": "Clear search",
       "acceptAll": "Accept & Prepare All ({count})"
     },
     "footer": {
