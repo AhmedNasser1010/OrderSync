@@ -6,6 +6,8 @@ import { useGeoPermission } from "@/components/LocationProvider";
 import { OnlineToggle } from "@/components/OnlineToggle";
 import { LocationPermissionBanner } from "@/components/LocationPermissionBanner";
 import { BottomNav } from "@/components/orders/BottomNav";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { MapPin, MapPinOff } from "lucide-react";
 
 export default function OrdersLayout({ children }: { children: ReactNode }) {
@@ -16,6 +18,7 @@ export default function OrdersLayout({ children }: { children: ReactNode }) {
   const isOnline = online.byManager && online.byUser;
 
   return (
+    <ThemeProvider>
     <div className="flex flex-col min-h-screen">
       <LocationPermissionBanner />
 
@@ -49,6 +52,7 @@ export default function OrdersLayout({ children }: { children: ReactNode }) {
                 No Location
               </span>
             )}
+            <ThemeToggle />
             <OnlineToggle byManager={online.byManager} byUser={online.byUser} />
           </div>
         </div>
@@ -58,5 +62,6 @@ export default function OrdersLayout({ children }: { children: ReactNode }) {
 
       <BottomNav />
     </div>
+    </ThemeProvider>
   );
 }
