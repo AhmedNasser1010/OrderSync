@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Printer } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -31,20 +31,26 @@ export default function OrderWorkflow() {
   };
 
   return (
-    <Card className="border border-border">
-      <CardHeader>
-        <CardTitle>Order Workflow Customization</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="print-invoice">Print Invoice</Label>
+    <section className="bg-card border border-border rounded-2xl overflow-hidden">
+      <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-orange-500/10 text-orange-500 shrink-0">
+          <Printer className="w-5 h-5" />
+        </div>
+        <div className="min-w-0">
+          <h2 className="text-sm font-semibold text-foreground">Order Workflow</h2>
+          <p className="text-xs text-muted-foreground">Customize order processing</p>
+        </div>
+      </div>
+      <div className="px-4 pb-4 pt-2">
+        <div className="flex items-center justify-between py-3 border-t border-border">
+          <Label htmlFor="print-invoice" className="text-sm text-foreground">Print Invoice</Label>
           <Switch
             id="print-invoice"
             defaultChecked={printInvoice}
             onCheckedChange={handlePrintInvoice}
           />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }

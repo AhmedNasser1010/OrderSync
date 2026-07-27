@@ -1,9 +1,7 @@
 "use client";
 
-import OrdersTabs from "./OrdersTabs";
-import OrdersView from "./OrdersView";
+import { usePathname } from "next/navigation";
 import ResStatusBtn from "./ResStatusBtn";
-import SettingsMenu from "@/components/more-menu/SettingsMenu";
 import useOrders from "@/hooks/useOrders";
 import { useAppSelector } from "@/rtk/hooks";
 import { activeTab } from "@/rtk/slices/toggleSlice";
@@ -14,15 +12,8 @@ import {
   Bike,
   CheckCircle,
   XCircle,
+  Settings,
 } from "lucide-react";
-
-const tabLabels: Record<MainTabTypes, string> = {
-  RECEIVED: "Received",
-  PREPARING: "Preparing",
-  DELIVERY: "Delivery",
-  COMPLETED: "Completed",
-  VOIDED: "Voided",
-};
 
 const tabIcons: Record<MainTabTypes, React.ElementType> = {
   RECEIVED: SquareArrowDown,
@@ -40,40 +31,67 @@ const tabCountsLabel: Record<MainTabTypes, string> = {
   VOIDED: "orders cancelled",
 };
 
-export default function OrdersPage() {
-  const { counts } = useOrders();
-  const activeTabValue = useAppSelector(activeTab);
-  const ActiveIcon = tabIcons[activeTabValue];
+export default function MainHeader() {
+  const pathname = usePathname();
+  const isSettings = pathname === "/settings";
 
-  return (
-    <main className="min-h-screen bg-background">
+  if (isSettings) {
+    return (
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10 text-primary shrink-0">
-                <ActiveIcon className="w-5 h-5" />
+                <Settings className="w-5 h-5" />
               </div>
               <div className="min-w-0">
                 <h1 className="text-lg font-semibold text-foreground truncate">
-                  Orders
+                  Settings
                 </h1>
                 <p className="text-xs text-muted-foreground truncate">
-                  {counts[activeTabValue]} {tabCountsLabel[activeTabValue]}
+                  Manage your preferences
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <ResStatusBtn />
-              <SettingsMenu />
             </div>
           </div>
         </div>
       </header>
-      <OrdersTabs counts={counts} />
-      <div className="px-4 pb-28 pt-6">
-        <OrdersView />
+    );
+  }
+
+  return <HomeHeader />;
+}
+
+function HomeHeader() {
+  const { counts } = useOrders();
+  const activeTabValue = useAppSelector(activeTab);
+  const ActiveIcon = tabIcons[activeTabValue];
+
+  return (
+    <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50">
+      <div className="max-w-5xl mx-auto px-4 py-3">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary/10 text-primary shrink-0">
+              <ActiveIcon className="w-5 h-5" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-lg font-semibold text-foreground truncate">
+                Orders
+              </h1>
+              <p className="text-xs text-muted-foreground truncate">
+                {counts[activeTabValue]} {tabCountsLabel[activeTabValue]}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <ResStatusBtn />
+          </div>
+        </div>
       </div>
-    </main>
+    </header>
   );
 }
