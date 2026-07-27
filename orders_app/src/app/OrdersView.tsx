@@ -36,7 +36,7 @@ export default function OrdersView() {
   }
 
   if (!formattedOrders || formattedOrders.length === 0) {
-    return <NoOrders />;
+    return <NoOrders activeTab={activeTabValue} />;
   }
 
   return (
