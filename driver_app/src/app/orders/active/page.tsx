@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMyOrders } from "@/hooks/useOrders";
+import { useMyOrders, useMarketplaceOrders } from "@/hooks/useOrders";
 import { useOrderActions } from "@/hooks/useOrderActions";
+import useNewOrderAlert from "@/hooks/useNewOrderAlert";
 import { useAuth } from "@/contexts/AuthContext";
 import type { OrderType, OrderStatusType } from "@ordersync/types";
 import { MapPin, Phone, ChevronRight } from "lucide-react";
@@ -243,8 +244,12 @@ export default function ActiveOrdersPage() {
   const { user } = useAuth();
   const driverUid = user?.uid ?? "";
   const { orders, isLoading, error } = useMyOrders();
+  const { orders: marketplaceOrders } = useMarketplaceOrders();
   const actions = useOrderActions();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const hasNoActiveOrders = orders.length === 0;
+  useNewOrderAlert(marketplaceOrders.length, hasNoActiveOrders);
 
   const normalizedSearch = searchQuery.trim().toLowerCase();
   const isSearching = normalizedSearch.length > 0;

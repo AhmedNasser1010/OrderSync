@@ -20,11 +20,16 @@ export function BottomNav() {
     ? "/orders/marketplace"
     : "/orders/active";
 
+  const hasNoActiveOrders = myOrders.length === 0;
+  const hasMarketplaceOrders = marketplaceOrders.length > 0;
+  const shouldFlashMarketplace = hasNoActiveOrders && hasMarketplaceOrders;
+
   return (
     <nav className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2">
       <div className="flex items-center justify-around rounded-2xl border border-border/50 bg-background/80 px-2 py-1.5 shadow-lg shadow-black/5 backdrop-blur-xl dark:bg-card/80">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.href;
+          const isMarketplaceTab = tab.href === "/orders/marketplace";
           const count =
             tab.href === "/orders/active" ? myOrders.length : marketplaceOrders.length;
           return (
@@ -38,6 +43,7 @@ export function BottomNav() {
                 isActive
                   ? "text-primary"
                   : "text-muted-foreground hover:text-foreground",
+                isMarketplaceTab && shouldFlashMarketplace && "animate-tab-flash",
               )}
             >
               {isActive && (
