@@ -6,7 +6,6 @@ import { useFetchRestaurantDataQuery } from "@/rtk/api/firestoreApi";
 import { accessToken } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
 import { skipToken } from "@reduxjs/toolkit/query";
-import PrintInvoiceDialog from "../print-invoice-dialog/PrintInvoiceDialog";
 import ControlMenu from "./ControlMenu";
 import useOrderHandler from "@/hooks/order-handlers/useOrderHandlers";
 import { isFinalStatus } from "@ordersync/order-utils";
@@ -81,39 +80,33 @@ export default function OrderFooter({ id, activeTabValue, status }: Props) {
   const PrimaryIcon = primaryForward ? FORWARD_ICONS[primaryForward] : null;
   const primaryLabel = primaryForward ? FORWARD_LABELS[primaryForward] : null;
 
-  return (
-    <CardFooter className="flex items-center justify-between gap-2">
-      <div className="flex items-center space-x-1">
-        {printInvoice && (
-          <PrintInvoiceDialog
-            orderId={id}
-            activeTabValue={activeTabValue}
-            restaurant={restaurant as BusinessDocument | undefined}
-          />
-        )}
-      </div>
+  const showPrintInvoice = printInvoice && activeTabValue !== "RECEIVED";
 
-      <div className="flex items-center gap-1 disabled-click-1">
+  return (
+    <CardFooter className="flex items-center justify-between gap-2 px-4 pb-3 pt-1">
+      <div className="flex items-center gap-1">
         {isReady ? (
-          <div className="flex flex-col items-end">
-            <div className="flex items-center gap-1.5">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
-              </span>
-              <span className="text-sm font-medium">Ready</span>
-            </div>
-            <span className="text-xs text-muted-foreground">Waiting for driver...</span>
+          <div className="flex items-center gap-1.5">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
+            </span>
+            <span className="text-sm font-medium">Ready</span>
+            <span className="text-xs text-muted-foreground">Waiting for driver</span>
           </div>
         ) : (
           primaryForward &&
           PrimaryIcon && (
             <Button
-              size="sm"
+              size="default"
               variant={status === "ON_ROUTE" ? "success" : "default"}
-              onClick={() => handleChangeStatus(id, primaryForward)}
+              className="h-9"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleChangeStatus(id, primaryForward);
+              }}
             >
-              <PrimaryIcon className="mr-1 h-3.5 w-3.5" />
+              <PrimaryIcon className="mr-1.5 h-4 w-4" />
               {primaryLabel}
             </Button>
           )
@@ -121,23 +114,31 @@ export default function OrderFooter({ id, activeTabValue, status }: Props) {
 
         {secondaryForward && (
           <Button
-            size="sm"
+            size="default"
             variant="outline"
-            onClick={() => handleChangeStatus(id, secondaryForward)}
+            className="h-9"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleChangeStatus(id, secondaryForward);
+            }}
           >
             {FORWARD_LABELS[secondaryForward] ?? secondaryForward.replace("_", " ")}
           </Button>
         )}
-
-        {!isTerminal && (
-          <ControlMenu
-            overflowStatuses={overflowForward}
-            previousStatuses={previousStatuses}
-            destructiveStatuses={destructive}
-            onStatusChange={(nextStatus) => handleChangeStatus(id, nextStatus)}
-          />
-        )}
       </div>
+
+      {!isTerminal && (
+        <ControlMenu
+          orderId={id}
+          activeTabValue={activeTabValue}
+          overflowStatuses={overflowForward}
+          previousStatuses={previousStatuses}
+          destructiveStatuses={destructive}
+          onStatusChange={(nextStatus) => handleChangeStatus(id, nextStatus)}
+          showPrintInvoice={showPrintInvoice}
+          restaurant={restaurant as BusinessDocument | undefined}
+        />
+      )}
     </CardFooter>
   );
 }

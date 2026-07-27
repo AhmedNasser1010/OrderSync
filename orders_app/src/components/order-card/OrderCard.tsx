@@ -14,27 +14,24 @@ const OrderCard = ({
 }) => {
   const router = useRouter();
 
-  const handleNavigate = (e: React.MouseEvent<HTMLDivElement>) => {
-    const preventedElement = (e.target as HTMLElement).closest(
-      ".disabled-click-1"
-    );
-
-    if (!preventedElement) {
-      router.push(`/order/${order.id}`);
-    }
+  const handleCardClick = () => {
+    router.push(`/order/${order.id}`);
   };
 
   return (
     <Card
       className="cursor-pointer transition-shadow hover:shadow-md border-border"
-      onClick={handleNavigate}
+      onClick={handleCardClick}
     >
-      <OrderHeader id={order.id} orderNumber={order.orderNumber} status={order.status} />
+      <OrderHeader
+        orderNumber={order.orderNumber}
+        status={order.status}
+        placedAt={order.placedAt}
+      />
       <OrderContent
         total={order.total}
         customer={order.customer}
         items={order.items}
-        placedAt={order.placedAt}
       />
       <OrderFooter
         id={order.id}

@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from "react";
 import type { OrderType } from "@ordersync/types";
 import type { ItemType } from "@ordersync/types";
-import type { FormattedOrderType, CartItemType } from "@/types/orders";
+import type { FormattedOrderType, CartItemType, MainTabTypes } from "@/types/orders";
 import {
   useFetchUserDataQuery,
   useFetchActiveOrdersQuery,
@@ -12,13 +12,41 @@ import { userUid } from "@/rtk/slices/constantsSlice";
 import { activeTab } from "@/rtk/slices/toggleSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
 
+type TabCounts = Record<MainTabTypes, number>;
+
 type UseOrders = {
   orders: OrderType[] | null;
   formattedOrders: FormattedOrderType[] | null;
+  counts: TabCounts;
   getOrderMenu: (orderCart: CartItemType[]) => (ItemType & CartItemType)[];
   getOrder: (id: string) => OrderType | undefined;
   isLoading: boolean;
+  isError: boolean;
 };
+
+function getStatusTab(status: string): MainTabTypes | null {
+  switch (status) {
+    case "RECEIVED":
+      return "RECEIVED";
+    case "ACCEPTED":
+    case "PREPARING":
+      return "PREPARING";
+    case "READY":
+    case "RESERVED":
+    case "PICKED_UP":
+    case "ON_ROUTE":
+      return "DELIVERY";
+    case "DELIVERED":
+    case "GIVEN_FEEDBACK":
+      return "COMPLETED";
+    case "CANCELED":
+    case "REJECTED":
+    case "VOIDED":
+      return "VOIDED";
+    default:
+      return null;
+  }
+}
 
 const useOrders = (): UseOrders => {
   const uid = useAppSelector(userUid);
@@ -26,10 +54,10 @@ const useOrders = (): UseOrders => {
   const { data: userData, isLoading: isUserDataLoading } =
     useFetchUserDataQuery(uid ? uid : skipToken);
 
-  const { data: activeOrdersData, isLoading: activeOrdersIsLoading } =
+  const { data: activeOrdersData, isLoading: activeOrdersIsLoading, isError: activeOrdersIsError } =
     useFetchActiveOrdersQuery(userData?.accessToken ?? skipToken, {
       skip: !userData?.accessToken,
-    }) as { data?: OrderType[]; isLoading?: boolean };
+    }) as { data?: OrderType[]; isLoading?: boolean; isError?: boolean };
 
   const { data: menuData, isLoading: menuIsLoading } = useFetchMenuDataQuery(
     userData?.accessToken,
@@ -37,6 +65,7 @@ const useOrders = (): UseOrders => {
   );
 
   const isLoading = isUserDataLoading || activeOrdersIsLoading || menuIsLoading;
+  const isError = activeOrdersIsError ?? false;
 
   const getOrder = useCallback(
     (id: string) => activeOrdersData?.find((order) => order.id === id),
@@ -55,26 +84,33 @@ const useOrders = (): UseOrders => {
     [menuData],
   );
 
+  const counts = useMemo<TabCounts>(() => {
+    const result: TabCounts = {
+      RECEIVED: 0,
+      PREPARING: 0,
+      DELIVERY: 0,
+      COMPLETED: 0,
+      VOIDED: 0,
+    };
+
+    if (!activeOrdersData) return result;
+
+    for (const order of activeOrdersData) {
+      const tab = getStatusTab(order.status.current);
+      if (tab) {
+        result[tab]++;
+      }
+    }
+
+    return result;
+  }, [activeOrdersData]);
+
   const filteredOrders = useMemo<OrderType[] | null>(() => {
     if (!activeOrdersData) return null;
 
     return activeOrdersData.filter((order) => {
-      const status = order.status.current;
-
-      switch (activeTabValue) {
-      case "RECEIVED":
-        return status === "RECEIVED";
-      case "PREPARING":
-        return ["ACCEPTED", "PREPARING"].includes(status);
-      case "DELIVERY":
-          return ["READY", "RESERVED", "PICKED_UP", "ON_ROUTE"].includes(status);
-        case "COMPLETED":
-          return status === "DELIVERED" || status === "GIVEN_FEEDBACK";
-        case "VOIDED":
-          return ["CANCELED", "REJECTED", "VOIDED"].includes(status);
-        default:
-          return false;
-      }
+      const tab = getStatusTab(order.status.current);
+      return tab === activeTabValue;
     });
   }, [activeOrdersData, activeTabValue]);
 
@@ -97,9 +133,11 @@ const useOrders = (): UseOrders => {
   return {
     orders: filteredOrders,
     formattedOrders,
+    counts,
     getOrderMenu,
     getOrder,
     isLoading,
+    isError,
   };
 };
 

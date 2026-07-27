@@ -100,13 +100,6 @@ export const firestoreApi = createApi({
         const q = query(
           ordersRef,
           where("businessId", "==", businessId),
-          where("status.current", "not-in", [
-            "DELIVERED",
-            "GIVEN_FEEDBACK",
-            "CANCELED",
-            "REJECTED",
-            "VOIDED",
-          ]),
         );
 
         await cacheDataLoaded;

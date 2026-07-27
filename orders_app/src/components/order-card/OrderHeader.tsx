@@ -1,7 +1,3 @@
-import {
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle,
@@ -16,33 +12,43 @@ import {
   PackageCheck,
 } from "lucide-react";
 import type { OrderStatusType } from "@ordersync/types";
+import { useEffect, useState } from "react";
+
+function getTimeAgo(timestamp: number): string {
+  const seconds = Math.floor((Date.now() - timestamp) / 1000);
+
+  if (seconds < 60) return "just now";
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
 
 const getStatusIcon = (status: OrderStatusType) => {
   switch (status) {
     case "RECEIVED":
-      return <SquareArrowDown className="h-4 w-4" />;
+      return <SquareArrowDown className="h-3.5 w-3.5" />;
     case "ACCEPTED":
-      return <CheckCircle className="h-4 w-4" />;
+      return <CheckCircle className="h-3.5 w-3.5" />;
     case "PREPARING":
-      return <CookingPot className="h-4 w-4" />;
+      return <CookingPot className="h-3.5 w-3.5" />;
     case "READY":
-      return <Package className="h-4 w-4" />;
+      return <Package className="h-3.5 w-3.5" />;
     case "RESERVED":
-      return <Bike className="h-4 w-4" />;
+      return <Bike className="h-3.5 w-3.5" />;
     case "PICKED_UP":
-      return <PackageCheck className="h-4 w-4" />;
+      return <PackageCheck className="h-3.5 w-3.5" />;
     case "ON_ROUTE":
-      return <Truck className="h-4 w-4" />;
+      return <Truck className="h-3.5 w-3.5" />;
     case "DELIVERED":
-      return <CheckCircle className="h-4 w-4" />;
+      return <CheckCircle className="h-3.5 w-3.5" />;
     case "GIVEN_FEEDBACK":
-      return <Star className="h-4 w-4" />;
+      return <Star className="h-3.5 w-3.5" />;
     case "REJECTED":
-      return <Ban className="h-4 w-4" />;
+      return <Ban className="h-3.5 w-3.5" />;
     case "CANCELED":
-      return <CircleX className="h-4 w-4" />;
+      return <CircleX className="h-3.5 w-3.5" />;
     case "VOIDED":
-      return <CircleX className="h-4 w-4" />;
+      return <CircleX className="h-3.5 w-3.5" />;
     default:
       return null;
   }
@@ -64,21 +70,39 @@ const getStatusVariant = (status: OrderStatusType) => {
   }
 };
 
-export default function OrderHeader({ id, orderNumber, status }: { id: string; orderNumber: number; status: OrderStatusType }) {
+export default function OrderHeader({
+  orderNumber,
+  status,
+  placedAt,
+}: {
+  orderNumber: number;
+  status: OrderStatusType;
+  placedAt: number;
+}) {
+  const [timeAgo, setTimeAgo] = useState(() => getTimeAgo(placedAt));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeAgo(getTimeAgo(placedAt));
+    }, 60_000);
+    return () => clearInterval(interval);
+  }, [placedAt]);
+
   return (
-    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-sm font-medium">
-        Order #{orderNumber}
-      </CardTitle>
+    <div className="flex items-center justify-between px-4 pt-3 pb-1">
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-semibold">#{orderNumber}</span>
+        <span className="text-xs text-muted-foreground">{timeAgo}</span>
+      </div>
       <Badge
         variant={getStatusVariant(status)}
-        className="flex items-center"
+        className="flex items-center gap-1 text-xs"
       >
         {getStatusIcon(status)}
-        <span className="ml-1 capitalize">
+        <span className="capitalize">
           {status.toLowerCase().replace("_", " ")}
         </span>
       </Badge>
-    </CardHeader>
+    </div>
   );
 }
