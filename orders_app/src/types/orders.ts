@@ -19,5 +19,6 @@ export type FormattedOrderType = {
   status: OrderStatusType;
   items: string;
   placedAt: number;
+  preparingAt?: number;
   isFirstOrder: boolean;
 };

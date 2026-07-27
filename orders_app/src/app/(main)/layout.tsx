@@ -3,15 +3,22 @@
 import MainHeader from "../MainHeader";
 import OrdersTabs from "../OrdersTabs";
 import useOrders from "@/hooks/useOrders";
+import { useMemo } from "react";
+import { getPreparingAgeUrgency } from "@/lib/orderAge";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  const { counts } = useOrders();
+  const { counts, preparingOrders } = useOrders();
+
+  const hasPreparingUrgency = useMemo(
+    () => preparingOrders.some((o) => o.timeline.preparingAt && getPreparingAgeUrgency(o.timeline.preparingAt) !== "normal"),
+    [preparingOrders],
+  );
 
   return (
     <main className="min-h-screen bg-background">
       <MainHeader />
       {children}
-      <OrdersTabs counts={counts} />
+      <OrdersTabs counts={counts} hasPreparingUrgency={hasPreparingUrgency} />
     </main>
   );
 }

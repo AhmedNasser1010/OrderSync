@@ -16,6 +16,8 @@ type TabCounts = Record<MainTabTypes, number>;
 
 type UseOrders = {
   orders: OrderType[] | null;
+  receivedOrders: OrderType[];
+  preparingOrders: OrderType[];
   formattedOrders: FormattedOrderType[] | null;
   counts: TabCounts;
   getOrderMenu: (orderCart: CartItemType[]) => (ItemType & CartItemType)[];
@@ -65,7 +67,7 @@ const useOrders = (): UseOrders => {
   );
 
   const isLoading = isUserDataLoading || activeOrdersIsLoading || menuIsLoading;
-  const isError = activeOrdersIsError;
+  const isError = activeOrdersIsError ?? false;
 
   const getOrder = useCallback(
     (id: string) => activeOrdersData?.find((order) => order.id === id),
@@ -108,10 +110,16 @@ const useOrders = (): UseOrders => {
   const filteredOrders = useMemo<OrderType[] | null>(() => {
     if (!activeOrdersData) return null;
 
-    return activeOrdersData.filter((order) => {
+    const filtered = activeOrdersData.filter((order) => {
       const tab = getStatusTab(order.status.current);
       return tab === activeTabValue;
     });
+
+    if (activeTabValue === "RECEIVED") {
+      return [...filtered].sort((a, b) => a.timeline.placedAt - b.timeline.placedAt);
+    }
+
+    return filtered;
   }, [activeOrdersData, activeTabValue]);
 
   const formattedOrders = useMemo<FormattedOrderType[] | null>(() => {
@@ -126,13 +134,28 @@ const useOrders = (): UseOrders => {
           .map((item) => `${item?.quantity}x ${item?.title}`)
           .join(", "),
         placedAt: order.timeline.placedAt,
+        preparingAt: order.timeline.preparingAt,
         isFirstOrder: order.customer.totalOrders === 1,
       })) || null
     );
   }, [filteredOrders, getOrderMenu]);
 
+  const receivedOrders = useMemo<OrderType[]>(() => {
+    if (!activeOrdersData) return [];
+    return activeOrdersData.filter((order) => order.status.current === "RECEIVED");
+  }, [activeOrdersData]);
+
+  const preparingOrders = useMemo<OrderType[]>(() => {
+    if (!activeOrdersData) return [];
+    return activeOrdersData.filter(
+      (order) => order.status.current === "ACCEPTED" || order.status.current === "PREPARING",
+    );
+  }, [activeOrdersData]);
+
   return {
     orders: filteredOrders,
+    receivedOrders,
+    preparingOrders,
     formattedOrders,
     counts,
     getOrderMenu,

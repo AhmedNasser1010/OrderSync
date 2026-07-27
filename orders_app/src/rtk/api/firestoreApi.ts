@@ -153,18 +153,24 @@ export const firestoreApi = createApi({
             }
 
             const now = Date.now();
-            const timelineField = getTimelineField(updatedStatus);
+            const isReverse = canReverseTransition(currentStatus, updatedStatus);
 
-            transaction.update(orderRef, {
+            const updateData: Record<string, unknown> = {
               "status.current": updatedStatus,
               "status.history": arrayUnion({
                 status: updatedStatus,
                 timestamp: now,
                 by: "manager",
               }),
-              [`timeline.${timelineField}`]: now,
               updatedAt: now,
-            });
+            };
+
+            if (!isReverse) {
+              const timelineField = getTimelineField(updatedStatus);
+              updateData[`timeline.${timelineField}`] = now;
+            }
+
+            transaction.update(orderRef, updateData);
           });
 
           return { data: null };

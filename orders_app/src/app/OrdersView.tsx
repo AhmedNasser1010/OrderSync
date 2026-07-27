@@ -8,9 +8,10 @@ import OrderCardSkeleton from "@/components/shimmer/OrderCardSkeleton";
 import NoOrders from "@/components/NoOrders";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
+import BatchActions from "@/components/BatchActions";
 
 export default function OrdersView() {
-  const { formattedOrders, isLoading, isError } = useOrders();
+  const { formattedOrders, receivedOrders, isLoading, isError } = useOrders();
   const activeTabValue = useAppSelector(activeTab);
 
   if (isError) {
@@ -41,6 +42,9 @@ export default function OrdersView() {
 
   return (
     <div className="flex flex-col gap-3">
+      {activeTabValue === "RECEIVED" && receivedOrders.length > 0 && (
+        <BatchActions receivedOrders={receivedOrders} />
+      )}
       {formattedOrders.map((order) => (
         <OrderCard
           key={order.id}

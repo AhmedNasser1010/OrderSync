@@ -19,7 +19,13 @@ const moreTabs: { value: MainTabTypes; label: string; icon: React.ElementType }[
   { value: "VOIDED", label: "Voided", icon: XCircle },
 ];
 
-export default function OrdersTabs({ counts }: { counts: Record<MainTabTypes, number> }) {
+export default function OrdersTabs({
+  counts,
+  hasPreparingUrgency,
+}: {
+  counts: Record<MainTabTypes, number>;
+  hasPreparingUrgency: boolean;
+}) {
   const dispatch = useAppDispatch();
   const activeTabValue = useAppSelector(activeTab);
   const [showMore, setShowMore] = useState(false);
@@ -128,6 +134,10 @@ export default function OrdersTabs({ counts }: { counts: Record<MainTabTypes, nu
           const isActive = activeTabValue === value;
           const count = counts[value];
 
+          const hasOrders =
+            (value === "RECEIVED" && count > 0 && !isActive) ||
+            (value === "PREPARING" && hasPreparingUrgency && !isActive);
+
           return (
             <button
               key={value}
@@ -135,7 +145,10 @@ export default function OrdersTabs({ counts }: { counts: Record<MainTabTypes, nu
                 setShowMore(false);
                 navigateHome(value);
               }}
-              className="relative flex flex-1 flex-col items-center gap-0.5 py-2 min-w-0 transition-colors"
+              className={cn(
+                "relative flex flex-1 flex-col items-center gap-0.5 py-2 min-w-0 transition-colors",
+                hasOrders && "animate-tab-flash"
+              )}
             >
               {isActive && (
                 <span className="absolute inset-0 bg-primary/10 rounded-xl -z-0" />

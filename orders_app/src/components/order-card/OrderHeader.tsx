@@ -85,11 +85,12 @@ export default function OrderHeader({
   const [timeAgo, setTimeAgo] = useState(() => getTimeAgo(placedAt));
 
   useEffect(() => {
+    const intervalMs = status === "RECEIVED" ? 10_000 : 60_000;
     const interval = setInterval(() => {
       setTimeAgo(getTimeAgo(placedAt));
-    }, 60_000);
+    }, intervalMs);
     return () => clearInterval(interval);
-  }, [placedAt]);
+  }, [placedAt, status]);
 
   return (
     <div className="flex items-center justify-between px-4 pt-3 pb-1">

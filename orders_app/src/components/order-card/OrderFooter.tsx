@@ -16,6 +16,7 @@ import {
   Bike,
   PackageCheck,
   Truck,
+  Play,
 } from "lucide-react";
 
 const FORWARD_ICONS: Record<string, React.ElementType> = {
@@ -82,6 +83,8 @@ export default function OrderFooter({ id, activeTabValue, status }: Props) {
 
   const showPrintInvoice = printInvoice && activeTabValue !== "RECEIVED";
 
+  const isReceived = status === "RECEIVED";
+
   return (
     <CardFooter className="flex items-center justify-between gap-2 px-4 pb-3 pt-1">
       <div className="flex items-center gap-1">
@@ -94,6 +97,34 @@ export default function OrderFooter({ id, activeTabValue, status }: Props) {
             <span className="text-sm font-medium">Ready</span>
             <span className="text-xs text-muted-foreground">Waiting for driver</span>
           </div>
+        ) : isReceived ? (
+          <>
+            <Button
+              size="default"
+              variant="default"
+              className="h-9"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleChangeStatus(id, "PREPARING");
+              }}
+            >
+              <Play className="mr-1.5 h-4 w-4" />
+              Start
+            </Button>
+            {primaryForward && primaryForward !== "PREPARING" && (
+              <Button
+                size="default"
+                variant="outline"
+                className="h-9"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleChangeStatus(id, primaryForward);
+                }}
+              >
+                {primaryLabel}
+              </Button>
+            )}
+          </>
         ) : (
           primaryForward &&
           PrimaryIcon && (
@@ -112,7 +143,7 @@ export default function OrderFooter({ id, activeTabValue, status }: Props) {
           )
         )}
 
-        {secondaryForward && (
+        {!isReceived && secondaryForward && (
           <Button
             size="default"
             variant="outline"
