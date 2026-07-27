@@ -1,11 +1,51 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useMarketplaceOrders } from "@/hooks/useOrders";
 import { OrderCard } from "@/components/orders/OrderCard";
-import { Package } from "lucide-react";
+import { OrderSearchBar } from "@/components/orders/OrderSearchBar";
+import { NoOrders } from "@/components/orders/NoOrders";
+
+function matchesSearch(order: {
+  id: string;
+  orderNumber: number;
+  customer?: { name?: string };
+  business?: { name?: string };
+  delivery?: { address?: string };
+  status?: { current?: string };
+  cart?: { name: string; selectedSize: string; quantity: number }[];
+}, query: string) {
+  const haystack = [
+    order.id,
+    `#${order.orderNumber}`,
+    order.orderNumber.toString(),
+    order.customer?.name ?? "",
+    order.business?.name ?? "",
+    order.delivery?.address ?? "",
+    order.status?.current ?? "",
+    order.cart
+      ?.map((item) => `${item.name} ${item.selectedSize} ${item.quantity}`)
+      .join(" "),
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  return haystack.includes(query);
+}
 
 export default function MarketplacePage() {
   const { orders, isLoading, error } = useMarketplaceOrders();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const isSearching = normalizedSearch.length > 0;
+
+  const visibleOrders = useMemo(() => {
+    if (!isSearching) return orders;
+    return orders.filter((order) => matchesSearch(order, normalizedSearch));
+  }, [isSearching, normalizedSearch, orders]);
+
+  const isSearchEmpty = isSearching && visibleOrders.length === 0;
 
   if (isLoading) {
     return (
@@ -30,25 +70,33 @@ export default function MarketplacePage() {
 
   return (
     <div className="p-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col gap-4">
+        <OrderSearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search orders by number, customer, item, or status"
+        />
         <p className="text-xs text-muted-foreground">
-          {orders.length} order{orders.length !== 1 ? "s" : ""} available
+          {visibleOrders.length} order{visibleOrders.length !== 1 ? "s" : ""} available of{" "}
+          {orders.length}
         </p>
       </div>
 
-      {orders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3">
-          <Package className="h-12 w-12 text-muted-foreground/50" />
-          <div className="text-center">
-            <p className="text-sm font-medium">No orders available</p>
-            <p className="text-xs text-muted-foreground">
-              New orders will appear here
-            </p>
-          </div>
-        </div>
+      {isSearchEmpty ? (
+        <NoOrders
+          title="No matching orders"
+          description="Try a different order number, customer name, item, or status"
+          searchQuery={searchQuery}
+          onClearSearch={() => setSearchQuery("")}
+        />
+      ) : orders.length === 0 ? (
+        <NoOrders
+          title="No orders available"
+          description="New orders will appear here"
+        />
       ) : (
         <div className="flex flex-col gap-3">
-          {orders.map((order) => (
+          {visibleOrders.map((order) => (
             <OrderCard key={order.id} order={order} />
           ))}
         </div>

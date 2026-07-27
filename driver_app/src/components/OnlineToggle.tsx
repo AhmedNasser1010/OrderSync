@@ -6,15 +6,39 @@ import { useAuth } from "@/contexts/AuthContext";
 interface OnlineToggleProps {
   byManager: boolean;
   byUser: boolean;
+  permissionState: "granted" | "prompt" | "denied" | "unsupported";
 }
 
-export function OnlineToggle({ byManager, byUser }: OnlineToggleProps) {
+export function OnlineToggle({
+  byManager,
+  byUser,
+  permissionState,
+}: OnlineToggleProps) {
   const { user } = useAuth();
   const driverUid = user?.uid ?? "";
   const [toggleOnline, { isLoading }] = useToggleOnlineStatusMutation();
 
   const isOnline = byManager && byUser;
   const canToggle = byManager;
+  const isTracking = isOnline && permissionState === "granted";
+
+  const label = (() => {
+    if (isTracking) return "Tracking · Online";
+    if (isOnline && permissionState === "prompt") return "Tracking · Location needed";
+    if (permissionState === "denied" || permissionState === "unsupported") {
+      return "Tracking · No location access";
+    }
+    return "Tracking · Offline";
+  })();
+
+  const dotClassName = (() => {
+    if (isTracking) return "bg-emerald-500";
+    if (isOnline && permissionState === "prompt") return "bg-amber-500";
+    if (permissionState === "denied" || permissionState === "unsupported") {
+      return "bg-rose-500";
+    }
+    return "bg-muted-foreground/50";
+  })();
 
   const handleToggle = async () => {
     if (!driverUid || !canToggle || isLoading) return;
@@ -25,18 +49,14 @@ export function OnlineToggle({ byManager, byUser }: OnlineToggleProps) {
     <button
       onClick={handleToggle}
       disabled={!canToggle || isLoading}
-      className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-        isOnline
-          ? "bg-green-100 text-green-700"
-          : "bg-gray-100 text-gray-500"
-      } ${!canToggle ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+      className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition-colors ${
+        isTracking
+          ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+          : "border-border bg-background text-muted-foreground"
+      } ${!canToggle ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:bg-muted"}`}
     >
-      <span
-        className={`h-2 w-2 rounded-full ${
-          isOnline ? "bg-green-500" : "bg-gray-400"
-        }`}
-      />
-      {isOnline ? "Online" : "Offline"}
+      <span className={`h-2 w-2 rounded-full ${dotClassName}`} />
+      {label}
     </button>
   );
 }

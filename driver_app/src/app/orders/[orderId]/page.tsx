@@ -213,7 +213,7 @@ export default function OrderDetailPage({
         )}
       </main>
 
-      <div className="sticky bottom-0 bg-background border-t p-4">
+      <div className="sticky bottom-24 bg-background border-t p-4">
         {currentStatus === "READY" && (
           <button
             onClick={handleClaim}
