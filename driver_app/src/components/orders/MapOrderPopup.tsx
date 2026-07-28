@@ -15,15 +15,17 @@ import {
   ShoppingBag,
   Loader2,
   Navigation,
+  Route,
 } from "lucide-react";
 import type { OrderType, OrderStatusType } from "@ordersync/types";
 
 interface MapOrderPopupProps {
   order: OrderType;
   onClose: () => void;
+  onNavigate?: (destination: [number, number], label: string) => void;
 }
 
-export function MapOrderPopup({ order, onClose }: MapOrderPopupProps) {
+export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps) {
   const router = useRouter();
   const { user } = useAuth();
   const driverUid = user?.uid ?? "";
@@ -85,6 +87,12 @@ export function MapOrderPopup({ order, onClose }: MapOrderPopupProps) {
       "_blank",
     );
   }, [hasLocation, deliveryLatLng]);
+
+  const handleInAppNavigate = useCallback(() => {
+    if (!hasLocation || !onNavigate) return;
+    const label = businessName || `Order #${order.orderNumber}`;
+    onNavigate(deliveryLatLng as [number, number], label);
+  }, [hasLocation, deliveryLatLng, onNavigate, businessName, order.orderNumber]);
 
   return (
     <div className="fixed bottom-6 left-4 right-4 z-[1100]">
@@ -170,15 +178,26 @@ export function MapOrderPopup({ order, onClose }: MapOrderPopupProps) {
         )}
 
         {hasLocation && (
-          <Button
-            size="lg"
-            variant="outline"
-            className="mt-2 h-10 w-full gap-1.5 text-sm"
-            onClick={handleNavigate}
-          >
-            <Navigation className="h-3.5 w-3.5" />
-            Navigate
-          </Button>
+          <>
+            <Button
+              size="lg"
+              variant="outline"
+              className="mt-2 h-10 w-full gap-1.5 text-sm"
+              onClick={handleInAppNavigate}
+            >
+              <Route className="h-3.5 w-3.5" />
+              Navigate
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="mt-2 h-10 w-full gap-1.5 text-sm"
+              onClick={handleNavigate}
+            >
+              <Navigation className="h-3.5 w-3.5" />
+              Maps
+            </Button>
+          </>
         )}
       </div>
     </div>

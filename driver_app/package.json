@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fleetbase/leaflet-routing-machine": "^3.2.17",
     "@ordersync/order-utils": "file:../packages/order-utils",
     "@ordersync/types": "file:../packages/types",
     "@reduxjs/toolkit": "^2.12.0",

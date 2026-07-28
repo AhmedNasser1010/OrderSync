@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { FitMapToMarkers } from "./FitMapToMarkers";
+import { RouteControl } from "./RouteControl";
 import {
   driverIcon,
   marketplaceOrderIcon,
@@ -13,6 +14,7 @@ import { MapFilterPanel } from "./MapFilterPanel";
 import { MapOrderPopup } from "./MapOrderPopup";
 import { MapRestaurantPopup } from "./MapRestaurantPopup";
 import { MapSearch } from "./MapSearch";
+import { X } from "lucide-react";
 import type { MapFilters } from "@/app/orders/map/page";
 import type { OrderType } from "@ordersync/types";
 import type { DriverPosition } from "@/hooks/useDriverLocation";
@@ -42,6 +44,10 @@ export function FullMap({
     address?: string;
     latlng: [number, number];
     orders: OrderType[];
+  } | null>(null);
+  const [activeRoute, setActiveRoute] = useState<{
+    destination: [number, number];
+    label: string;
   } | null>(null);
 
   const allOrders = useMemo(
@@ -178,6 +184,17 @@ export function FullMap({
     [allOrders],
   );
 
+  const handleNavigate = useCallback(
+    (destination: [number, number], label: string) => {
+      setActiveRoute({ destination, label });
+    },
+    [],
+  );
+
+  const handleClearRoute = useCallback(() => {
+    setActiveRoute(null);
+  }, []);
+
   return (
     <div className="relative h-dvh w-full">
       <MapContainer
@@ -192,6 +209,13 @@ export function FullMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         />
         <FitMapToMarkers points={fitPoints} />
+
+        {activeRoute && driverPoint && (
+          <RouteControl
+            driverPosition={driverPoint}
+            destination={activeRoute.destination}
+          />
+        )}
 
         {driverPoint && (
           <Marker position={driverPoint} icon={driverIcon} />
@@ -242,8 +266,19 @@ export function FullMap({
         onSelectRestaurant={handleSearchSelectRestaurant}
       />
 
+      {activeRoute && (
+        <button
+          type="button"
+          onClick={handleClearRoute}
+          className="fixed bottom-24 left-4 right-4 z-[1100] flex items-center justify-center gap-2 rounded-2xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-xl transition-colors hover:bg-muted"
+        >
+          <X className="h-4 w-4" />
+          Clear route to {activeRoute.label}
+        </button>
+      )}
+
       {selectedOrder && (
-        <MapOrderPopup order={selectedOrder} onClose={handleClosePopup} />
+        <MapOrderPopup order={selectedOrder} onClose={handleClosePopup} onNavigate={handleNavigate} />
       )}
 
       {selectedRestaurant && (
@@ -254,6 +289,7 @@ export function FullMap({
           orders={selectedRestaurant.orders}
           onClose={handleClosePopup}
           onSelectOrder={handleSelectOrderFromRestaurant}
+          onNavigate={handleNavigate}
         />
       )}
     </div>

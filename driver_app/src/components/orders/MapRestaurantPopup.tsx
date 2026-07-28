@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Store, MapPin, ShoppingBag, ArrowRight, Navigation } from "lucide-react";
+import { X, Store, MapPin, ShoppingBag, ArrowRight, Navigation, Route } from "lucide-react";
 import { cn, formatPrice } from "@/lib/utils";
 import type { OrderType, OrderStatusType } from "@ordersync/types";
 
@@ -11,6 +11,7 @@ interface MapRestaurantPopupProps {
   orders: OrderType[];
   onClose: () => void;
   onSelectOrder: (order: OrderType) => void;
+  onNavigate?: (destination: [number, number], label: string) => void;
 }
 
 export function MapRestaurantPopup({
@@ -20,6 +21,7 @@ export function MapRestaurantPopup({
   orders,
   onClose,
   onSelectOrder,
+  onNavigate,
 }: MapRestaurantPopupProps) {
   const availableOrders = orders.filter(
     (o) => (o.status?.current as OrderStatusType) === "READY",
@@ -37,6 +39,11 @@ export function MapRestaurantPopup({
       `https://www.google.com/maps/dir/?api=1&destination=${restaurantLatlng[0]},${restaurantLatlng[1]}`,
       "_blank",
     );
+  };
+
+  const handleInAppNavigate = () => {
+    if (!hasLocation || !onNavigate) return;
+    onNavigate(restaurantLatlng as [number, number], restaurantName);
   };
 
   return (
@@ -106,14 +113,24 @@ export function MapRestaurantPopup({
         )}
 
         {hasLocation && (
-          <button
-            type="button"
-            onClick={handleNavigate}
-            className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-border/50 bg-background py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
-          >
-            <Navigation className="h-3.5 w-3.5" />
-            Navigate
-          </button>
+          <div className="mt-3 space-y-2">
+            <button
+              type="button"
+              onClick={handleInAppNavigate}
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-border/50 bg-background py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
+            >
+              <Route className="h-3.5 w-3.5" />
+              Navigate
+            </button>
+            <button
+              type="button"
+              onClick={handleNavigate}
+              className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-border/50 bg-background py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted active:scale-[0.98]"
+            >
+              <Navigation className="h-3.5 w-3.5" />
+              Maps
+            </button>
+          </div>
         )}
       </div>
     </div>
