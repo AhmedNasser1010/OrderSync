@@ -40,7 +40,7 @@ export function useMyOrders() {
 
   const sortedOrders = useMemo(() => {
     if (!orders) return [];
-    return [...orders].sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0));
+    return [...orders].sort((a, b) => (a.updatedAt ?? 0) - (b.updatedAt ?? 0));
   }, [orders]);
 
   return {

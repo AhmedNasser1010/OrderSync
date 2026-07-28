@@ -234,7 +234,7 @@ export function OrderCard({
     []
   );
 
-  const cardContent = (
+  const cardDisplay = (
     <div className="space-y-3">
       {/* Header: Status + Order # */}
       <div className="flex items-center justify-between">
@@ -316,142 +316,129 @@ export function OrderCard({
 
       {/* Progress Stepper (active only) */}
       {variant === "active" && <ProgressStepper current={status} />}
-
-      {/* Action Buttons (active only) */}
-      {variant === "active" && actions && driverUid && (
-        <div className="flex gap-2 pt-1">
-          {status === "RESERVED" && (
-            <>
-              <Button
-                size="lg"
-                className="flex-1"
-                onClick={(e) =>
-                  handleAction(e, () => actions.start(order.id, driverUid))
-                }
-                disabled={actions.isLoading}
-              >
-                Start Delivery
-              </Button>
-              <Button
-                size="lg"
-                variant="destructive"
-                onClick={(e) =>
-                  handleAction(e, () => actions.cancel(order.id, driverUid))
-                }
-                disabled={actions.isLoading}
-              >
-                Cancel
-              </Button>
-            </>
-          )}
-          {status === "PICKED_UP" && (
-            <>
-              <a
-                href={`tel:${customerPhone}`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="gap-1.5"
-                  asChild
-                >
-                  <span>
-                    <Phone className="size-3.5" />
-                    Call
-                  </span>
-                </Button>
-              </a>
-              <Button
-                size="lg"
-                className="flex-1"
-                onClick={(e) =>
-                  handleAction(e, () =>
-                    actions.startRoute(order.id, driverUid)
-                  )
-                }
-                disabled={actions.isLoading}
-              >
-                Start Route
-              </Button>
-              <Button
-                size="lg"
-                variant="destructive"
-                onClick={(e) =>
-                  handleAction(e, () => actions.cancel(order.id, driverUid))
-                }
-                disabled={actions.isLoading}
-              >
-                Cancel
-              </Button>
-            </>
-          )}
-          {status === "ON_ROUTE" && (
-            <>
-              <a
-                href={`tel:${customerPhone}`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="gap-1.5"
-                  asChild
-                >
-                  <span>
-                    <Phone className="size-3.5" />
-                    Call
-                  </span>
-                </Button>
-              </a>
-              <Button
-                size="lg"
-                className="flex-1 bg-green-600 text-white hover:bg-green-700"
-                onClick={(e) =>
-                  handleAction(e, () =>
-                    actions.complete(order.id, driverUid)
-                  )
-                }
-                disabled={actions.isLoading}
-              >
-                Complete Delivery
-              </Button>
-              <Button
-                size="lg"
-                variant="destructive"
-                onClick={(e) =>
-                  handleAction(e, () => actions.cancel(order.id, driverUid))
-                }
-                disabled={actions.isLoading}
-              >
-                Cancel
-              </Button>
-            </>
-          )}
-        </div>
-      )}
     </div>
   );
 
+  const cardActions =
+    variant === "active" && actions && driverUid ? (
+      <div className="flex gap-2 pt-1">
+        {status === "RESERVED" && (
+          <>
+            <Button
+              size="lg"
+              className="flex-1"
+              onClick={(e) =>
+                handleAction(e, () => actions.start(order.id, driverUid))
+              }
+              disabled={actions.isLoading}
+            >
+              Start Delivery
+            </Button>
+            <Button
+              size="lg"
+              variant="destructive"
+              onClick={(e) =>
+                handleAction(e, () => actions.cancel(order.id, driverUid))
+              }
+              disabled={actions.isLoading}
+            >
+              Cancel
+            </Button>
+          </>
+        )}
+        {status === "PICKED_UP" && (
+          <>
+            <a href={`tel:${customerPhone}`}>
+              <Button size="lg" variant="outline" className="gap-1.5" asChild>
+                <span>
+                  <Phone className="size-3.5" />
+                  Call
+                </span>
+              </Button>
+            </a>
+            <Button
+              size="lg"
+              className="flex-1"
+              onClick={(e) =>
+                handleAction(e, () =>
+                  actions.startRoute(order.id, driverUid)
+                )
+              }
+              disabled={actions.isLoading}
+            >
+              Start Route
+            </Button>
+            <Button
+              size="lg"
+              variant="destructive"
+              onClick={(e) =>
+                handleAction(e, () => actions.cancel(order.id, driverUid))
+              }
+              disabled={actions.isLoading}
+            >
+              Cancel
+            </Button>
+          </>
+        )}
+        {status === "ON_ROUTE" && (
+          <>
+            <a href={`tel:${customerPhone}`}>
+              <Button size="lg" variant="outline" className="gap-1.5" asChild>
+                <span>
+                  <Phone className="size-3.5" />
+                  Call
+                </span>
+              </Button>
+            </a>
+            <Button
+              size="lg"
+              className="flex-1 bg-green-600 text-white hover:bg-green-700"
+              onClick={(e) =>
+                handleAction(e, () =>
+                  actions.complete(order.id, driverUid)
+                )
+              }
+              disabled={actions.isLoading}
+            >
+              Complete Delivery
+            </Button>
+            <Button
+              size="lg"
+              variant="destructive"
+              onClick={(e) =>
+                handleAction(e, () => actions.cancel(order.id, driverUid))
+              }
+              disabled={actions.isLoading}
+            >
+              Cancel
+            </Button>
+          </>
+        )}
+      </div>
+    ) : null;
+
   const sharedClasses = cn(
-    "border-l-4 p-4 transition-shadow cursor-pointer active:scale-[0.98]",
+    "border-l-4 p-4 transition-shadow active:scale-[0.98]",
     isCritical && variant === "marketplace" && "border-l-red-500",
     isWarning && variant === "marketplace" && "border-l-amber-500",
     !isStale && config.accent,
-    variant === "marketplace" && "hover:shadow-md"
+    variant === "marketplace" && "hover:shadow-md cursor-pointer"
   );
 
   if (variant === "marketplace") {
     return (
       <Link href={`/orders/${order.id}`} className="block">
-        <Card className={sharedClasses}>{cardContent}</Card>
+        <Card className={sharedClasses}>{cardDisplay}</Card>
       </Link>
     );
   }
 
   return (
-    <Link href={`/orders/${order.id}`} className="block">
-      <Card className={sharedClasses}>{cardContent}</Card>
-    </Link>
+    <Card className={sharedClasses}>
+      <Link href={`/orders/${order.id}`} className="block">
+        {cardDisplay}
+      </Link>
+      {cardActions}
+    </Card>
   );
 }

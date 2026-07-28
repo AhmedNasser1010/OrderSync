@@ -230,7 +230,6 @@ export const firestoreApi = createApi({
           return { error: { message, data: "" } };
         }
       },
-      invalidatesTags: ["MarketplaceOrders", "MyOrders"],
     }),
 
     // Transactional: Start delivery (RESERVED -> PICKED_UP)
@@ -278,7 +277,6 @@ export const firestoreApi = createApi({
           return { error: { message, data: "" } };
         }
       },
-      invalidatesTags: ["MyOrders"],
     }),
 
     // Transactional: Start route (PICKED_UP -> ON_ROUTE)
@@ -326,7 +324,6 @@ export const firestoreApi = createApi({
           return { error: { message, data: "" } };
         }
       },
-      invalidatesTags: ["MyOrders"],
     }),
 
     // Transactional: Complete delivery (ON_ROUTE -> DELIVERED)
@@ -384,7 +381,6 @@ export const firestoreApi = createApi({
           return { error: { message, data: "" } };
         }
       },
-      invalidatesTags: ["MyOrders"],
     }),
 
     // Transactional: Cancel order (any active status -> CANCELED)
@@ -446,7 +442,6 @@ export const firestoreApi = createApi({
           return { error: { message, data: "" } };
         }
       },
-      invalidatesTags: ["MyOrders", "MarketplaceOrders"],
     }),
 
     toggleOnlineStatus: builder.mutation<
