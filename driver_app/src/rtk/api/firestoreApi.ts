@@ -232,6 +232,94 @@ export const firestoreApi = createApi({
           return { error: { message, data: "" } };
         }
       },
+      invalidatesTags: ["MarketplaceOrders", "MyOrders"],
+    }),
+
+    // Transactional: Claim multiple READY orders in a single transaction
+    claimOrdersBatch: builder.mutation({
+      async queryFn({
+        orderIds,
+        driverUid,
+      }: {
+        orderIds: string[];
+        driverUid: string;
+      }) {
+        try {
+          if (!orderIds.length || !driverUid)
+            throw new Error("Order IDs and Driver UID required.");
+
+          const driverRef = doc(db, "drivers", driverUid);
+
+          await runTransaction(db, async (transaction) => {
+            const orderRefs = orderIds.map((id) => doc(db, "orders", id));
+            const orderSnaps = await Promise.all(
+              orderRefs.map((ref) => transaction.get(ref)),
+            );
+
+            for (let i = 0; i < orderSnaps.length; i++) {
+              const snap = orderSnaps[i];
+              if (!snap.exists())
+                throw new Error(`Order not found: ${orderIds[i]}`);
+              const order = snap.data() as OrderType;
+              if (order.status.current !== "READY")
+                throw new Error(
+                  `Order ${orderIds[i]} is not READY. Current: ${order.status.current}`,
+                );
+              if (order.assignment?.driverUid)
+                throw new Error(
+                  `Order ${orderIds[i]} already claimed.`,
+                );
+            }
+
+            const now = Date.now();
+            const customerUids: string[] = [];
+            let businessId = "";
+
+            for (let i = 0; i < orderSnaps.length; i++) {
+              const order = orderSnaps[i].data() as OrderType;
+              const orderRef = orderRefs[i];
+
+              transaction.update(orderRef, {
+                "assignment.driverUid": driverUid,
+                "status.current": "RESERVED",
+                "status.history": arrayUnion({
+                  status: "RESERVED",
+                  timestamp: now,
+                  by: `driver:${driverUid}`,
+                }),
+                "timeline.reservedAt": now,
+                updatedAt: now,
+              });
+
+              if (!businessId && order.businessId) {
+                businessId = order.businessId;
+              }
+              if (order.customer?.uid) {
+                customerUids.push(order.customer.uid);
+              }
+            }
+
+            const driverUpdate: Record<string, unknown> = {};
+            if (businessId) {
+              driverUpdate.accessToken = businessId;
+            }
+            if (customerUids.length > 0) {
+              driverUpdate.trackingCustomerIds =
+                arrayUnion(...customerUids);
+            }
+            if (Object.keys(driverUpdate).length > 0) {
+              transaction.update(driverRef, driverUpdate);
+            }
+          });
+
+          return { data: null };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          console.error("Error batch claiming orders:", message);
+          return { error: { message, data: "" } };
+        }
+      },
+      invalidatesTags: ["MarketplaceOrders", "MyOrders"],
     }),
 
     // Transactional: Start delivery (RESERVED -> PICKED_UP)
@@ -478,6 +566,7 @@ export const {
   useFetchMarketplaceOrdersQuery,
   useFetchMyOrdersQuery,
   useClaimOrderMutation,
+  useClaimOrdersBatchMutation,
   useStartDeliveryMutation,
   useCompleteDeliveryMutation,
   useStartRouteMutation,

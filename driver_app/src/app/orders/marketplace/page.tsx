@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { useMarketplaceOrders } from "@/hooks/useOrders";
+import { useRecommendedOrders } from "@/hooks/useRecommendedOrders";
 import { OrderCard } from "@/components/orders/OrderCard";
+import { RecommendedOrders } from "@/components/orders/RecommendedOrders";
 import { OrderSearchBar } from "@/components/orders/OrderSearchBar";
 import { NoOrders } from "@/components/orders/NoOrders";
 import useDriverFinance from "@/hooks/useDriverFinance";
@@ -37,6 +39,7 @@ function matchesSearch(order: {
 
 export default function MarketplacePage() {
   const { orders, isLoading, error } = useMarketplaceOrders();
+  const { recommendedOrderIds } = useRecommendedOrders();
   const [searchQuery, setSearchQuery] = useState("");
   const { currentCash, blockLimit, isBlocked, isLoading: financeLoading } = useDriverFinance();
 
@@ -45,12 +48,14 @@ export default function MarketplacePage() {
 
   const sortedOrders = useMemo(
     () =>
-      [...orders].sort(
-        (a, b) =>
-          (a.timeline?.readyAt ?? a.createdAt) -
-          (b.timeline?.readyAt ?? b.createdAt)
-      ),
-    [orders]
+      [...orders]
+        .filter((order) => !recommendedOrderIds.has(order.id))
+        .sort(
+          (a, b) =>
+            (a.timeline?.readyAt ?? a.createdAt) -
+            (b.timeline?.readyAt ?? b.createdAt),
+        ),
+    [orders, recommendedOrderIds],
   );
 
   const visibleOrders = useMemo(() => {
@@ -129,6 +134,7 @@ export default function MarketplacePage() {
         />
       ) : (
         <div className="flex flex-col gap-3">
+          <RecommendedOrders />
           {visibleOrders.map((order) => (
             <OrderCard key={order.id} order={order} variant="marketplace" />
           ))}

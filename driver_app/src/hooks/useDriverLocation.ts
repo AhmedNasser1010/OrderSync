@@ -5,10 +5,12 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFetchMyOrdersQuery } from "@/rtk/api/firestoreApi";
+import { haversineDistance } from "@/utilities/routeOptimizer";
 import type { OrderType, LiveLocation } from "@ordersync/types";
 
 type DriverState = "idle" | "reserved" | "pickedUp";
 export type GeoPermissionState = "unsupported" | "denied" | "granted" | "prompt";
+export type DriverPosition = { lat: number; lng: number };
 
 const INTERVALS: Record<DriverState, number> = {
   idle: 25_000,
@@ -18,25 +20,6 @@ const INTERVALS: Record<DriverState, number> = {
 
 const BACKGROUND_INTERVAL = 20_000;
 const MOVEMENT_THRESHOLD_METERS = 25;
-
-function toRadians(deg: number): number {
-  return (deg * Math.PI) / 180;
-}
-
-function haversineDistance(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number,
-): number {
-  const R = 6_371_000;
-  const dLat = toRadians(lat2 - lat1);
-  const dLng = toRadians(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
 
 function getDriverState(orders: OrderType[]): DriverState {
   for (const order of orders) {
@@ -60,6 +43,7 @@ export function useDriverLocation(online: { byManager: boolean; byUser: boolean 
   });
 
   const [permissionState, setPermissionState] = useState<GeoPermissionState>("prompt");
+  const [position, setPosition] = useState<DriverPosition | null>(null);
 
   const lastLocationRef = useRef<LiveLocation | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -75,7 +59,7 @@ export function useDriverLocation(online: { byManager: boolean; byUser: boolean 
 
       const last = lastLocationRef.current;
       if (last) {
-        const dist = haversineDistance(last.lat, last.lng, latitude, longitude);
+        const dist = haversineDistance([last.lat, last.lng], [latitude, longitude]);
         if (dist < MOVEMENT_THRESHOLD_METERS) return;
       }
 
@@ -94,6 +78,7 @@ export function useDriverLocation(online: { byManager: boolean; byUser: boolean 
           updatedAt: now,
         });
         lastLocationRef.current = liveLocation as unknown as LiveLocation;
+        setPosition({ lat: latitude, lng: longitude });
       } catch (err) {
         console.error("Failed to write driver location:", err);
       }
@@ -193,5 +178,5 @@ export function useDriverLocation(online: { byManager: boolean; byUser: boolean 
     };
   }, [driverUid, online, myOrders, writeLocation]);
 
-  return { permissionState };
+  return { permissionState, position };
 }
