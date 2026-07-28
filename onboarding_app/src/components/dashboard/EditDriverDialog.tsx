@@ -102,12 +102,11 @@ export function EditDriverDialog({
 
       const newWarningLimit = warningLimit ? parseInt(warningLimit) : undefined;
       const newBlockLimit = blockLimit ? parseInt(blockLimit) : undefined;
-      if (newWarningLimit != null || newBlockLimit != null) {
-        updates.finance = {
-          ...driver.finance,
-          ...(newWarningLimit != null && { warningLimit: newWarningLimit }),
-          ...(newBlockLimit != null && { blockLimit: newBlockLimit }),
-        };
+      if (newWarningLimit != null) {
+        updates["finance.warningLimit"] = newWarningLimit;
+      }
+      if (newBlockLimit != null) {
+        updates["finance.blockLimit"] = newBlockLimit;
       }
 
       await updateDriverDocument({

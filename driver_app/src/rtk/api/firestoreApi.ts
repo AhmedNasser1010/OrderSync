@@ -15,6 +15,7 @@ import {
   limit,
   deleteField,
   updateDoc,
+  increment,
 } from "firebase/firestore";
 import type { Driver, OrderType, OrderStatusType } from "@ordersync/types";
 import { canTransition, getTimelineField, isMarketplaceVisible, isFinalStatus } from "@ordersync/order-utils";
@@ -25,10 +26,10 @@ export const firestoreApi = createApi({
   tagTypes: ["UserData", "DriverProfile", "MarketplaceOrders", "MyOrders"],
   endpoints: (builder) => ({
     fetchUserData: builder.query<
-      Pick<Driver, "userInfo" | "online">,
+      Pick<Driver, "userInfo" | "online" | "finance">,
       { uid: string }
     >({
-      queryFn: () => ({ data: { userInfo: {} as Driver["userInfo"], online: { byManager: false, byUser: false } } }),
+      queryFn: () => ({ data: { userInfo: {} as Driver["userInfo"], online: { byManager: false, byUser: false }, finance: { currentCash: 0, warningLimit: 0, blockLimit: 0 } } }),
       async onCacheEntryAdded(
         user,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
@@ -47,6 +48,7 @@ export const firestoreApi = createApi({
               updateCachedData(() => ({
                 userInfo: data.userInfo,
                 online: data.online,
+                finance: data.finance,
               }));
             }
           },
@@ -367,6 +369,7 @@ export const firestoreApi = createApi({
 
             const driverUpdate: Record<string, unknown> = {
               accessToken: deleteField(),
+              "finance.currentCash": increment(order.pricing?.total ?? 0),
             };
             if (customerUid) {
               driverUpdate.trackingCustomerIds = arrayRemove(customerUid);

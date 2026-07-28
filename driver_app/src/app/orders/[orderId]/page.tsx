@@ -10,6 +10,7 @@ import {
 } from "@/rtk/api/firestoreApi";
 import { useOrderActions } from "@/hooks/useOrderActions";
 import { useAuth } from "@/contexts/AuthContext";
+import useDriverFinance from "@/hooks/useDriverFinance";
 import { OrderMap } from "@/components/orders/OrderMap";
 import { cn, formatPrice, formatRelativeTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -53,6 +54,7 @@ export default function OrderDetailPage({
 
   const { claim, start, startRoute, complete, cancel, isLoading } =
     useOrderActions();
+  const { isBlocked } = useDriverFinance();
 
   const [driverLocation, setDriverLocation] = useState<LiveLocation | null>(
     null,
@@ -344,13 +346,15 @@ export default function OrderDetailPage({
                 size="lg"
                 className="h-12 w-full text-sm font-semibold"
                 onClick={handleClaim}
-                disabled={isLoading}
+                disabled={isLoading || isBlocked}
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Claiming...
                   </>
+                ) : isBlocked ? (
+                  "Limit Reached"
                 ) : (
                   "Claim Order"
                 )}

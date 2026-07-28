@@ -5,8 +5,9 @@ import useUser from "@/hooks/useUser";
 import { useGeoPermission } from "@/components/LocationProvider";
 import { OnlineToggle } from "@/components/OnlineToggle";
 import { UserMenu } from "@/components/UserMenu";
+import useDriverFinance from "@/hooks/useDriverFinance";
 import type { ReactNode } from "react";
-import { Package, Store, Settings } from "lucide-react";
+import { Package, Store, Settings, Wallet } from "lucide-react";
 
 interface OrdersHeaderProps {
   icon?: ReactNode;
@@ -18,6 +19,7 @@ export function OrdersHeader({ icon }: OrdersHeaderProps) {
   const { userData } = useUser();
 
   const online = userData?.online ?? { byManager: false, byUser: false };
+  const { currentCash, isWarning, isBlocked, isLoading: financeLoading } = useDriverFinance();
 
   const title = pathname.startsWith("/orders/marketplace")
     ? "Marketplace"
@@ -52,6 +54,20 @@ export function OrdersHeader({ icon }: OrdersHeaderProps) {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          {!financeLoading && (
+            <div
+              className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-medium ${
+                isBlocked
+                  ? "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-300"
+                  : isWarning
+                    ? "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+                    : "border-border bg-background text-muted-foreground"
+              }`}
+            >
+              <Wallet className="h-3.5 w-3.5" />
+              <span className="tabular-nums">${currentCash.toFixed(2)}</span>
+            </div>
+          )}
           <OnlineToggle
             byManager={online.byManager}
             byUser={online.byUser}
