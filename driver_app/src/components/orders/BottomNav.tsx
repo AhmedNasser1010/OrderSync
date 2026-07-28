@@ -26,7 +26,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2">
-      <div className="flex items-center justify-around rounded-2xl border border-border/50 bg-background/80 px-2 py-1.5 shadow-lg shadow-black/5 backdrop-blur-xl dark:bg-card/80">
+      <div className="flex items-center justify-around rounded-2xl border border-border/50 bg-background px-2 py-1.5 shadow-lg shadow-black/5 dark:bg-card">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.href;
           const isMarketplaceTab = tab.href === "/orders/marketplace";

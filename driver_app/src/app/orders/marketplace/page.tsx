@@ -40,10 +40,22 @@ export default function MarketplacePage() {
   const normalizedSearch = searchQuery.trim().toLowerCase();
   const isSearching = normalizedSearch.length > 0;
 
+  const sortedOrders = useMemo(
+    () =>
+      [...orders].sort(
+        (a, b) =>
+          (a.timeline?.readyAt ?? a.createdAt) -
+          (b.timeline?.readyAt ?? b.createdAt)
+      ),
+    [orders]
+  );
+
   const visibleOrders = useMemo(() => {
-    if (!isSearching) return orders;
-    return orders.filter((order) => matchesSearch(order, normalizedSearch));
-  }, [isSearching, normalizedSearch, orders]);
+    if (!isSearching) return sortedOrders;
+    return sortedOrders.filter((order) =>
+      matchesSearch(order, normalizedSearch)
+    );
+  }, [isSearching, normalizedSearch, sortedOrders]);
 
   const isSearchEmpty = isSearching && visibleOrders.length === 0;
 
@@ -76,10 +88,6 @@ export default function MarketplacePage() {
           onChange={setSearchQuery}
           placeholder="Search orders by number, customer, item, or status"
         />
-        <p className="text-xs text-muted-foreground">
-          {visibleOrders.length} order{visibleOrders.length !== 1 ? "s" : ""} available of{" "}
-          {orders.length}
-        </p>
       </div>
 
       {isSearchEmpty ? (
@@ -97,7 +105,7 @@ export default function MarketplacePage() {
       ) : (
         <div className="flex flex-col gap-3">
           {visibleOrders.map((order) => (
-            <OrderCard key={order.id} order={order} />
+            <OrderCard key={order.id} order={order} variant="marketplace" />
           ))}
         </div>
       )}

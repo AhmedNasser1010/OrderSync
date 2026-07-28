@@ -22,7 +22,7 @@ export function OrderMap({ orderLocation, driverLocation, restaurantLocation }: 
   if (restaurantLocation) points.push(restaurantLocation);
 
   return (
-    <div className="h-[300px] w-full rounded-lg overflow-hidden border">
+    <div className="h-[400px] w-[calc(100%+40px)] -translate-x-5">
       <MapContainer
         center={orderLocation}
         zoom={13}

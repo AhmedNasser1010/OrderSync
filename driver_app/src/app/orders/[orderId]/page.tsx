@@ -4,12 +4,28 @@ import { use, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { useFetchMyOrdersQuery, useFetchMarketplaceOrdersQuery } from "@/rtk/api/firestoreApi";
+import {
+  useFetchMyOrdersQuery,
+  useFetchMarketplaceOrdersQuery,
+} from "@/rtk/api/firestoreApi";
 import { useOrderActions } from "@/hooks/useOrderActions";
 import { useAuth } from "@/contexts/AuthContext";
 import { OrderMap } from "@/components/orders/OrderMap";
-import { ArrowLeft, MapPin, Phone, User } from "lucide-react";
-import type { OrderType, LiveLocation } from "@ordersync/types";
+import { cn, formatPrice, formatRelativeTime } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  ArrowLeft,
+  MapPin,
+  Phone,
+  User,
+  Navigation,
+  ChevronDown,
+  Clock,
+  Loader2,
+  X,
+  ExternalLink,
+} from "lucide-react";
+import type { LiveLocation, OrderStatusType } from "@ordersync/types";
 
 export default function OrderDetailPage({
   params,
@@ -22,10 +38,12 @@ export default function OrderDetailPage({
   const { user } = useAuth();
   const driverUid = user?.uid ?? "";
 
-  // Check if order is in marketplace (READY) or in my orders (RESERVED, PICKED_UP, etc.)
-  const { data: marketplaceOrders } = useFetchMarketplaceOrdersQuery(driverUid, {
-    skip: !driverUid,
-  });
+  const { data: marketplaceOrders } = useFetchMarketplaceOrdersQuery(
+    driverUid,
+    {
+      skip: !driverUid,
+    },
+  );
   const { data: myOrders } = useFetchMyOrdersQuery(driverUid, {
     skip: !driverUid,
   });
@@ -33,9 +51,13 @@ export default function OrderDetailPage({
   const allOrders = [...(marketplaceOrders ?? []), ...(myOrders ?? [])];
   const order = allOrders.find((o) => o.id === orderId);
 
-  const { claim, start, startRoute, complete, cancel, isLoading } = useOrderActions();
+  const { claim, start, startRoute, complete, cancel, isLoading } =
+    useOrderActions();
 
-  const [driverLocation, setDriverLocation] = useState<LiveLocation | null>(null);
+  const [driverLocation, setDriverLocation] = useState<LiveLocation | null>(
+    null,
+  );
+  const [notesExpanded, setNotesExpanded] = useState(false);
 
   const handleClaim = useCallback(async () => {
     if (!order || !driverUid) return;
@@ -85,10 +107,20 @@ export default function OrderDetailPage({
     }
   }, [order, driverUid, cancel, router]);
 
-  useEffect(() => {
-    if (!order?.assignment?.driverUid) return;
+  const handleOpenMaps = useCallback(() => {
+    const loc = order?.delivery?.latlng;
+    if (loc && loc[0] && loc[1]) {
+      window.open(
+        `https://www.google.com/maps/dir/?api=1&destination=${loc[0]},${loc[1]}`,
+        "_blank",
+      );
+    }
+  }, [order?.delivery?.latlng]);
 
-    const driverRef = doc(db, "drivers", order.assignment.driverUid);
+  useEffect(() => {
+    if (!driverUid) return;
+
+    const driverRef = doc(db, "drivers", driverUid);
     const unsubscribe = onSnapshot(driverRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
@@ -99,11 +131,11 @@ export default function OrderDetailPage({
     });
 
     return () => unsubscribe();
-  }, [order?.assignment?.driverUid]);
+  }, [driverUid]);
 
   if (!order) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-2">
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3">
         <div className="animate-spin">
           <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
         </div>
@@ -118,147 +150,303 @@ export default function OrderDetailPage({
   const hasDriverLocation =
     driverLocation && driverLocation.lat && driverLocation.lng;
 
-  const currentStatus = order.status?.current;
+  const currentStatus = order.status?.current as OrderStatusType;
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-10 bg-background border-b px-4 py-3 flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-1 hover:bg-accent rounded-md">
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <div>
-          <h1 className="text-lg font-semibold">
-            #{order.orderNumber}
-          </h1>
-          <p className="text-xs text-muted-foreground">{currentStatus}</p>
-        </div>
-      </header>
-
-      <main className="flex-1 p-4 flex flex-col gap-4 pb-24">
-        {hasOrderLocation ? (
-          <OrderMap
-            orderLocation={orderLocation}
-            driverLocation={hasDriverLocation ? driverLocation : undefined}
-            restaurantLocation={order.business?.latlng}
-          />
-        ) : (
-          <section className="border rounded-lg p-4">
-            <h2 className="font-semibold text-sm mb-3">Map</h2>
-            <p className="text-sm text-muted-foreground">
-              No delivery location available
-            </p>
-          </section>
-        )}
-
-        <section className="border rounded-lg p-4">
-          <h2 className="font-semibold text-sm mb-3">Customer</h2>
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <User className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">{order.customer?.name}</span>
+      {/* Scrollable Content */}
+      <main className="flex-1 pb-44">
+        {/* Map Section */}
+        <div className="relative z-0 px-4">
+          {hasOrderLocation ? (
+            <div className="relative w-full shadow-lg">
+              <OrderMap
+                orderLocation={orderLocation}
+                driverLocation={hasDriverLocation ? driverLocation : undefined}
+                restaurantLocation={order.business?.latlng}
+              />
+              <button
+                onClick={handleOpenMaps}
+                className="absolute right-3 top-3 z-[1000] flex h-10 items-center gap-2 rounded-xl bg-background px-3 py-2 text-sm font-medium shadow-lg transition-all hover:bg-muted active:scale-[0.96]"
+              >
+                <Navigation className="h-4 w-4" />
+                Navigate
+              </button>
+              <button
+                onClick={() => router.back()}
+                className="absolute left-3 top-3 z-[1000] flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-lg transition-all hover:bg-muted active:scale-[0.95]"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
             </div>
-            <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <div className="flex h-[200px] w-full items-center justify-center rounded-2xl bg-muted/30 ring-1 ring-foreground/5">
+              <div className="text-center">
+                <MapPin className="mx-auto h-8 w-8 text-muted-foreground/40" />
+                <p className="mt-2 text-sm text-muted-foreground">
+                  No delivery location available
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Customer Card */}
+        <div className="relative z-20 px-4 -mt-10">
+          <div className="rounded-2xl bg-card p-4 shadow-sm ring-1 ring-foreground/5">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Customer
+            </h2>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted/60">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <span className="text-sm font-medium text-foreground">
+                  {order.customer?.name}
+                </span>
+              </div>
               <a
                 href={`tel:${order.customer?.phone}`}
-                className="text-sm text-blue-600"
+                className="flex items-center gap-3 group"
               >
-                {order.customer?.phone}
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
+                  <Phone className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-medium text-primary">
+                  {order.customer?.phone}
+                </span>
+                <ExternalLink className="ml-auto h-3.5 w-3.5 shrink-0 text-primary/40 group-hover:text-primary/70 transition-colors" />
               </a>
+              {order.delivery?.address && (
+                <button
+                  onClick={handleOpenMaps}
+                  className="flex items-start gap-3 text-left group w-full cursor-pointer"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary/20">
+                    <MapPin className="h-4 w-4" />
+                  </div>
+                  <span className="text-sm font-medium text-primary leading-relaxed">
+                    {order.delivery.address}
+                  </span>
+                  <ExternalLink className="ml-auto mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/40 group-hover:text-primary/70 transition-colors" />
+                </button>
+              )}
             </div>
-            {order.delivery?.address && (
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-muted-foreground shrink-0" />
-                <span className="text-sm">{order.delivery.address}</span>
+          </div>
+        </div>
+
+        {/* Items Card */}
+        <div className="px-4 pt-3">
+          <div className="rounded-2xl bg-card p-4 shadow-sm ring-1 ring-foreground/5">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Items
+            </h2>
+            <div className="flex flex-col gap-1">
+              {order.cart?.map(
+                (
+                  item: {
+                    id: string;
+                    name?: string;
+                    quantity: number;
+                    selectedSize?: string;
+                  },
+                  index: number,
+                ) => (
+                  <div
+                    key={`${item.id}-${index}`}
+                    className={cn(
+                      "flex items-center justify-between rounded-xl px-3 py-2.5",
+                      index % 2 === 0 ? "bg-muted/30" : "bg-transparent",
+                    )}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[11px] font-semibold text-primary">
+                        {item.quantity}x
+                      </span>
+                      <span className="text-sm font-medium text-foreground truncate">
+                        {item.name || item.id}
+                      </span>
+                      {item.selectedSize && (
+                        <span className="shrink-0 text-xs text-muted-foreground">
+                          {item.selectedSize}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ),
+              )}
+            </div>
+            <div className="mt-3 flex items-center justify-between rounded-xl bg-muted/40 px-3 py-3">
+              <span className="text-sm font-semibold text-foreground">
+                Total
+              </span>
+              <span className="text-base font-bold tabular-nums text-foreground">
+                {formatPrice(order.pricing?.total ?? 0)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Notes Section */}
+        {order.notes?.order && (
+          <div className="px-4 pt-3">
+            <button
+              onClick={() => setNotesExpanded(!notesExpanded)}
+              className="flex w-full items-center justify-between rounded-2xl bg-card p-4 shadow-sm ring-1 ring-foreground/5 transition-colors hover:bg-muted active:scale-[0.99]"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
+                  <span className="text-base">📝</span>
+                </div>
+                <span className="text-sm font-medium text-foreground">
+                  Order Notes
+                </span>
+              </div>
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                  notesExpanded && "rotate-180",
+                )}
+              />
+            </button>
+            {notesExpanded && (
+              <div className="mt-1 rounded-2xl bg-amber-500/5 p-4 ring-1 ring-amber-500/10">
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {order.notes.order}
+                </p>
               </div>
             )}
           </div>
-        </section>
+        )}
 
-        <section className="border rounded-lg p-4">
-          <h2 className="font-semibold text-sm mb-3">Items</h2>
-          <div className="flex flex-col gap-2">
-            {order.cart?.map((item: { id: string; name?: string; quantity: number; selectedSize?: string }, index: number) => (
-              <div
-                key={`${item.id}-${index}`}
-                className="flex items-center justify-between text-sm"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">
-                    {item.quantity}x
-                  </span>
-                  <span>{item.name || item.id}</span>
-                  {item.selectedSize && (
-                    <span className="text-xs text-muted-foreground">
-                      ({item.selectedSize})
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
+        {/* Timing Info */}
+        {order.timeline?.readyAt && (
+          <div className="px-4 pt-3">
+            <div className="flex items-center gap-2 px-1">
+              <Clock className="h-3.5 w-3.5 text-muted-foreground/60" />
+              <span className="text-xs text-muted-foreground/60">
+                Ready {formatRelativeTime(order.timeline.readyAt)}
+              </span>
+            </div>
           </div>
-          <div className="border-t mt-3 pt-3 flex items-center justify-between">
-            <span className="text-sm font-medium">Total</span>
-            <span className="font-semibold">
-              {order.pricing?.total?.toFixed(2) ?? "0.00"}
-            </span>
-          </div>
-        </section>
-
-        {order.notes?.order && (
-          <section className="border rounded-lg p-4">
-            <h2 className="font-semibold text-sm mb-1">Note</h2>
-            <p className="text-sm text-muted-foreground">{order.notes.order}</p>
-          </section>
         )}
       </main>
 
-      <div className="sticky bottom-24 bg-background border-t p-4">
-        {currentStatus === "READY" && (
-          <button
-            onClick={handleClaim}
-            disabled={isLoading}
-            className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
-          >
-            {isLoading ? "Claiming..." : "Claim Order"}
-          </button>
-        )}
-        {currentStatus === "RESERVED" && (
-          <button
-            onClick={handleStartDelivery}
-            disabled={isLoading}
-            className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
-          >
-            {isLoading ? "Starting..." : "Start Delivery"}
-          </button>
-        )}
-        {currentStatus === "PICKED_UP" && (
-          <button
-            onClick={handleStartRoute}
-            disabled={isLoading}
-            className="w-full bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
-          >
-            {isLoading ? "Starting Route..." : "Start Route"}
-          </button>
-        )}
-        {currentStatus === "ON_ROUTE" && (
-          <button
-            onClick={handleCompleteDelivery}
-            disabled={isLoading}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
-          >
-            {isLoading ? "Completing..." : "Complete Delivery"}
-          </button>
-        )}
-        {(currentStatus === "RESERVED" || currentStatus === "PICKED_UP" || currentStatus === "ON_ROUTE") && (
-          <button
-            onClick={handleCancel}
-            disabled={isLoading}
-            className="w-full mt-2 bg-destructive text-destructive-foreground py-3 rounded-lg font-semibold hover:bg-destructive/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
-          >
-            {isLoading ? "Canceling..." : "Cancel Order"}
-          </button>
-        )}
+      {/* Sticky Action Bar - above BottomNav (z-50) */}
+      <div className="fixed bottom-20 left-0 right-0 z-[60]">
+        <div className="mx-auto flex max-w-lg flex-col gap-2 px-4">
+          <div className="rounded-2xl border border-border/50 bg-background p-3 shadow-xl">
+            {/* Primary Action */}
+            {currentStatus === "READY" && (
+              <Button
+                size="lg"
+                className="h-12 w-full text-sm font-semibold"
+                onClick={handleClaim}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Claiming...
+                  </>
+                ) : (
+                  "Claim Order"
+                )}
+              </Button>
+            )}
+            {currentStatus === "RESERVED" && (
+              <Button
+                size="lg"
+                className="h-12 w-full text-sm font-semibold"
+                onClick={handleStartDelivery}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Starting...
+                  </>
+                ) : (
+                  "Start Delivery"
+                )}
+              </Button>
+            )}
+            {currentStatus === "PICKED_UP" && (
+              <Button
+                size="lg"
+                className="h-12 w-full text-sm font-semibold"
+                onClick={handleStartRoute}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Starting Route...
+                  </>
+                ) : (
+                  "Start Route"
+                )}
+              </Button>
+            )}
+            {currentStatus === "ON_ROUTE" && (
+              <Button
+                size="lg"
+                className="h-12 w-full bg-green-600 text-white hover:bg-green-700 text-sm font-semibold"
+                onClick={handleCompleteDelivery}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Completing...
+                  </>
+                ) : (
+                  "Complete Delivery"
+                )}
+              </Button>
+            )}
+
+            {/* Secondary Actions */}
+            {(currentStatus === "RESERVED" ||
+              currentStatus === "PICKED_UP" ||
+              currentStatus === "ON_ROUTE") && (
+              <div className="flex gap-2">
+                <a href={`tel:${order.customer?.phone}`} className="flex-1">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="h-10 w-full gap-1.5 text-sm"
+                    disabled={isLoading}
+                  >
+                    <Phone className="h-3.5 w-3.5" />
+                    Call
+                  </Button>
+                </a>
+                <Button
+                  size="lg"
+                  variant="destructive"
+                  className="h-10 flex-1 text-sm"
+                  onClick={handleCancel}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      Canceling...
+                    </>
+                  ) : (
+                    <>
+                      <X className="h-3.5 w-3.5" />
+                      Cancel
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
