@@ -1,4 +1,4 @@
-import { db } from "@/lib/firebase";
+import { db, auth } from "@/lib/firebase";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
   collection,
@@ -51,7 +51,9 @@ export const firestoreApi = createApi({
             }
           },
           (error) => {
-            console.error("Error in user data listener:", error?.message);
+            if (auth.currentUser) {
+              console.error("Error in user data listener:", error?.message);
+            }
           },
         );
 
@@ -113,7 +115,9 @@ export const firestoreApi = createApi({
             });
           },
           (error) => {
-            console.error("Error in marketplace listener:", error?.message);
+            if (auth.currentUser) {
+              console.error("Error in marketplace listener:", error?.message);
+            }
           },
         );
 
@@ -158,7 +162,9 @@ export const firestoreApi = createApi({
             });
           },
           (error) => {
-            console.error("Error in my orders listener:", error?.message);
+            if (auth.currentUser) {
+              console.error("Error in my orders listener:", error?.message);
+            }
           },
         );
 

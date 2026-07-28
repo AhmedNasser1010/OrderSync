@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AuthGuard } from "./AuthProvider";
+import { HtmlAttributes } from "@/components/HtmlAttributes";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,8 +33,9 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className="h-full antialiased"
     >
+      <HtmlAttributes locale="en" fontClass={inter.variable} />
       <head>
         <Script
           id="theme-init"
@@ -51,7 +55,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col">
+      <body className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col`}>
         <StoreProvider>
           <AuthProvider>
             <AuthGuard>

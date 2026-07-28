@@ -52,7 +52,8 @@
       "description": "You aren't assigned to any businesses yet",
       "signedInAs": "Signed in as",
       "logout": "Logout",
-      "loggingOut": "Logging out..."
+    "loggingOut": "Logging out...",
+    "cancel": "Cancel"
     },
     "notFound": {
       "title": "Auth Not Found",
@@ -347,7 +348,12 @@
     "theme": "Theme",
     "themeDescription": "Toggle between light and dark mode",
     "language": "Language",
-    "languageDescription": "Choose your preferred language"
+    "languageDescription": "Choose your preferred language",
+    "logout": "Logout",
+    "logoutDescription": "Sign out of your account",
+    "logoutConfirm": "Are you sure you want to log out?",
+    "loggingOut": "Logging out...",
+    "cancel": "Cancel"
   },
   "ImageEditor": {
     "title": "Edit Images",

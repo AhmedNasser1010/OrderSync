@@ -52,7 +52,8 @@
       "description": "لم يتم تعيينك لأي نشاط تجاري بعد",
       "signedInAs": "تم تسجيل الدخول باسم",
       "logout": "تسجيل الخروج",
-      "loggingOut": "جارٍ تسجيل الخروج..."
+    "loggingOut": "جارٍ تسجيل الخروج...",
+    "cancel": "إلغاء"
     },
     "notFound": {
       "title": "المصادقة غير موجودة",
@@ -347,7 +348,12 @@
     "theme": "المظهر",
     "themeDescription": "التبديل بين الوضع الفاتح والداكن",
     "language": "اللغة",
-    "languageDescription": "اختر لغتك المفضلة"
+    "languageDescription": "اختر لغتك المفضلة",
+    "logout": "تسجيل الخروج",
+    "logoutDescription": "تسجيل الخروج من حسابك",
+    "logoutConfirm": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+    "loggingOut": "جارٍ تسجيل الخروج...",
+    "cancel": "إلغاء"
   },
   "ImageEditor": {
     "title": "تعديل الصور",

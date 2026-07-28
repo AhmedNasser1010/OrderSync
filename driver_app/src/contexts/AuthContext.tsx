@@ -23,6 +23,8 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { setAuthCookie, clearAuthCookie } from "@/lib/auth-cookie";
 import { setUserRoleClaim } from "@/app/actions/setUserRoleClaim";
+import { useAppDispatch } from "@/rtk/hooks";
+import { firestoreApi } from "@/rtk/api/firestoreApi";
 
 interface AuthContextValue {
   user: FirebaseUser | null;
@@ -41,6 +43,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
@@ -359,6 +362,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async (): Promise<void> => {
     try {
+      dispatch(firestoreApi.util.resetApiState());
       clearAuthCookie();
       await firebaseSignOut(auth);
     } catch (err) {
