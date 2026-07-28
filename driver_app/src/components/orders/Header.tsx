@@ -7,7 +7,7 @@ import { OnlineToggle } from "@/components/OnlineToggle";
 import { UserMenu } from "@/components/UserMenu";
 import useDriverFinance from "@/hooks/useDriverFinance";
 import type { ReactNode } from "react";
-import { Package, Store, Settings, Wallet } from "lucide-react";
+import { Package, Store, Settings, Wallet, MapPin } from "lucide-react";
 
 interface OrdersHeaderProps {
   icon?: ReactNode;
@@ -21,15 +21,19 @@ export function OrdersHeader({ icon }: OrdersHeaderProps) {
   const online = userData?.online ?? { byManager: false, byUser: false };
   const { currentCash, isWarning, isBlocked, isLoading: financeLoading } = useDriverFinance();
 
-  const title = pathname.startsWith("/orders/marketplace")
-    ? "Marketplace"
-    : pathname.startsWith("/orders/settings")
-      ? "Settings"
-      : "My Orders";
+  const title = pathname.startsWith("/orders/map")
+    ? "Map"
+    : pathname.startsWith("/orders/marketplace")
+      ? "Marketplace"
+      : pathname.startsWith("/orders/settings")
+        ? "Settings"
+        : "My Orders";
 
   const pageIcon = icon ?? (
     <>
-      {pathname.startsWith("/orders/marketplace") ? (
+      {pathname.startsWith("/orders/map") ? (
+        <MapPin className="h-5 w-5" />
+      ) : pathname.startsWith("/orders/marketplace") ? (
         <Store className="h-5 w-5" />
       ) : pathname.startsWith("/orders/settings") ? (
         <Settings className="h-5 w-5" />

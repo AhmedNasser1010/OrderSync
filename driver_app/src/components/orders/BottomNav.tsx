@@ -2,13 +2,14 @@
 
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { Package, Store } from "lucide-react";
+import { Package, Store, Map } from "lucide-react";
 import { useMarketplaceOrders, useMyOrders } from "@/hooks/useOrders";
 import { cn } from "@/lib/utils";
 
 const tabs = [
   { href: "/orders/active", label: "My Orders", icon: Package },
   { href: "/orders/marketplace", label: "Marketplace", icon: Store },
+  { href: "/orders/map", label: "Map", icon: Map },
 ] as const;
 
 export function BottomNav() {
@@ -16,17 +17,19 @@ export function BottomNav() {
   const router = useRouter();
   const { orders: myOrders } = useMyOrders();
   const { orders: marketplaceOrders } = useMarketplaceOrders();
-  const activeTab = pathname.startsWith("/orders/marketplace")
-    ? "/orders/marketplace"
-    : "/orders/active";
+  const activeTab = pathname.startsWith("/orders/map")
+    ? "/orders/map"
+    : pathname.startsWith("/orders/marketplace")
+      ? "/orders/marketplace"
+      : "/orders/active";
 
   const hasNoActiveOrders = myOrders.length === 0;
   const hasMarketplaceOrders = marketplaceOrders.length > 0;
   const shouldFlashMarketplace = hasNoActiveOrders && hasMarketplaceOrders;
 
   return (
-    <nav className="fixed bottom-4 left-1/2 z-50 w-[calc(100%-2rem)] max-w-lg -translate-x-1/2">
-      <div className="flex items-center justify-around rounded-2xl border border-border/50 bg-background px-2 py-1.5 shadow-lg shadow-black/5 dark:bg-card">
+    <nav className="fixed bottom-4 left-1/2 z-[1000] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2">
+      <div className="flex items-center justify-around rounded-2xl border border-border/50 bg-background/80 px-2 py-1.5 shadow-lg shadow-black/5 backdrop-blur-xl dark:bg-card/80">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.href;
           const isMarketplaceTab = tab.href === "/orders/marketplace";
