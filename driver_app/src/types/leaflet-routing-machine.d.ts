@@ -32,8 +32,28 @@ declare module "@fleetbase/leaflet-routing-machine" {
     defaultErrorHandler?: (e: { error: unknown }) => void;
   }
 
+  interface OSRMv1Route {
+    coordinates: L.LatLng[];
+    instructions: Array<{
+      type: string;
+      distance: number;
+      time: number;
+      road: string;
+      direction: string;
+      text: string;
+    }>;
+    summary: { totalDistance: number; totalTime: number };
+    name: string;
+  }
+
   class OSRMv1 {
     constructor(options?: OSRMv1Options);
+    route(
+      waypoints: Array<{ latLng: L.LatLng; name?: string }>,
+      callback: (err: unknown, routes?: OSRMv1Route[]) => void,
+      context?: unknown,
+      options?: { geometryOnly?: boolean; simplifyGeometry?: boolean },
+    ): void;
   }
 
   class Control extends L.Control {

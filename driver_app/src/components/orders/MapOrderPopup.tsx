@@ -92,7 +92,8 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
     if (!hasLocation || !onNavigate) return;
     const label = businessName || `Order #${order.orderNumber}`;
     onNavigate(deliveryLatLng as [number, number], label);
-  }, [hasLocation, deliveryLatLng, onNavigate, businessName, order.orderNumber]);
+    onClose();
+  }, [hasLocation, deliveryLatLng, onNavigate, businessName, order.orderNumber, onClose]);
 
   return (
     <div className="fixed bottom-6 left-4 right-4 z-[1100]">

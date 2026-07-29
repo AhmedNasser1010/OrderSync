@@ -35,12 +35,40 @@ export const restaurantIcon = createSvgIcon(
   "#6b7280"
 );
 
-export const marketplaceOrderIcon = createRadarIcon(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`,
-  "#10b981"
-);
+const ORDER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`;
 
-export const activeOrderIcon = createSvgIcon(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>`,
-  "#f59e0b"
-);
+const STATUS_COLORS: Record<string, string> = {
+  READY: "#10b981",
+  RESERVED: "#3b82f6",
+  PICKED_UP: "#f59e0b",
+  ON_ROUTE: "#a855f7",
+  DELIVERED: "#22c55e",
+  CANCELED: "#ef4444",
+  REJECTED: "#ef4444",
+};
+
+const DEFAULT_COLOR = "#6b7280";
+
+const STALE_WARNING_MS = 3 * 60 * 1000;
+const STALE_CRITICAL_MS = 7 * 60 * 1000;
+
+export function createOrderStatusIcon(status: string, readyAt?: number): L.DivIcon {
+  const color = STATUS_COLORS[status] ?? DEFAULT_COLOR;
+
+  if (status === "READY") {
+    const elapsed = readyAt ? Date.now() - readyAt : 0;
+    if (elapsed >= STALE_CRITICAL_MS) {
+      return createRadarIcon(ORDER_SVG, "#ef4444");
+    }
+    if (elapsed >= STALE_WARNING_MS) {
+      return createRadarIcon(ORDER_SVG, "#f59e0b");
+    }
+    return createRadarIcon(ORDER_SVG, color);
+  }
+
+  return createSvgIcon(ORDER_SVG, color);
+}
+
+export const marketplaceOrderIcon = createRadarIcon(ORDER_SVG, "#10b981");
+
+export const activeOrderIcon = createSvgIcon(ORDER_SVG, "#f59e0b");

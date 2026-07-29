@@ -6,8 +6,7 @@ import { FitMapToMarkers } from "./FitMapToMarkers";
 import { RouteControl } from "./RouteControl";
 import {
   driverIcon,
-  marketplaceOrderIcon,
-  activeOrderIcon,
+  createOrderStatusIcon,
   restaurantIcon,
 } from "./mapCustomMarker";
 import { MapFilterPanel } from "./MapFilterPanel";
@@ -19,8 +18,6 @@ import type { MapFilters } from "@/app/orders/map/page";
 import type { OrderType } from "@ordersync/types";
 import type { DriverPosition } from "@/hooks/useDriverLocation";
 import "leaflet/dist/leaflet.css";
-
-const ACTIVE_STATUSES = new Set(["RESERVED", "PICKED_UP", "ON_ROUTE"]);
 
 interface FullMapProps {
   marketplaceOrders: OrderType[];
@@ -129,6 +126,7 @@ export function FullMap({
   const handleMarkerClick = useCallback(
     (order: OrderType) => {
       setSelectedOrder(order);
+      setSelectedRestaurant(null);
     },
     [],
   );
@@ -214,6 +212,8 @@ export function FullMap({
           <RouteControl
             driverPosition={driverPoint}
             destination={activeRoute.destination}
+            label={activeRoute.label}
+            onError={handleClearRoute}
           />
         )}
 
@@ -224,10 +224,10 @@ export function FullMap({
         {visibleOrders.map((order) => {
           const ll = order.delivery?.latlng;
           if (!ll || !ll[0] || !ll[1]) return null;
-          const status = order.status?.current;
-          const icon = ACTIVE_STATUSES.has(status)
-            ? activeOrderIcon
-            : marketplaceOrderIcon;
+          const icon = createOrderStatusIcon(
+            order.status?.current ?? "READY",
+            order.timeline?.readyAt ?? order.createdAt,
+          );
           return (
             <Marker
               key={order.id}

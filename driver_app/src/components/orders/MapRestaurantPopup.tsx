@@ -44,6 +44,7 @@ export function MapRestaurantPopup({
   const handleInAppNavigate = () => {
     if (!hasLocation || !onNavigate) return;
     onNavigate(restaurantLatlng as [number, number], restaurantName);
+    onClose();
   };
 
   return (
