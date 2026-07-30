@@ -2,6 +2,7 @@
 
 import { Inbox, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 type NoOrdersProps = {
   title: string;
@@ -16,6 +17,7 @@ export function NoOrders({
   searchQuery,
   onClearSearch,
 }: NoOrdersProps) {
+  const t = useTranslations("noOrders");
   const hasSearchQuery = Boolean(searchQuery?.trim());
 
   return (
@@ -36,7 +38,7 @@ export function NoOrders({
           className="mt-5"
           onClick={onClearSearch}
         >
-          Clear search
+          {t("clearSearch")}
         </Button>
       )}
     </div>

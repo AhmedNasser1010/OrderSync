@@ -1,12 +1,14 @@
 "use client";
 
-import { useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "@/i18n/routing";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrderActions } from "@/hooks/useOrderActions";
 import useDriverFinance from "@/hooks/useDriverFinance";
-import { STATUS_CONFIG } from "./OrderCard";
+import { STATUS_CONFIG, STATUS_TRANSLATION_KEY } from "./OrderCard";
 import { cn, formatPrice, formatRelativeTime } from "@/lib/utils";
+import { useTranslations } from "next-intl";
+import { useBusinessDisplayName } from "@/contexts/BusinessNamesContext";
 import { Button } from "@/components/ui/button";
 import {
   X,
@@ -18,6 +20,18 @@ import {
   Route,
 } from "lucide-react";
 import type { OrderType, OrderStatusType } from "@ordersync/types";
+
+const STALE_WARNING_MS = 3 * 60 * 1000;
+const STALE_CRITICAL_MS = 7 * 60 * 1000;
+
+type StaleLevel = "none" | "warning" | "critical";
+
+function getStaleLevel(readyAt: number): StaleLevel {
+  const elapsed = Date.now() - readyAt;
+  if (elapsed >= STALE_CRITICAL_MS) return "critical";
+  if (elapsed >= STALE_WARNING_MS) return "warning";
+  return "none";
+}
 
 interface MapOrderPopupProps {
   order: OrderType;
@@ -31,15 +45,39 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
   const driverUid = user?.uid ?? "";
   const { claim, start, startRoute, complete, isLoading } = useOrderActions();
   const { isBlocked } = useDriverFinance();
+  const t = useTranslations("orderCard");
+  const p = useTranslations("mapOrderPopup");
 
   const status = order.status?.current as OrderStatusType;
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.READY;
 
-  const businessName = order.business?.name ?? "";
+  const businessName = useBusinessDisplayName(order.business?.id, order.business?.name);
   const address = order.delivery?.address ?? "";
   const totalPrice = order.pricing?.total ?? 0;
   const itemCount = order.cart?.length ?? 0;
   const readyAt = order.timeline?.readyAt ?? order.createdAt;
+
+  const [staleLevel, setStaleLevel] = useState<StaleLevel>(
+    status === "READY" ? getStaleLevel(readyAt) : "none"
+  );
+
+  useEffect(() => {
+    if (status !== "READY") return;
+    const id = setInterval(() => {
+      setStaleLevel(getStaleLevel(readyAt));
+    }, 30_000);
+    return () => clearInterval(id);
+  }, [status, readyAt]);
+
+  const isWarning = staleLevel === "warning";
+  const isCritical = staleLevel === "critical";
+  const isStale = isWarning || isCritical;
+
+  const statusLabel = isCritical
+    ? t("urgent")
+    : isWarning
+      ? t("waiting")
+      : t(STATUS_TRANSLATION_KEY[status] ?? "available");
 
   const handleAction = useCallback(async () => {
     if (!driverUid) return;
@@ -58,19 +96,15 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
         router.push("/orders/active");
       }
     } catch {
-      alert("Action failed. Please try again.");
+      alert(p("actionFailed"));
     }
-  }, [status, order.id, driverUid, claim, start, startRoute, complete, onClose, router]);
+  }, [status, order.id, driverUid, claim, start, startRoute, complete, onClose, router, p]);
 
-  const actionLabel =
-    status === "READY"
-      ? "Claim Order"
-      : status === "RESERVED"
-        ? "Start Delivery"
-        : status === "PICKED_UP"
-          ? "Start Route"
-          : status === "ON_ROUTE"
-            ? "Complete Delivery"
+  const actionLabelKey =
+    status === "READY" ? "claimOrder"
+      : status === "RESERVED" ? "startDelivery"
+        : status === "PICKED_UP" ? "startRoute"
+          : status === "ON_ROUTE" ? "completeDelivery"
             : null;
 
   const isActionDisabled =
@@ -103,10 +137,14 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
             <span
               className={cn(
                 "rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
-                config.color,
+                isCritical &&
+                  "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
+                isWarning &&
+                  "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
+                !isStale && config.color,
               )}
             >
-              {config.label}
+              {statusLabel}
             </span>
             <span className="text-sm font-bold tabular-nums">
               #{order.orderNumber}
@@ -116,7 +154,7 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
             type="button"
             onClick={onClose}
             className="flex h-7 w-7 items-center justify-center rounded-full bg-muted transition-colors hover:bg-muted/80"
-            aria-label="Close"
+            aria-label={p("close")}
           >
             <X className="h-3.5 w-3.5 text-muted-foreground" />
           </button>
@@ -141,7 +179,7 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
           <div className="flex items-center gap-1.5">
             <ShoppingBag className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">
-              {itemCount} {itemCount === 1 ? "item" : "items"}
+              {t(itemCount === 1 ? "item" : "items", { count: itemCount })}
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -154,7 +192,7 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
           </div>
         </div>
 
-        {actionLabel && (
+        {actionLabelKey && (
           <Button
             size="lg"
             className={cn(
@@ -168,12 +206,12 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Processing...
+                {p("processing")}
               </>
             ) : status === "READY" && isBlocked ? (
-              "Limit Reached"
+              p("limitReached")
             ) : (
-              actionLabel
+              t(actionLabelKey)
             )}
           </Button>
         )}
@@ -187,7 +225,7 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
               onClick={handleInAppNavigate}
             >
               <Route className="h-3.5 w-3.5" />
-              Navigate
+              {p("navigate")}
             </Button>
             <Button
               size="lg"
@@ -196,7 +234,7 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
               onClick={handleNavigate}
             >
               <Navigation className="h-3.5 w-3.5" />
-              Maps
+              {p("maps")}
             </Button>
           </>
         )}

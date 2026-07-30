@@ -15,9 +15,12 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { MoonStar, LogOut, Loader2 } from "lucide-react";
+import { MoonStar, LogOut, Loader2, Languages } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { LocaleToggle } from "@/components/LocaleToggle";
 
 export default function SettingsPage() {
+  const t = useTranslations("settings");
   const { logout } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
@@ -41,11 +44,11 @@ export default function SettingsPage() {
               <div className="flex items-center gap-2">
                 <MoonStar className="h-4 w-4 text-muted-foreground" />
                 <h3 className="text-sm font-semibold text-foreground">
-                  Theme
+                  {t("theme")}
                 </h3>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                Switch between light and dark mode.
+                {t("themeDesc")}
               </p>
             </div>
 
@@ -57,13 +60,31 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between gap-4 p-4">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <LogOut className="h-4 w-4 text-muted-foreground" />
+                <Languages className="h-4 w-4 text-muted-foreground" />
                 <h3 className="text-sm font-semibold text-foreground">
-                  Logout
+                  {t("language")}
                 </h3>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                Sign out of your account.
+                {t("languageDesc")}
+              </p>
+            </div>
+
+            <LocaleToggle />
+          </div>
+        </Card>
+
+        <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
+          <div className="flex items-center justify-between gap-4 p-4">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <LogOut className="h-4 w-4 text-muted-foreground" />
+                <h3 className="text-sm font-semibold text-foreground">
+                  {t("logout")}
+                </h3>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t("logoutDesc")}
               </p>
             </div>
 
@@ -78,7 +99,7 @@ export default function SettingsPage() {
               ) : (
                 <LogOut className="h-3.5 w-3.5 mr-1.5" />
               )}
-              {isLoggingOut ? "Logging out..." : "Logout"}
+              {isLoggingOut ? t("loggingOut") : t("logout")}
             </Button>
           </div>
         </Card>
@@ -87,14 +108,14 @@ export default function SettingsPage() {
       <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Logout</AlertDialogTitle>
+            <AlertDialogTitle>{t("logoutConfirm")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to log out?
+              {t("logoutConfirmDesc")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isLoggingOut}>
-              Cancel
+              {t("logout")}
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleLogout} disabled={isLoggingOut}>
               {isLoggingOut ? (
@@ -102,7 +123,7 @@ export default function SettingsPage() {
               ) : (
                 <LogOut className="h-3.5 w-3.5 mr-1.5" />
               )}
-              {isLoggingOut ? "Logging out..." : "Logout"}
+              {isLoggingOut ? t("loggingOut") : t("logout")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

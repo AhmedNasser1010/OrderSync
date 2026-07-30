@@ -14,7 +14,8 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 
 interface AuthFormProps {
   mode: "signin" | "signup";
@@ -22,6 +23,7 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ mode, onSuccess }: AuthFormProps) {
+  const t = useTranslations("auth");
   const {
     signIn,
     signup,
@@ -46,14 +48,14 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
         await signIn(email, password);
       } else {
         if (password !== confirmPassword) {
-          setError("Passwords do not match");
+          setError(t("passwordsDoNotMatch"));
           return;
         }
         await signup(email, password);
       }
       onSuccess?.();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "An error occurred";
+      const message = err instanceof Error ? err.message : t("anErrorOccurred");
       setError(message);
     }
   };
@@ -67,7 +69,7 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
       await signInWithGoogle();
       onSuccess?.();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "An error occurred";
+      const message = err instanceof Error ? err.message : t("anErrorOccurred");
       setError(message);
     }
   };
@@ -76,27 +78,27 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
     <Card className="w-full">
       <CardHeader className="space-y-2">
         <CardTitle className="text-2xl">
-          {isSignIn ? "Sign In" : "Create Account"}
+          {isSignIn ? t("signIn") : t("createAccount")}
         </CardTitle>
         <CardDescription>
           {isSignIn ? (
             <>
-              Don&apos;t have an account?{" "}
+              {t("dontHaveAccount")}{" "}
               <Link
                 href="/auth/signup"
                 className="font-medium text-primary hover:underline"
               >
-                Sign up
+                {t("signUp")}
               </Link>
             </>
           ) : (
             <>
-              Already have an account?{" "}
+              {t("alreadyHaveAccount")}{" "}
               <Link
                 href="/auth/signin"
                 className="font-medium text-primary hover:underline"
               >
-                Sign in
+                {t("signInLink")}
               </Link>
             </>
           )}
@@ -140,21 +142,21 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
                 fill="#EA4335"
               />
             </svg>
-            Continue with Google
+            {t("continueWithGoogle")}
           </Button>
 
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <div className="h-px flex-1 bg-border" />
-            <span>or</span>
+            <span>{t("or")}</span>
             <div className="h-px flex-1 bg-border" />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="name@example.com"
+              placeholder={t("emailPlaceholder")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
@@ -163,12 +165,12 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t("password")}</Label>
             <Input
               id="password"
               type="password"
               placeholder={
-                isSignUp ? "At least 6 characters" : "Enter your password"
+                isSignUp ? t("passwordPlaceholderSignUp") : t("passwordPlaceholderSignIn")
               }
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -179,11 +181,11 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
 
           {isSignUp && (
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm Password</Label>
+              <Label htmlFor="confirm-password">{t("confirmPassword")}</Label>
               <Input
                 id="confirm-password"
                 type="password"
-                placeholder="Confirm your password"
+                placeholder={t("confirmPasswordPlaceholder")}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={isLoading}
@@ -198,7 +200,7 @@ export function AuthForm({ mode, onSuccess }: AuthFormProps) {
             disabled={isLoading}
             size="lg"
           >
-            {isLoading ? "Loading..." : isSignIn ? "Sign In" : "Create Account"}
+            {isLoading ? t("loading") : isSignIn ? t("signIn") : t("createAccount")}
           </Button>
         </form>
       </CardContent>

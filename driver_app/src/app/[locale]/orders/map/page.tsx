@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useMarketplaceOrders, useMyOrders } from "@/hooks/useOrders";
 import { useDriverPosition } from "@/components/LocationProvider";
 import { FullMap } from "@/components/orders/FullMap";
+import { useTranslations } from "next-intl";
 
 export type MapFilters = {
   orders: boolean;
@@ -12,6 +13,7 @@ export type MapFilters = {
 };
 
 export default function MapPage() {
+  const t = useTranslations("mapPage");
   const { orders: marketplaceOrders, isLoading: marketplaceLoading } =
     useMarketplaceOrders();
   const { orders: myOrders, isLoading: myLoading } = useMyOrders();
@@ -32,7 +34,7 @@ export default function MapPage() {
           <div className="animate-spin">
             <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
           </div>
-          <p className="text-sm text-muted-foreground">Loading map...</p>
+          <p className="text-sm text-muted-foreground">{t("loadingMap")}</p>
         </div>
       </div>
     );

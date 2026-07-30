@@ -69,6 +69,7 @@ export type OrderType = {
   business: {
     id: string;
     name: string;
+    nameInAr: string;
     phone: string;
 
     address: string;

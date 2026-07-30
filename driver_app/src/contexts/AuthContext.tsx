@@ -9,7 +9,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { auth, db } from "@/lib/firebase";
 import {
   type User as FirebaseUser,
@@ -43,6 +43,12 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const locale = pathname.split("/")[1] || "en";
+  const localeRouter = {
+    push: (path: string) => router.push(`/${locale}${path}`),
+    replace: (path: string) => router.replace(`/${locale}${path}`),
+  };
   const dispatch = useAppDispatch();
 
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -131,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               setIsInitializing(false);
               if (!initialCheckDone.current) {
                 initialCheckDone.current = true;
-                router.push("/auth/signin");
+                localeRouter.push("/auth/signin");
               }
             }
             return;
@@ -150,7 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (!initialCheckDone.current) {
             initialCheckDone.current = true;
             if (onboarded) {
-              router.push("/orders/active");
+              localeRouter.push("/orders/active");
             }
           }
         } else {
@@ -162,9 +168,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           if (!initialCheckDone.current) {
             initialCheckDone.current = true;
-            router.push("/auth/signin");
+            localeRouter.push("/auth/signin");
           } else {
-            router.push("/auth/signin");
+            localeRouter.push("/auth/signin");
           }
         }
       },
@@ -173,7 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAuthLoading(false);
         setIsInitializing(false);
         setAuthError(error);
-        router.push("/auth/signin");
+        localeRouter.push("/auth/signin");
       },
     );
 
@@ -258,7 +264,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsInitializing(false);
       initialCheckDone.current = true;
       if (onboarded) {
-        router.push("/orders/active");
+        localeRouter.push("/orders/active");
       }
     } catch (err: unknown) {
       const firebaseErr = err as { message?: string; code?: string };

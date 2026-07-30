@@ -4,7 +4,7 @@ export type LatLng = [number, number];
 
 export type RouteGroup = {
   orders: OrderType[];
-  restaurant: { name: string; latlng: LatLng };
+  restaurant: { id: string; name: string; latlng: LatLng };
   totalRouteDistance: number;
   individualDistance: number;
   savings: number;
@@ -123,6 +123,7 @@ export function findBestRouteGroup(
     if (restaurantOrders.length < 2) continue;
 
     const restaurant = {
+      id: restaurantOrders[0].business.id,
       name: restaurantOrders[0].business.name,
       latlng: restaurantOrders[0].business.latlng,
     };

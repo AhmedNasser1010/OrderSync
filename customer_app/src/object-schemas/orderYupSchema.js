@@ -6,6 +6,7 @@ const orderYupSchema = yup.object().shape({
   business: yup.object().shape({
     id: yup.string().required(),
     name: yup.string().required(),
+    nameInAr: yup.string().required(),
     phone: yup.string().required(),
     address: yup.string().required(),
     latlng: yup.array().of(yup.number()).min(2).max(2).required(),

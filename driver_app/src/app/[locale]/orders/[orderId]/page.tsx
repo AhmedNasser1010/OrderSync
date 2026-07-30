@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import {
@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import useDriverFinance from "@/hooks/useDriverFinance";
 import { OrderMap } from "@/components/orders/OrderMap";
 import { cn, formatPrice, formatRelativeTime } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
@@ -35,6 +36,7 @@ export default function OrderDetailPage({
 }) {
   const { orderId } = use(params);
   const router = useRouter();
+  const t = useTranslations("orderDetail");
 
   const { user } = useAuth();
   const driverUid = user?.uid ?? "";
@@ -67,27 +69,27 @@ export default function OrderDetailPage({
       await claim(order.id, driverUid);
       router.push("/orders/active");
     } catch {
-      alert("Failed to claim order");
+      alert(t("failedToClaim"));
     }
-  }, [order, driverUid, claim, router]);
+  }, [order, driverUid, claim, router, t]);
 
   const handleStartDelivery = useCallback(async () => {
     if (!order || !driverUid) return;
     try {
       await start(order.id, driverUid);
     } catch {
-      alert("Failed to start delivery");
+      alert(t("failedToStartDelivery"));
     }
-  }, [order, driverUid, start]);
+  }, [order, driverUid, start, t]);
 
   const handleStartRoute = useCallback(async () => {
     if (!order || !driverUid) return;
     try {
       await startRoute(order.id, driverUid);
     } catch {
-      alert("Failed to start route");
+      alert(t("failedToStartRoute"));
     }
-  }, [order, driverUid, startRoute]);
+  }, [order, driverUid, startRoute, t]);
 
   const handleCompleteDelivery = useCallback(async () => {
     if (!order || !driverUid) return;
@@ -95,9 +97,9 @@ export default function OrderDetailPage({
       await complete(order.id, driverUid);
       router.push("/orders/active");
     } catch {
-      alert("Failed to complete delivery");
+      alert(t("failedToComplete"));
     }
-  }, [order, driverUid, complete, router]);
+  }, [order, driverUid, complete, router, t]);
 
   const handleCancel = useCallback(async () => {
     if (!order || !driverUid) return;
@@ -105,9 +107,9 @@ export default function OrderDetailPage({
       await cancel(order.id, driverUid);
       router.push("/orders/active");
     } catch {
-      alert("Failed to cancel order");
+      alert(t("failedToCancel"));
     }
-  }, [order, driverUid, cancel, router]);
+  }, [order, driverUid, cancel, router, t]);
 
   const handleOpenMaps = useCallback(() => {
     const loc = order?.delivery?.latlng;
@@ -141,7 +143,7 @@ export default function OrderDetailPage({
         <div className="animate-spin">
           <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
         </div>
-        <p className="text-sm text-muted-foreground">Loading order...</p>
+        <p className="text-sm text-muted-foreground">{t("loadingOrder")}</p>
       </div>
     );
   }
@@ -172,12 +174,12 @@ export default function OrderDetailPage({
                 className="absolute right-3 top-3 z-[1000] flex h-10 items-center gap-2 rounded-xl bg-background px-3 py-2 text-sm font-medium shadow-lg transition-all hover:bg-muted active:scale-[0.96]"
               >
                 <Navigation className="h-4 w-4" />
-                Navigate
+                {t("navigate")}
               </button>
               <button
                 onClick={() => router.back()}
-                className="absolute left-3 top-3 z-[1000] flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-lg transition-all hover:bg-muted active:scale-[0.95]"
-                aria-label="Go back"
+                className="absolute start-3 top-3 z-[1000] flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-lg transition-all hover:bg-muted active:scale-[0.95]"
+                aria-label={t("goBack")}
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
@@ -187,7 +189,7 @@ export default function OrderDetailPage({
               <div className="text-center">
                 <MapPin className="mx-auto h-8 w-8 text-muted-foreground/40" />
                 <p className="mt-2 text-sm text-muted-foreground">
-                  No delivery location available
+                  {t("noDeliveryLocation")}
                 </p>
               </div>
             </div>
@@ -198,7 +200,7 @@ export default function OrderDetailPage({
         <div className="relative z-20 px-4 -mt-10">
           <div className="rounded-2xl bg-card p-4 shadow-sm ring-1 ring-foreground/5">
             <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Customer
+              {t("customer")}
             </h2>
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-3">
@@ -243,7 +245,7 @@ export default function OrderDetailPage({
         <div className="px-4 pt-3">
           <div className="rounded-2xl bg-card p-4 shadow-sm ring-1 ring-foreground/5">
             <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Items
+              {t("items")}
             </h2>
             <div className="flex flex-col gap-1">
               {order.cart?.map(
@@ -282,7 +284,7 @@ export default function OrderDetailPage({
             </div>
             <div className="mt-3 flex items-center justify-between rounded-xl bg-muted/40 px-3 py-3">
               <span className="text-sm font-semibold text-foreground">
-                Total
+                {t("total")}
               </span>
               <span className="text-base font-bold tabular-nums text-foreground">
                 {formatPrice(order.pricing?.total ?? 0)}
@@ -303,7 +305,7 @@ export default function OrderDetailPage({
                   <span className="text-base">📝</span>
                 </div>
                 <span className="text-sm font-medium text-foreground">
-                  Order Notes
+                  {t("orderNotes")}
                 </span>
               </div>
               <ChevronDown
@@ -329,7 +331,7 @@ export default function OrderDetailPage({
             <div className="flex items-center gap-2 px-1">
               <Clock className="h-3.5 w-3.5 text-muted-foreground/60" />
               <span className="text-xs text-muted-foreground/60">
-                Ready {formatRelativeTime(order.timeline.readyAt)}
+                {t("ready", { time: formatRelativeTime(order.timeline.readyAt) })}
               </span>
             </div>
           </div>
@@ -351,12 +353,12 @@ export default function OrderDetailPage({
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Claiming...
+                    {t("claiming2")}
                   </>
                 ) : isBlocked ? (
-                  "Limit Reached"
+                  t("limitReached")
                 ) : (
-                  "Claim Order"
+                  t("claimOrder")
                 )}
               </Button>
             )}
@@ -370,10 +372,10 @@ export default function OrderDetailPage({
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Starting...
+                    {t("starting")}
                   </>
                 ) : (
-                  "Start Delivery"
+                  t("startDelivery")
                 )}
               </Button>
             )}
@@ -387,10 +389,10 @@ export default function OrderDetailPage({
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Starting Route...
+                    {t("startingRoute")}
                   </>
                 ) : (
-                  "Start Route"
+                  t("startRoute")
                 )}
               </Button>
             )}
@@ -404,10 +406,10 @@ export default function OrderDetailPage({
                 {isLoading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Completing...
+                    {t("completing")}
                   </>
                 ) : (
-                  "Complete Delivery"
+                  t("completeDelivery")
                 )}
               </Button>
             )}
@@ -425,7 +427,7 @@ export default function OrderDetailPage({
                     disabled={isLoading}
                   >
                     <Phone className="h-3.5 w-3.5" />
-                    Call
+                    {t("call")}
                   </Button>
                 </a>
                 <Button
@@ -438,12 +440,12 @@ export default function OrderDetailPage({
                   {isLoading ? (
                     <>
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      Canceling...
+                      {t("canceling")}
                     </>
                   ) : (
                     <>
                       <X className="h-3.5 w-3.5" />
-                      Cancel
+                      {t("cancel")}
                     </>
                   )}
                 </Button>

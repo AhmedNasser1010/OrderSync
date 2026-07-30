@@ -10,6 +10,8 @@ import { useRecommendedOrders } from "@/hooks/useRecommendedOrders";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn, formatRelativeTime } from "@/lib/utils";
+import { useTranslations } from "next-intl";
+import { useBusinessDisplayName } from "@/contexts/BusinessNamesContext";
 import type { OrderType } from "@ordersync/types";
 import {
   Sparkles,
@@ -33,11 +35,11 @@ function getStaleLevel(readyAt: number): StaleLevel {
   return "none";
 }
 
-function formatMeters(meters: number): string {
+function formatDistance(meters: number, t: (key: string) => string): string {
   if (meters >= 1000) {
-    return `${(meters / 1000).toFixed(1)} km`;
+    return `${(meters / 1000).toFixed(1)}${t("km")}`;
   }
-  return `${Math.round(meters)} m`;
+  return `${Math.round(meters)}${t("m")}`;
 }
 
 function IndividualOrder({
@@ -49,6 +51,7 @@ function IndividualOrder({
   driverUid: string;
   onClaim: (orderId: string) => void;
 }) {
+  const t = useTranslations("recommendedOrders");
   const [claimOrder, { isLoading }] = useClaimOrderMutation();
   const [error, setError] = useState<string | null>(null);
 
@@ -73,14 +76,14 @@ function IndividualOrder({
     try {
       const result = await claimOrder({ orderId: order.id, driverUid });
       if ("error" in result) {
-        setError("Already taken");
+        setError(t("alreadyTaken"));
         return;
       }
       onClaim(order.id);
     } catch {
-      setError("Failed to claim");
+      setError(t("failedToClaim"));
     }
-  }, [claimOrder, order.id, driverUid, onClaim]);
+  }, [claimOrder, order.id, driverUid, onClaim, t]);
 
   const itemCount = order.cart?.length ?? 0;
   const totalPrice = order.pricing?.total ?? 0;
@@ -118,7 +121,7 @@ function IndividualOrder({
           <div className="flex items-center gap-1.5">
             <ShoppingBag className="size-3.5 text-muted-foreground" />
             <span className="text-xs text-muted-foreground">
-              {itemCount} {itemCount === 1 ? "item" : "items"}
+              {t(itemCount === 1 ? "item" : "items", { count: itemCount })}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -147,7 +150,7 @@ function IndividualOrder({
           onClick={handleClaim}
           disabled={isLoading}
         >
-          {isLoading ? "Claiming..." : "Claim"}
+          {isLoading ? t("claiming") : t("claim")}
         </Button>
 
         {error && (
@@ -159,6 +162,7 @@ function IndividualOrder({
 }
 
 export function RecommendedOrders() {
+  const t = useTranslations("recommendedOrders");
   const { user } = useAuth();
   const driverUid = user?.uid ?? "";
   const { recommended, isLoading: isComputing } = useRecommendedOrders();
@@ -175,14 +179,12 @@ export function RecommendedOrders() {
       const orderIds = recommended.orders.map((o) => o.id);
       const result = await claimOrdersBatch({ orderIds, driverUid });
       if ("error" in result) {
-        setClaimError(
-          "Failed to claim orders. They may have been taken already.",
-        );
+        setClaimError(t("batchClaimFailed"));
       }
     } catch {
-      setClaimError("Something went wrong. Please try again.");
+      setClaimError(t("somethingWentWrong"));
     }
-  }, [recommended, driverUid, claimOrdersBatch]);
+  }, [recommended, driverUid, claimOrdersBatch, t]);
 
   const handleIndividualClaim = useCallback(() => {
     setClaimError(null);
@@ -192,6 +194,13 @@ export function RecommendedOrders() {
   if (!recommended) return null;
 
   const { orders, restaurant, totalRouteDistance, savings } = recommended;
+  const restaurantDisplayName = useBusinessDisplayName(restaurant.id, restaurant.name);
+
+  const totalItems = orders.reduce((sum, o) => sum + (o.cart?.length ?? 0), 0);
+  const totalPrice = orders.reduce(
+    (sum, o) => sum + (o.pricing?.total ?? 0),
+    0,
+  );
 
   return (
     <div className="space-y-2">
@@ -203,32 +212,32 @@ export function RecommendedOrders() {
             <div className="flex items-center gap-2">
               <Sparkles className="size-4 text-emerald-600 dark:text-emerald-400" />
               <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
-                Recommended Route
+                {t("recommendedRoute")}
               </span>
             </div>
             <span className="text-xs text-muted-foreground">
-              {orders.length} {orders.length === 1 ? "order" : "orders"}
+              {t(orders.length === 1 ? "order" : "orders", { count: orders.length })}
             </span>
           </div>
 
           {/* Restaurant */}
           <div className="flex items-center gap-1.5">
             <Store className="size-3.5 text-muted-foreground shrink-0" />
-            <span className="text-sm font-medium truncate">
-              {restaurant.name}
-            </span>
+              <span className="text-sm font-medium truncate">
+                  {restaurantDisplayName}
+                </span>
           </div>
 
           {/* Route info */}
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <Navigation className="size-3" />
-              <span>{formatMeters(totalRouteDistance)} route</span>
+              <span>{formatDistance(totalRouteDistance, t)}{t("route")}</span>
             </div>
             <div className="flex items-center gap-1">
               <Route className="size-3" />
               <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                Save {formatMeters(savings)}
+                {t("save")}{formatDistance(savings, t)}
               </span>
             </div>
           </div>
@@ -237,17 +246,10 @@ export function RecommendedOrders() {
           <div className="rounded-md bg-muted/50 p-2.5">
             <div className="flex items-center justify-between text-xs">
               <span className="text-muted-foreground">
-                {orders.reduce((sum, o) => sum + (o.cart?.length ?? 0), 0)}{" "}
-                {orders.reduce((sum, o) => sum + (o.cart?.length ?? 0), 0) ===
-                1
-                  ? "item"
-                  : "items"}{" "}
-                total
+                {t("itemsTotal", { count: totalItems })}
               </span>
               <span className="font-semibold tabular-nums">
-                {orders
-                  .reduce((sum, o) => sum + (o.pricing?.total ?? 0), 0)
-                  .toFixed(2)}
+                {totalPrice.toFixed(2)}
               </span>
             </div>
           </div>
@@ -264,11 +266,11 @@ export function RecommendedOrders() {
                 <div className="animate-spin">
                   <div className="h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full" />
                 </div>
-                Claiming...
+                {t("claiming")}
               </>
             ) : (
               <>
-                Claim All {orders.length} Orders
+                {t("claimAll", { count: orders.length })}
                 <ChevronRight className="size-4" />
               </>
             )}
@@ -286,7 +288,7 @@ export function RecommendedOrders() {
       <div className="flex items-center gap-2 px-1">
         <div className="h-px flex-1 bg-border" />
         <span className="text-[10px] text-muted-foreground uppercase tracking-wider">
-          or claim individually
+          {t("orClaimIndividually")}
         </span>
         <div className="h-px flex-1 bg-border" />
       </div>

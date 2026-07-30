@@ -2,7 +2,8 @@
 
 import { Package, Store, Crosshair } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { MapFilters } from "@/app/orders/map/page";
+import { useTranslations } from "next-intl";
+import type { MapFilters } from "@/app/[locale]/orders/map/page";
 
 interface MapFilterPanelProps {
   filters: MapFilters;
@@ -17,12 +18,14 @@ export function MapFilterPanel({
   orderCount,
   restaurantCount,
 }: MapFilterPanelProps) {
+  const t = useTranslations("mapPage");
+
   const toggle = (key: keyof MapFilters) => {
     onFiltersChange({ ...filters, [key]: !filters[key] });
   };
 
   return (
-    <div className="fixed top-16 right-4 z-[1000] flex flex-col gap-1.5 rounded-2xl border border-border/50 bg-background/80 p-2 shadow-lg backdrop-blur-xl">
+    <div className="fixed top-16 end-4 z-[1000] flex flex-col gap-1.5 rounded-2xl border border-border/50 bg-background/80 p-2 shadow-lg backdrop-blur-xl">
       <button
         type="button"
         onClick={() => toggle("orders")}
@@ -34,7 +37,7 @@ export function MapFilterPanel({
         )}
       >
         <Package className="h-3.5 w-3.5" />
-        <span>Orders</span>
+        <span>{t("filterOrders")}</span>
         <span
           className={cn(
             "ml-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-semibold",
@@ -58,7 +61,7 @@ export function MapFilterPanel({
         )}
       >
         <Store className="h-3.5 w-3.5" />
-        <span>Restaurants</span>
+        <span>{t("filterRestaurants")}</span>
         <span
           className={cn(
             "ml-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-semibold",
@@ -82,7 +85,7 @@ export function MapFilterPanel({
         )}
       >
         <Crosshair className="h-3.5 w-3.5" />
-        <span>My Location</span>
+        <span>{t("filterMyLocation")}</span>
       </button>
     </div>
   );

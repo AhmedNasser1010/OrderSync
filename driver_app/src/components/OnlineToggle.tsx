@@ -2,6 +2,7 @@
 
 import { useToggleOnlineStatusMutation } from "@/rtk/api/firestoreApi";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslations } from "next-intl";
 
 interface OnlineToggleProps {
   byManager: boolean;
@@ -14,6 +15,7 @@ export function OnlineToggle({
   byUser,
   permissionState,
 }: OnlineToggleProps) {
+  const t = useTranslations("onlineToggle");
   const { user } = useAuth();
   const driverUid = user?.uid ?? "";
   const [toggleOnline, { isLoading }] = useToggleOnlineStatusMutation();
@@ -23,12 +25,12 @@ export function OnlineToggle({
   const isTracking = isOnline && permissionState === "granted";
 
   const label = (() => {
-    if (isTracking) return "Tracking · Online";
-    if (isOnline && permissionState === "prompt") return "Tracking · Location needed";
+    if (isTracking) return t("online");
+    if (isOnline && permissionState === "prompt") return t("locationNeeded");
     if (permissionState === "denied" || permissionState === "unsupported") {
-      return "Tracking · No location access";
+      return t("noLocationAccess");
     }
-    return "Tracking · Offline";
+    return t("offline");
   })();
 
   const dotClassName = (() => {

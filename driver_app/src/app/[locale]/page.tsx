@@ -1,14 +1,20 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
+import { useAuth } from "@/contexts/AuthContext";
 
-export default function OrdersPage() {
+export default function Home() {
   const router = useRouter();
+  const { user, isAuthLoading } = useAuth();
 
   useEffect(() => {
-    router.replace("/orders/active");
-  }, [router]);
+    if (user) {
+      router.push("/orders/active");
+    } else if (!isAuthLoading) {
+      router.push("/auth/signin");
+    }
+  }, [user, isAuthLoading, router]);
 
   return (
     <div className="flex flex-1 items-center justify-center">

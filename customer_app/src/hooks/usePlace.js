@@ -170,6 +170,7 @@ const usePlace = () => {
       business: {
         id: currentRes.accessToken,
         name: currentRes.profile.name,
+        nameInAr: currentRes.profile.nameInAr,
         phone: currentRes.owner.phone,
         address: currentRes.profile.address,
         latlng: currentRes.profile.latlng,

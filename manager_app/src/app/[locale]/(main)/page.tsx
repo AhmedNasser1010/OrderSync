@@ -3,7 +3,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
-import { BarChart3, Calendar, Inbox, ChevronDown } from "lucide-react";
+import { BarChart3, Calendar, ChevronDown } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 import {
   Select,
@@ -39,6 +39,7 @@ import {
 } from "@/lib/rtk/slices/toggleSlice";
 import useAnalytics from "@/hooks/useAnalytics";
 import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton";
+import NoData from "@/components/dashboard/no-data";
 
 export default function Component() {
   const { dashboardData, hasData, loading } = useAnalytics();
@@ -152,15 +153,7 @@ export default function Component() {
         {loading ? (
           <DashboardSkeleton />
         ) : !hasData ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <Inbox className="w-12 h-12 text-muted-foreground mb-4" />
-            <h2 className="text-lg font-semibold text-foreground mb-2">
-              {tNoData("title")}
-            </h2>
-            <p className="text-sm text-muted-foreground max-w-sm">
-              {tNoData("description")}
-            </p>
-          </div>
+          <NoData title={tNoData("title")} description={tNoData("description")} />
         ) : (
           <>
             <KPICards kpis={dashboardData.kpis} />

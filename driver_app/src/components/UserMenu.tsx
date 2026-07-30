@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { Settings2 } from "lucide-react";
 import { UserAvatar } from "@/components/user-avatar";
 import useUser from "@/hooks/useUser";
+import { useTranslations } from "next-intl";
 
 export function UserMenu() {
+  const t = useTranslations("userMenu");
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const { name } = useUser();
@@ -60,7 +62,7 @@ export function UserMenu() {
             className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-muted"
           >
             <Settings2 className="h-4 w-4 text-muted-foreground" />
-            Settings
+            {t("settings")}
           </Link>
         </div>
       )}

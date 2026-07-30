@@ -1,0 +1,204 @@
+{
+  "common": {
+    "loading": "جارٍ التحميل...",
+    "cancel": "إلغاء",
+    "call": "اتصال",
+    "save": "حفظ",
+    "claim": "استلام",
+    "claiming": "جارٍ الاستلام...",
+    "logout": "تسجيل الخروج",
+    "loggingOut": "جارٍ تسجيل الخروج...",
+    "settings": "الإعدادات",
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "or": "أو"
+  },
+  "auth": {
+    "signIn": "تسجيل الدخول",
+    "createAccount": "إنشاء حساب",
+    "dontHaveAccount": "ليس لديك حساب؟",
+    "alreadyHaveAccount": "لديك حساب بالفعل؟",
+    "signUp": "اشتراك",
+    "signInLink": "تسجيل الدخول",
+    "continueWithGoogle": "المتابعة مع Google",
+    "or": "أو",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "name@example.com",
+    "password": "كلمة المرور",
+    "passwordPlaceholderSignUp": "6 أحرف على الأقل",
+    "passwordPlaceholderSignIn": "أدخل كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+    "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين",
+    "anErrorOccurred": "حدث خطأ",
+    "loading": "جارٍ التحميل..."
+  },
+  "authLayout": {
+    "title": "سائق",
+    "subtitle": "إدارة توصيلاتك بسهولة",
+    "copyright": "\u00a9 2025 السائق. جميع الحقوق محفوظة."
+  },
+  "bottomNav": {
+    "myOrders": "طلباتي",
+    "marketplace": "السوق",
+    "map": "الخريطة"
+  },
+  "header": {
+    "myOrders": "طلباتي",
+    "marketplace": "السوق",
+    "map": "الخريطة",
+    "settings": "الإعدادات"
+  },
+  "orderCard": {
+    "reserved": "محجوز",
+    "pickedUp": "تم الاستلام",
+    "onRoute": "في الطريق",
+    "delivered": "تم التوصيل",
+    "available": "متاح",
+    "received": "تم الاستلام",
+    "accepted": "مقبول",
+    "preparing": "جارٍ التحضير",
+    "feedback": "تقييم",
+    "canceled": "ملغي",
+    "rejected": "مرفوض",
+    "voided": "ملغى",
+    "urgent": "عاجل",
+    "waiting": "انتظار",
+    "actionFailed": "فشلت العملية. حاول مرة أخرى.",
+    "item": "{count} صنف",
+    "items": "{count} أصناف",
+    "startDelivery": "بدء التوصيل",
+    "startRoute": "بدء المسار",
+    "completeDelivery": "إكمال التوصيل",
+    "cancel": "إلغاء",
+    "call": "اتصال",
+    "claimOrder": "استلام الطلب"
+  },
+  "noOrders": {
+    "clearSearch": "مسح البحث"
+  },
+  "recommendedOrders": {
+    "km": " كم",
+    "m": " م",
+    "alreadyTaken": "تم الاستلام بالفعل",
+    "failedToClaim": "فشل الاستلام",
+    "item": "{count} صنف",
+    "items": "{count} أصناف",
+    "claiming": "جارٍ الاستلام...",
+    "claim": "استلام",
+    "batchClaimFailed": "فشل استلام الطلبات. ربما تم استلامها بالفعل.",
+    "somethingWentWrong": "حدث خطأ ما. حاول مرة أخرى.",
+    "recommendedRoute": "المسار المقترح",
+    "order": "{count} طلب",
+    "orders": "{count} طلبات",
+    "route": " مسار",
+    "save": "توفير ",
+    "itemsTotal": "{count} أصناف إجمالاً",
+    "claimAll": "استلام الكل ({count})",
+    "orClaimIndividually": "أو الاستلام بشكل فردي"
+  },
+  "location": {
+    "notSupported": "الموقع الجغرافي غير مدعوم في متصفحك",
+    "accessDenied": "تم رفض الوصول إلى الموقع. فعّله في إعدادات المتصفح للاتصال."
+  },
+  "finance": {
+    "blocked": "رصيدك النقدي (${amount}) بلغ الحد الأقصى (${limit}). لا يمكنك استلام طلبات جديدة.",
+    "warning": "رصيدك النقدي (${amount}) بلغ حد التحذير (${limit})."
+  },
+  "userMenu": {
+    "settings": "الإعدادات"
+  },
+  "onlineToggle": {
+    "online": "تتبع \u00b7 متصل",
+    "locationNeeded": "تتبع \u00b7 الموقع مطلوب",
+    "noLocationAccess": "تتبع \u00b7 لا يوجد وصول للموقع",
+    "offline": "تتبع \u00b7 غير متصل"
+  },
+  "accountSetup": {
+    "title": "أكمل تسجيلك",
+    "description": "تم إنشاء حسابك بنجاح. يرجى إكمال تسجيلك بالتواصل مع مديرك. سيقوم بإعداد ملفك الشخصي وتفعيل حسابك."
+  },
+  "orderDetail": {
+    "loadingOrder": "جارٍ تحميل الطلب...",
+    "customer": "العميل",
+    "items": "الأصناف",
+    "total": "الإجمالي",
+    "orderNotes": "ملاحظات الطلب",
+    "navigate": "تنقل",
+    "goBack": "العودة",
+    "noDeliveryLocation": "لا يوجد موقع توصيل متاح",
+    "ready": "جاهز {time}",
+    "claimOrder": "استلام الطلب",
+    "limitReached": "تم الوصول للحد",
+    "startDelivery": "بدء التوصيل",
+    "startRoute": "بدء المسار",
+    "completeDelivery": "إكمال التوصيل",
+    "starting": "جارٍ البدء...",
+    "startingRoute": "جارٍ بدء المسار...",
+    "completing": "جارٍ الإكمال...",
+    "canceling": "جارٍ الإلغاء...",
+    "claiming2": "جارٍ الاستلام...",
+    "call": "اتصال",
+    "cancel": "إلغاء",
+    "failedToClaim": "فشل استلام الطلب",
+    "failedToStartDelivery": "فشل بدء التوصيل",
+    "failedToStartRoute": "فشل بدء المسار",
+    "failedToComplete": "فشل إكمال التوصيل",
+    "failedToCancel": "فشل إلغاء الطلب"
+  },
+  "mapPage": {
+    "loadingMap": "جارٍ تحميل الخريطة...",
+    "filterOrders": "الطلبات",
+    "filterRestaurants": "المطاعم",
+    "filterMyLocation": "موقعي",
+    "searchPlaceholder": "ابحث عن طلبات، مطاعم...",
+    "noResultsFound": "لا توجد نتائج",
+    "countOrders": "{count} طلبات",
+    "clearRoute": "مسح المسار إلى {label}",
+    "ordersAvailable": "{count} متاح",
+    "ordersActive": "{count} نشط",
+    "noOrdersFromRestaurant": "لا توجد طلبات من هذا المطعم",
+    "navigate": "تنقل",
+    "maps": "خرائط",
+    "close": "إغلاق"
+  },
+  "activeOrders": {
+    "loadingOrders": "جارٍ تحميل الطلبات...",
+    "failedToLoad": "فشل تحميل الطلبات",
+    "searchPlaceholder": "ابحث عن طلب بالرقم أو العميل أو الصنف أو الحالة",
+    "noMatchingOrders": "لا توجد طلبات مطابقة",
+    "noMatchingOrdersDesc": "جرب رقم طلب أو اسم عميل أو صنف أو حالة مختلف",
+    "noActiveOrders": "لا توجد طلبات نشطة",
+    "noActiveOrdersDesc": "استلم طلباً من السوق للبدء"
+  },
+  "marketplace": {
+    "loadingOrders": "جارٍ تحميل الطلبات...",
+    "failedToLoad": "فشل تحميل الطلبات",
+    "searchPlaceholder": "ابحث عن طلب بالرقم أو العميل أو الصنف أو الحالة",
+    "noMatchingOrders": "لا توجد طلبات مطابقة",
+    "noMatchingOrdersDesc": "جرب رقم طلب أو اسم عميل أو صنف أو حالة مختلف",
+    "noOrdersAvailable": "لا توجد طلبات متاحة",
+    "noOrdersAvailableDesc": "ستظهر الطلبات الجديدة هنا",
+    "limitReached": "تم الوصول للحد المالي",
+    "limitReachedDesc": "رصيدك النقدي (${amount}) بلغ الحد الأقصى (${limit}). تواصل مع مديرك للمتابعة."
+  },
+  "settings": {
+    "theme": "المظهر",
+    "themeDesc": "التبديل بين الوضع الفاتح والداكن.",
+    "language": "اللغة",
+    "languageDesc": "التبديل بين الإنجليزية والعربية.",
+    "logout": "تسجيل الخروج",
+    "logoutDesc": "تسجيل الخروج من حسابك.",
+    "logoutConfirm": "تسجيل الخروج",
+    "logoutConfirmDesc": "هل أنت متأكد من تسجيل الخروج؟",
+    "loggingOut": "جارٍ تسجيل الخروج..."
+  },
+  "mapOrderPopup": {
+    "processing": "جارٍ المعالجة...",
+    "navigate": "تنقل",
+    "maps": "خرائط",
+    "close": "إغلاق",
+    "actionFailed": "فشلت العملية. حاول مرة أخرى.",
+    "limitReached": "تم الوصول للحد"
+  }
+}

@@ -14,7 +14,9 @@ import { MapOrderPopup } from "./MapOrderPopup";
 import { MapRestaurantPopup } from "./MapRestaurantPopup";
 import { MapSearch } from "./MapSearch";
 import { X } from "lucide-react";
-import type { MapFilters } from "@/app/orders/map/page";
+import { useTranslations } from "next-intl";
+import { useBusinessDisplayName } from "@/contexts/BusinessNamesContext";
+import type { MapFilters } from "@/app/[locale]/orders/map/page";
 import type { OrderType } from "@ordersync/types";
 import type { DriverPosition } from "@/hooks/useDriverLocation";
 import "leaflet/dist/leaflet.css";
@@ -34,6 +36,7 @@ export function FullMap({
   filters,
   onFiltersChange,
 }: FullMapProps) {
+  const t = useTranslations("mapPage");
   const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
   const [selectedRestaurant, setSelectedRestaurant] = useState<{
     id: string;
@@ -91,7 +94,7 @@ export function FullMap({
       } else {
         map.set(id, {
           id,
-          name: order.business?.name ?? "",
+          name: order.business?.nameInAr ?? order.business?.name ?? "",
           address: order.business?.address,
           latlng: ll,
           orders: [order],
@@ -164,7 +167,7 @@ export function FullMap({
         } else {
           map.set(id, {
             id,
-            name: order.business?.name ?? "",
+          name: order.business?.name ?? "",
             address: order.business?.address,
             latlng: ll,
             orders: [order],
@@ -273,7 +276,7 @@ export function FullMap({
           className="fixed bottom-24 left-4 right-4 z-[1100] flex items-center justify-center gap-2 rounded-2xl border border-border/50 bg-card px-4 py-3 text-sm font-medium shadow-xl transition-colors hover:bg-muted"
         >
           <X className="h-4 w-4" />
-          Clear route to {activeRoute.label}
+          {t("clearRoute", { label: activeRoute.label })}
         </button>
       )}
 
@@ -283,6 +286,7 @@ export function FullMap({
 
       {selectedRestaurant && (
         <MapRestaurantPopup
+          businessId={selectedRestaurant.id}
           restaurantName={selectedRestaurant.name}
           restaurantAddress={selectedRestaurant.address}
           restaurantLatlng={selectedRestaurant.latlng}

@@ -23,7 +23,7 @@ import { canTransition, getTimelineField, isMarketplaceVisible, isFinalStatus } 
 export const firestoreApi = createApi({
   reducerPath: "firestoreApi",
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["UserData", "DriverProfile", "MarketplaceOrders", "MyOrders"],
+  tagTypes: ["UserData", "DriverProfile", "MarketplaceOrders", "MyOrders", "BusinessNames"],
   endpoints: (builder) => ({
     fetchUserData: builder.query<
       Pick<Driver, "userInfo" | "online" | "finance">,
@@ -535,6 +535,41 @@ export const firestoreApi = createApi({
       },
     }),
 
+    fetchBusinessNames: builder.query<
+      Record<string, { nameInAr: string }>,
+      string[]
+    >({
+      async queryFn(businessIds) {
+        if (!businessIds.length) return { data: {} };
+        try {
+          const uniqueIds = [...new Set(businessIds)];
+          if (uniqueIds.length === 0) return { data: {} };
+          const refs = uniqueIds.map((id) => doc(db, "businesses", id));
+          const snapshots = await Promise.all(
+            refs.map((ref) => getDoc(ref)),
+          );
+          const result: Record<string, { nameInAr: string }> = {};
+          for (let i = 0; i < uniqueIds.length; i++) {
+            const snap = snapshots[i];
+            if (snap.exists()) {
+              const data = snap.data();
+              const nameInAr = data?.profile?.nameInAr;
+              if (nameInAr) {
+                result[uniqueIds[i]] = { nameInAr };
+              }
+            }
+          }
+          return { data: result };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          console.error("Error fetching business names:", message);
+          return { error: { message, data: "" } };
+        }
+      },
+      providesTags: (_result, _error, ids) =>
+        ids.map((id) => ({ type: "BusinessNames" as const, id })),
+    }),
+
     toggleOnlineStatus: builder.mutation<
       boolean,
       { uid: string; byUser: boolean }
@@ -572,4 +607,5 @@ export const {
   useStartRouteMutation,
   useCancelOrderMutation,
   useToggleOnlineStatusMutation,
+  useFetchBusinessNamesQuery,
 } = firestoreApi;

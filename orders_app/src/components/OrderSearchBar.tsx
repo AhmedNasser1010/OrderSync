@@ -9,7 +9,7 @@ type OrderSearchBarProps = {
   placeholder: string;
 };
 
-export function OrderSearchBar({
+export default function OrderSearchBar({
   value,
   onChange,
   placeholder,

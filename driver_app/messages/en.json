@@ -1,0 +1,204 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "call": "Call",
+    "save": "Save",
+    "claim": "Claim",
+    "claiming": "Claiming...",
+    "logout": "Logout",
+    "loggingOut": "Logging out...",
+    "settings": "Settings",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "or": "or"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "createAccount": "Create Account",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "signUp": "Sign up",
+    "signInLink": "Sign in",
+    "continueWithGoogle": "Continue with Google",
+    "or": "or",
+    "email": "Email",
+    "emailPlaceholder": "name@example.com",
+    "password": "Password",
+    "passwordPlaceholderSignUp": "At least 6 characters",
+    "passwordPlaceholderSignIn": "Enter your password",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "anErrorOccurred": "An error occurred",
+    "loading": "Loading..."
+  },
+  "authLayout": {
+    "title": "Driver",
+    "subtitle": "Manage your deliveries with ease",
+    "copyright": "\u00a9 2025 Driver. All rights reserved."
+  },
+  "bottomNav": {
+    "myOrders": "My Orders",
+    "marketplace": "Marketplace",
+    "map": "Map"
+  },
+  "header": {
+    "myOrders": "My Orders",
+    "marketplace": "Marketplace",
+    "map": "Map",
+    "settings": "Settings"
+  },
+  "orderCard": {
+    "reserved": "Reserved",
+    "pickedUp": "Picked Up",
+    "onRoute": "On Route",
+    "delivered": "Delivered",
+    "available": "Available",
+    "received": "Received",
+    "accepted": "Accepted",
+    "preparing": "Preparing",
+    "feedback": "Feedback",
+    "canceled": "Canceled",
+    "rejected": "Rejected",
+    "voided": "Voided",
+    "urgent": "Urgent",
+    "waiting": "Waiting",
+    "actionFailed": "Action failed. Please try again.",
+    "item": "{count} item",
+    "items": "{count} items",
+    "startDelivery": "Start Delivery",
+    "startRoute": "Start Route",
+    "completeDelivery": "Complete Delivery",
+    "cancel": "Cancel",
+    "call": "Call",
+    "claimOrder": "Claim Order"
+  },
+  "noOrders": {
+    "clearSearch": "Clear search"
+  },
+  "recommendedOrders": {
+    "km": " km",
+    "m": " m",
+    "alreadyTaken": "Already taken",
+    "failedToClaim": "Failed to claim",
+    "item": "{count} item",
+    "items": "{count} items",
+    "claiming": "Claiming...",
+    "claim": "Claim",
+    "batchClaimFailed": "Failed to claim orders. They may have been taken already.",
+    "somethingWentWrong": "Something went wrong. Please try again.",
+    "recommendedRoute": "Recommended Route",
+    "order": "{count} order",
+    "orders": "{count} orders",
+    "route": " route",
+    "save": "Save ",
+    "itemsTotal": "{count} items total",
+    "claimAll": "Claim All {count} Orders",
+    "orClaimIndividually": "or claim individually"
+  },
+  "location": {
+    "notSupported": "Geolocation is not supported by your browser",
+    "accessDenied": "Location access denied. Enable it in your browser settings to go online."
+  },
+  "finance": {
+    "blocked": "Your cash balance (${amount}) has reached the limit (${limit}). You cannot claim new orders.",
+    "warning": "Your cash balance (${amount}) has reached the warning limit (${limit})."
+  },
+  "userMenu": {
+    "settings": "Settings"
+  },
+  "onlineToggle": {
+    "online": "Tracking \u00b7 Online",
+    "locationNeeded": "Tracking \u00b7 Location needed",
+    "noLocationAccess": "Tracking \u00b7 No location access",
+    "offline": "Tracking \u00b7 Offline"
+  },
+  "accountSetup": {
+    "title": "Complete Your Registration",
+    "description": "Your account has been created successfully. Please complete your registration by contacting your manager. They will set up your profile and activate your account."
+  },
+  "orderDetail": {
+    "loadingOrder": "Loading order...",
+    "customer": "Customer",
+    "items": "Items",
+    "total": "Total",
+    "orderNotes": "Order Notes",
+    "navigate": "Navigate",
+    "goBack": "Go back",
+    "noDeliveryLocation": "No delivery location available",
+    "ready": "Ready {time}",
+    "claimOrder": "Claim Order",
+    "limitReached": "Limit Reached",
+    "startDelivery": "Start Delivery",
+    "startRoute": "Start Route",
+    "completeDelivery": "Complete Delivery",
+    "starting": "Starting...",
+    "startingRoute": "Starting Route...",
+    "completing": "Completing...",
+    "canceling": "Canceling...",
+    "claiming2": "Claiming...",
+    "call": "Call",
+    "cancel": "Cancel",
+    "failedToClaim": "Failed to claim order",
+    "failedToStartDelivery": "Failed to start delivery",
+    "failedToStartRoute": "Failed to start route",
+    "failedToComplete": "Failed to complete delivery",
+    "failedToCancel": "Failed to cancel order"
+  },
+  "mapPage": {
+    "loadingMap": "Loading map...",
+    "filterOrders": "Orders",
+    "filterRestaurants": "Restaurants",
+    "filterMyLocation": "My Location",
+    "searchPlaceholder": "Search orders, restaurants...",
+    "noResultsFound": "No results found",
+    "countOrders": "{count} orders",
+    "clearRoute": "Clear route to {label}",
+    "ordersAvailable": "{count} available",
+    "ordersActive": "{count} active",
+    "noOrdersFromRestaurant": "No orders from this restaurant",
+    "navigate": "Navigate",
+    "maps": "Maps",
+    "close": "Close"
+  },
+  "activeOrders": {
+    "loadingOrders": "Loading orders...",
+    "failedToLoad": "Failed to load orders",
+    "searchPlaceholder": "Search orders by number, customer, item, or status",
+    "noMatchingOrders": "No matching orders",
+    "noMatchingOrdersDesc": "Try a different order number, customer name, item, or status",
+    "noActiveOrders": "No active orders",
+    "noActiveOrdersDesc": "Claim an order from the Marketplace to get started"
+  },
+  "marketplace": {
+    "loadingOrders": "Loading orders...",
+    "failedToLoad": "Failed to load orders",
+    "searchPlaceholder": "Search orders by number, customer, item, or status",
+    "noMatchingOrders": "No matching orders",
+    "noMatchingOrdersDesc": "Try a different order number, customer name, item, or status",
+    "noOrdersAvailable": "No orders available",
+    "noOrdersAvailableDesc": "New orders will appear here",
+    "limitReached": "$ Limit Reached",
+    "limitReachedDesc": "Your cash balance (${amount}) has reached the limit (${limit}). Contact your manager to continue."
+  },
+  "settings": {
+    "theme": "Theme",
+    "themeDesc": "Switch between light and dark mode.",
+    "language": "Language",
+    "languageDesc": "Switch between English and Arabic.",
+    "logout": "Logout",
+    "logoutDesc": "Sign out of your account.",
+    "logoutConfirm": "Logout",
+    "logoutConfirmDesc": "Are you sure you want to log out?",
+    "loggingOut": "Logging out..."
+  },
+  "mapOrderPopup": {
+    "processing": "Processing...",
+    "navigate": "Navigate",
+    "maps": "Maps",
+    "close": "Close",
+    "actionFailed": "Action failed. Please try again.",
+    "limitReached": "Limit Reached"
+  }
+}

@@ -16,7 +16,7 @@ export function AuthGuard({ children }: Props) {
   const { isOnboarded, user, isInitializing } = useAuth();
   const pathname = usePathname();
 
-  const isAuthPage = pathname.startsWith("/auth");
+  const isAuthPage = /^\/[a-z]{2}\/auth\//.test(pathname) || pathname.startsWith("/auth/");
 
   if (isInitializing) {
     return (

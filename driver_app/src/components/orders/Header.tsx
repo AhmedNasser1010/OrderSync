@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname } from "@/i18n/routing";
 import useUser from "@/hooks/useUser";
 import { useGeoPermission } from "@/components/LocationProvider";
 import { OnlineToggle } from "@/components/OnlineToggle";
@@ -8,12 +8,14 @@ import { UserMenu } from "@/components/UserMenu";
 import useDriverFinance from "@/hooks/useDriverFinance";
 import type { ReactNode } from "react";
 import { Package, Store, Settings, Wallet, MapPin } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface OrdersHeaderProps {
   icon?: ReactNode;
 }
 
 export function OrdersHeader({ icon }: OrdersHeaderProps) {
+  const t = useTranslations("header");
   const pathname = usePathname();
   const permissionState = useGeoPermission();
   const { userData } = useUser();
@@ -22,12 +24,12 @@ export function OrdersHeader({ icon }: OrdersHeaderProps) {
   const { currentCash, isWarning, isBlocked, isLoading: financeLoading } = useDriverFinance();
 
   const title = pathname.startsWith("/orders/map")
-    ? "Map"
+    ? t("map")
     : pathname.startsWith("/orders/marketplace")
-      ? "Marketplace"
+      ? t("marketplace")
       : pathname.startsWith("/orders/settings")
-        ? "Settings"
-        : "My Orders";
+        ? t("settings")
+        : t("myOrders");
 
   const pageIcon = icon ?? (
     <>

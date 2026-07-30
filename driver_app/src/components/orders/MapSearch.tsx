@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { Search, X, Store, MapPin } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useBusinessNamesMap } from "@/contexts/BusinessNamesContext";
 import type { OrderType } from "@ordersync/types";
 
 interface MapSearchProps {
@@ -31,7 +33,10 @@ export function MapSearch({
   onSelectOrder,
   onSelectRestaurant,
 }: MapSearchProps) {
+  const t = useTranslations("mapPage");
+  const businessNamesMap = useBusinessNamesMap();
   const [isOpen, setIsOpen] = useState(false);
+
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -68,18 +73,28 @@ export function MapSearch({
   }, [isOpen]);
 
   const results = useMemo<SearchResult[]>(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
+    const raw = query.trim();
+    if (!raw) return [];
+
+    const stripTashkeel = (s: string) =>
+      s.replace(/[\u064B-\u065F\u0670]/g, "");
+    const normalize = (s: string) =>
+      stripTashkeel(s.normalize("NFKC")).toLowerCase();
+    const q = normalize(raw);
 
     const restaurantMap = new Map<
       string,
-      { name: string; address?: string; latlng: [number, number]; count: number }
+      { name: string; nameAr: string; address?: string; latlng: [number, number]; count: number }
     >();
     const matchedOrders: OrderResult[] = [];
+
+    const qTokens = q.split(/\s+/).filter(Boolean);
 
     for (const order of allOrders) {
       const busId = order.business?.id;
       const busName = order.business?.name ?? "";
+      const busNameAr = busId ? (businessNamesMap[busId] ?? busName) : busName;
+      const busNameOrder = order.business?.nameInAr ?? "";
       const busAddress = order.business?.address;
       const busLL = order.business?.latlng;
 
@@ -87,6 +102,7 @@ export function MapSearch({
         if (!restaurantMap.has(busId)) {
           restaurantMap.set(busId, {
             name: busName,
+            nameAr: busNameAr || busNameOrder || busName,
             address: busAddress,
             latlng: busLL,
             count: 0,
@@ -97,6 +113,8 @@ export function MapSearch({
 
       const haystack = [
         busName,
+        busNameAr,
+        busNameOrder,
         busAddress ?? "",
         order.customer?.name ?? "",
         order.delivery?.address ?? "",
@@ -107,22 +125,22 @@ export function MapSearch({
           ?.map((i) => `${i.name} ${i.selectedSize}`)
           .join(" "),
       ]
-        .join(" ")
-        .toLowerCase();
+        .join(" ");
 
-      if (haystack.includes(q)) {
+      const nHaystack = normalize(haystack);
+      if (qTokens.every((tok) => nHaystack.includes(tok))) {
         matchedOrders.push({ type: "order", order });
       }
     }
 
     const matchedRestaurants: RestaurantResult[] = [];
     for (const [id, r] of restaurantMap) {
-      const rHaystack = `${r.name} ${r.address ?? ""}`.toLowerCase();
-      if (rHaystack.includes(q)) {
+      const rHaystack = normalize(`${r.name} ${r.nameAr} ${r.address ?? ""}`);
+      if (qTokens.every((tok) => rHaystack.includes(tok))) {
         matchedRestaurants.push({
           type: "restaurant",
           id,
-          name: r.name,
+          name: r.nameAr,
           address: r.address,
           latlng: r.latlng,
           orderCount: r.count,
@@ -147,7 +165,7 @@ export function MapSearch({
   );
 
   return (
-    <div ref={containerRef} className="fixed top-16 left-4 z-[1000]">
+    <div ref={containerRef} className="fixed top-16 start-4 z-[1000]">
       {isOpen ? (
         <div className="w-[calc(100vw-2rem)] max-w-sm rounded-2xl border border-border/50 bg-background/80 shadow-lg backdrop-blur-xl">
           <div className="flex items-center gap-2 border-b border-border/50 px-3 py-2.5">
@@ -157,7 +175,7 @@ export function MapSearch({
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search orders, restaurants..."
+              placeholder={t("searchPlaceholder")}
               className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
             <button
@@ -176,7 +194,7 @@ export function MapSearch({
             <div className="max-h-[320px] overflow-y-auto p-1.5">
               {results.length === 0 ? (
                 <p className="py-4 text-center text-xs text-muted-foreground">
-                  No results found
+                  {t("noResultsFound")}
                 </p>
               ) : (
                 results.map((result) =>
@@ -201,7 +219,7 @@ export function MapSearch({
                         )}
                       </div>
                       <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                        {result.orderCount} orders
+                        {t("countOrders", { count: result.orderCount })}
                       </span>
                     </button>
                   ) : (

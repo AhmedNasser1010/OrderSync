@@ -7,6 +7,8 @@ import type { useOrderActions } from "@/hooks/useOrderActions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn, formatRelativeTime } from "@/lib/utils";
+import { useTranslations } from "next-intl";
+import { useBusinessDisplayName } from "@/contexts/BusinessNamesContext";
 import {
   MapPin,
   ShoppingBag,
@@ -17,87 +19,75 @@ import {
 
 export const STATUS_CONFIG: Record<
   OrderStatusType,
-  { label: string; color: string; dot: string; accent: string; progress: number }
+  { color: string; dot: string; accent: string; progress: number }
 > = {
   RESERVED: {
-    label: "Reserved",
     color: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
     dot: "bg-blue-500",
     accent: "border-l-blue-500",
     progress: 1,
   },
   PICKED_UP: {
-    label: "Picked Up",
     color: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
     dot: "bg-amber-500",
     accent: "border-l-amber-500",
     progress: 2,
   },
   ON_ROUTE: {
-    label: "On Route",
     color: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
     dot: "bg-purple-500",
     accent: "border-l-purple-500",
     progress: 3,
   },
   DELIVERED: {
-    label: "Delivered",
     color: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
     dot: "bg-green-500",
     accent: "border-l-green-500",
     progress: 3,
   },
   READY: {
-    label: "Available",
     color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
     dot: "bg-emerald-500",
     accent: "border-l-emerald-500",
     progress: 0,
   },
   RECEIVED: {
-    label: "Received",
     color: "bg-gray-100 text-gray-800 dark:bg-gray-800/40 dark:text-gray-300",
     dot: "bg-gray-500",
     accent: "border-l-gray-400",
     progress: 0,
   },
   ACCEPTED: {
-    label: "Accepted",
     color: "bg-gray-100 text-gray-800 dark:bg-gray-800/40 dark:text-gray-300",
     dot: "bg-gray-500",
     accent: "border-l-gray-400",
     progress: 0,
   },
   PREPARING: {
-    label: "Preparing",
     color: "bg-gray-100 text-gray-800 dark:bg-gray-800/40 dark:text-gray-300",
     dot: "bg-gray-500",
     accent: "border-l-gray-400",
     progress: 0,
   },
   GIVEN_FEEDBACK: {
-    label: "Feedback",
     color: "bg-gray-100 text-gray-800 dark:bg-gray-800/40 dark:text-gray-300",
     dot: "bg-gray-500",
     accent: "border-l-gray-400",
     progress: 0,
   },
   CANCELED: {
-    label: "Canceled",
     color: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
     dot: "bg-red-500",
     accent: "border-l-red-500",
     progress: 0,
   },
   REJECTED: {
-    label: "Rejected",
     color: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
     dot: "bg-red-500",
     accent: "border-l-red-500",
     progress: 0,
   },
   VOIDED: {
-    label: "Voided",
     color: "bg-gray-100 text-gray-800 dark:bg-gray-800/40 dark:text-gray-300",
     dot: "bg-gray-500",
     accent: "border-l-gray-400",
@@ -109,10 +99,25 @@ export function getStatusBadgeClass(status: OrderStatusType): string {
   return STATUS_CONFIG[status]?.color ?? STATUS_CONFIG.READY.color;
 }
 
+export const STATUS_TRANSLATION_KEY: Record<OrderStatusType, string> = {
+  RESERVED: "reserved",
+  PICKED_UP: "pickedUp",
+  ON_ROUTE: "onRoute",
+  DELIVERED: "delivered",
+  READY: "available",
+  RECEIVED: "received",
+  ACCEPTED: "accepted",
+  PREPARING: "preparing",
+  GIVEN_FEEDBACK: "feedback",
+  CANCELED: "canceled",
+  REJECTED: "rejected",
+  VOIDED: "voided",
+};
+
 const PROGRESS_STEPS = [
-  { status: "RESERVED", label: "Reserved" },
-  { status: "PICKED_UP", label: "Picked Up" },
-  { status: "ON_ROUTE", label: "On Route" },
+  "reserved",
+  "pickedUp",
+  "onRoute",
 ] as const;
 
 const STALE_WARNING_MS = 3 * 60 * 1000;
@@ -128,16 +133,17 @@ function getStaleLevel(readyAt: number): StaleLevel {
 }
 
 function ProgressStepper({ current }: { current: OrderStatusType }) {
+  const t = useTranslations("orderCard");
   const currentProgress = STATUS_CONFIG[current]?.progress ?? 0;
 
   return (
     <div className="w-full space-y-1.5">
       <div className="flex items-center gap-2">
-        {PROGRESS_STEPS.map((step, i) => {
+        {PROGRESS_STEPS.map((stepKey, i) => {
           const isActive = i + 1 <= currentProgress;
           const isCurrent = i + 1 === currentProgress;
           return (
-            <div key={step.status} className="flex items-center flex-1 gap-2">
+            <div key={stepKey} className="flex items-center flex-1 gap-2">
               <div
                 className={cn(
                   "size-2.5 rounded-full shrink-0 transition-colors",
@@ -158,11 +164,11 @@ function ProgressStepper({ current }: { current: OrderStatusType }) {
         })}
       </div>
       <div className="flex justify-between">
-        {PROGRESS_STEPS.map((step, i) => {
+        {PROGRESS_STEPS.map((stepKey, i) => {
           const isActive = i + 1 <= currentProgress;
           return (
             <span
-              key={step.status}
+              key={stepKey}
               className={cn(
                 "text-[10px] w-16 text-center",
                 isActive
@@ -170,7 +176,7 @@ function ProgressStepper({ current }: { current: OrderStatusType }) {
                   : "text-muted-foreground"
               )}
             >
-              {step.label}
+              {t(stepKey)}
             </span>
           );
         })}
@@ -192,12 +198,13 @@ export function OrderCard({
   driverUid,
   actions,
 }: OrderCardProps) {
+  const t = useTranslations("orderCard");
   const status = order.status?.current as OrderStatusType;
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.READY;
   const address = order.delivery?.address ?? "";
   const customerName = order.customer?.name ?? "";
   const customerPhone = order.customer?.phone ?? "";
-  const businessName = order.business?.name ?? "";
+  const businessName = useBusinessDisplayName(order.business?.id, order.business?.name);
   const totalPrice = order.pricing?.total ?? 0;
   const itemCount = order.cart?.length ?? 0;
   const displayTime =
@@ -228,10 +235,10 @@ export function OrderCard({
       try {
         await action();
       } catch {
-        alert("Action failed. Please try again.");
+        alert(t("actionFailed"));
       }
     },
-    []
+    [t]
   );
 
   const cardDisplay = (
@@ -257,7 +264,11 @@ export function OrderCard({
               !isStale && config.color
             )}
           >
-            {isCritical ? "Urgent" : isWarning ? "Waiting" : config.label}
+            {isCritical
+              ? t("urgent")
+              : isWarning
+                ? t("waiting")
+                : t(STATUS_TRANSLATION_KEY[status] ?? "available")}
           </span>
         </div>
         <span className="text-sm font-bold tabular-nums">
@@ -296,7 +307,7 @@ export function OrderCard({
         <div className="flex items-center gap-1.5">
           <ShoppingBag className="size-3.5 text-muted-foreground" />
           <span className="text-xs text-muted-foreground">
-            {itemCount} {itemCount === 1 ? "item" : "items"}
+            {t(itemCount === 1 ? "item" : "items", { count: itemCount })}
           </span>
         </div>
         <div
@@ -332,7 +343,7 @@ export function OrderCard({
               }
               disabled={actions.isLoading}
             >
-              Start Delivery
+              {t("startDelivery")}
             </Button>
             <Button
               size="lg"
@@ -342,7 +353,7 @@ export function OrderCard({
               }
               disabled={actions.isLoading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
           </>
         )}
@@ -352,7 +363,7 @@ export function OrderCard({
               <Button size="lg" variant="outline" className="gap-1.5" asChild>
                 <span>
                   <Phone className="size-3.5" />
-                  Call
+                  {t("call")}
                 </span>
               </Button>
             </a>
@@ -366,7 +377,7 @@ export function OrderCard({
               }
               disabled={actions.isLoading}
             >
-              Start Route
+              {t("startRoute")}
             </Button>
             <Button
               size="lg"
@@ -376,7 +387,7 @@ export function OrderCard({
               }
               disabled={actions.isLoading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
           </>
         )}
@@ -386,7 +397,7 @@ export function OrderCard({
               <Button size="lg" variant="outline" className="gap-1.5" asChild>
                 <span>
                   <Phone className="size-3.5" />
-                  Call
+                  {t("call")}
                 </span>
               </Button>
             </a>
@@ -400,7 +411,7 @@ export function OrderCard({
               }
               disabled={actions.isLoading}
             >
-              Complete Delivery
+              {t("completeDelivery")}
             </Button>
             <Button
               size="lg"
@@ -410,7 +421,7 @@ export function OrderCard({
               }
               disabled={actions.isLoading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
           </>
         )}

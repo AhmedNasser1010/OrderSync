@@ -11,7 +11,8 @@
     "import:auth": "tsx importAuth.ts",
     "auth:create": "tsx createAuthUsersFromFirestore.ts",
     "clone": "npm run export && npm run import",
-    "clone:auth": "tsx clone.ts --auth"
+    "clone:auth": "tsx clone.ts --auth",
+    "backfill:nameInAr": "tsx backfillBusinessNameInAr.ts"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

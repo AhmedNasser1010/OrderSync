@@ -5,7 +5,6 @@ import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AuthGuard } from "./AuthProvider";
-import { HtmlAttributes } from "@/components/HtmlAttributes";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -31,11 +30,9 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
       suppressHydrationWarning
       className="h-full antialiased"
     >
-      <HtmlAttributes locale="en" fontClass={inter.variable} />
       <head>
         <Script
           id="theme-init"

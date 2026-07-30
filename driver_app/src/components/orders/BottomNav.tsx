@@ -1,18 +1,19 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/routing";
 import { Package, Store, Map } from "lucide-react";
 import { useMarketplaceOrders, useMyOrders } from "@/hooks/useOrders";
 import { cn } from "@/lib/utils";
-
-const tabs = [
-  { href: "/orders/active", label: "My Orders", icon: Package },
-  { href: "/orders/marketplace", label: "Marketplace", icon: Store },
-  { href: "/orders/map", label: "Map", icon: Map },
-] as const;
+import { useTranslations } from "next-intl";
 
 export function BottomNav() {
+  const t = useTranslations("bottomNav");
+  const tabs = [
+    { href: "/orders/active", label: t("myOrders"), icon: Package },
+    { href: "/orders/marketplace", label: t("marketplace"), icon: Store },
+    { href: "/orders/map", label: t("map"), icon: Map },
+  ] as const;
+
   const pathname = usePathname();
   const router = useRouter();
   const { orders: myOrders } = useMyOrders();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Calendar, Inbox } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { AppHeader } from "@/components/dashboard/app-header";
 import { TodayKPICards } from "@/components/today/today-kpi-cards";
 import { TodayBalanceCard } from "@/components/today/today-balance-card";
@@ -12,6 +12,7 @@ import { TodayTopItems } from "@/components/today/today-top-items";
 import { TodayCustomerInsights } from "@/components/today/today-customer-insights";
 import useTodayOrders from "@/hooks/useTodayOrders";
 import { TodaySkeleton } from "@/components/today/today-skeleton";
+import NoData from "@/components/dashboard/no-data";
 
 export default function TodayPage() {
   const { todayData, loading, hasData } = useTodayOrders();
@@ -29,15 +30,7 @@ export default function TodayPage() {
         {loading ? (
           <TodaySkeleton />
         ) : !hasData ? (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <Inbox className="w-12 h-12 text-muted-foreground mb-4" />
-            <h2 className="text-lg font-semibold text-foreground mb-2">
-              {t("noData.title")}
-            </h2>
-            <p className="text-sm text-muted-foreground max-w-sm">
-              {t("noData.description")}
-            </p>
-          </div>
+          <NoData title={t("noData.title")} description={t("noData.description")} />
         ) : (
           <>
             <TodayKPICards data={todayData} />

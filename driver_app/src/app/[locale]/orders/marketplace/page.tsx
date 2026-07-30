@@ -8,43 +8,29 @@ import { RecommendedOrders } from "@/components/orders/RecommendedOrders";
 import { OrderSearchBar } from "@/components/orders/OrderSearchBar";
 import { NoOrders } from "@/components/orders/NoOrders";
 import useDriverFinance from "@/hooks/useDriverFinance";
+import { useBusinessNamesMap } from "@/contexts/BusinessNamesContext";
 import { Ban } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-function matchesSearch(order: {
-  id: string;
-  orderNumber: number;
-  customer?: { name?: string };
-  business?: { name?: string };
-  delivery?: { address?: string };
-  status?: { current?: string };
-  cart?: { name: string; selectedSize: string; quantity: number }[];
-}, query: string) {
-  const haystack = [
-    order.id,
-    `#${order.orderNumber}`,
-    order.orderNumber.toString(),
-    order.customer?.name ?? "",
-    order.business?.name ?? "",
-    order.delivery?.address ?? "",
-    order.status?.current ?? "",
-    order.cart
-      ?.map((item) => `${item.name} ${item.selectedSize} ${item.quantity}`)
-      .join(" "),
-  ]
-    .join(" ")
-    .toLowerCase();
+const stripTashkeel = (s: string) => s.replace(/[\u064B-\u065F\u0670]/g, "");
+const normalize = (s: string) => stripTashkeel(s.normalize("NFKC")).toLowerCase();
 
-  return haystack.includes(query);
+function tokenMatch(text: string, queryTokens: string[]) {
+  const n = normalize(text);
+  return queryTokens.every((tok) => n.includes(tok));
 }
 
 export default function MarketplacePage() {
+  const t = useTranslations("marketplace");
   const { orders, isLoading, error } = useMarketplaceOrders();
   const { recommendedOrderIds } = useRecommendedOrders();
+  const businessNamesMap = useBusinessNamesMap();
   const [searchQuery, setSearchQuery] = useState("");
   const { currentCash, blockLimit, isBlocked, isLoading: financeLoading } = useDriverFinance();
 
-  const normalizedSearch = searchQuery.trim().toLowerCase();
-  const isSearching = normalizedSearch.length > 0;
+  const normalizedSearch = searchQuery.trim();
+  const qTokens = normalizedSearch ? normalize(normalizedSearch).split(/\s+/).filter(Boolean) : [];
+  const isSearching = qTokens.length > 0;
 
   const sortedOrders = useMemo(
     () =>
@@ -60,10 +46,28 @@ export default function MarketplacePage() {
 
   const visibleOrders = useMemo(() => {
     if (!isSearching) return sortedOrders;
-    return sortedOrders.filter((order) =>
-      matchesSearch(order, normalizedSearch)
-    );
-  }, [isSearching, normalizedSearch, sortedOrders]);
+    return sortedOrders.filter((order) => {
+      const busId = (order as any).business?.id;
+      const busName = (order as any).business?.name ?? "";
+      const busNameAr = busId ? (businessNamesMap[busId] ?? busName) : busName;
+      const busNameOrder = (order as any).business?.nameInAr ?? "";
+      const haystack = [
+        busName,
+        busNameAr,
+        busNameOrder,
+        order.customer?.name ?? "",
+        order.delivery?.address ?? "",
+        `#${order.orderNumber}`,
+        order.orderNumber.toString(),
+        order.id,
+        order.status?.current ?? "",
+        order.cart
+          ?.map((item) => `${item.name} ${item.selectedSize} ${item.quantity}`)
+          .join(" "),
+      ].join(" ");
+      return tokenMatch(haystack, qTokens);
+    });
+  }, [isSearching, qTokens, sortedOrders, businessNamesMap]);
 
   const isSearchEmpty = isSearching && visibleOrders.length === 0;
 
@@ -74,7 +78,7 @@ export default function MarketplacePage() {
           <div className="animate-spin">
             <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
           </div>
-          <p className="text-sm text-muted-foreground">Loading orders...</p>
+          <p className="text-sm text-muted-foreground">{t("loadingOrders")}</p>
         </div>
       </div>
     );
@@ -83,7 +87,7 @@ export default function MarketplacePage() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <p className="text-sm text-destructive">Failed to load orders</p>
+        <p className="text-sm text-destructive">{t("failedToLoad")}</p>
       </div>
     );
   }
@@ -97,12 +101,13 @@ export default function MarketplacePage() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground">
-              $ Limit Reached
+              {t("limitReached")}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Your cash balance (${currentCash.toFixed(2)}) has reached the
-              limit (${blockLimit.toFixed(2)}). Contact your manager to
-              continue.
+              {t("limitReachedDesc", {
+                amount: currentCash.toFixed(2),
+                limit: blockLimit.toFixed(2),
+              })}
             </p>
           </div>
         </div>
@@ -116,21 +121,21 @@ export default function MarketplacePage() {
         <OrderSearchBar
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search orders by number, customer, item, or status"
+          placeholder={t("searchPlaceholder")}
         />
       </div>
 
       {isSearchEmpty ? (
         <NoOrders
-          title="No matching orders"
-          description="Try a different order number, customer name, item, or status"
+          title={t("noMatchingOrders")}
+          description={t("noMatchingOrdersDesc")}
           searchQuery={searchQuery}
           onClearSearch={() => setSearchQuery("")}
         />
       ) : orders.length === 0 ? (
         <NoOrders
-          title="No orders available"
-          description="New orders will appear here"
+          title={t("noOrdersAvailable")}
+          description={t("noOrdersAvailableDesc")}
         />
       ) : (
         <div className="flex flex-col gap-3">
