@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { useCallback, useEffect, useState } from "react";
 import type { OrderType, OrderStatusType } from "@ordersync/types";
 import type { useOrderActions } from "@/hooks/useOrderActions";
@@ -9,13 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn, formatRelativeTime } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { useBusinessDisplayName } from "@/contexts/BusinessNamesContext";
-import {
-  MapPin,
-  ShoppingBag,
-  Store,
-  Phone,
-  AlarmClock,
-} from "lucide-react";
+import { MapPin, ShoppingBag, Store, Phone, AlarmClock } from "lucide-react";
 
 export const STATUS_CONFIG: Record<
   OrderStatusType,
@@ -28,25 +22,29 @@ export const STATUS_CONFIG: Record<
     progress: 1,
   },
   PICKED_UP: {
-    color: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
+    color:
+      "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
     dot: "bg-amber-500",
     accent: "border-l-amber-500",
     progress: 2,
   },
   ON_ROUTE: {
-    color: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
+    color:
+      "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
     dot: "bg-purple-500",
     accent: "border-l-purple-500",
     progress: 3,
   },
   DELIVERED: {
-    color: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
+    color:
+      "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
     dot: "bg-green-500",
     accent: "border-l-green-500",
     progress: 3,
   },
   READY: {
-    color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
+    color:
+      "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
     dot: "bg-emerald-500",
     accent: "border-l-emerald-500",
     progress: 0,
@@ -114,11 +112,7 @@ export const STATUS_TRANSLATION_KEY: Record<OrderStatusType, string> = {
   VOIDED: "voided",
 };
 
-const PROGRESS_STEPS = [
-  "reserved",
-  "pickedUp",
-  "onRoute",
-] as const;
+const PROGRESS_STEPS = ["reserved", "pickedUp", "onRoute"] as const;
 
 const STALE_WARNING_MS = 3 * 60 * 1000;
 const STALE_CRITICAL_MS = 7 * 60 * 1000;
@@ -148,14 +142,14 @@ function ProgressStepper({ current }: { current: OrderStatusType }) {
                 className={cn(
                   "size-2.5 rounded-full shrink-0 transition-colors",
                   isActive ? "bg-primary" : "bg-border",
-                  isCurrent && "ring-2 ring-primary/30"
+                  isCurrent && "ring-2 ring-primary/30",
                 )}
               />
               {i < PROGRESS_STEPS.length - 1 && (
                 <div
                   className={cn(
                     "h-1 flex-1 rounded-full transition-colors",
-                    isActive ? "bg-primary" : "bg-border"
+                    isActive ? "bg-primary" : "bg-border",
                   )}
                 />
               )}
@@ -173,7 +167,7 @@ function ProgressStepper({ current }: { current: OrderStatusType }) {
                 "text-[10px] w-16 text-center",
                 isActive
                   ? "text-foreground font-medium"
-                  : "text-muted-foreground"
+                  : "text-muted-foreground",
               )}
             >
               {t(stepKey)}
@@ -204,7 +198,10 @@ export function OrderCard({
   const address = order.delivery?.address ?? "";
   const customerName = order.customer?.name ?? "";
   const customerPhone = order.customer?.phone ?? "";
-  const businessName = useBusinessDisplayName(order.business?.id, order.business?.name);
+  const businessName = useBusinessDisplayName(
+    order.business?.id,
+    order.business?.name,
+  );
   const totalPrice = order.pricing?.total ?? 0;
   const itemCount = order.cart?.length ?? 0;
   const displayTime =
@@ -214,7 +211,7 @@ export function OrderCard({
 
   const readyAt = order.timeline?.readyAt ?? order.createdAt;
   const [staleLevel, setStaleLevel] = useState<StaleLevel>(
-    variant === "marketplace" ? getStaleLevel(readyAt) : "none"
+    variant === "marketplace" ? getStaleLevel(readyAt) : "none",
   );
 
   useEffect(() => {
@@ -238,7 +235,7 @@ export function OrderCard({
         alert(t("actionFailed"));
       }
     },
-    [t]
+    [t],
   );
 
   const cardDisplay = (
@@ -251,7 +248,7 @@ export function OrderCard({
               "size-2 rounded-full shrink-0",
               isCritical && "bg-red-500 animate-pulse",
               isWarning && "bg-amber-500 animate-pulse",
-              !isStale && config.dot
+              !isStale && config.dot,
             )}
           />
           <span
@@ -261,7 +258,7 @@ export function OrderCard({
                 "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
               isWarning &&
                 "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
-              !isStale && config.color
+              !isStale && config.color,
             )}
           >
             {isCritical
@@ -315,7 +312,7 @@ export function OrderCard({
             "flex items-center gap-1.5",
             isCritical && "text-red-600 dark:text-red-400",
             isWarning && "text-amber-600 dark:text-amber-400",
-            !isStale && "text-muted-foreground"
+            !isStale && "text-muted-foreground",
           )}
         >
           {isStale && <AlarmClock className="size-3.5 shrink-0" />}
@@ -371,9 +368,7 @@ export function OrderCard({
               size="lg"
               className="flex-1"
               onClick={(e) =>
-                handleAction(e, () =>
-                  actions.startRoute(order.id, driverUid)
-                )
+                handleAction(e, () => actions.startRoute(order.id, driverUid))
               }
               disabled={actions.isLoading}
             >
@@ -405,9 +400,7 @@ export function OrderCard({
               size="lg"
               className="flex-1 bg-green-600 text-white hover:bg-green-700"
               onClick={(e) =>
-                handleAction(e, () =>
-                  actions.complete(order.id, driverUid)
-                )
+                handleAction(e, () => actions.complete(order.id, driverUid))
               }
               disabled={actions.isLoading}
             >
@@ -433,7 +426,7 @@ export function OrderCard({
     isCritical && variant === "marketplace" && "border-l-red-500",
     isWarning && variant === "marketplace" && "border-l-amber-500",
     !isStale && config.accent,
-    variant === "marketplace" && "hover:shadow-md cursor-pointer"
+    variant === "marketplace" && "hover:shadow-md cursor-pointer",
   );
 
   if (variant === "marketplace") {
