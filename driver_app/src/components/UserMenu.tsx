@@ -53,7 +53,7 @@ export function UserMenu() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-44 overflow-hidden rounded-2xl border border-border/60 bg-background/95 p-1 shadow-xl shadow-black/10 backdrop-blur-xl"
+          className="absolute end-0 top-[calc(100%+0.5rem)] z-50 w-44 overflow-hidden rounded-2xl border border-border/60 bg-background/95 p-1 shadow-xl shadow-black/10 backdrop-blur-xl"
         >
           <Link
             href="/orders/settings"
