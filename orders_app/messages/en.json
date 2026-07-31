@@ -113,8 +113,7 @@
       "moveTo": "Move to {status}",
       "moveBackTo": "Move back to {status}",
       "cancelOrder": "Cancel Order",
-      "rejectOrder": "Reject Order",
-      "voidOrder": "Void Order"
+      "rejectOrder": "Reject Order"
     },
     "statuses": {
       "RECEIVED": "Received",
@@ -182,7 +181,9 @@
     "workflow": {
       "title": "Order Workflow",
       "description": "Customize order processing",
-      "printInvoice": "Print Invoice"
+      "printInvoice": "Print Invoice",
+      "skipAccepted": "Skip Acceptance",
+      "skipAcceptedDesc": "New orders move straight to preparing (forward and backward)"
     },
     "appearance": {
       "title": "Appearance",

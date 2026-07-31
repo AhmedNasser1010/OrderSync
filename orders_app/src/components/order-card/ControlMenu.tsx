@@ -159,7 +159,7 @@ export default function ControlMenu({
                   }}
                   className="text-destructive focus:text-destructive"
                 >
-                  {nextStatus === "CANCELED" || nextStatus === "VOIDED" ? (
+                  {nextStatus === "CANCELED" ? (
                     <Trash2 className="mr-2 h-4 w-4" />
                   ) : (
                     <Ban className="mr-2 h-4 w-4" />
@@ -167,9 +167,7 @@ export default function ControlMenu({
                   <span>
                     {nextStatus === "CANCELED"
                       ? ot("cancelOrder")
-                      : nextStatus === "REJECTED"
-                        ? ot("rejectOrder")
-                        : ot("voidOrder")}
+                      : ot("rejectOrder")}
                   </span>
                 </DropdownMenuItem>
               ))}

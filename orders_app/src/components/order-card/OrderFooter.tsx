@@ -41,7 +41,7 @@ const FORWARD_LABEL_KEYS: Record<string, string> = {
   ON_ROUTE: "delivered",
 };
 
-const DESTRUCTIVE_STATUSES: OrderStatusType[] = ["CANCELED", "REJECTED", "VOIDED"];
+const DESTRUCTIVE_STATUSES: OrderStatusType[] = ["CANCELED", "REJECTED"];
 
 function categorizeStatuses(statuses: OrderStatusType[]) {
   const forward: OrderStatusType[] = [];

@@ -42,6 +42,7 @@ export type BusinessDocument = {
   };
   settings: {
     printInvoice: boolean;
+    skipAccepted?: boolean;
   };
   status: RestaurantStatusTypes;
   updatedAt: number;

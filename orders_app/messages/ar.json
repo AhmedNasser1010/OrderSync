@@ -113,8 +113,7 @@
       "moveTo": "نقل إلى {status}",
       "moveBackTo": "إرجاع إلى {status}",
       "cancelOrder": "إلغاء الطلب",
-      "rejectOrder": "رفض الطلب",
-      "voidOrder": "إبطال الطلب"
+      "rejectOrder": "رفض الطلب"
     },
     "statuses": {
       "RECEIVED": "مستلم",
@@ -182,7 +181,9 @@
     "workflow": {
       "title": "سير عمل الطلبات",
       "description": "تخصيص معالجة الطلبات",
-      "printInvoice": "طباعة الفاتورة"
+      "printInvoice": "طباعة الفاتورة",
+      "skipAccepted": "تخطي مرحلة القبول",
+      "skipAcceptedDesc": "تنتقل الطلبات الجديدة مباشرة إلى مرحلة التحضير (للأمام والخلف)"
     },
     "appearance": {
       "title": "المظهر",

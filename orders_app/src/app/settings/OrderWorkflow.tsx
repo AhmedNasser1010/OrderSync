@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Printer } from "lucide-react";
+import { Printer, Zap } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -24,12 +24,21 @@ export default function OrderWorkflow() {
     },
   );
   const printInvoice = resData?.settings?.printInvoice ?? false;
+  const skipAccepted = resData?.settings?.skipAccepted ?? false;
   const [setOrderWorkflowSettings] = useSetOrderWorkflowSettingsMutation();
 
   const handlePrintInvoice = (checked: boolean) => {
     setOrderWorkflowSettings({
       resId: userData?.accessToken,
       settingName: "printInvoice",
+      value: checked,
+    });
+  };
+
+  const handleSkipAccepted = (checked: boolean) => {
+    setOrderWorkflowSettings({
+      resId: userData?.accessToken,
+      settingName: "skipAccepted",
       value: checked,
     });
   };
@@ -52,6 +61,22 @@ export default function OrderWorkflow() {
             id="print-invoice"
             defaultChecked={printInvoice}
             onCheckedChange={handlePrintInvoice}
+          />
+        </div>
+        <div className="flex items-center justify-between gap-3 py-3 border-t border-border">
+          <div className="min-w-0">
+            <Label htmlFor="skip-accepted" className="text-sm text-foreground">
+              <span className="flex items-center gap-1.5">
+                <Zap className="h-3.5 w-3.5 text-orange-500" />
+                {t("skipAccepted")}
+              </span>
+            </Label>
+            <p className="text-xs text-muted-foreground mt-0.5">{t("skipAcceptedDesc")}</p>
+          </div>
+          <Switch
+            id="skip-accepted"
+            defaultChecked={skipAccepted}
+            onCheckedChange={handleSkipAccepted}
           />
         </div>
       </div>

@@ -12,6 +12,28 @@ import { skipToken } from "@reduxjs/toolkit/query";
 import { canTransition, canReverseTransition, getNextStatuses, getPreviousStatuses, isDriverOwned } from "@ordersync/order-utils";
 import { sendMarketplacePush } from "@/app/actions/sendMarketplacePush";
 
+const DESTRUCTIVE_STATUSES: OrderStatusType[] = ["CANCELED", "REJECTED", "VOIDED"];
+
+const RESTAURANT_DESTRUCTIVE_STATUSES: Record<OrderStatusType, OrderStatusType[]> = {
+  RECEIVED: ["REJECTED"],
+  ACCEPTED: ["CANCELED"],
+  PREPARING: ["CANCELED"],
+  READY: [],
+  RESERVED: [],
+  PICKED_UP: [],
+  ON_ROUTE: [],
+  DELIVERED: [],
+  GIVEN_FEEDBACK: [],
+  CANCELED: [],
+  REJECTED: [],
+  VOIDED: [],
+};
+
+const isRestaurantDestructiveStatusAllowed = (
+  current: OrderStatusType,
+  next: OrderStatusType,
+): boolean => RESTAURANT_DESTRUCTIVE_STATUSES[current]?.includes(next) ?? false;
+
 type OrderHandler = {
   handleChangeStatus: (orderId: string, nextStatus: OrderStatusType, reason?: string) => void;
   deleteOrder: {
@@ -32,6 +54,12 @@ const useOrderHandler = (): OrderHandler => {
   const [setCancelOrder, { isLoading: orderCancellationIsLoading, error: orderCancellationError }] =
     useSetCancelOrderMutation();
 
+  const skipAccepted = restaurant?.settings?.skipAccepted ?? false;
+
+  const canReverse = (current: OrderStatusType, next: OrderStatusType): boolean =>
+    canReverseTransition(current, next) ||
+    (skipAccepted && current === "PREPARING" && next === "RECEIVED");
+
   const handleChangeStatus = (orderId: string, nextStatus: OrderStatusType, reason?: string) => {
     if (!orders?.length || !orderId) return;
 
@@ -48,8 +76,18 @@ const useOrderHandler = (): OrderHandler => {
       return;
     }
 
+    if (nextStatus === "VOIDED") {
+      console.error(`Voiding orders is not supported in the orders app`);
+      return;
+    }
+
+    if (DESTRUCTIVE_STATUSES.includes(nextStatus) && !isRestaurantDestructiveStatusAllowed(currentStatus, nextStatus)) {
+      console.error(`Invalid transition: ${currentStatus} -> ${nextStatus}`);
+      return;
+    }
+
     const isValidForward = canTransition(currentStatus, nextStatus);
-    const isValidReverse = canReverseTransition(currentStatus, nextStatus);
+    const isValidReverse = canReverse(currentStatus, nextStatus);
 
     if (!isValidForward && !isValidReverse) {
       console.error(`Invalid transition: ${currentStatus} -> ${nextStatus}`);
@@ -57,7 +95,7 @@ const useOrderHandler = (): OrderHandler => {
     }
 
     if (nextStatus === "CANCELED" || nextStatus === "REJECTED") {
-      setCancelOrder({ orderId, reason });
+      setCancelOrder({ orderId, reason, status: nextStatus });
     } else {
       setOrderStatus({ orderId, updatedStatus: nextStatus })
         .unwrap()
@@ -76,13 +114,29 @@ const useOrderHandler = (): OrderHandler => {
     if (isDriverOwned(order)) {
       return [];
     }
-    return getNextStatuses(order.status.current);
+    const nextStatuses = getNextStatuses(order.status.current);
+    return nextStatuses.filter(
+      (next) => {
+        if (skipAccepted && order.status.current === "RECEIVED" && next === "ACCEPTED") {
+          return false;
+        }
+        return (
+          !DESTRUCTIVE_STATUSES.includes(next) ||
+          isRestaurantDestructiveStatusAllowed(order.status.current, next)
+        );
+      },
+    );
   };
 
   const getPossiblePreviousStatuses = (orderId: string): OrderStatusType[] => {
     const order = orders?.find((o) => o.id === orderId);
     if (!order) return [];
     if (isDriverOwned(order)) return [];
+    if (skipAccepted && order.status.current === "PREPARING") {
+      return getPreviousStatuses(order.status.current)
+        .filter((prev) => prev !== "ACCEPTED")
+        .concat("RECEIVED");
+    }
     return getPreviousStatuses(order.status.current);
   };
 

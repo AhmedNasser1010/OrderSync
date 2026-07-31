@@ -152,14 +152,31 @@ export const firestoreApi = createApi({
               );
             }
 
-            if (!canTransition(currentStatus, updatedStatus) && !canReverseTransition(currentStatus, updatedStatus)) {
+            if (updatedStatus === "VOIDED") {
+              throw new Error("Voiding orders is not supported in the orders app");
+            }
+
+            const businessRef = doc(db, "businesses", order.businessId);
+            const businessSnap = await transaction.get(businessRef);
+            const skipAccepted =
+              businessSnap.exists() &&
+              (businessSnap.data() as BusinessDocument).settings?.skipAccepted === true;
+
+            const isSkipAcceptedReverse =
+              skipAccepted && currentStatus === "PREPARING" && updatedStatus === "RECEIVED";
+
+            if (
+              !canTransition(currentStatus, updatedStatus) &&
+              !canReverseTransition(currentStatus, updatedStatus) &&
+              !isSkipAcceptedReverse
+            ) {
               throw new Error(
                 `Invalid transition: ${currentStatus} -> ${updatedStatus}`,
               );
             }
 
             const now = Date.now();
-            const isReverse = canReverseTransition(currentStatus, updatedStatus);
+            const isReverse = canReverseTransition(currentStatus, updatedStatus) || isSkipAcceptedReverse;
 
             const updateData: Record<string, unknown> = {
               "status.current": updatedStatus,
@@ -190,7 +207,15 @@ export const firestoreApi = createApi({
     }),
 
     setCancelOrder: builder.mutation({
-      async queryFn({ orderId, reason }: { orderId: string; reason?: string }) {
+      async queryFn({
+        orderId,
+        reason,
+        status = "CANCELED",
+      }: {
+        orderId: string;
+        reason?: string;
+        status?: "CANCELED" | "REJECTED";
+      }) {
         try {
           if (!orderId) throw new Error("Order ID is required.");
 
@@ -207,26 +232,38 @@ export const firestoreApi = createApi({
 
             if (isDriverOwned(order)) {
               throw new Error(
-                `Order is claimed by a driver and cannot be canceled from the orders app`,
+                `Order is claimed by a driver and cannot be ${status === "REJECTED" ? "rejected" : "canceled"} from the orders app`,
               );
             }
 
-            if (!canTransition(currentStatus, "CANCELED")) {
+            if (!canTransition(currentStatus, status)) {
               throw new Error(
-                `Cannot cancel order in status: ${currentStatus}`,
+                `Cannot ${status === "REJECTED" ? "reject" : "cancel"} order in status: ${currentStatus}`,
+              );
+            }
+
+            if (status === "CANCELED" && currentStatus !== "ACCEPTED" && currentStatus !== "PREPARING") {
+              throw new Error(
+                `Order in status ${currentStatus} can only be rejected, not canceled`,
+              );
+            }
+
+            if (status === "REJECTED" && currentStatus !== "RECEIVED") {
+              throw new Error(
+                `Order in status ${currentStatus} cannot be rejected`,
               );
             }
 
             const now = Date.now();
 
             const updateData: Record<string, unknown> = {
-              "status.current": "CANCELED",
+              "status.current": status,
               "status.history": arrayUnion({
-                status: "CANCELED",
+                status,
                 timestamp: now,
                 by: "manager",
               }),
-              "timeline.canceledAt": now,
+              [`timeline.${getTimelineField(status)}`]: now,
               updatedAt: now,
             };
 
@@ -240,7 +277,7 @@ export const firestoreApi = createApi({
           return { data: null };
         } catch (error) {
           const message = error instanceof Error ? error.message : "Unknown error";
-          console.error("Error canceling order:", message);
+          console.error(`Error ${status === "REJECTED" ? "rejecting" : "canceling"} order:`, message);
           return { error: message };
         }
       },
