@@ -203,12 +203,14 @@
     "settings": "Settings",
     "openSettings": "Open settings menu"
   },
-  "DeleteOrder": {
-    "title": "Delete Order",
-    "description": "Please provide a reason for deleting the order or leave it empty and click delete.",
-    "reasonPlaceholder": "Type the reason of delete",
+  "ReasonDialog": {
+    "titleCancel": "Cancel Order",
+    "titleReject": "Reject Order",
+    "description": "Please provide a reason for the customer (optional).",
+    "reasonPlaceholder": "Type a reason (optional)",
     "orderIdNotFound": "Order Id Not Found",
-    "button": "Delete Order"
+    "confirmCancel": "Cancel Order",
+    "confirmReject": "Reject Order"
   },
   "ResStatus": {
     "active": "Active",

@@ -14,56 +14,57 @@ import {
 } from "@/components/ui/dialog"
 import { AlertCircle } from "lucide-react"
 import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
-import { deletePopup } from "@/rtk/slices/toggleSlice";
-import { setDeletePopup } from "@/rtk/slices/toggleSlice";
+import { reasonDialog, setReasonDialog } from "@/rtk/slices/toggleSlice";
 import useOrderHandler from '@/hooks/order-handlers/useOrderHandlers'
 
-export default function DeleteOrderPopup() {
-  const t = useTranslations("DeleteOrder");
+export default function ReasonDialog() {
+  const t = useTranslations("ReasonDialog");
   const ct = useTranslations("Common");
   const dispatch = useAppDispatch()
-  const deletePopupValue = useAppSelector(deletePopup);
-  const { deleteOrder } = useOrderHandler()
+  const reasonDialogValue = useAppSelector(reasonDialog);
+  const { handleChangeStatus, isCanceling } = useOrderHandler()
+  const isCancel = reasonDialogValue.status === "CANCELED"
 
   useEffect(() => {
-    if (deletePopupValue.isOpen) {
-      if (deletePopupValue.orderId) {
-        dispatch(setDeletePopup({ error: null }))
+    if (reasonDialogValue.isOpen) {
+      if (reasonDialogValue.orderId) {
+        dispatch(setReasonDialog({ error: null }))
       } else {
-        dispatch(setDeletePopup({ error: t("orderIdNotFound") }))
+        dispatch(setReasonDialog({ error: t("orderIdNotFound") }))
       }
     }
-  }, [dispatch, deletePopupValue.orderId, deletePopupValue.isOpen, t])
+  }, [dispatch, reasonDialogValue.orderId, reasonDialogValue.isOpen, t])
 
   const handleClose = () => {
-    dispatch(setDeletePopup({
+    dispatch(setReasonDialog({
       isOpen: false,
       orderId: null,
-      cancellationReason: null,
+      status: null,
+      reason: null,
       error: null
     }))
   }
 
-  const handleDelete = () => {
-    if (!deletePopupValue.error) {
-      deleteOrder.handleDeleteOrder(deletePopupValue.orderId)
+  const handleConfirm = () => {
+    if (!reasonDialogValue.error && reasonDialogValue.orderId && reasonDialogValue.status) {
+      handleChangeStatus(
+        reasonDialogValue.orderId,
+        reasonDialogValue.status,
+        reasonDialogValue.reason ?? undefined,
+      )
       handleClose()
     }
   }
 
   const handleInputChange = (value: string) => {
-    if (value === '') {
-      dispatch(setDeletePopup({ cancellationReason: null }))
-    } else {
-      dispatch(setDeletePopup({ cancellationReason: value }))
-    }
+    dispatch(setReasonDialog({ reason: value === "" ? null : value }))
   }
 
   return (
-    <Dialog open={deletePopupValue.isOpen} onOpenChange={handleClose}>
+    <Dialog open={reasonDialogValue.isOpen} onOpenChange={handleClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("title")}</DialogTitle>
+          <DialogTitle>{isCancel ? t("titleCancel") : t("titleReject")}</DialogTitle>
           <DialogDescription>
             {t("description")}
           </DialogDescription>
@@ -71,14 +72,14 @@ export default function DeleteOrderPopup() {
         <div className="grid gap-4 py-4">
           <Input
             placeholder={t("reasonPlaceholder")}
-            value={deletePopupValue.cancellationReason || ''}
+            value={reasonDialogValue.reason || ''}
             onChange={(e) => handleInputChange(e.target.value)}
             className="col-span-3"
           />
-          {deletePopupValue.error && (
+          {reasonDialogValue.error && (
             <div className="flex items-center text-red-500 text-sm">
-              <AlertCircle className="w-4 h-4 mr-2" />
-              {deletePopupValue.error}
+              <AlertCircle className="w-4 h-4 ms-2" />
+              {reasonDialogValue.error}
             </div>
           )}
         </div>
@@ -86,10 +87,10 @@ export default function DeleteOrderPopup() {
           <Button
             type="button"
             variant="destructive"
-            onClick={handleDelete}
-            disabled={deletePopupValue?.error || deleteOrder.isLoading ? true : false}
+            onClick={handleConfirm}
+            disabled={reasonDialogValue?.error || isCanceling ? true : false}
           >
-            {t("button")}
+            {isCancel ? t("confirmCancel") : t("confirmReject")}
           </Button>
           <Button
             type="button"

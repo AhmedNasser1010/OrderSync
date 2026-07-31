@@ -52,9 +52,7 @@ const useCloseDay = (): UseCloseDay => {
             ...closeDayPopupValues.errors,
             noQueue: {
               isPassed: !hasActiveOrders,
-              text: hasActiveOrders
-                ? "There are active orders. Wait for them to complete before closing the day."
-                : "",
+              text: "",
             },
             hasCompletedOrders: {
               isPassed: true,

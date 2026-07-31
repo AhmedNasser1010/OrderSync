@@ -203,12 +203,14 @@
     "settings": "الإعدادات",
     "openSettings": "فتح قائمة الإعدادات"
   },
-  "DeleteOrder": {
-    "title": "حذف الطلب",
-    "description": "يرجى تقديم سبب لحذف الطلب أو تركه فارغاً وانقر حذف.",
-    "reasonPlaceholder": "اكتب سبب الحذف",
+  "ReasonDialog": {
+    "titleCancel": "إلغاء الطلب",
+    "titleReject": "رفض الطلب",
+    "description": "يرجى تقديم سبب للعميل (اختياري).",
+    "reasonPlaceholder": "اكتب السبب (اختياري)",
     "orderIdNotFound": "معرف الطلب غير موجود",
-    "button": "حذف الطلب"
+    "confirmCancel": "إلغاء الطلب",
+    "confirmReject": "رفض الطلب"
   },
   "ResStatus": {
     "active": "نشط",

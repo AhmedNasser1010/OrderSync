@@ -52,7 +52,10 @@ const useOrder = () => {
 
   // On Cancellation Scenario
   useEffect(() => {
-    if (trackedOrderData && trackedOrderData?.status?.current === 'CANCELED') {
+    if (
+      trackedOrderData &&
+      ['CANCELED', 'REJECTED', 'VOIDED'].includes(trackedOrderData?.status?.current)
+    ) {
       console.log('Order Canceled')
       dispatch(clearCart())
       dispatch(setCancellationNoticeIsOpen(true))

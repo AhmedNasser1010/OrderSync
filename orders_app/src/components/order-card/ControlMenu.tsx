@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useAppDispatch } from "@/rtk/hooks";
+import { setReasonDialog } from "@/rtk/slices/toggleSlice";
 import {
   Dialog,
   DialogContent,
@@ -57,6 +59,7 @@ export default function ControlMenu({
   const ct = useTranslations("Common");
   const ot = useTranslations("Orders.controlMenu");
   const st = useTranslations("Orders.statuses");
+  const dispatch = useAppDispatch();
   const [printOpen, setPrintOpen] = useState(false);
   const [order, setOrder] = useState<OrderType | undefined>(undefined);
   const [orderMenu, setOrderMenu] = useState<
@@ -109,7 +112,7 @@ export default function ControlMenu({
                 setPrintOpen(true);
               }}
             >
-              <Printer className="mr-2 h-4 w-4" />
+              <Printer className="ms-2 h-4 w-4" />
               <span>{ct("printInvoice")}</span>
             </DropdownMenuItem>
           )}
@@ -124,7 +127,7 @@ export default function ControlMenu({
                 onStatusChange(nextStatus);
               }}
             >
-              <ArrowUpCircle className="mr-2 h-4 w-4" />
+              <ArrowUpCircle className="ms-2 h-4 w-4" />
               <span>{ot("moveTo", { status: st(nextStatus) })}</span>
             </DropdownMenuItem>
           ))}
@@ -139,7 +142,7 @@ export default function ControlMenu({
                     onStatusChange(prevStatus);
                   }}
                 >
-                  <ArrowDownCircle className="mr-2 h-4 w-4" />
+                  <ArrowDownCircle className="ms-2 h-4 w-4" />
                   <span>{ot("moveBackTo", { status: st(prevStatus) })}</span>
                 </DropdownMenuItem>
               ))}
@@ -155,14 +158,14 @@ export default function ControlMenu({
                   key={nextStatus}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onStatusChange(nextStatus);
+                    dispatch(setReasonDialog({ isOpen: true, orderId, status: nextStatus }));
                   }}
                   className="text-destructive focus:text-destructive"
                 >
                   {nextStatus === "CANCELED" ? (
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Trash2 className="ms-2 h-4 w-4" />
                   ) : (
-                    <Ban className="mr-2 h-4 w-4" />
+                    <Ban className="ms-2 h-4 w-4" />
                   )}
                   <span>
                     {nextStatus === "CANCELED"
@@ -190,7 +193,7 @@ export default function ControlMenu({
             />
           </ScrollArea>
           <Button onClick={reactToPrintFn}>
-            <Printer className="mr-2 h-4 w-4" />
+            <Printer className="ms-2 h-4 w-4" />
             {ct("printInvoice")}
           </Button>
         </DialogContent>

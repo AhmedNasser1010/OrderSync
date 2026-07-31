@@ -36,11 +36,7 @@ const isRestaurantDestructiveStatusAllowed = (
 
 type OrderHandler = {
   handleChangeStatus: (orderId: string, nextStatus: OrderStatusType, reason?: string) => void;
-  deleteOrder: {
-    handleDeleteOrder: (orderId: string | null) => void;
-    isLoading: boolean;
-    error: unknown;
-  };
+  isCanceling: boolean;
   getPossibleNextStatuses: (orderId: string) => OrderStatusType[];
   getPossiblePreviousStatuses: (orderId: string) => OrderStatusType[];
 };
@@ -51,7 +47,7 @@ const useOrderHandler = (): OrderHandler => {
   const { data: orders } = useFetchActiveOrdersQuery(userData?.accessToken ?? skipToken);
   const { data: restaurant } = useFetchRestaurantDataQuery(userData?.accessToken ?? skipToken);
   const [setOrderStatus] = useSetOrderStatusMutation();
-  const [setCancelOrder, { isLoading: orderCancellationIsLoading, error: orderCancellationError }] =
+  const [setCancelOrder, { isLoading: orderCancellationIsLoading }] =
     useSetCancelOrderMutation();
 
   const skipAccepted = restaurant?.settings?.skipAccepted ?? false;
@@ -140,18 +136,9 @@ const useOrderHandler = (): OrderHandler => {
     return getPreviousStatuses(order.status.current);
   };
 
-  const handleDeleteOrder = (orderId: string | null) => {
-    if (!orderId) return;
-    setCancelOrder({ orderId });
-  };
-
   return {
     handleChangeStatus,
-    deleteOrder: {
-      handleDeleteOrder,
-      isLoading: orderCancellationIsLoading,
-      error: orderCancellationError,
-    },
+    isCanceling: orderCancellationIsLoading,
     getPossibleNextStatuses,
     getPossiblePreviousStatuses,
   };

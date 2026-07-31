@@ -20,6 +20,12 @@ function OrderCancellationNotice() {
   const { trackedOrderData } = useOrder()
   const [cancellationReason, setCancellationReason] = useState('')
   const { t } = useTranslation()
+  const status = trackedOrderData?.status?.current
+  const noticeTitles = {
+    CANCELED: 'Your Order Has Been Canceled!',
+    REJECTED: 'Your Order Has Been Rejected!',
+    VOIDED: 'Your Order Has Been Voided!'
+  }
 
   useEffect(() => {
     if (trackedOrderData?.status?.cancellationReason) {
@@ -37,7 +43,7 @@ function OrderCancellationNotice() {
       <Popup>
         <PopupContent>
           <PopupHeader closePopupCallback={handleClick}>
-            <PopupTitle>{t('Your Order Has Been Canceled!')}</PopupTitle>
+            <PopupTitle>{t(noticeTitles[status] || 'Your Order Has Been Canceled!')}</PopupTitle>
             <PopupDescription>
               {cancellationReason ||
                 t('Sorry, your order was canceled due to an issue in the kitchen. We apologize for the inconvenience.')}

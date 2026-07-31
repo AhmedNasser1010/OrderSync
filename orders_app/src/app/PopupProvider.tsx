@@ -1,6 +1,6 @@
 "use client";
 
-import DeleteOrderPopup from "../components/popups/DeleteOrderPopup";
+import ReasonDialog from "../components/popups/ReasonDialog";
 import CloseDayPopup from "../components/popups/CloseDayPopup";
 
 const PopupProvider = ({
@@ -11,7 +11,7 @@ const PopupProvider = ({
 
   return (
     <>
-      <DeleteOrderPopup />
+      <ReasonDialog />
       <CloseDayPopup />
       {children}
     </>

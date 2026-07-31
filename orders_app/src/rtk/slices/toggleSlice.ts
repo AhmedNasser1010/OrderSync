@@ -1,12 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 import type { MainTabTypes } from "@/types/orders";
+import type { OrderStatusType } from "@ordersync/types";
 
 type Toggle = {
-  deletePopup: {
+  reasonDialog: {
     isOpen: boolean;
     orderId: string | null;
-    cancellationReason: string | null;
+    status: OrderStatusType | null;
+    reason: string | null;
     error: string | null;
   };
   closeDayPopup: {
@@ -32,10 +34,11 @@ type Toggle = {
 };
 
 const initialState: Toggle = {
-  deletePopup: {
+  reasonDialog: {
     isOpen: false,
     orderId: null,
-    cancellationReason: null,
+    status: null,
+    reason: null,
     error: null,
   },
   closeDayPopup: {
@@ -64,8 +67,8 @@ export const toggleSlice = createSlice({
   name: "toggle",
   initialState,
   reducers: {
-    setDeletePopup(state, { payload }) {
-      state.deletePopup = { ...state.deletePopup, ...payload };
+    setReasonDialog(state, { payload }) {
+      state.reasonDialog = { ...state.reasonDialog, ...payload };
     },
     setCloseDayPopup(state, { payload }) {
       state.closeDayPopup = { ...state.closeDayPopup, ...payload };
@@ -80,13 +83,13 @@ export const toggleSlice = createSlice({
 });
 
 export const {
-  setDeletePopup,
+  setReasonDialog,
   setCloseDayPopup,
   setActiveTab,
   setOptionsMenuView,
 } = toggleSlice.actions;
 
-export const deletePopup = (state: RootState) => state.toggle.deletePopup;
+export const reasonDialog = (state: RootState) => state.toggle.reasonDialog;
 export const closeDayPopup = (state: RootState) => state.toggle.closeDayPopup;
 export const activeTab = (state: RootState) => state.toggle.activeTab;
 export const optionMenuView = (state: RootState) => state.toggle.optionsMenuView;
