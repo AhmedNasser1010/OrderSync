@@ -10,6 +10,7 @@ import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
 import { closeDayPopup, setCloseDayPopup } from "@/rtk/slices/toggleSlice";
 import type { OrderType } from "@ordersync/types";
 import type { MainMenuType } from "@ordersync/types";
+import { isFinalStatus } from "@ordersync/order-utils";
 import extractDaySummary from "@/analytics/day_scope/extractDaySummary";
 import { skipToken } from "@reduxjs/toolkit/query";
 
@@ -43,7 +44,9 @@ const useCloseDay = (): UseCloseDay => {
 
   useEffect(() => {
     if (activeOrdersData && closeDayPopupValues.isOpen) {
-      const hasActiveOrders = activeOrdersData.length > 0;
+      const hasActiveOrders = activeOrdersData.some(
+        (order) => !isFinalStatus(order.status.current),
+      );
 
       dispatch(
         setCloseDayPopup({

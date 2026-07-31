@@ -29,18 +29,6 @@ export {
 } from "./guards";
 
 export {
-  restaurantActiveOrders,
-  marketplaceOrders,
-  driverActiveOrders,
-  customerOrders,
-  restaurantDeliveredOrders,
-  restaurantUnpaidOrders,
-  driverUnsettledOrders,
-  ordersForDateRange,
-  getDailyReportRef,
-} from "./queries";
-
-export {
   isDiscountActive,
   evaluateConditions,
   isWithinTimeRules,

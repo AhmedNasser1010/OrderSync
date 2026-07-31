@@ -75,13 +75,13 @@ export default function CloseDayPopup() {
               <span>{t("checking")}</span>
             </div>
           )}
-          {!closeDayPopupValues?.errors?.noQueue.isPassed && (
+          {!closeDayPopupValues?.errors?.noQueue.isPassed && !isLoading && (
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 text-sm text-red-500">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{closeDayPopupValues?.errors?.noQueue.text || t("hasActiveOrders")}</span>
             </div>
           )}
-          {!closeDayPopupValues?.errors?.hasCompletedOrders.isPassed && (
+          {!closeDayPopupValues?.errors?.hasCompletedOrders.isPassed && !isLoading && (
             <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 text-sm text-red-500">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{closeDayPopupValues?.errors?.hasCompletedOrders.text}</span>

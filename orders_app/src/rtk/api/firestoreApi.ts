@@ -15,7 +15,9 @@ import { db } from "@/lib/firebase";
 import type { OrderType, OrderStatusType, RestaurantStatusTypes, BusinessDocument } from "@ordersync/types";
 import type { DailyReport } from "@ordersync/types";
 import { canTransition, canReverseTransition, getTimelineField, isDriverOwned } from "@ordersync/order-utils";
-import { ordersForDateRange, getDailyReportRef } from "@ordersync/order-utils";
+
+const getDailyReportRef = (businessId: string, dateStr: string) =>
+  doc(collection(db, "dailyReports"), `${businessId}_${dateStr}`);
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
@@ -313,7 +315,7 @@ export const firestoreApi = createApi({
           const batch = writeBatch(db);
 
           // Write the daily report to the new top-level collection
-          const reportRef = getDailyReportRef(db, resId, dateStr);
+          const reportRef = getDailyReportRef(resId, dateStr);
           const reportData: DailyReport = {
             businessId: resId,
             businessDate: dateStr,
