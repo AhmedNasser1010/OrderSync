@@ -1,6 +1,7 @@
 import {
   useFetchMenuDataQuery,
   useFetchOrdersDataQuery,
+  useFetchRestaurantDataQuery,
   useFetchUserDataQuery,
 } from "@/lib/rtk/api/firestoreApi";
 import { useTranslations } from "next-intl";
@@ -25,6 +26,12 @@ const useAnalytics = () => {
 
   const { data: menuData } = useFetchMenuDataQuery(resId ?? skipToken);
 
+  const { data: restaurantData } = useFetchRestaurantDataQuery(
+    resId ?? skipToken,
+  );
+
+  const openingHours = restaurantData?.operations?.openingHours;
+
   const timeRangeValue = useAppSelector(timeRange);
   const customRange = useAppSelector(customDateRange);
 
@@ -47,8 +54,8 @@ const useAnalytics = () => {
   }, [timeRangeValue, customRange]);
 
   const ranges = useMemo(
-    () => getAnalyticsRanges(timeRangeValue, customRange),
-    [timeRangeValue, customRange],
+    () => getAnalyticsRanges(timeRangeValue, customRange, openingHours),
+    [timeRangeValue, customRange, openingHours],
   );
 
   const isCustomIncomplete =
@@ -72,13 +79,14 @@ const useAnalytics = () => {
   const { data: previousOrders } = useFetchOrdersDataQuery(previousArgs);
 
   const currentPeriodData = useMemo<AnalyticsEntry[]>(
-    () => buildAnalyticsFromOrders(currentOrders ?? [], menuData),
-    [currentOrders, menuData],
+    () => buildAnalyticsFromOrders(currentOrders ?? [], menuData, openingHours),
+    [currentOrders, menuData, openingHours],
   );
 
   const previousPeriodData = useMemo<AnalyticsEntry[]>(
-    () => buildAnalyticsFromOrders(previousOrders ?? [], menuData),
-    [previousOrders, menuData],
+    () =>
+      buildAnalyticsFromOrders(previousOrders ?? [], menuData, openingHours),
+    [previousOrders, menuData, openingHours],
   );
 
   const dashboardData = useMemo(() => {

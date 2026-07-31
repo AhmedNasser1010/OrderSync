@@ -9,22 +9,36 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { useFetchUserDataQuery } from "@/lib/rtk/api/firestoreApi";
+import {
+  useFetchRestaurantDataQuery,
+  useFetchUserDataQuery,
+} from "@/lib/rtk/api/firestoreApi";
 import { useAppSelector } from "@/lib/rtk/hooks";
 import { userUid } from "@/lib/rtk/slices/constantsSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
-import type { OrderType } from "@ordersync/types";
+import type { BusinessDocument, OrderType } from "@ordersync/types";
+import {
+  getActiveSessionBounds,
+  getBusinessDayOfTimestamp,
+  localDateKey,
+} from "@ordersync/order-utils";
 import type { TodayData } from "@/lib/types/types";
 
-function getTodayBounds(): { startMs: number; endMs: number; dateStr: string } {
+type OpeningHours = BusinessDocument["operations"]["openingHours"];
+
+function getTodayBounds(openingHours?: OpeningHours): {
+  startMs: number;
+  endMs: number;
+  dateStr: string;
+} {
   const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const end = new Date(start);
-  end.setDate(end.getDate() + 1);
+  const { startMs, endMs } = getActiveSessionBounds(now.getTime(), openingHours);
   return {
-    startMs: start.getTime(),
-    endMs: end.getTime(),
-    dateStr: start.toISOString().split("T")[0],
+    startMs,
+    endMs,
+    dateStr:
+      getBusinessDayOfTimestamp(now.getTime(), openingHours)?.dateKey ??
+      localDateKey(now),
   };
 }
 
@@ -43,6 +57,11 @@ const useTodayOrders = () => {
   const { data: user } = useFetchUserDataQuery(uid ?? skipToken);
   const resId = user?.accessToken;
 
+  const { data: restaurantData } = useFetchRestaurantDataQuery(
+    resId ?? skipToken,
+  );
+  const openingHours = restaurantData?.operations?.openingHours;
+
   const [orders, setOrders] = useState<OrderType[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,7 +72,7 @@ const useTodayOrders = () => {
     }
 
     setLoading(true);
-    const { startMs, endMs } = getTodayBounds();
+    const { startMs, endMs } = getTodayBounds(openingHours);
 
     const ordersRef = collection(db, "orders");
     const q = query(
@@ -80,10 +99,10 @@ const useTodayOrders = () => {
     );
 
     return () => unsubscribe();
-  }, [resId]);
+  }, [resId, openingHours]);
 
   const todayData = useMemo<TodayData>(() => {
-    const { dateStr } = getTodayBounds();
+    const { dateStr } = getTodayBounds(openingHours);
 
     if (orders.length === 0) {
       return {
@@ -225,7 +244,7 @@ const useTodayOrders = () => {
       },
       operations: { avgPrepTime, avgDeliveryTime },
     };
-  }, [orders]);
+  }, [orders, openingHours]);
 
   return { todayData, loading, hasData: orders.length > 0 };
 };

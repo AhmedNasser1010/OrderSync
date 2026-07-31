@@ -1,12 +1,16 @@
-import type { OrderType, MainMenuType, ItemType } from "@ordersync/types";
+import type {
+  OrderType,
+  MainMenuType,
+  ItemType,
+  BusinessDocument,
+} from "@ordersync/types";
+import {
+  getBusinessDayOfTimestamp,
+  localDateKey,
+} from "@ordersync/order-utils";
 import type { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
 
-function dayKey(ts: number): string {
-  const d = new Date(ts);
-  const month = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}-${month}-${day}`;
-}
+type OpeningHours = BusinessDocument["operations"]["openingHours"];
 
 function average(values: number[]): number {
   if (!values.length) return 0;
@@ -37,6 +41,7 @@ type CategoryAgg = {
 const buildAnalyticsFromOrders = (
   orders: OrderType[],
   menu?: MainMenuType,
+  openingHours?: OpeningHours,
 ): AnalyticsEntry[] => {
   if (!orders.length) return [];
 
@@ -58,7 +63,9 @@ const buildAnalyticsFromOrders = (
 
   const grouped = new Map<string, OrderType[]>();
   for (const order of orders) {
-    const key = dayKey(order.createdAt);
+    const key =
+      getBusinessDayOfTimestamp(order.createdAt, openingHours)?.dateKey ??
+      localDateKey(new Date(order.createdAt));
     const dayOrders = grouped.get(key);
     if (dayOrders) dayOrders.push(order);
     else grouped.set(key, [order]);

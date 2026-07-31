@@ -1,3 +1,8 @@
+import type { BusinessDocument } from "@ordersync/types";
+import { getSessionRangeForDate } from "@ordersync/order-utils";
+
+type OpeningHours = BusinessDocument["operations"]["openingHours"];
+
 export type AnalyticsRanges = {
   start: number | null;
   end: number | null;
@@ -16,9 +21,20 @@ function shiftDays(ts: number, days: number): number {
   return d.getTime();
 }
 
+function sessionStartOfDate(ts: number, openingHours?: OpeningHours): number {
+  const range = getSessionRangeForDate(new Date(ts), openingHours);
+  return range ? range.startMs : ts;
+}
+
+function sessionEndOfDate(ts: number, openingHours?: OpeningHours): number {
+  const range = getSessionRangeForDate(new Date(ts), openingHours);
+  return range ? range.endMs : shiftDays(ts, 1);
+}
+
 const getAnalyticsRanges = (
   timeRangeValue: string,
   customRange: { start: string; end: string },
+  openingHours?: OpeningHours,
 ): AnalyticsRanges => {
   const now = new Date();
   const todayStart = new Date(
@@ -46,8 +62,14 @@ const getAnalyticsRanges = (
       };
     }
 
-    const start = localMidnightOf(customRange.start);
-    const end = shiftDays(localMidnightOf(customRange.end), 1);
+    const start = sessionStartOfDate(
+      localMidnightOf(customRange.start),
+      openingHours,
+    );
+    const end = sessionEndOfDate(
+      localMidnightOf(customRange.end),
+      openingHours,
+    );
     const diff = end - start;
 
     return {
@@ -61,10 +83,16 @@ const getAnalyticsRanges = (
   const days = Number(timeRangeValue);
 
   return {
-    start: shiftDays(todayStart, -days),
-    end: shiftDays(todayStart, 1),
-    previousStart: shiftDays(todayStart, -2 * days),
-    previousEnd: shiftDays(todayStart, -days + 1),
+    start: sessionStartOfDate(shiftDays(todayStart, -days), openingHours),
+    end: sessionEndOfDate(todayStart, openingHours),
+    previousStart: sessionStartOfDate(
+      shiftDays(todayStart, -2 * days),
+      openingHours,
+    ),
+    previousEnd: sessionEndOfDate(
+      shiftDays(todayStart, -days),
+      openingHours,
+    ),
   };
 };
 

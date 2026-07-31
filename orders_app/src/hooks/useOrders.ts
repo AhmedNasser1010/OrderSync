@@ -1,11 +1,16 @@
 import { useMemo, useCallback } from "react";
-import type { OrderType } from "@ordersync/types";
+import type { OrderType, BusinessDocument } from "@ordersync/types";
 import type { ItemType } from "@ordersync/types";
+import {
+  getBusinessDayOfTimestamp,
+  localDateKey,
+} from "@ordersync/order-utils";
 import type { FormattedOrderType, CartItemType, MainTabTypes } from "@/types/orders";
 import {
   useFetchUserDataQuery,
   useFetchActiveOrdersQuery,
   useFetchMenuDataQuery,
+  useFetchRestaurantDataQuery,
 } from "@/rtk/api/firestoreApi";
 import { useAppSelector } from "@/rtk/hooks";
 import { userUid } from "@/rtk/slices/constantsSlice";
@@ -13,6 +18,8 @@ import { activeTab } from "@/rtk/slices/toggleSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
 
 type TabCounts = Record<MainTabTypes, number>;
+
+type OpeningHours = BusinessDocument["operations"]["openingHours"];
 
 type UseOrders = {
   orders: OrderType[] | null;
@@ -50,6 +57,20 @@ function getStatusTab(status: string): MainTabTypes | null {
   }
 }
 
+function businessDayKey(ts: number, openingHours?: OpeningHours): string {
+  return (
+    getBusinessDayOfTimestamp(ts, openingHours)?.dateKey ??
+    localDateKey(new Date(ts))
+  );
+}
+
+function isTodayOrder(order: OrderType, openingHours?: OpeningHours): boolean {
+  return (
+    businessDayKey(order.createdAt, openingHours) ===
+    businessDayKey(Date.now(), openingHours)
+  );
+}
+
 const useOrders = (): UseOrders => {
   const uid = useAppSelector(userUid);
   const activeTabValue = useAppSelector(activeTab);
@@ -65,6 +86,11 @@ const useOrders = (): UseOrders => {
     userData?.accessToken,
     { skip: !userData?.accessToken },
   );
+
+  const { data: restaurantData } = useFetchRestaurantDataQuery(
+    userData?.accessToken ?? skipToken,
+  );
+  const openingHours = restaurantData?.operations?.openingHours;
 
   const isLoading = isUserDataLoading || activeOrdersIsLoading || menuIsLoading;
   const isError = activeOrdersIsError ?? false;
@@ -100,19 +126,32 @@ const useOrders = (): UseOrders => {
     for (const order of activeOrdersData) {
       const tab = getStatusTab(order.status.current);
       if (tab) {
+        if (
+          (tab === "COMPLETED" || tab === "VOIDED") &&
+          !isTodayOrder(order, openingHours)
+        ) {
+          continue;
+        }
         result[tab]++;
       }
     }
 
     return result;
-  }, [activeOrdersData]);
+  }, [activeOrdersData, openingHours]);
 
   const filteredOrders = useMemo<OrderType[] | null>(() => {
     if (!activeOrdersData) return null;
 
     const filtered = activeOrdersData.filter((order) => {
       const tab = getStatusTab(order.status.current);
-      return tab === activeTabValue;
+      if (tab !== activeTabValue) return false;
+      if (
+        (activeTabValue === "COMPLETED" || activeTabValue === "VOIDED") &&
+        !isTodayOrder(order, openingHours)
+      ) {
+        return false;
+      }
+      return true;
     });
 
     if (activeTabValue === "RECEIVED") {
@@ -120,7 +159,7 @@ const useOrders = (): UseOrders => {
     }
 
     return filtered;
-  }, [activeOrdersData, activeTabValue]);
+  }, [activeOrdersData, activeTabValue, openingHours]);
 
   const formattedOrders = useMemo<FormattedOrderType[] | null>(() => {
     return (
