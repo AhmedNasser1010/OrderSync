@@ -101,6 +101,15 @@
     "notSupported": "Geolocation is not supported by your browser",
     "accessDenied": "Location access denied. Enable it in your browser settings to go online."
   },
+  "notifications": {
+    "notSupported": "Push notifications are not supported by your browser",
+    "accessDenied": "Notifications are blocked. Enable them in your browser settings.",
+    "enablePrompt": "Enable push notifications to get alerted when new orders arrive.",
+    "enable": "Enable",
+    "newOrderTitle": "New Order Available",
+    "view": "View",
+    "close": "Close"
+  },
   "finance": {
     "blocked": "Your cash balance (${amount}) has reached the limit (${limit}). You cannot claim new orders.",
     "warning": "Your cash balance (${amount}) has reached the warning limit (${limit})."
@@ -191,7 +200,9 @@
     "logoutDesc": "Sign out of your account.",
     "logoutConfirm": "Logout",
     "logoutConfirmDesc": "Are you sure you want to log out?",
-    "loggingOut": "Logging out..."
+    "loggingOut": "Logging out...",
+    "notifications": "Notifications",
+    "notificationsDesc": "Receive push notifications for new orders."
   },
   "mapOrderPopup": {
     "processing": "Processing...",

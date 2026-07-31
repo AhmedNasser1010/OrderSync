@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -15,15 +16,29 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { MoonStar, LogOut, Loader2, Languages } from "lucide-react";
+import { MoonStar, LogOut, Loader2, Languages, Bell } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { LocaleToggle } from "@/components/LocaleToggle";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export default function SettingsPage() {
   const t = useTranslations("settings");
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const [notifyPush, setNotifyPush] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
+  const handleTogglePush = async (enabled: boolean) => {
+    if (!user?.uid) return;
+    setNotifyPush(enabled);
+    try {
+      const driverRef = doc(db, "drivers", user.uid);
+      await updateDoc(driverRef, { notifyPush: enabled });
+    } catch {
+      setNotifyPush(!enabled);
+    }
+  };
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -71,6 +86,27 @@ export default function SettingsPage() {
             </div>
 
             <LocaleToggle />
+          </div>
+        </Card>
+
+        <Card className="border-border/60 bg-card/80 backdrop-blur-sm">
+          <div className="flex items-center justify-between gap-4 p-4">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <Bell className="h-4 w-4 text-muted-foreground" />
+                <h3 className="text-sm font-semibold text-foreground">
+                  {t("notifications")}
+                </h3>
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t("notificationsDesc")}
+              </p>
+            </div>
+
+            <Switch
+              checked={notifyPush}
+              onCheckedChange={handleTogglePush}
+            />
           </div>
         </Card>
 

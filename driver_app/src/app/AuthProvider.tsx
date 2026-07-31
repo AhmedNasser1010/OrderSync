@@ -6,6 +6,7 @@ import { LoaderCircle } from "lucide-react";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { AccountSetupScreen } from "@/components/approval/AccountSetupScreen";
 import { LocationTracker } from "@/components/LocationTracker";
+import { NotificationTracker } from "@/components/NotificationTracker";
 import { usePathname } from "next/navigation";
 
 type Props = {
@@ -40,5 +41,11 @@ export function AuthGuard({ children }: Props) {
     return <AccountSetupScreen />;
   }
 
-  return <LocationTracker>{children}</LocationTracker>;
+  return (
+    <LocationTracker>
+      <NotificationTracker>
+        {children}
+      </NotificationTracker>
+    </LocationTracker>
+  );
 }

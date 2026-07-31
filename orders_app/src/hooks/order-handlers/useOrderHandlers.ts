@@ -10,6 +10,7 @@ import { useAppSelector } from "@/rtk/hooks";
 import type { OrderType, OrderStatusType } from "@ordersync/types";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { canTransition, canReverseTransition, getNextStatuses, getPreviousStatuses, isDriverOwned } from "@ordersync/order-utils";
+import { sendMarketplacePush } from "@/app/actions/sendMarketplacePush";
 
 type OrderHandler = {
   handleChangeStatus: (orderId: string, nextStatus: OrderStatusType, reason?: string) => void;
@@ -58,7 +59,14 @@ const useOrderHandler = (): OrderHandler => {
     if (nextStatus === "CANCELED" || nextStatus === "REJECTED") {
       setCancelOrder({ orderId, reason });
     } else {
-      setOrderStatus({ orderId, updatedStatus: nextStatus });
+      setOrderStatus({ orderId, updatedStatus: nextStatus })
+        .unwrap()
+        .then(() => {
+          if (nextStatus === "READY") {
+            sendMarketplacePush(orderToUpdate.orderNumber).catch(() => {});
+          }
+        })
+        .catch(() => {});
     }
   };
 

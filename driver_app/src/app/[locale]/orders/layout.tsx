@@ -3,6 +3,8 @@
 import { ReactNode } from "react";
 import { usePathname } from "@/i18n/routing";
 import { LocationPermissionBanner } from "@/components/LocationPermissionBanner";
+import { NotificationPermissionBanner } from "@/components/NotificationPermissionBanner";
+import { NewOrderToast } from "@/components/NewOrderToast";
 import { FinanceWarningBanner } from "@/components/FinanceWarningBanner";
 import { BottomNav } from "@/components/orders/BottomNav";
 import { OrdersHeader } from "@/components/orders/Header";
@@ -17,6 +19,8 @@ export default function OrdersLayout({ children }: { children: ReactNode }) {
     <ThemeProvider>
       <BusinessNamesProvider>
       <div className="flex min-h-dvh flex-col">
+        <NotificationPermissionBanner />
+        <NewOrderToast />
         {!isMapPage && (
           <>
             <LocationPermissionBanner />

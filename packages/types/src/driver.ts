@@ -36,4 +36,6 @@ export type Driver = {
     warningLimit: number;
     blockLimit: number;
   };
+  fcmTokens?: string[];
+  notifyPush?: boolean;
 };
