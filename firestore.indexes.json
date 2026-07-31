@@ -82,15 +82,6 @@
       ]
     },
     {
-      "collectionGroup": "dailyReports",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "businessId", "order": "ASCENDING" },
-        { "fieldPath": "businessDate", "order": "DESCENDING" },
-        { "fieldPath": "__name__", "order": "ASCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "orders",
       "queryScope": "COLLECTION",
       "fields": [

@@ -6,22 +6,17 @@ import {
   getDoc,
   onSnapshot,
   runTransaction,
-  writeBatch,
   arrayUnion,
   query,
   where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { OrderType, OrderStatusType, RestaurantStatusTypes, BusinessDocument } from "@ordersync/types";
-import type { DailyReport } from "@ordersync/types";
 import { canTransition, canReverseTransition, getTimelineField, isDriverOwned } from "@ordersync/order-utils";
-
-const getDailyReportRef = (businessId: string, dateStr: string) =>
-  doc(collection(db, "dailyReports"), `${businessId}_${dateStr}`);
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["User", "Orders", "Menu", "Restaurant", "DailyReports"],
+  tagTypes: ["User", "Orders", "Menu", "Restaurant"],
   endpoints: (builder) => ({
     // =====================================================================
     // Query Endpoints
@@ -304,57 +299,15 @@ export const firestoreApi = createApi({
     }),
 
     setCloseDay: builder.mutation({
-      async queryFn({ resId, summaryData }: { resId: string; summaryData: { date: string; [key: string]: unknown } }) {
+      async queryFn({ resId }: { resId: string }) {
         try {
           if (!resId) throw new Error("Restaurant ID is required.");
-          if (!summaryData?.date) throw new Error("Summary data with date is required.");
 
-          const dateStr = summaryData.date;
-          const now = Date.now();
+          await updateDoc(doc(db, "businesses", resId), {
+            status: "inactive",
+          });
 
-          const batch = writeBatch(db);
-
-          // Write the daily report to the new top-level collection
-          const reportRef = getDailyReportRef(resId, dateStr);
-          const reportData: DailyReport = {
-            businessId: resId,
-            businessDate: dateStr,
-            createdAt: now,
-            totalOrders: (summaryData.totalOrders as number) || 0,
-            totalRevenue: (summaryData.totalRevenue as number) || 0,
-            totalDiscounts: (summaryData.totalDiscounts as number) || 0,
-            totalDeliveryFees: (summaryData.totalDeliveryFees as number) || 0,
-            itemsAnalytics: (summaryData.itemsAnalytics as DailyReport["itemsAnalytics"]) || [],
-            categoriesAnalytics: (summaryData.categoriesAnalytics as DailyReport["categoriesAnalytics"]) || [],
-            orderDurations: (summaryData.orderDurations as DailyReport["orderDurations"]) || {
-              averagePreparationTime: 0,
-              averageDeliveryTime: 0,
-              averageCompletionTime: 0,
-            },
-            customerInsights: (summaryData.customerInsights as DailyReport["customerInsights"]) || {
-              totalUniqueCustomers: 0,
-              newCustomers: 0,
-              returningCustomers: 0,
-              averageRating: 0,
-              feedbackCount: 0,
-            },
-            paymentMethods: (summaryData.paymentMethods as DailyReport["paymentMethods"]) || {},
-            orderSources: (summaryData.orderSources as DailyReport["orderSources"]) || {},
-            topLocations: (summaryData.topLocations as DailyReport["topLocations"]) || [],
-            cancelledOrders: (summaryData.cancelledOrders as DailyReport["cancelledOrders"]) || {
-              totalCancelled: 0,
-              cancellationRate: 0,
-            },
-          };
-          batch.set(reportRef, reportData);
-
-          // Set restaurant status to inactive
-          const businessRef = doc(db, "businesses", resId);
-          batch.update(businessRef, { status: "inactive" });
-
-          await batch.commit();
-
-          console.log("Close day completed. Daily report saved, restaurant set to inactive.");
+          console.log("Close day completed. Restaurant set to inactive.");
           return { data: null };
         } catch (error) {
           const message = error instanceof Error ? error.message : "Unknown error";
@@ -362,7 +315,7 @@ export const firestoreApi = createApi({
           return { error: message };
         }
       },
-      invalidatesTags: ["Restaurant", "DailyReports"],
+      invalidatesTags: ["Restaurant"],
     }),
 
     setDisplaySettings: builder.mutation({

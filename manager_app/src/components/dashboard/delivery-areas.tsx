@@ -19,9 +19,6 @@ export function DeliveryAreas({ areas }: DeliveryAreasProps) {
           {t("title")}
           <WidgetHelp widgetKey="deliveryAreas" />
         </h3>
-        <button className="text-xs font-medium px-2.5 py-1 bg-primary text-primary-foreground rounded-lg hover:opacity-90">
-          {t("viewMap")}
-        </button>
       </div>
 
       <div className="space-y-3">

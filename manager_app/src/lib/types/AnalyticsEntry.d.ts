@@ -54,7 +54,7 @@ export type CancelledOrders = {
   cancellationRate: number;
 };
 
-// Represents a single analytics entry (compatible with DailyReport)
+// Represents a single analytics entry per business day
 export type AnalyticsEntry = {
   businessDate: string;
   businessId: string;

@@ -12,26 +12,19 @@ import {
   deleteDoc,
   setDoc,
 } from "firebase/firestore";
+import type { QueryConstraint } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type {
   ManagerUser,
   MainMenuType,
   BusinessDocument,
-  DailyReport,
   PromoCode,
 } from "@ordersync/types";
 import type { OrderType } from "@ordersync/types";
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: [
-    "User",
-    "Menu",
-    "Restaurant",
-    "Orders",
-    "DailyReports",
-    "PromoCodes",
-  ],
+  tagTypes: ["User", "Menu", "Restaurant", "Orders", "PromoCodes"],
   endpoints: (builder) => ({
     // Query Endpoints
     fetchUserData: builder.query<ManagerUser, string>({
@@ -104,69 +97,37 @@ export const firestoreApi = createApi({
       providesTags: ["Restaurant"],
     }),
 
-    // Real-time orders for this business from global collection
-    fetchOrdersData: builder.query({
-      queryFn: () => ({ data: [] }),
-      async onCacheEntryAdded(
-        resId,
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
-      ) {
-        const ordersRef = collection(db, "orders");
-        const q = query(
-          ordersRef,
-          where("businessId", "==", resId),
-          orderBy("createdAt", "desc"),
-        );
-
-        await cacheDataLoaded;
-
-        const unsubscribe = onSnapshot(
-          q,
-          (snapshot) => {
-            updateCachedData((draft: OrderType[]) => {
-              draft.length = 0;
-              snapshot.docs.forEach((doc) =>
-                draft.push(doc.data() as OrderType),
-              );
-            });
-            console.log("Real-time Update [orders]");
-          },
-          (error) => {
-            console.error("Error in real-time listener [orders]:", error?.message);
-          },
-        );
-
-        await cacheEntryRemoved;
-        unsubscribe();
-      },
-      providesTags: ["Orders"],
-    }),
-
-    // Daily reports from the top-level collection
-    fetchDailyReportsData: builder.query<DailyReport[], string>({
-      async queryFn(resId) {
+    // Orders for this business from global collection, filtered by time range
+    fetchOrdersData: builder.query<
+      OrderType[],
+      { resId: string; start: number | null; end: number | null }
+    >({
+      async queryFn({ resId, start, end }) {
         try {
-          const dailyReportsRef = collection(db, "dailyReports");
-          const q = query(
-            dailyReportsRef,
+          if (!resId) return { error: "Restaurant ID is required." };
+
+          const ordersRef = collection(db, "orders");
+          const constraints: QueryConstraint[] = [
             where("businessId", "==", resId),
-            orderBy("businessDate", "desc"),
+          ];
+          if (start != null) constraints.push(where("createdAt", ">=", start));
+          if (end != null) constraints.push(where("createdAt", "<", end));
+          constraints.push(orderBy("createdAt", "desc"));
+
+          const ordersSnapshot = await getDocs(query(ordersRef, ...constraints));
+          const orders = ordersSnapshot.docs.map(
+            (d) => d.data() as OrderType,
           );
-          const dailyReportsSnapshot = await getDocs(q);
-          const dailyReports = dailyReportsSnapshot.docs.map(
-            (d) => d.data() as DailyReport,
-          );
-          console.log("Read Operation [dailyReports]");
-          return { data: dailyReports };
+          console.log("Read Operation [orders]");
+          return { data: orders };
         } catch (error: unknown) {
           const message =
             error instanceof Error ? error.message : "Unknown error";
-          console.error(error);
-          console.error(error instanceof Error ? error.stack : undefined);
+          console.error(message);
           return { error: message };
         }
       },
-      providesTags: ["DailyReports"],
+      providesTags: ["Orders"],
     }),
 
     syncMenuData: builder.mutation<
@@ -274,7 +235,6 @@ export const {
   useFetchMenuDataQuery,
   useFetchRestaurantDataQuery,
   useFetchOrdersDataQuery,
-  useFetchDailyReportsDataQuery,
   useSyncMenuDataMutation,
   useFetchPromoCodesQuery,
   useAddPromoCodeMutation,

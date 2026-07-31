@@ -12,7 +12,6 @@ rules_version = '2';
 //
 // Architecture:
 //   orders/{orderId}     -> flat global collection, no subcollections
-//   dailyReports/{id}    -> pre-computed daily analytics snapshots
 // =========================================================================
 
 service cloud.firestore {
@@ -260,18 +259,6 @@ service cloud.firestore {
         && resourceData().businessId in partnerBusinessIds()
         && incomingData().diff(resourceData()).affectedKeys()
             .hasOnly(['reconciliation', 'updatedAt']);
-    }
-
-    // =====================================================================
-    // /dailyReports/{reportId}
-    //
-    // Pre-computed daily analytics snapshots written by orders_app
-    // when the restaurant closes the day.
-    // Document ID format: {businessId}_{yyyy-MM-dd}
-    // =====================================================================
-    match /dailyReports/{reportId} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn();
     }
 
     // =====================================================================

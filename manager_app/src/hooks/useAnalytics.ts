@@ -1,30 +1,29 @@
 import {
-  useFetchDailyReportsDataQuery,
+  useFetchMenuDataQuery,
+  useFetchOrdersDataQuery,
   useFetchUserDataQuery,
 } from "@/lib/rtk/api/firestoreApi";
 import { useTranslations } from "next-intl";
 import { useAppSelector } from "@/lib/rtk/hooks";
 import { userUid } from "@/lib/rtk/slices/constantsSlice";
 import { timeRange, customDateRange } from "@/lib/rtk/slices/toggleSlice";
-import filterDataByDateRange from "@/utilities/filterDataByDateRange";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useMemo, useState, useEffect, useRef } from "react";
 import { calculateMetrics } from "@/utilities/analytics/calculateMetrics";
 import { calculatePercentageChange } from "@/utilities/analytics/calculatePercentageChange";
 import { generateDashboardData } from "@/utilities/analytics/generateDashboardData";
-import type { DailyReport } from "@ordersync/types";
-import type { DashboardData } from "@/lib/types/types";
+import getAnalyticsRanges from "@/utilities/analytics/getAnalyticsRanges";
+import buildAnalyticsFromOrders from "@/utilities/analytics/buildAnalyticsFromOrders";
+import type { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
 
 const useAnalytics = () => {
   const t = useTranslations("Dashboard.kpis");
   const uid = useAppSelector(userUid);
 
   const { data: user } = useFetchUserDataQuery(uid ?? skipToken);
-
   const resId = user?.accessToken;
 
-  const { data: dailyReportsData } =
-    useFetchDailyReportsDataQuery(resId ?? skipToken);
+  const { data: menuData } = useFetchMenuDataQuery(resId ?? skipToken);
 
   const timeRangeValue = useAppSelector(timeRange);
   const customRange = useAppSelector(customDateRange);
@@ -47,75 +46,40 @@ const useAnalytics = () => {
     }
   }, [timeRangeValue, customRange]);
 
-  const currentPeriodData = useMemo(() => {
-    if (!dailyReportsData) return [];
+  const ranges = useMemo(
+    () => getAnalyticsRanges(timeRangeValue, customRange),
+    [timeRangeValue, customRange],
+  );
 
-    if (timeRangeValue === "all") {
-      return dailyReportsData;
-    }
+  const isCustomIncomplete =
+    timeRangeValue === "custom" && (!customRange.start || !customRange.end);
 
-    if (timeRangeValue === "custom") {
-      if (!customRange.start || !customRange.end) return [];
-      return filterDataByDateRange(
-        customRange.start,
-        customRange.end,
-        "businessDate",
-        dailyReportsData,
-      );
-    }
+  const currentArgs =
+    resId && !isCustomIncomplete
+      ? { resId, start: ranges.start, end: ranges.end }
+      : skipToken;
 
-    const startDate = new Date(
-      new Date().setDate(new Date().getDate() - Number(timeRangeValue)),
-    )
-      .toISOString()
-      .split("T")[0];
+  const previousArgs =
+    resId &&
+    !isCustomIncomplete &&
+    timeRangeValue !== "all" &&
+    ranges.previousStart != null &&
+    ranges.previousEnd != null
+      ? { resId, start: ranges.previousStart, end: ranges.previousEnd }
+      : skipToken;
 
-    const endDate = new Date().toISOString().split("T")[0];
+  const { data: currentOrders } = useFetchOrdersDataQuery(currentArgs);
+  const { data: previousOrders } = useFetchOrdersDataQuery(previousArgs);
 
-    return filterDataByDateRange(
-      startDate,
-      endDate,
-      "businessDate",
-      dailyReportsData,
-    );
-  }, [dailyReportsData, timeRangeValue, customRange.start, customRange.end]);
+  const currentPeriodData = useMemo<AnalyticsEntry[]>(
+    () => buildAnalyticsFromOrders(currentOrders ?? [], menuData),
+    [currentOrders, menuData],
+  );
 
-  const previousPeriodData = useMemo(() => {
-    if (!dailyReportsData || timeRangeValue === "all") {
-      return [];
-    }
-
-    if (timeRangeValue === "custom") {
-      if (!customRange.start || !customRange.end) return [];
-      const diff =
-        new Date(customRange.end).getTime() -
-        new Date(customRange.start).getTime();
-      const previousEnd = new Date(new Date(customRange.start).getTime() - 1);
-      const previousStart = new Date(previousEnd.getTime() - diff);
-      return filterDataByDateRange(
-        previousStart.toISOString().split("T")[0],
-        previousEnd.toISOString().split("T")[0],
-        "businessDate",
-        dailyReportsData,
-      );
-    }
-
-    const days = Number(timeRangeValue);
-
-    const previousEnd = new Date();
-    previousEnd.setDate(previousEnd.getDate() - days);
-
-    const previousStart = new Date(previousEnd);
-
-    previousStart.setDate(previousStart.getDate() - days);
-
-    return filterDataByDateRange(
-      previousStart.toISOString().split("T")[0],
-      previousEnd.toISOString().split("T")[0],
-      "businessDate",
-      dailyReportsData,
-    );
-  }, [dailyReportsData, timeRangeValue, customRange.start, customRange.end]);
+  const previousPeriodData = useMemo<AnalyticsEntry[]>(
+    () => buildAnalyticsFromOrders(previousOrders ?? [], menuData),
+    [previousOrders, menuData],
+  );
 
   const dashboardData = useMemo(() => {
     const currentMetrics = calculateMetrics(currentPeriodData);
@@ -168,11 +132,16 @@ const useAnalytics = () => {
     });
   }, [currentPeriodData, previousPeriodData]);
 
+  const loading =
+    !resId ||
+    (currentArgs !== skipToken && (!currentOrders || !menuData)) ||
+    filterLoading;
+
   return {
     data: currentPeriodData,
     previousData: previousPeriodData,
     dashboardData,
-    loading: !dailyReportsData || filterLoading,
+    loading,
     hasData: currentPeriodData.length > 0,
   };
 };

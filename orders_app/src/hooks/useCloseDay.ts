@@ -2,16 +2,13 @@ import { useEffect } from "react";
 import {
   useFetchUserDataQuery,
   useFetchActiveOrdersQuery,
-  useFetchMenuDataQuery,
   useSetCloseDayMutation,
 } from "@/rtk/api/firestoreApi";
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { useAppSelector, useAppDispatch } from "@/rtk/hooks";
 import { closeDayPopup, setCloseDayPopup } from "@/rtk/slices/toggleSlice";
 import type { OrderType } from "@ordersync/types";
-import type { MainMenuType } from "@ordersync/types";
 import { isFinalStatus } from "@ordersync/order-utils";
-import extractDaySummary from "@/analytics/day_scope/extractDaySummary";
 import { skipToken } from "@reduxjs/toolkit/query";
 
 type UseCloseDay = {
@@ -37,10 +34,6 @@ const useCloseDay = (): UseCloseDay => {
       skip: !userData?.accessToken,
     },
   ) as { data?: OrderType[]; isLoading?: boolean };
-
-  const { data: menuData } = useFetchMenuDataQuery(userData?.accessToken, {
-    skip: !userData?.accessToken,
-  }) as { data?: MainMenuType; isLoading?: boolean };
 
   useEffect(() => {
     if (activeOrdersData && closeDayPopupValues.isOpen) {
@@ -118,15 +111,7 @@ const useCloseDay = (): UseCloseDay => {
   };
 
   const closeDay = () => {
-    if (isPassed() && menuData) {
-      const todayDate = new Date().toISOString().split("T")[0];
-      // Use all orders (including delivered, voided) for the daily summary
-      // The extractDaySummary function will filter as needed
-      const extractDaySummaryData = extractDaySummary(
-        activeOrdersData || [],
-        menuData,
-        todayDate,
-      );
+    if (isPassed()) {
       dispatch(
         setCloseDayPopup({
           isLoading: true,
@@ -136,13 +121,7 @@ const useCloseDay = (): UseCloseDay => {
           },
         }),
       );
-      setCloseDay({
-        resId: userData?.accessToken,
-        summaryData: {
-          ...extractDaySummaryData,
-          date: todayDate,
-        },
-      })
+      setCloseDay({ resId: userData?.accessToken })
         .unwrap()
         .catch(() => {
           // Error state is handled by the effect above.
