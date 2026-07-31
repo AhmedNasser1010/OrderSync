@@ -12,6 +12,7 @@ import NoOrders from "@/components/NoOrders";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import BatchActions from "@/components/BatchActions";
+import { Separator } from "@/components/ui/separator";
 
 function matchesSearch(order: {
   id: string;
@@ -38,6 +39,7 @@ function matchesSearch(order: {
 
 export default function OrdersView() {
   const t = useTranslations("Orders.view");
+  const st = useTranslations("Orders.statuses");
   const ct = useTranslations("Common");
   const { formattedOrders, receivedOrders, isLoading, isError } = useOrders();
   const activeTabValue = useAppSelector(activeTab);
@@ -64,6 +66,17 @@ export default function OrdersView() {
 
   const hasOrders = (formattedOrders?.length ?? 0) > 0;
   const isSearchEmpty = isSearching && visibleOrders.length === 0;
+
+  const preparingGroups = useMemo(() => {
+    if (activeTabValue !== "PREPARING") return null;
+
+    const accepted = visibleOrders.filter((order) => order.status === "ACCEPTED");
+    const preparing = visibleOrders.filter((order) => order.status === "PREPARING");
+
+    if (accepted.length === 0 || preparing.length === 0) return null;
+
+    return { accepted, preparing };
+  }, [activeTabValue, visibleOrders]);
 
   if (isError) {
     return (
@@ -109,13 +122,39 @@ export default function OrdersView() {
         <NoOrders activeTab={activeTabValue} />
       ) : (
         <div className="flex flex-col gap-3">
-          {visibleOrders.map((order) => (
-            <OrderCard
-              key={order.id}
-              order={order}
-              activeTabValue={activeTabValue}
-            />
-          ))}
+          {preparingGroups ? (
+            <>
+              {preparingGroups.accepted.map((order) => (
+                <OrderCard
+                  key={order.id}
+                  order={order}
+                  activeTabValue={activeTabValue}
+                />
+              ))}
+              <div className="flex items-center gap-3 px-1" role="separator">
+                <Separator className="flex-1" />
+                <span className="text-xs font-medium text-muted-foreground">
+                  {st("PREPARING")}
+                </span>
+                <Separator className="flex-1" />
+              </div>
+              {preparingGroups.preparing.map((order) => (
+                <OrderCard
+                  key={order.id}
+                  order={order}
+                  activeTabValue={activeTabValue}
+                />
+              ))}
+            </>
+          ) : (
+            visibleOrders.map((order) => (
+              <OrderCard
+                key={order.id}
+                order={order}
+                activeTabValue={activeTabValue}
+              />
+            ))
+          )}
         </div>
       )}
     </div>
