@@ -10,12 +10,14 @@ import {
   useMap,
 } from "react-leaflet";
 import { latLngBounds } from "leaflet";
+import "leaflet/dist/leaflet.css";
 import { useTranslations } from "next-intl";
 import {
   restaurantMapIcon,
   driverMapIcon,
   personMapIcon,
 } from "@/components/Sidebar/mapCustomMarker";
+import { cn } from "@/lib/utils";
 import type { RestaurantDocument } from "@/types/restaurant";
 
 interface OrderTrackingMapProps {
@@ -25,6 +27,7 @@ interface OrderTrackingMapProps {
   restaurant: RestaurantDocument | undefined;
   deliveryLatlng: [number, number] | null;
   driverLocation: [number, number] | null;
+  className?: string;
 }
 
 function FitMapToMarkers({ points }: { points: ([number, number] | null)[] }) {
@@ -63,6 +66,7 @@ function OrderTrackingMap({
   restaurant,
   deliveryLatlng,
   driverLocation,
+  className,
 }: OrderTrackingMapProps) {
   const t = useTranslations();
 
@@ -71,7 +75,7 @@ function OrderTrackingMap({
       center={center}
       zoom={13}
       scrollWheelZoom={isMapLive}
-      className="w-full h-[400px] relative z-0"
+      className={cn("w-full h-[400px] relative z-0", className)}
     >
       <FitMapToMarkers points={mapPoints} />
       <TileLayer

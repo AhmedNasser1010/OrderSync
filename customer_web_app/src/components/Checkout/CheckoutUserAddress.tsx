@@ -67,7 +67,7 @@ const CheckoutUserAddress = ({
 
   const handleOnRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!newCustomMark) {
-      toast.error(t("First, select your custom location on the map."), {
+      toast.error(t("selectCustomLocationFirst"), {
         position: "top-center",
         duration: 3000,
       });

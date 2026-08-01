@@ -22,7 +22,7 @@ function LocationButton({
       map.flyTo(latlng, 15);
       addMarker(latlng);
     } else {
-      console.warn(t("Location not available yet."));
+      console.warn(t("locationNotAvailable"));
     }
   };
 
@@ -42,7 +42,7 @@ function LocationButton({
         options
       );
     } else {
-      console.warn(t("Geolocation is not supported by this browser."));
+      console.warn(t("geolocationUnsupported"));
     }
   };
 

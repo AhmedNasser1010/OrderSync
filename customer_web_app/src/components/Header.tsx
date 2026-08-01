@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
-import { ChevronDownIcon, MapPinIcon } from "lucide-react";
+import { useEffect, useSyncExternalStore } from "react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import {
-  toggleLocationSidebar,
   toggleLoginSidebar,
   toggleOrderSidebar,
   toggleLng,
 } from "@/rtk/slices/toggleSlice";
 import { LOGO_URL } from "@/utils/constants";
 import { useTranslations, useLocale } from "next-intl";
-import { Link, useRouter } from "@/i18n/routing";
+import { Link } from "@/i18n/routing";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { initUser } from "@/rtk/slices/userSlice";
@@ -20,18 +18,19 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { toast } from "sonner";
 
+const emptySubscribe = () => () => {};
+
 const Header = () => {
   const t = useTranslations();
   const locale = useLocale();
-  const router = useRouter();
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector((state) => state.cart.items);
   const user = useAppSelector((state) => state.user);
-
-  const handleLocationSidebar = () => {
-    dispatch(toggleLocationSidebar());
-    document.body.classList.add("overflow-hidden");
-  };
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const handleOrderSidebar = () => {
     dispatch(toggleOrderSidebar());
@@ -71,7 +70,7 @@ const Header = () => {
 
   useEffect(() => {
     if (user?.userInfo?.uid && user?.userInfo?.phone) {
-      toast(t("Great! After successfully logging in, please update your contact information to be able to place orders."), {
+      toast(t("updateContactInfoAfterLogin"), {
         position: "top-center",
         duration: 4000,
       });
@@ -90,11 +89,6 @@ const Header = () => {
     dispatch(toggleLng(locale));
   }, [locale, dispatch]);
 
-  const changeLanguage = (lng: string) => {
-    router.replace("/", { locale: lng });
-    dispatch(toggleLng(lng));
-  };
-
   return (
     <header className="shadow-md w-full fixed left-0 top-0 right-0 h-20 z-40 md:px-5 text-color-1 bg-white px-3">
       <div className="flex justify-between items-center h-full container mx-auto">
@@ -105,34 +99,6 @@ const Header = () => {
           <Link href="/">
             <h1 className="font-Beiruti md:text-3xl text-2xl">{t("Zack's Eats")}</h1>
           </Link>
-          <button
-            onClick={handleLocationSidebar}
-            type="button"
-            className="md:flex items-center gap-2 group hidden"
-          >
-            {!user?.locations?.city && (
-              <span className="custom-underline relative font-ProximaNovaBold text-sm group-hover:text-color-2">
-                {t("Select")}
-              </span>
-            )}
-            {user?.locations?.city ? (
-              <span className="block text-[#686b78] text-sm font-ProximaNovaThin group-hover:text-color-5">
-                {t(user.locations.city)}
-              </span>
-            ) : null}
-            <span className="text-color-2 text-xl">
-              <ChevronDownIcon className="size-5" />
-            </span>
-          </button>
-          <button
-            onClick={handleLocationSidebar}
-            className="md:hidden flex gap-1 items-center text-color-1"
-          >
-            <div className="text-xl">
-              <MapPinIcon className="size-5" />
-            </div>
-            <span className="text-sm font-ProximaNovaThin">{t("Location")}</span>
-          </button>
         </div>
 
         <ul className="font-ProximaNovaMed flex items-center md:gap-5 gap-4">
@@ -162,7 +128,7 @@ const Header = () => {
           </button>
           <Link href="/cart" className="flex items-center gap-2 group hover:text-color-2">
             <div className="relative overflow-hidden font-ProximaNovaSemiBold">
-              {cartItems.length > 0 ? (
+              {mounted && cartItems.length > 0 ? (
                 <>
                   <svg
                     className="stroke-color-11 fill-color-11 stroke-2"
@@ -173,7 +139,7 @@ const Header = () => {
                     <path d="M4.438 0l-2.598 5.11-1.84 26.124h34.909l-1.906-26.124-2.597-5.11z"></path>
                   </svg>
                   <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm text-white">
-                    {cartItems.length}
+                    {mounted ? cartItems.length : 0}
                   </span>
                 </>
               ) : (
@@ -187,19 +153,13 @@ const Header = () => {
                     <path d="M4.438 0l-2.598 5.11-1.84 26.124h34.909l-1.906-26.124-2.597-5.11z"></path>
                   </svg>
                   <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm">
-                    {cartItems.length}
+                    {mounted ? cartItems.length : 0}
                   </span>
                 </>
               )}
             </div>
             <span>{t("Cart")}</span>
           </Link>
-          <button
-            onClick={() => changeLanguage(locale === "ar" ? "en" : "ar")}
-            className="text-sm font-ProximaNovaSemiBold text-color-6 hover:text-color-2"
-          >
-            {locale === "ar" ? "EN" : "عربي"}
-          </button>
         </ul>
       </div>
     </header>

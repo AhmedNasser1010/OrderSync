@@ -14,12 +14,9 @@ import MenuPopups from "@/components/RestaurantMenu/MenuPopups";
 import { resetPopupStates } from "@/rtk/slices/toggleSlice";
 import type { RestaurantDocument } from "@/types/restaurant";
 
-const inactiveMsg =
-  "This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding.";
-const busyMsg =
-  "This restaurant is currently busy, so your order may take longer than usual.";
-const pauseMsg =
-  "This restaurant is temporarily paused, so we can't take any orders at the moment. We apologize for the inconvenience.";
+const inactiveMsg = "restaurantClosedMessage";
+const busyMsg = "restaurantBusyMessage";
+const pauseMsg = "restaurantPausedMessage";
 
 export default function RestaurantMenuPage() {
   const dispatch = useAppDispatch();

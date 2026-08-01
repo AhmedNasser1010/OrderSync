@@ -11,9 +11,17 @@ export interface CartState {
   items: CartItem[];
   restaurant: string;
   appliedOrderDiscount: Record<string, unknown> | null;
+  hydrated: boolean;
 }
 
-const loadStateFromLocalStorage = (): CartState => {
+const emptyCartState = (): CartState => ({
+  items: [],
+  restaurant: "",
+  appliedOrderDiscount: null,
+  hydrated: false,
+});
+
+const loadStateFromLocalStorage = (): Omit<CartState, "hydrated"> => {
   if (typeof window === "undefined") {
     return { items: [], restaurant: "", appliedOrderDiscount: null };
   }
@@ -33,7 +41,7 @@ const saveStateToLocalStorage = (state: CartState) => {
   }
 };
 
-const initialState: CartState = loadStateFromLocalStorage();
+const initialState: CartState = emptyCartState();
 
 export const cartSlice = createSlice({
   name: "cart",
@@ -43,8 +51,17 @@ export const cartSlice = createSlice({
       saveStateToLocalStorage(payload);
       return payload;
     },
+    hydrateCart: (state) => {
+      if (state.hydrated) return state;
+      const saved = loadStateFromLocalStorage();
+      state.items = saved.items;
+      state.restaurant = saved.restaurant;
+      state.appliedOrderDiscount = saved.appliedOrderDiscount;
+      state.hydrated = true;
+      return state;
+    },
     clearCart: () => {
-      const newState: CartState = { items: [], restaurant: "", appliedOrderDiscount: null };
+      const newState = { ...emptyCartState(), hydrated: true };
       saveStateToLocalStorage(newState);
       return newState;
     },
@@ -106,6 +123,7 @@ export const cartSlice = createSlice({
 
 export const {
   initCart,
+  hydrateCart,
   clearCart,
   addToCart,
   quantityHandle,

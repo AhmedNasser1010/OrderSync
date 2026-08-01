@@ -120,7 +120,11 @@ const CheckoutUserPayment = ({
   const handlePlaceOrder = () => {
     setButtonIsDisable(true);
     placeOrder(checkout?.comment as string)
-      .then(() => {
+      .then((placed) => {
+        if (!placed) {
+          setButtonIsDisable(false);
+          return;
+        }
         setWindowIsOpen(true);
         setTimeout(() => {
           dispatch(clearCheckout());
@@ -230,7 +234,7 @@ const CheckoutUserPayment = ({
           />
           <span className="text-[22px] font-light">{t("Cash Payment")}</span>
           <p className="text-[13px] w-4/5 text-center text-color-8">
-            {t("Pay your order to the delivery captain.")}
+            {t("payToDeliveryCaptain")}
           </p>
         </RadioInputWrapper>
         <RadioInputWrapper htmlFor="visa" selected={paymentMethod === "ONLINE"}>
@@ -244,7 +248,7 @@ const CheckoutUserPayment = ({
           />
           <span className="text-[22px] font-light">{t("Online Payment")}</span>
           <p className="text-[13px] w-4/5 text-center text-color-8">
-            {t("Pay online with, Visa or Vodafone Cash.")}
+            {t("payOnlineMethods")}
           </p>
         </RadioInputWrapper>
       </div>
@@ -339,9 +343,7 @@ const CheckoutUserPayment = ({
               />
             </svg>
             <p className="text-center text-[17px] leading-6 max-w-[70%] font-bold">
-              {t(
-                "Successfully received your order. The delivery captain will contact you when your order is ready."
-              )}
+              {t("orderReceivedSuccessfully")}
             </p>
           </div>
         </PopupWindow>

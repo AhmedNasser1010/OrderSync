@@ -89,7 +89,7 @@ export default function CheckoutPage() {
           title={t("Not Available")}
           subject={
             res?.branding?.closeMsg ||
-            t("Sorry we are not available right now come back again later.")
+            t("notAvailableRightNow")
           }
           button={<Link href="/">{t("Back To Home")}</Link>}
         />

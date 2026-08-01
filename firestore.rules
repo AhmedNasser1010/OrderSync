@@ -181,25 +181,33 @@ service cloud.firestore {
       // --- READ permissions ---
 
       // Customers can read orders they placed.
-      allow read: if isCustomer()
-        && resourceData().customer.uid == request.auth.uid;
+      // resource == null lets an order listener resolve exists() == false
+      // (instead of permission-denied) when the order doc isn't created yet,
+      // so the transient listener keeps running and picks up the order once it appears.
+      allow read: if resource == null
+        || (isCustomer()
+          && resourceData().customer.uid == request.auth.uid);
 
       // Managers can read orders for their business.
-      allow read: if isManager()
-        && resourceData().businessId == managerAccessToken();
+      allow read: if resource == null
+        || (isManager()
+          && resourceData().businessId == managerAccessToken());
 
       // Partners can read orders for their businesses.
-      allow read: if isPartner()
-        && resourceData().businessId in partnerBusinessIds();
+      allow read: if resource == null
+        || (isPartner()
+          && resourceData().businessId in partnerBusinessIds());
 
       // Drivers can read READY orders (marketplace browsing).
-      allow read: if isRider()
-        && resourceData().status.current == 'READY';
+      allow read: if resource == null
+        || (isRider()
+          && resourceData().status.current == 'READY');
 
       // Drivers can read orders assigned to them.
-      allow read: if isRider()
-        && resourceData().assignment != null
-        && resourceData().assignment.driverUid == request.auth.uid;
+      allow read: if resource == null
+        || (isRider()
+          && resourceData().assignment != null
+          && resourceData().assignment.driverUid == request.auth.uid);
 
       // --- CREATE permissions ---
 

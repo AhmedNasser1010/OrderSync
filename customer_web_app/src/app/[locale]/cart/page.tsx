@@ -417,7 +417,7 @@ export default function CartPage() {
                 {t("Clear All")}
               </button>
               <button
-                onClick={() => placeOrder(comment)}
+                onClick={() => placeOrder(comment).catch(() => {})}
                 className="bg-color-11 border border-color-11 text-white hover:bg-white hover:text-color-11"
               >
                 {t("Place Order")}

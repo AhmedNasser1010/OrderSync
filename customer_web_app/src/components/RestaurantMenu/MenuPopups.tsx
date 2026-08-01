@@ -44,9 +44,7 @@ const MenuPopups = () => {
     <>
       <MenuPopup
         title={t("Items already in cart")}
-        description={t(
-          "Your cart contains items from other restaurant. Would you like to reset your cart for adding items from this restaurant?"
-        )}
+        description={t("resetCartConfirmation")}
         visibility={showItemsAlreadyInCartPopup}
         closeCallback={() => dispatch(setShowItemsAlreadyInCartPopup(false))}
         callbackFunc={handleClearCart}
@@ -56,9 +54,7 @@ const MenuPopups = () => {
 
       <MenuPopup
         title={t("Order already in delivery")}
-        description={t(
-          "You cannot clear these items because your order from this restaurant is already placed and being delivered to you."
-        )}
+        description={t("cannotClearDeliveredOrderItems")}
         visibility={showTrackedOrderLockPopup}
         closeCallback={() => dispatch(setShowTrackedOrderLockPopup(false))}
         noLabel={t("Close")}
@@ -67,9 +63,7 @@ const MenuPopups = () => {
 
       <MenuPopup
         title={t("Restaurant Is Closed")}
-        description={t(
-          "This restaurant is currently closed or outside of working hours. Please check back during our regular hours. We appreciate your understanding."
-        )}
+        description={t("restaurantClosedMessage")}
         visibility={showResClosedPopup}
         closeCallback={() => dispatch(setShowResClosedPopup(false))}
         callbackFunc={() => router.push("/")}
@@ -79,9 +73,7 @@ const MenuPopups = () => {
 
       <MenuPopup
         title={t("Restaurant Is Paused")}
-        description={t(
-          "This restaurant is temporarily paused, so we can't take any orders at the moment. We apologize for the inconvenience."
-        )}
+        description={t("restaurantPausedMessage")}
         visibility={showResPausedPopup}
         closeCallback={() => dispatch(setShowResPausedPopup(false))}
         callbackFunc={() => router.push("/")}

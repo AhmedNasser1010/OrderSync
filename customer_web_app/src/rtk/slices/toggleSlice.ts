@@ -1,7 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
 export interface ToggleState {
-  isLocationSidebarOpen: boolean;
   isLoginSidebarOpen: boolean;
   isOrderSidebarOpen: boolean;
   lng: string;
@@ -16,7 +15,6 @@ export interface ToggleState {
 }
 
 const initialState: ToggleState = {
-  isLocationSidebarOpen: false,
   isLoginSidebarOpen: false,
   isOrderSidebarOpen: false,
   lng: "ar",
@@ -34,9 +32,6 @@ const toggleSlice = createSlice({
   name: "toggle",
   initialState,
   reducers: {
-    toggleLocationSidebar: (state) => {
-      state.isLocationSidebarOpen = !state.isLocationSidebarOpen;
-    },
     toggleLoginSidebar: (state) => {
       state.isLoginSidebarOpen = !state.isLoginSidebarOpen;
     },
@@ -87,7 +82,6 @@ const toggleSlice = createSlice({
 });
 
 export const {
-  toggleLocationSidebar,
   toggleLoginSidebar,
   toggleOrderSidebar,
   toggleLng,

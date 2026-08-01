@@ -4,7 +4,6 @@ import { routing } from "@/i18n/routing";
 import { HtmlAttributes } from "@/components/HtmlAttributes";
 import { Toaster } from "sonner";
 import Header from "@/components/Header";
-import LocationSidebar from "@/components/Sidebar/LocationSidebar";
 import LoginSidebar from "@/components/Sidebar/LoginSidebar";
 import OrderSidebar from "@/components/Sidebar/OrderSidebar";
 import PopupProvider from "@/components/PopupProvider";
@@ -29,7 +28,6 @@ export default async function LocaleLayout({ children, params }: Props) {
       <PopupProvider>
         <Header />
         <main className="pt-20 min-h-screen bg-white">{children}</main>
-        <LocationSidebar />
         <LoginSidebar />
         <OrderSidebar />
       </PopupProvider>

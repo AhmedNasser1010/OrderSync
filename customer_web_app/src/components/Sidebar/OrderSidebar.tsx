@@ -4,13 +4,15 @@ import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
-import { XCircleIcon } from "lucide-react";
 import {
+  XIcon,
   SendIcon,
   CheckCircleIcon,
   CheckCheckIcon,
   CookingPotIcon,
   BikeIcon,
+  StoreIcon,
+  PhoneIcon,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { toggleOrderSidebar } from "@/rtk/slices/toggleSlice";
@@ -24,17 +26,52 @@ const OrderTrackingMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[400px] rounded-xl bg-color-7/30 animate-pulse" />
+      <div className="w-full h-56 sm:h-64 bg-color-7/50 animate-pulse" />
     ),
   }
 );
 
 const STEPS = [
-  { key: "placed", statuses: ["RECEIVED"], icon: SendIcon, label: "Placed", sublabel: "Order placed successfully" },
-  { key: "confirmed", statuses: ["ACCEPTED"], icon: CheckCircleIcon, label: "Confirmed", sublabel: "Restaurant accepted" },
-  { key: "preparing", statuses: ["PREPARING"], icon: CookingPotIcon, label: "Preparing", sublabel: "Being prepared" },
-  { key: "ontheway", statuses: ["READY", "RESERVED", "PICKED_UP", "ON_ROUTE"], icon: BikeIcon, label: "On the Way", sublabel: "On its way to you" },
-  { key: "delivered", statuses: ["DELIVERED", "GIVEN_FEEDBACK"], icon: CheckCheckIcon, label: "Delivered", sublabel: "Arrived at your door" },
+  {
+    key: "placed",
+    statuses: ["RECEIVED"],
+    icon: SendIcon,
+    label: "Placed",
+    sublabel: "Order placed successfully",
+    timelineKey: "placedAt",
+  },
+  {
+    key: "confirmed",
+    statuses: ["ACCEPTED"],
+    icon: CheckCircleIcon,
+    label: "Confirmed",
+    sublabel: "Restaurant accepted",
+    timelineKey: "acceptedAt",
+  },
+  {
+    key: "preparing",
+    statuses: ["PREPARING"],
+    icon: CookingPotIcon,
+    label: "Preparing",
+    sublabel: "Currently being prepared",
+    timelineKey: "preparingAt",
+  },
+  {
+    key: "ontheway",
+    statuses: ["READY", "RESERVED", "PICKED_UP", "ON_ROUTE"],
+    icon: BikeIcon,
+    label: "On the Way",
+    sublabel: "On its way to you",
+    timelineKey: null,
+  },
+  {
+    key: "delivered",
+    statuses: ["DELIVERED", "GIVEN_FEEDBACK"],
+    icon: CheckCheckIcon,
+    label: "Delivered",
+    sublabel: "Arrived at your door",
+    timelineKey: "deliveredAt",
+  },
 ];
 
 const ERROR_STATUSES = ["CANCELED", "REJECTED", "VOIDED"];
@@ -44,11 +81,15 @@ function StepIndicator({
   index,
   currentStepIndex,
   totalSteps,
+  timestamp,
+  locale,
 }: {
   step: (typeof STEPS)[number];
   index: number;
   currentStepIndex: number;
   totalSteps: number;
+  timestamp?: number;
+  locale: string;
 }) {
   const t = useTranslations();
   const isCompleted = index < currentStepIndex;
@@ -57,44 +98,63 @@ function StepIndicator({
   const isLast = index === totalSteps - 1;
   const Icon = step.icon;
 
+  const timeLabel = timestamp
+    ? new Date(timestamp).toLocaleTimeString(
+        locale === "ar" ? "ar-EG" : "en-US",
+        { hour: "2-digit", minute: "2-digit" }
+      )
+    : "";
+
   return (
     <div className="flex items-stretch gap-3">
       <div className="flex flex-col items-center">
         <div
           className={cn(
-            "relative flex items-center justify-center rounded-full transition-all duration-500",
-            isCompleted && "w-7 h-7 bg-color-11",
-            isActive && "w-8 h-8 bg-color-2 order-pulse",
-            isPending && "w-7 h-7 border-2 border-color-7 bg-white"
+            "relative flex items-center justify-center rounded-full shrink-0 transition-all duration-500",
+            isCompleted && "size-7 bg-color-11",
+            isActive && "size-8 bg-color-2 order-pulse",
+            isPending && "size-7 border-2 border-color-7 bg-white"
           )}
         >
           {isCompleted && <CheckCheckIcon className="text-white text-sm" />}
           {isActive && <Icon className="text-white text-sm" />}
-          {isPending && <Icon className="text-color-7 text-xs" />}
+          {isPending && <Icon className="text-color-5 text-xs" />}
         </div>
         {!isLast && (
           <div
             className={cn(
-              "w-0.5 flex-1 min-h-[32px] transition-all duration-500",
+              "w-0.5 flex-1 min-h-[34px] my-1 rounded-full transition-all duration-500",
               isCompleted && "bg-color-11",
-              isActive && "bg-gradient-to-b from-color-2 to-color-7",
-              isPending && "bg-color-7 opacity-40"
+              isActive && "bg-gradient-to-b from-color-2 via-color-2/50 to-color-7",
+              isPending && "bg-color-7 opacity-60"
             )}
           />
         )}
       </div>
 
-      <div className={`pb-6 ${isLast ? "pb-0" : ""}`}>
-        <p
-          className={cn(
-            "text-sm leading-tight transition-all duration-300",
-            isCompleted && "text-color-1 font-ProximaNovaSemiBold",
-            isActive && "text-color-2 font-ProximaNovaBold text-base",
-            isPending && "text-color-5 font-ProximaNovaMed"
+      <div className={cn("flex-1 min-w-0", isLast ? "pb-0" : "pb-5")}>
+        <div className="flex items-center justify-between gap-3">
+          <p
+            className={cn(
+              "leading-tight transition-all duration-300",
+              isCompleted && "text-color-1 font-ProximaNovaSemiBold text-sm",
+              isActive && "text-color-2 font-ProximaNovaBold text-[15px]",
+              isPending && "text-color-5 font-ProximaNovaMed text-sm"
+            )}
+          >
+            {t(step.label)}
+          </p>
+          {timeLabel && (
+            <span
+              className={cn(
+                "text-[11px] font-ProximaNovaThin tabular-nums shrink-0",
+                isActive ? "text-color-2" : "text-color-5"
+              )}
+            >
+              {timeLabel}
+            </span>
           )}
-        >
-          {t(step.label)}
-        </p>
+        </div>
         {(isCompleted || isActive) && (
           <p className="text-xs text-color-5 font-ProximaNovaThin mt-0.5 leading-tight">
             {t(step.sublabel)}
@@ -114,22 +174,39 @@ function ErrorBanner({
 }) {
   const t = useTranslations();
   const labels: Record<string, string> = {
-    CANCELED: "Order Canceled",
-    REJECTED: "Order Rejected",
-    VOIDED: "Order Voided",
+    CANCELED: "Your Order Has Been Canceled!",
+    REJECTED: "Your Order Has Been Rejected!",
+    VOIDED: "Your Order Has Been Voided!",
   };
 
   return (
-    <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-5">
-      <p className="text-red-600 font-ProximaNovaSemiBold text-sm">
-        {t(labels[status || ""] || "Order Ended")}
-      </p>
-      {reason && (
-        <p className="text-red-400 font-ProximaNovaThin text-xs mt-1">
-          {t(reason)}
+    <div className="border border-red-200 bg-red-50 rounded-2xl p-4 mb-4 flex items-start gap-3">
+      <span className="size-9 grid place-items-center rounded-full bg-red-100 shrink-0">
+        <XIcon className="size-4.5 text-red-500" />
+      </span>
+      <div className="min-w-0">
+        <p className="text-red-600 font-ProximaNovaSemiBold text-sm">
+          {t(labels[status || ""] || "Your Order Has Been Canceled!")}
         </p>
-      )}
+        {reason && (
+          <p className="text-red-400 font-ProximaNovaThin text-xs mt-1">
+            {t(reason)}
+          </p>
+        )}
+      </div>
     </div>
+  );
+}
+
+function LivePill() {
+  const t = useTranslations();
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-color-11/10 border border-color-11/30 px-2.5 py-1">
+      <span className="size-2 rounded-full bg-color-11 animate-pulse" />
+      <span className="text-[11px] font-ProximaNovaSemiBold text-color-11">
+        {t("Live")}
+      </span>
+    </span>
   );
 }
 
@@ -168,11 +245,47 @@ const OrderSidebar = () => {
     return idx >= 0 ? idx : 0;
   }, [currentStatus]);
 
+  const stepTimes = useMemo(() => {
+    const timeline = trackedOrderData?.timeline;
+    if (!timeline) return [];
+    return STEPS.map((step) => {
+      if (step.timelineKey) {
+        const field = timeline[step.timelineKey as keyof typeof timeline];
+        return typeof field === "number" ? field : undefined;
+      }
+      return (
+        timeline.pickedUpAt ??
+        timeline.onRouteAt ??
+        timeline.readyAt ??
+        timeline.reservedAt ??
+        undefined
+      );
+    });
+  }, [trackedOrderData?.timeline]);
+
   const isError = ERROR_STATUSES.includes(currentStatus ?? "");
   const isMapLive = ["READY", "RESERVED", "PICKED_UP", "ON_ROUTE"].includes(
     currentStatus ?? ""
   );
   const isRTL = locale === "ar";
+
+  const activeStep = STEPS[Math.max(0, currentStepIndex)];
+
+  const items = trackedOrderData?.cart ?? [];
+  const orderNumber = trackedOrderData?.orderNumber;
+  const total = trackedOrderData?.pricing?.total;
+  const deliveryAddress = trackedOrderData?.delivery?.address;
+  const resName =
+    locale === "ar"
+      ? currentRes?.profile?.nameInAr ||
+        trackedOrderData?.business?.nameInAr ||
+        currentRes?.profile?.name
+      : currentRes?.profile?.name || trackedOrderData?.business?.name;
+  const resAddress = currentRes?.profile?.address;
+  const resIcon = currentRes?.branding?.icon;
+  const resPhone = currentRes?.business?.contactNumbers?.[0]
+    ?.slice(2)
+    ?.trim();
 
   const handleCloseSidebar = () => {
     dispatch(toggleOrderSidebar());
@@ -183,7 +296,7 @@ const OrderSidebar = () => {
     <>
       <div
         className={cn(
-          "order-sidebar fixed top-0 h-full overflow-y-scroll bg-white transition-all duration-500 z-40 px-5 py-5 w-full sm:py-10 flex flex-col sm:w-[500px]",
+          "order-sidebar fixed top-0 h-full overflow-y-scroll bg-white transition-all duration-500 z-40 px-5 py-5 w-full sm:py-6 flex flex-col sm:w-[500px]",
           isRTL ? "left-0" : "right-0",
           isOrderSidebarOpen
             ? "translate-x-0"
@@ -192,13 +305,60 @@ const OrderSidebar = () => {
               : "translate-x-full"
         )}
       >
-        <button className="text-3xl mb-5" onClick={handleCloseSidebar}>
-          <XCircleIcon className="size-7" />
-        </button>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <button
+            onClick={handleCloseSidebar}
+            aria-label="Close"
+            className="size-9 grid place-items-center rounded-full bg-color-7/60 hover:bg-color-7 transition-colors cursor-pointer"
+          >
+            <XIcon className="size-5 text-color-1" />
+          </button>
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-color-1 text-xl font-ProximaNovaBold">
+              {t("Order Tracking")}
+            </h2>
+            {isMapLive && <LivePill />}
+          </div>
+          <div className="size-9" />
+        </div>
 
-        <h2 className="text-color-1 text-3xl font-ProximaNovaMed text-center mb-5">
-          {t("Order Tracking")}
-        </h2>
+        {/* Restaurant card */}
+        {resName && (
+          <div className="flex items-center gap-3 rounded-2xl border border-color-7 bg-white p-3.5 shadow-sm mb-4">
+            <div className="size-12 grid place-items-center rounded-xl bg-color-7/50 overflow-hidden shrink-0">
+              {resIcon ? (
+                <img
+                  src={resIcon}
+                  alt={resName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <StoreIcon className="size-6 text-color-5" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-color-1 font-ProximaNovaSemiBold text-sm truncate">
+                {resName}
+              </p>
+              {resAddress && (
+                <p className="text-color-5 font-ProximaNovaThin text-xs truncate mt-0.5">
+                  {resAddress}
+                </p>
+              )}
+            </div>
+            {orderNumber && (
+              <div className="text-right shrink-0">
+                <p className="text-[10px] uppercase tracking-wide text-color-5 font-ProximaNovaThin">
+                  {t("Order number")}
+                </p>
+                <p className="text-color-1 font-ProximaNovaBold text-sm">
+                  #{orderNumber}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {isError && trackedOrderData && (
           <ErrorBanner
@@ -208,20 +368,43 @@ const OrderSidebar = () => {
         )}
 
         {!isError && (
-          <div className="mb-5 px-1">
-            {STEPS.map((step, index) => (
-              <StepIndicator
-                key={step.key}
-                step={step}
-                index={index}
-                currentStepIndex={currentStepIndex}
-                totalSteps={STEPS.length}
-              />
-            ))}
-          </div>
+          <>
+            {/* Status hero */}
+            <div className="relative overflow-hidden rounded-2xl p-4 mb-4 text-white bg-gradient-to-br from-color-2 to-[#ffab4a] shadow-sm">
+              <div className="absolute -right-8 -top-10 size-28 rounded-full bg-white/15" />
+              <div className="absolute -right-1 top-2 size-14 rounded-full bg-white/10" />
+              <div className="relative">
+                <p className="text-[11px] font-ProximaNovaThin uppercase tracking-widest opacity-90">
+                  {t("Order Tracking")}
+                </p>
+                <p className="font-ProximaNovaBold text-lg leading-tight mt-0.5">
+                  {t(activeStep.sublabel)}
+                </p>
+                <p className="font-ProximaNovaThin text-sm opacity-90 mt-1">
+                  {t(activeStep.label)}
+                </p>
+              </div>
+            </div>
+
+            {/* Timeline */}
+            <div className="rounded-2xl border border-color-7 bg-white p-4 shadow-sm mb-4">
+              {STEPS.map((step, index) => (
+                <StepIndicator
+                  key={step.key}
+                  step={step}
+                  index={index}
+                  currentStepIndex={currentStepIndex}
+                  totalSteps={STEPS.length}
+                  timestamp={stepTimes[index]}
+                  locale={locale}
+                />
+              ))}
+            </div>
+          </>
         )}
 
-        <div className="relative mb-4">
+        {/* Map */}
+        <div className="relative overflow-hidden rounded-2xl border border-color-7 bg-white shadow-sm mb-4">
           <OrderTrackingMap
             center={
               (user?.locations?.home?.latlng as [number, number]) ||
@@ -236,10 +419,22 @@ const OrderSidebar = () => {
                 | undefined) ?? null
             }
             driverLocation={driverLocation}
+            className="h-56 sm:h-64"
           />
+          {isMapLive && (
+            <div className="absolute top-3 start-3 flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md px-3 py-1.5 pointer-events-none z-[900]">
+              <span className="relative flex size-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-color-2 opacity-75" />
+                <span className="relative inline-flex size-2.5 rounded-full bg-color-2" />
+              </span>
+              <span className="text-xs font-ProximaNovaSemiBold text-color-1">
+                {t("Driver on the way")}
+              </span>
+            </div>
+          )}
           {!isMapLive && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="bg-white/80 backdrop-blur-sm rounded-xl px-4 py-2.5 shadow-md">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-color-1/20 backdrop-blur-[1.5px]">
+              <div className="bg-white/95 backdrop-blur-sm rounded-2xl px-5 py-3.5 shadow-lg text-center">
                 <p className="text-color-1 font-ProximaNovaSemiBold text-sm text-center">
                   {t("Live tracking available soon")}
                 </p>
@@ -251,20 +446,109 @@ const OrderSidebar = () => {
           )}
         </div>
 
-        <div className="flex relative mt-10 mb-10">
+        {/* Order summary */}
+        {trackedOrderData && (
+          <div className="rounded-2xl border border-color-7 bg-white p-4 shadow-sm mb-4">
+            <p className="text-[11px] uppercase tracking-wider text-color-5 font-ProximaNovaSemiBold mb-3">
+              {t("Order summary")}
+            </p>
+
+            {items.length > 0 && (
+              <div className="mb-3">
+                {items.slice(0, 4).map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between gap-3 text-sm mb-2 last:mb-0"
+                  >
+                    <span className="text-color-6 font-ProximaNovaThin flex-1 min-w-0 truncate">
+                      {item.name}
+                      {item.selectedSize && (
+                        <span className="text-color-5">
+                          {" "}
+                          ({item.selectedSize})
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-color-1 font-ProximaNovaSemiBold shrink-0">
+                      × {item.quantity}
+                    </span>
+                  </div>
+                ))}
+                {items.length > 4 && (
+                  <p className="text-xs text-color-5 font-ProximaNovaThin mt-2">
+                    +{items.length - 4}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-color-6 font-ProximaNovaThin">
+                {t("Order number")}
+              </span>
+              <span className="text-color-1 font-ProximaNovaSemiBold">
+                #{orderNumber}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between text-sm mb-2">
+              <span className="text-color-6 font-ProximaNovaThin">
+                {t("Items")}
+              </span>
+              <span className="text-color-1 font-ProximaNovaSemiBold">
+                {items.reduce((sum, item) => sum + item.quantity, 0)}
+              </span>
+            </div>
+
+            {deliveryAddress && (
+              <div className="mb-2">
+                <span className="text-color-6 font-ProximaNovaThin text-xs">
+                  {t("Deliver to")}
+                </span>
+                <p className="text-color-1 font-ProximaNovaSemiBold text-sm mt-0.5 leading-snug">
+                  {deliveryAddress}
+                </p>
+              </div>
+            )}
+
+            {typeof total === "number" && (
+              <>
+                <div className="h-px bg-color-7 my-3" />
+                <div className="flex items-center justify-between">
+                  <span className="text-color-1 font-ProximaNovaSemiBold text-sm">
+                    {t("Total")}
+                  </span>
+                  <span className="egp text-color-2 font-ProximaNovaBold text-base">
+                    {total}
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Footer actions */}
+        <div className="mt-auto pt-3">
           {currentStatus === "RECEIVED" ? (
             <button
               onClick={cancelOrder}
-              className="w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-red-500 rounded-xl"
+              className="w-full py-4 rounded-2xl text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-red-500 hover:bg-red-600 transition-colors"
             >
               {t("Order Cancel")}
             </button>
           ) : (
-            <button className="w-full py-4 uppercase text-base text-white font-ProximaNovaSemiBold cursor-pointer bg-color-5 rounded-xl">
-              {t("Cancellations and modifications")}
-              <br />
-              {currentRes?.business?.contactNumbers &&
-                currentRes.business.contactNumbers[0].slice(2)}
+            <button className="w-full rounded-2xl border border-color-7 bg-white p-3.5 hover:bg-color-7/40 transition-colors cursor-pointer">
+              <span className="flex items-center justify-center gap-2">
+                <PhoneIcon className="size-4 text-color-2" />
+                <span className="text-color-1 font-ProximaNovaSemiBold text-sm">
+                  {t("Cancellations and modifications")}
+                </span>
+              </span>
+              {resPhone && (
+                <span className="block text-color-2 font-ProximaNovaBold text-base mt-0.5">
+                  {resPhone}
+                </span>
+              )}
             </button>
           )}
         </div>

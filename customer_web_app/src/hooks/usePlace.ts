@@ -87,9 +87,7 @@ const usePlace = () => {
 
   const checkIfUserIsLoggedIn = () => {
     if (user?.uid) return true;
-    showError(
-      "Please log in first and update your contact information before continuing with your order."
-    );
+    showError("loginAndUpdateContactFirst");
     return false;
   };
 
@@ -124,9 +122,7 @@ const usePlace = () => {
 
   const checkIfUserIsActive = () => {
     if (user?.isActive === false) {
-      showError(
-        "Your account has been suspended. Please contact support for assistance."
-      );
+      showError("accountSuspendedMessage");
       return false;
     }
     return true;
@@ -351,7 +347,7 @@ const usePlace = () => {
             placeOrderMutation(validatedData)
               .then(() => {
                 handleOrderPlacementSuccess();
-                resolve(null);
+                resolve(true);
               })
               .catch((err) => {
                 handleOrderPlacementError(err);
@@ -363,7 +359,7 @@ const usePlace = () => {
             reject(err);
           });
       } else {
-        reject(new Error("Order placement failed"));
+        resolve(false);
       }
     });
   };
