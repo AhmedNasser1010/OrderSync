@@ -7,7 +7,7 @@ import { evaluateSegments } from "./evaluateSegments";
 
 export const priceAfterDiscount = (
   price: number,
-  discount: DiscountObject,
+  discount: DiscountObject | null | undefined,
   user: User,
   resId: string
 ): PriceAfterDiscountResult => {
