@@ -13,12 +13,14 @@ import {
   BikeIcon,
   StoreIcon,
   PhoneIcon,
+  ClockIcon,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { toggleOrderSidebar } from "@/rtk/slices/toggleSlice";
 import { cn } from "@/lib/utils";
 import useOrder from "@/hooks/useOrder";
 import { useDriverLocation } from "@/hooks/useDriverLocation";
+import { useEta } from "@/hooks/useEta";
 import type { RestaurantDocument } from "@/types/restaurant";
 
 const OrderTrackingMap = dynamic(
@@ -210,6 +212,62 @@ function LivePill() {
   );
 }
 
+function formatEtaClock(
+  arrivalTime: number,
+  locale: string
+): string {
+  return new Date(arrivalTime).toLocaleTimeString(
+    locale === "ar" ? "ar-EG" : "en-US",
+    { hour: "2-digit", minute: "2-digit" }
+  );
+}
+
+/**
+ * Badge shown inside the status hero card. Renders an absolute "arrives by"
+ * clock time while the order is still being prepared/en route, and an
+ * "Arrived" label once delivered.
+ */
+function EtaBadge({
+  eta,
+  locale,
+}: {
+  eta: ReturnType<typeof useEta>;
+  locale: string;
+}) {
+  const t = useTranslations();
+
+  if (eta.isArrived) {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm px-2.5 py-1 mt-2">
+        <CheckCheckIcon className="size-3.5 text-white" />
+        <span className="text-[11px] font-ProximaNovaSemiBold text-white">
+          {t("Arrived")}
+        </span>
+      </span>
+    );
+  }
+
+  if (eta.minutes === null || eta.arrivalTime === null) return null;
+
+  const isSoon = eta.minutes <= 5;
+  const clockLabel = formatEtaClock(eta.arrivalTime, locale);
+
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm px-2.5 py-1 mt-2">
+      <ClockIcon className="size-3.5 text-white" />
+      {isSoon ? (
+        <span className="text-[11px] font-ProximaNovaSemiBold text-white">
+          {t("Arriving soon")} · {eta.minutes} {t("min")}
+        </span>
+      ) : (
+        <span className="text-[11px] font-ProximaNovaSemiBold text-white">
+          {t("Arrives by")} {clockLabel} · {eta.minutes} {t("min")}
+        </span>
+      )}
+    </span>
+  );
+}
+
 const OrderSidebar = () => {
   const dispatch = useAppDispatch();
   const locale = useLocale();
@@ -231,9 +289,26 @@ const OrderSidebar = () => {
   const driverLocation: [number, number] | null = liveLocation
     ? [liveLocation.lat, liveLocation.lng]
     : null;
+  const deliveryLatlng =
+    (trackedOrderData?.delivery?.latlng as [number, number] | undefined) ?? null;
+  const restaurantLatlng =
+    (currentRes?.profile?.latlng as [number, number] | undefined) ?? null;
+  const eta = useEta({
+    status: trackedOrderData?.status?.current,
+    timeline: (trackedOrderData?.timeline ?? null) as {
+      placedAt?: number;
+      preparingAt?: number;
+      readyAt?: number;
+      onRouteAt?: number;
+      deliveredAt?: number;
+    } | null,
+    driverLocation: liveLocation,
+    deliveryLatlng,
+    restaurantLatlng,
+  });
   const mapPoints: ([number, number] | null)[] = [
-    (currentRes?.profile?.latlng as [number, number] | undefined) ?? null,
-    (trackedOrderData?.delivery?.latlng as [number, number] | undefined) ?? null,
+    restaurantLatlng,
+    deliveryLatlng,
     driverLocation,
   ];
 
@@ -383,6 +458,7 @@ const OrderSidebar = () => {
                 <p className="font-ProximaNovaThin text-sm opacity-90 mt-1">
                   {t(activeStep.label)}
                 </p>
+                <EtaBadge eta={eta} locale={locale} />
               </div>
             </div>
 
@@ -422,14 +498,27 @@ const OrderSidebar = () => {
             className="h-56 sm:h-64"
           />
           {isMapLive && (
-            <div className="absolute top-3 start-3 flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md px-3 py-1.5 pointer-events-none z-[900]">
-              <span className="relative flex size-2.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-color-2 opacity-75" />
-                <span className="relative inline-flex size-2.5 rounded-full bg-color-2" />
-              </span>
-              <span className="text-xs font-ProximaNovaSemiBold text-color-1">
-                {t("Driver on the way")}
-              </span>
+            <div className="absolute top-3 start-3 pointer-events-none z-[900]">
+              {eta.isEnRoute && eta.minutes !== null ? (
+                <div className="flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md px-3 py-1.5">
+                  <ClockIcon className="size-3.5 text-color-2" />
+                  <span className="text-xs font-ProximaNovaSemiBold text-color-1">
+                    {eta.minutes <= 5
+                      ? t("Arriving soon")
+                      : `${t("Estimated arrival")}: ${eta.minutes} ${t("min")}`}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md px-3 py-1.5">
+                  <span className="relative flex size-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-color-2 opacity-75" />
+                    <span className="relative inline-flex size-2.5 rounded-full bg-color-2" />
+                  </span>
+                  <span className="text-xs font-ProximaNovaSemiBold text-color-1">
+                    {t("Driver on the way")}
+                  </span>
+                </div>
+              )}
             </div>
           )}
           {!isMapLive && (
