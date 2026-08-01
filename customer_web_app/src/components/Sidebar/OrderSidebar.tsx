@@ -404,7 +404,7 @@ const OrderSidebar = () => {
         )}
 
         {/* Map */}
-        <div className="relative overflow-hidden rounded-2xl border border-color-7 bg-white shadow-sm mb-4">
+        <div className="relative shrink-0 overflow-hidden rounded-2xl border border-color-7 bg-white shadow-sm mb-4">
           <OrderTrackingMap
             center={
               (user?.locations?.home?.latlng as [number, number]) ||

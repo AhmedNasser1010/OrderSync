@@ -59,6 +59,24 @@ function FitMapToMarkers({ points }: { points: ([number, number] | null)[] }) {
   return null;
 }
 
+function AutoResize() {
+  const map = useMap();
+
+  useEffect(() => {
+    // Make sure Leaflet recalculates its size after mount and whenever the
+    // container is resized (e.g. when the sidebar is opened/closed or the
+    // surrounding flex layout changes). Without this the map can render as a
+    // thin sliver if it was initialised while its container had no height.
+    map.invalidateSize();
+    const container = map.getContainer();
+    const ro = new ResizeObserver(() => map.invalidateSize());
+    ro.observe(container);
+    return () => ro.disconnect();
+  }, [map]);
+
+  return null;
+}
+
 function OrderTrackingMap({
   center,
   mapPoints,
@@ -78,6 +96,7 @@ function OrderTrackingMap({
       className={cn("w-full h-[400px] relative z-0", className)}
     >
       <FitMapToMarkers points={mapPoints} />
+      <AutoResize />
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://ahmed-nasser.netlify.app/" target="_blank">Ahmed Nasser</a> OrderSync Systems'
