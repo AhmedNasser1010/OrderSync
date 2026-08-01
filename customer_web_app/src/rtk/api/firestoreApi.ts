@@ -141,8 +141,8 @@ export const firestoreApi = createApi({
       providesTags: ["Menu"],
     }),
 
-    fetchOrderTrackingData: builder.query<Partial<OrderType> | null, TrackedOrderArg>({
-      queryFn: () => ({ data: null }),
+    fetchOrderTrackingData: builder.query<Partial<OrderType>, TrackedOrderArg>({
+      queryFn: () => ({ data: {} as Partial<OrderType> }),
       async onCacheEntryAdded(
         { orderId },
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch }
@@ -162,7 +162,7 @@ export const firestoreApi = createApi({
             if (docSnapshot.exists()) {
               const data = docSnapshot.data() as Partial<OrderType>;
               updateCachedData((draft) => {
-                if (draft) Object.assign(draft, data);
+                Object.assign(draft, data);
               });
               dispatch(setHasOrder(true));
               if (data.status?.current === "DELIVERED") {
@@ -170,7 +170,7 @@ export const firestoreApi = createApi({
               }
             } else {
               updateCachedData((draft) => {
-                if (draft) Object.keys(draft).forEach((k) => delete draft[k as keyof typeof draft]);
+                Object.keys(draft).forEach((k) => delete draft[k as keyof typeof draft]);
               });
               dispatch(setHasOrder(false));
             }
