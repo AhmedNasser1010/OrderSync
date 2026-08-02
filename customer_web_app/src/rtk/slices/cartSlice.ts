@@ -69,6 +69,20 @@ export const cartSlice = createSlice({
       state.items.push({ ...payload });
       saveStateToLocalStorage(state);
     },
+    removeFromCart: (
+      state,
+      { payload }: PayloadAction<{ id: string; selectedSize?: string | null }>
+    ) => {
+      state.items = state.items.filter(
+        (item) =>
+          item.id !== payload.id ||
+          (item.selectedSize ?? null) !== (payload.selectedSize ?? null)
+      );
+      if (state.items.length === 0) {
+        state.restaurant = "";
+      }
+      saveStateToLocalStorage(state);
+    },
     quantityHandle: (
       state,
       { payload }: PayloadAction<{ id: string; selectedSize?: string | null; quantity: "+" | "-" }>
@@ -126,6 +140,7 @@ export const {
   hydrateCart,
   clearCart,
   addToCart,
+  removeFromCart,
   quantityHandle,
   setRestaurant,
   handleAddDiscount,

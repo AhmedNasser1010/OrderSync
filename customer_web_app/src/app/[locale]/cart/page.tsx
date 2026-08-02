@@ -1,8 +1,17 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
+import {
+  ArrowLeft,
+  BikeIcon,
+  ChevronRight,
+  Clock,
+  ShoppingCart,
+  Store,
+  Trash2,
+} from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import useRestaurants from "@/hooks/useRestaurants";
@@ -10,6 +19,7 @@ import useRestaurantMenu from "@/hooks/useRestaurantMenu";
 import usePlace from "@/hooks/usePlace";
 import {
   quantityHandle,
+  removeFromCart,
   clearCart,
 } from "@/rtk/slices/cartSlice";
 import { addCheckout } from "@/rtk/slices/checkoutSlice";
@@ -17,20 +27,19 @@ import { toggleOrderSidebar } from "@/rtk/slices/toggleSlice";
 import { priceAfterDiscount, resolveItemDiscount, applyOrderDiscounts } from "@ordersync/order-utils";
 import getDistanceFromLatlngInKm from "@/utils/getDistanceFromLatlngInKm";
 import getDeliveryFees from "@/utils/getDeliveryFees";
-import OrderInfo from "@/components/Cart/OrderInfo";
-import ItemAvailability from "@/components/RestaurantMenu/ItemAvailability";
-import ItemTitle from "@/components/RestaurantMenu/ItemTitle";
-import DiscountMsg from "@/components/RestaurantMenu/DiscountMsg";
-import ItemPrice from "@/components/RestaurantMenu/ItemPrice";
-import ItemDescription from "@/components/RestaurantMenu/ItemDescription";
-import ItemSizesBar from "@/components/RestaurantMenu/ItemSizesBar";
+import CartEmptyState from "@/components/Cart/CartEmptyState";
+import CartItemCard from "@/components/Cart/CartItemCard";
+import BillDetails from "@/components/Cart/BillDetails";
 import type { ItemType } from "@ordersync/types";
 import type { RestaurantDocument } from "@/types/restaurant";
 
 type SelectedItem = ItemType & { quantity: number; selectedSize?: string | null };
 
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
 export default function CartPage() {
   const t = useTranslations();
+  const locale = useLocale();
   const dispatch = useAppDispatch();
   const cart = useAppSelector((state) => state.cart);
   const cartItems = useAppSelector((state) => state.cart.items);
@@ -148,14 +157,16 @@ export default function CartPage() {
           return {
             total: accumulator.total + price * item.quantity,
             discount: accumulator.discount + finalPrice * item.quantity,
+            autoOrderAmount: accumulator.autoOrderAmount,
           };
         }
         return {
           total: accumulator.total + price * item.quantity,
           discount: accumulator.discount + price * item.quantity,
+          autoOrderAmount: accumulator.autoOrderAmount,
         };
       },
-      { total: deliveryFees, discount: deliveryFees }
+      { total: deliveryFees, discount: deliveryFees, autoOrderAmount: 0 }
     );
 
     if (autoOrderDiscount && result) {
@@ -164,6 +175,7 @@ export default function CartPage() {
         autoOrderDiscount.type === "P"
           ? itemSubtotal * (autoOrderDiscount.value / 100)
           : Math.min(autoOrderDiscount.value, itemSubtotal);
+      result.autoOrderAmount = orderDiscountAmount;
       result.discount = Math.max(0, result.discount - orderDiscountAmount);
     }
 
@@ -176,6 +188,46 @@ export default function CartPage() {
     user,
     cartRestaurantID,
   ]);
+
+  const totalItems = useMemo(
+    () => selectedItems.reduce((sum, item) => sum + item.quantity, 0),
+    [selectedItems]
+  );
+
+  const itemTotal = cartTotalPrice
+    ? round2(
+        cartTotalPrice.discount - deliveryFees + cartTotalPrice.autoOrderAmount
+      )
+    : 0;
+  const finalTotal = cartTotalPrice ? round2(cartTotalPrice.discount) : 0;
+  const savings = cartTotalPrice ? round2(cartTotalPrice.total - cartTotalPrice.discount) : 0;
+  const autoOrderAmount = cartTotalPrice ? round2(cartTotalPrice.autoOrderAmount) : 0;
+
+  const getItemPriceInfo = (item: SelectedItem) => {
+    const sizePrice = item?.selectedSize
+      ? item?.sizes?.find(
+          (itemSize) => itemSize.size === item?.selectedSize
+        )?.price
+      : undefined;
+    const price = Number(sizePrice ?? item.price);
+    const category = categories?.find((cat) => cat.id === item.category);
+    const effectiveDiscount = resolveItemDiscount(item, category);
+    const { finalPrice, isAvailableForUser } = effectiveDiscount
+      ? priceAfterDiscount(
+          price,
+          effectiveDiscount,
+          user,
+          resInfo?.accessToken || cartRestaurantID
+        )
+      : { finalPrice: price, isAvailableForUser: false };
+    const discountIncluded = isAvailableForUser && price !== finalPrice;
+    return {
+      price,
+      finalPrice: discountIncluded ? finalPrice : price,
+      discountIncluded,
+      discountMsg: discountIncluded ? effectiveDiscount?.message ?? null : null,
+    };
+  };
 
   const handleIncreaseQty = (item: SelectedItem) => {
     if (!trackedOrder.id) {
@@ -201,6 +253,17 @@ export default function CartPage() {
     }
   };
 
+  const handleRemoveItem = (item: SelectedItem) => {
+    if (!trackedOrder.id) {
+      dispatch(
+        removeFromCart({
+          id: item.id,
+          selectedSize: item?.selectedSize,
+        })
+      );
+    }
+  };
+
   const handleClearAll = () => {
     if (!trackedOrder.id) {
       dispatch(clearCart());
@@ -211,221 +274,194 @@ export default function CartPage() {
     }
   };
 
-  const handleComment = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleComment = (value: string) => {
     if (!trackedOrder.id) {
-      setComment(e.target.value);
+      setComment(value);
       dispatch(
         addCheckout({
-          comment: e.target.value,
+          comment: value,
         })
       );
     }
   };
 
   if (cartItems.length === 0) {
-    return (
-      <div className="mx-auto pt-5 mb-10 md:w-1/2 min-h-screen">
-        <div className="flex items-center justify-center flex-col mt-20">
-          <img
-            src="/assets/empty-cart.webp"
-            alt="empty-cart"
-            className="w-72 h-64"
-          />
-          <h2 className="mt-6 text-xl text-color-6 font-ProximaNovaSemiBold">
-            {t("Your cart is empty")}
-          </h2>
-          <p className="mt-1 text-color-8 font-ProximaNovaThin text-sm">
-            {t("You can go to home page to view more restaurants")}
-          </p>
-          <Link
-            href="/"
-            className="uppercase mt-7 py-3 px-5 bg-color-2 text-white font-ProximaNovaBold cursor-pointer border-0 text-[15px] text-center"
-          >
-            {t("see restaurants near you")}
-          </Link>
-        </div>
-      </div>
-    );
+    return <CartEmptyState />;
   }
 
+  const resSlug = resInfo?.profile?.name?.split(" ").join("-");
+  const cookTime = resInfo?.operations?.cookTime;
+  const resName = locale === "ar" ? resInfo?.profile?.nameInAr : resInfo?.profile?.name;
+
   return (
-    <div className="mx-auto mt-28 mb-10 2xl:w-1/2 md:w-4/5 md:px-0 px-5">
-      <div className="checkout-container">
-        <div className="flex items-start justify-center gap-4 my-3">
+    <div className="mx-auto min-h-screen max-w-6xl px-4 pb-40 pt-24 sm:px-6 lg:pt-28">
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/"
+            aria-label={t("Back")}
+            className="grid size-10 shrink-0 place-items-center rounded-full border border-color-7 bg-white text-color-6 transition-colors hover:bg-color-7/40"
+          >
+            <ArrowLeft className="size-5 rtl:rotate-180" />
+          </Link>
           <div>
-            <img
-              src={resInfo?.branding?.cover}
-              alt="res-img"
-              className="w-20"
-            />
-          </div>
-          <div className="tracking-tighter">
-            <h2 className="font-ProximaNovaMed sm:text-2xl text-lg">
-              {resInfo?.profile?.name}
-            </h2>
-            <p className="font-ProximaNovaThin sm:text-base text-sm -mt-1">
-              {t("El-Ayat")}
+            <h1 className="font-Beiruti text-3xl leading-none text-color-1 sm:text-4xl">
+              {t("Cart")}
+            </h1>
+            <p className="mt-1.5 flex items-center gap-1.5 text-sm font-ProximaNovaThin text-color-8">
+              <ShoppingCart className="size-3.5" />
+              {totalItems} {t("Items")}
             </p>
           </div>
         </div>
-        {selectedItems?.map((item) => {
-          const sizePrice = item?.selectedSize
-            ? item?.sizes?.find(
-                (itemSize) => itemSize.size === item?.selectedSize
-              )?.price
-            : undefined;
-          const price = Number(sizePrice ?? item.price);
-          const category = categories?.find((cat) => cat.id === item.category);
-          const effectiveDiscount = resolveItemDiscount(item, category);
-          const { finalPrice, isAvailableForUser } = effectiveDiscount
-            ? priceAfterDiscount(price, effectiveDiscount, user, resInfo?.accessToken || cartRestaurantID)
-            : { finalPrice: price, isAvailableForUser: false };
-          const discountIncluded = isAvailableForUser && price !== finalPrice;
-          return (
-            <div
-              key={item?.id + item?.selectedSize}
-              className="item flex items-start justify-between pb-8"
-            >
-              <div className="md:w-auto w-3/5">
-                <ItemAvailability />
-                <ItemTitle title={item?.title} discountIncluded={discountIncluded} />
-                <DiscountMsg
-                  discountMsg={effectiveDiscount?.message}
-                  discountIncluded={discountIncluded}
-                />
-                <ItemPrice
-                  price={price}
-                  finalPrice={finalPrice ?? item?.price}
-                  discountIncluded={discountIncluded}
-                />
-                <ItemDescription description={item?.description} />
-                <ItemSizesBar item={item} selectedSize={item?.selectedSize} />
-              </div>
-              <div className="relative w-[118px] h-24">
-                {item?.backgrounds?.[0] && (
-                  <button className="cursor-pointer w-[118px] h-24 rounded-md">
-                    <img
-                      src={item?.backgrounds[0]}
-                      alt="menu-img"
-                      className="rounded-md w-[118px] h-24 object-cover"
-                    />
-                  </button>
-                )}
-                <div className="absolute flex justify-around items-center text-x1 -bottom-2 left-1/2 -translate-x-1/2 z-[1] w-24 h-9 shadow-md shadow-color-7 bg-color-11 text-white text-center rounded text-sm font-ProximaNovaSemiBold uppercase">
-                  <button
-                    className="w-1/3 h-full"
-                    onMouseUp={() => handleIncreaseQty(item)}
-                  >
-                    +
-                  </button>
-                  <span className="w-1/3">{item.quantity}</span>
-                  <button
-                    className="w-1/3 h-full"
-                    onMouseUp={() => handleDecreaseQty(item)}
-                  >
-                    -
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        <OrderInfo
-          deliveryFees={deliveryFees}
-          orderNumber={user?.trackedOrder?.orderNumber}
-        />
-        {cartTotalPrice.total !== cartTotalPrice.discount && (
-          <>
-            <div className="discount flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
-              <div>
-                <h3 className="font-ProximaNovaSemiBold">{t("Total Price")}</h3>
-              </div>
-              <div>
-                <span className="egp font-ProximaNovaSemiBold">
-                  {cartTotalPrice.total}
-                </span>
-              </div>
-            </div>
-            {autoOrderDiscount && (
-              <div className="flex justify-between bg-green-600 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
-                <div>
-                  <h3 className="font-ProximaNovaSemiBold">
-                    {autoOrderDiscount.message || autoOrderDiscount.code}
-                  </h3>
-                </div>
-                <div>
-                  <span className="egp font-ProximaNovaSemiBold">
-                    {autoOrderDiscount.type === "P"
-                      ? `-${autoOrderDiscount.value}%`
-                      : `-${autoOrderDiscount.value}LE`}
-                  </span>
-                </div>
-              </div>
-            )}
-            <div className="flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
-              <div>
-                <h3 className="font-ProximaNovaSemiBold">
-                  {t("Total Price Discounted")}
-                </h3>
-              </div>
-              <div>
-                <span className="egp font-ProximaNovaSemiBold">
-                  {cartTotalPrice.discount}
-                </span>
-              </div>
-            </div>
-          </>
-        )}
-        {cartTotalPrice.total === cartTotalPrice.discount && (
-          <div className="flex justify-between bg-color-11 text-white py-2 sm:py-3 px-3 md:text-xl my-2 sm:flex-row flex-col sm:items-start items-center">
-            <div>
-              <h3 className="font-ProximaNovaSemiBold">{t("Total Price")}</h3>
-            </div>
-            <div>
-              <span className="egp font-ProximaNovaSemiBold">
-                {cartTotalPrice.total}
-              </span>
-            </div>
-          </div>
-        )}
+
         {!trackedOrder.id && (
-          <input
-            className="w-full p-3 border border-gray-300"
-            id="comment"
-            type="text"
-            placeholder={t("Comment, extras")}
-            value={comment}
-            onChange={handleComment}
-          />
+          <button
+            type="button"
+            onClick={handleClearAll}
+            className="flex shrink-0 items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-ProximaNovaSemiBold text-red-500 transition-colors hover:bg-red-100 cursor-pointer"
+          >
+            <Trash2 className="size-4" />
+            {t("Clear All")}
+          </button>
         )}
-        <div className="flex items-center justify-center gap-2 mt-2 checkout-btns">
-          {trackedOrder.id && (
-            <button
-              onClick={() => dispatch(toggleOrderSidebar())}
-              className="bg-color-11 border border-color-11 text-white hover:bg-white hover:text-color-11"
-            >
-              {t("Order Track")}
-            </button>
+      </div>
+
+      <div className="grid gap-8 lg:grid-cols-[1fr_380px] xl:grid-cols-[1fr_400px]">
+        <div className="space-y-6">
+          {resInfo && (
+            <div className="flex items-center gap-4 rounded-2xl border border-color-7 bg-white p-4">
+              {resInfo?.branding?.cover && (
+                <img
+                  src={resInfo.branding.cover}
+                  alt={resName || "restaurant"}
+                  className="size-14 shrink-0 rounded-xl object-cover"
+                />
+              )}
+              <div className="min-w-0 flex-1">
+                <h2 className="flex items-center gap-1.5 truncate font-ProximaNovaBold text-lg text-color-1">
+                  <Store className="size-4 shrink-0 text-color-2" />
+                  <span className="truncate">{resName}</span>
+                </h2>
+                <p className="mt-0.5 flex items-center gap-1.5 text-sm font-ProximaNovaThin text-color-8">
+                  <Clock className="size-3.5 shrink-0" />
+                  {cookTime
+                    ? `${cookTime[0]}-${cookTime[1]} ${t("min")}`
+                    : t("El-Ayat")}
+                </p>
+              </div>
+              {resSlug && (
+                <Link
+                  href={`/${resSlug}`}
+                  className="flex shrink-0 items-center gap-1 rounded-full bg-color-7/60 px-4 py-2 text-sm font-ProximaNovaSemiBold text-color-6 transition-colors hover:bg-color-7"
+                >
+                  {t("Menu")}
+                  <ChevronRight className="size-4 rtl:rotate-180" />
+                </Link>
+              )}
+            </div>
           )}
 
-          {!trackedOrder.id && (
-            <>
+          <div className="rounded-2xl border border-color-7 bg-white px-4 sm:px-6">
+            {selectedItems?.map((item) => {
+              const info = getItemPriceInfo(item);
+              return (
+                <div
+                  key={item?.id + item?.selectedSize}
+                  className="border-b border-dashed border-color-7 last:border-none"
+                >
+                  <CartItemCard
+                    item={item}
+                    price={info.price}
+                    finalPrice={info.finalPrice}
+                    discountIncluded={info.discountIncluded}
+                    discountMsg={info.discountMsg}
+                    disabled={Boolean(trackedOrder.id)}
+                    onIncrease={() => handleIncreaseQty(item)}
+                    onDecrease={() => handleDecreaseQty(item)}
+                    onRemove={() => handleRemoveItem(item)}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <aside className="lg:sticky lg:top-24 lg:self-start">
+          <BillDetails
+            itemTotal={itemTotal}
+            deliveryFees={round2(deliveryFees)}
+            orderDiscount={
+              autoOrderDiscount
+                ? {
+                    message: autoOrderDiscount.message,
+                    code: autoOrderDiscount.code,
+                  }
+                : null
+            }
+            orderDiscountAmount={autoOrderAmount}
+            total={finalTotal}
+            savings={savings}
+            orderNumber={user?.trackedOrder?.orderNumber}
+            comment={comment}
+            disabled={Boolean(trackedOrder.id)}
+            onCommentChange={handleComment}
+          >
+            {trackedOrder.id ? (
               <button
-                onClick={handleClearAll}
-                className="border border-red-500 bg-red-500 text-white hover:bg-white hover:text-red-500"
+                type="button"
+                onClick={() => dispatch(toggleOrderSidebar())}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-color-11 py-3.5 font-ProximaNovaSemiBold text-white transition-colors hover:bg-color-11/90 cursor-pointer"
               >
-                {t("Clear All")}
+                <BikeIcon className="size-5" />
+                {t("Order Track")}
               </button>
+            ) : (
               <button
+                type="button"
                 onClick={() => placeOrder(comment).catch(() => {})}
-                className="bg-color-11 border border-color-11 text-white hover:bg-white hover:text-color-11"
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-color-2 py-3.5 font-ProximaNovaSemiBold text-base text-white shadow-lg shadow-color-2/30 transition-all hover:bg-color-2/90 hover:shadow-color-2/40 cursor-pointer"
               >
+                <ShoppingCart className="size-5" />
                 {t("Place Order")}
               </button>
-            </>
-          )}
-        </div>
+            )}
+          </BillDetails>
+        </aside>
       </div>
+
+      {trackedOrder.id ? (
+        <div className="fixed inset-x-0 bottom-4 z-40 px-4 lg:hidden">
+          <button
+            type="button"
+            onClick={() => dispatch(toggleOrderSidebar())}
+            className="mx-auto flex w-full max-w-xl items-center justify-center gap-2 rounded-full bg-color-11 p-4 font-ProximaNovaSemiBold text-white shadow-2xl shadow-color-11/30 cursor-pointer"
+          >
+            <BikeIcon className="size-5" />
+            {t("Order Track")}
+          </button>
+        </div>
+      ) : (
+        <div className="fixed inset-x-0 bottom-4 z-40 px-4 lg:hidden">
+          <div className="mx-auto flex max-w-xl items-center justify-between gap-4 rounded-full bg-color-1 p-2 ps-5 text-white shadow-2xl shadow-color-1/40">
+            <span className="flex flex-col">
+              <span className="font-ProximaNovaThin text-xs text-white/70">
+                {t("Total Price")}
+              </span>
+              <span className="egp font-ProximaNovaBold text-lg">
+                {finalTotal}
+              </span>
+            </span>
+            <button
+              type="button"
+              onClick={() => placeOrder(comment).catch(() => {})}
+              className="flex items-center gap-1.5 rounded-full bg-color-2 px-6 py-3 font-ProximaNovaSemiBold text-sm text-white transition-colors hover:bg-color-2/90 cursor-pointer"
+            >
+              {t("Place Order")}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
