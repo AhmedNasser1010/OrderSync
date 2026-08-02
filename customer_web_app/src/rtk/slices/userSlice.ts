@@ -88,6 +88,15 @@ const userSlice = createSlice({
         },
       };
     },
+    updateUserSecondPhone: (state, { payload }: PayloadAction<string>) => {
+      return {
+        ...state,
+        userInfo: {
+          ...state.userInfo,
+          secondPhone: payload,
+        },
+      };
+    },
     updateUserAddress: (state, { payload }: PayloadAction<string>) => {
       return {
         ...state,
@@ -122,6 +131,7 @@ export const {
   addUserAddress,
   updateUserName,
   updateUserPhone,
+  updateUserSecondPhone,
   updateUserAddress,
   updateUserLocation,
 } = userSlice.actions;

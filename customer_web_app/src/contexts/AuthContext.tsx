@@ -6,7 +6,6 @@ import {
   useState,
   useEffect,
   useCallback,
-  useRef,
   type ReactNode,
 } from "react";
 import { useAppDispatch } from "@/rtk/hooks";
@@ -17,9 +16,6 @@ import {
   signOut as firebaseSignOut,
   GoogleAuthProvider,
   signInWithPopup,
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  type ConfirmationResult,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { setUserUid } from "@/rtk/slices/constantsSlice";
@@ -29,8 +25,6 @@ interface AuthContextValue {
   user: FirebaseUser | null;
   isAuthLoading: boolean;
   signInWithGoogle: () => Promise<void>;
-  sendPhoneOtp: (phone: string) => Promise<boolean>;
-  verifyOtp: (otp: string) => Promise<FirebaseUser | null>;
   ensureCustomerDocument: (data?: {
     name?: string;
     phone?: string;
@@ -46,7 +40,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
-  const confirmationResultRef = useRef<ConfirmationResult | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -93,50 +86,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(result.user);
   }, [ensureCustomerDocument]);
 
-  const sendPhoneOtp = useCallback(async (phone: string): Promise<boolean> => {
-    try {
-      if (!document.getElementById("recaptcha")) {
-        return false;
-      }
-      const appVerifier = new RecaptchaVerifier(auth, "recaptcha", {
-        size: "invisible",
-        callback: () => {},
-      });
-      const confirmationResult = await signInWithPhoneNumber(
-        auth,
-        phone,
-        appVerifier
-      );
-      confirmationResultRef.current = confirmationResult;
-      return true;
-    } catch (error) {
-      console.error("Error sending OTP:", error);
-      return false;
-    }
-  }, []);
-
-  const verifyOtp = useCallback(
-    async (otp: string): Promise<FirebaseUser | null> => {
-      try {
-        if (otp.length === 6 && confirmationResultRef.current) {
-          const result = await confirmationResultRef.current.confirm(otp);
-          await ensureCustomerDocument({ provider: "Phone" });
-          setUser(result.user);
-          return result.user;
-        }
-        return null;
-      } catch (error) {
-        console.error("Error verifying OTP:", error);
-        return null;
-      }
-    },
-    [ensureCustomerDocument]
-  );
-
   const logout = useCallback(async (): Promise<void> => {
     try {
       await firebaseSignOut(auth);
-      confirmationResultRef.current = null;
       window.location.reload();
     } catch (err) {
       window.location.reload();
@@ -150,8 +102,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         isAuthLoading,
         signInWithGoogle,
-        sendPhoneOtp,
-        verifyOtp,
         ensureCustomerDocument,
         logout,
       }}

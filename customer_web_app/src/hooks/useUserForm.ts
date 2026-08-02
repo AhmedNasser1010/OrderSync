@@ -5,6 +5,7 @@ import DB_UPDATE_NESTED_VALUE from "@/utils/DB_UPDATE_NESTED_VALUE";
 import {
   updateUserName,
   updateUserPhone,
+  updateUserSecondPhone,
   updateUserAddress,
   updateUserLocation,
 } from "@/rtk/slices/userSlice";
@@ -12,6 +13,7 @@ import {
 const pathMap: Record<string, string> = {
   name: "userInfo.name",
   phone: "userInfo.phone",
+  secondPhone: "userInfo.secondPhone",
   address: "locations.home.address",
   location: "locations.home.latlng",
 };
@@ -31,7 +33,6 @@ const useUserForm = () => {
       return false;
     }
     if (!newValue) {
-      console.error("Input value is empty.");
       return false;
     }
     if (expectedName !== inputName) {
@@ -39,7 +40,6 @@ const useUserForm = () => {
       return false;
     }
     if (currentValue === newValue) {
-      console.error("New value is the same as the current value.");
       return false;
     }
     return true;
@@ -76,6 +76,8 @@ const useUserForm = () => {
     updateField("name", e?.target?.value, updateUserName);
   const savePhone = (e: React.FocusEvent<HTMLInputElement>) =>
     updateField("phone", e?.target?.value, updateUserPhone);
+  const saveSecondPhone = (e: React.FocusEvent<HTMLInputElement>) =>
+    updateField("secondPhone", e?.target?.value, updateUserSecondPhone);
   const saveAddress = (e: React.FocusEvent<HTMLInputElement>) =>
     updateField("address", e?.target?.value, updateUserAddress);
   const saveLocation = (value: number[]) =>
@@ -84,6 +86,7 @@ const useUserForm = () => {
   return {
     saveName,
     savePhone,
+    saveSecondPhone,
     saveAddress,
     saveLocation,
   };
