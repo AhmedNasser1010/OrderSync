@@ -16,6 +16,7 @@ interface UseEtaArgs {
   deliveryLatlng?: [number, number] | null;
   restaurantLatlng?: [number, number] | null;
   prepTimeMin?: number;
+  prepTimeMax?: number;
 }
 
 /**
@@ -39,6 +40,7 @@ export function useEta(args: UseEtaArgs): EtaResult & {
         deliveryLatlng: args.deliveryLatlng,
         restaurantLatlng: args.restaurantLatlng,
         prepTimeMin: args.prepTimeMin,
+        prepTimeMax: args.prepTimeMax,
       }),
     [
       args.status,
@@ -47,6 +49,7 @@ export function useEta(args: UseEtaArgs): EtaResult & {
       args.deliveryLatlng,
       args.restaurantLatlng,
       args.prepTimeMin,
+      args.prepTimeMax,
     ]
   );
 

@@ -3,9 +3,13 @@ import getDistanceFromLatlngInKm from "@/utils/getDistanceFromLatlngInKm";
 /**
  * ETA tuning constants.
  *
- * PREP_TIME_MIN      — assumed restaurant preparation time (minutes) used as a
- *                      fallback when no `preparingAt`/`readyAt` timestamp exists
- *                      yet (i.e. order still in RECEIVED/ACCEPTED/PREPARING).
+ * PREP_TIME_MIN      — assumed lower bound of restaurant preparation time
+ *                      (minutes) used as a fallback when no
+ *                      `preparingAt`/`readyAt` timestamp exists yet (i.e. order
+ *                      still in RECEIVED/ACCEPTED/PREPARING).
+ * PREP_TIME_MAX      — assumed upper bound of restaurant preparation time used
+ *                      to derive the ETA range. Overridden by the restaurant's
+ *                      `operations.cookTime` when available.
  * DRIVER_SPEED_KMH   — assumed average urban driving speed (km/h) used to turn
  *                      a distance into a travel time. Falls back to this when
  *                      the driver's reported `speed` is missing/unreliable.
@@ -16,6 +20,7 @@ import getDistanceFromLatlngInKm from "@/utils/getDistanceFromLatlngInKm";
  *                      before a status transition).
  */
 export const PREP_TIME_MIN = 15;
+export const PREP_TIME_MAX = 25;
 export const DRIVER_SPEED_KMH = 22;
 export const DISTANCE_CORRECTION = 1.3;
 export const MIN_ETA_MIN = 1;
@@ -25,6 +30,11 @@ export type EtaKind = "preparing" | "enRoute" | "arrived" | null;
 export interface EtaResult {
   /** Estimated whole minutes remaining until arrival, or null when unknown. */
   minutes: number | null;
+  /**
+   * Upper bound of the estimated minutes remaining, derived from the
+   * restaurant's max prep time. Equals `minutes` while en route or arrived.
+   */
+  minutesMax: number | null;
   /** Absolute arrival time in epoch ms, or null when unknown. */
   arrivalTime: number | null;
   /** Which phase the ETA belongs to (drives UI copy/styling). */
@@ -49,6 +59,11 @@ interface ComputeEtaArgs {
    * instead, so this only applies to the pre-prep estimate.
    */
   prepTimeMin?: number;
+  /**
+   * Optional upper bound of the assumed prep time (minutes). Defaults to
+   * `prepTimeMin` (i.e. no range) when omitted.
+   */
+  prepTimeMax?: number;
 }
 
 /**
@@ -73,11 +88,17 @@ export function computeEta(args: ComputeEtaArgs): EtaResult {
     deliveryLatlng,
     restaurantLatlng,
     prepTimeMin = PREP_TIME_MIN,
+    prepTimeMax = prepTimeMin,
   } = args;
 
   // Terminal success states — order has already arrived.
   if (status === "DELIVERED" || status === "GIVEN_FEEDBACK") {
-    return { minutes: 0, arrivalTime: timeline?.deliveredAt ?? null, kind: "arrived" };
+    return {
+      minutes: 0,
+      minutesMax: 0,
+      arrivalTime: timeline?.deliveredAt ?? null,
+      kind: "arrived",
+    };
   }
 
   // Error / non-trackable states — no ETA to show.
@@ -87,7 +108,7 @@ export function computeEta(args: ComputeEtaArgs): EtaResult {
     status === "REJECTED" ||
     status === "VOIDED"
   ) {
-    return { minutes: null, arrivalTime: null, kind: null };
+    return { minutes: null, minutesMax: null, arrivalTime: null, kind: null };
   }
 
   const now = Date.now();
@@ -116,6 +137,7 @@ export function computeEta(args: ComputeEtaArgs): EtaResult {
 
     return {
       minutes,
+      minutesMax: minutes,
       arrivalTime: now + minutes * 60_000,
       kind: "enRoute",
     };
@@ -123,17 +145,16 @@ export function computeEta(args: ComputeEtaArgs): EtaResult {
 
   // ----- Pre-driver phase: prep time + travel estimate --------------------
   if (deliveryLatlng) {
-    // Remaining preparation time.
-    let prepRemainingMin: number;
-    if (timeline?.preparingAt) {
-      // Already preparing — assume prep finishes `prepTimeMin` after it started.
-      const prepEnd = timeline.preparingAt + prepTimeMin * 60_000;
-      prepRemainingMin = Math.max(0, Math.ceil((prepEnd - now) / 60_000));
-    } else if (timeline?.readyAt) {
-      prepRemainingMin = 0;
-    } else {
-      prepRemainingMin = prepTimeMin;
-    }
+    // Remaining preparation time for a given prep bound.
+    const prepRemaining = (prepTime: number) => {
+      if (timeline?.preparingAt) {
+        // Already preparing — assume prep finishes `prepTime` after it started.
+        const prepEnd = timeline.preparingAt + prepTime * 60_000;
+        return Math.max(0, Math.ceil((prepEnd - now) / 60_000));
+      }
+      if (timeline?.readyAt) return 0;
+      return prepTime;
+    };
 
     // Travel estimate from restaurant → delivery (straight-line, corrected).
     let travelMin = 0;
@@ -146,16 +167,24 @@ export function computeEta(args: ComputeEtaArgs): EtaResult {
       travelMin = Math.round((distanceKm / DRIVER_SPEED_KMH) * 60);
     }
 
-    const minutes = Math.max(MIN_ETA_MIN, prepRemainingMin + travelMin);
+    const minutes = Math.max(
+      MIN_ETA_MIN,
+      prepRemaining(prepTimeMin) + travelMin
+    );
+    const minutesMax = Math.max(
+      MIN_ETA_MIN,
+      prepRemaining(prepTimeMax) + travelMin
+    );
     return {
       minutes,
+      minutesMax,
       arrivalTime: now + minutes * 60_000,
       kind: "preparing",
     };
   }
 
   // No delivery coordinates — can't estimate.
-  return { minutes: null, arrivalTime: null, kind: null };
+  return { minutes: null, minutesMax: null, arrivalTime: null, kind: null };
 }
 
 export default computeEta;

@@ -107,12 +107,29 @@ function StepIndicator({
       )
     : "";
 
+  const segmentColor = (seg: number) => {
+    if (seg < currentStepIndex) return "bg-color-11";
+    if (seg === currentStepIndex)
+      return cn(
+        "bg-gradient-to-r",
+        locale === "ar" && "bg-gradient-to-l",
+        "from-color-2 via-color-2/50 to-color-7"
+      );
+    return "bg-color-7 opacity-60";
+  };
+
   return (
-    <div className="flex items-stretch gap-3">
-      <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center flex-1 min-w-0">
+      <div className="flex w-full items-center">
         <div
           className={cn(
-            "relative flex items-center justify-center rounded-full shrink-0 transition-all duration-500",
+            "h-0.5 flex-1 rounded-full transition-all duration-500",
+            index === 0 ? "bg-transparent" : segmentColor(index - 1)
+          )}
+        />
+        <div
+          className={cn(
+            "relative flex items-center justify-center rounded-full shrink-0 z-10 transition-all duration-500",
             isCompleted && "size-7 bg-color-11",
             isActive && "size-8 bg-color-2 order-pulse",
             isPending && "size-7 border-2 border-color-7 bg-white"
@@ -122,45 +139,35 @@ function StepIndicator({
           {isActive && <Icon className="text-white text-sm" />}
           {isPending && <Icon className="text-color-5 text-xs" />}
         </div>
-        {!isLast && (
-          <div
-            className={cn(
-              "w-0.5 flex-1 min-h-[34px] my-1 rounded-full transition-all duration-500",
-              isCompleted && "bg-color-11",
-              isActive && "bg-gradient-to-b from-color-2 via-color-2/50 to-color-7",
-              isPending && "bg-color-7 opacity-60"
-            )}
-          />
-        )}
+        <div
+          className={cn(
+            "h-0.5 flex-1 rounded-full transition-all duration-500",
+            isLast ? "bg-transparent" : segmentColor(index)
+          )}
+        />
       </div>
 
-      <div className={cn("flex-1 min-w-0", isLast ? "pb-0" : "pb-5")}>
-        <div className="flex items-center justify-between gap-3">
-          <p
+      <div className="flex flex-col items-center min-w-0 mt-6">
+        <p
+          className={cn(
+            "leading-tight text-center whitespace-nowrap transition-all duration-300",
+            locale === "ar" ? "rotate-45" : "-rotate-45",
+            isCompleted && "text-color-1 font-ProximaNovaSemiBold text-sm",
+            isActive && "text-color-2 font-ProximaNovaBold text-[15px]",
+            isPending && "text-color-5 font-ProximaNovaMed text-sm"
+          )}
+        >
+          {t(step.label)}
+        </p>
+        {timeLabel && (
+          <span
             className={cn(
-              "leading-tight transition-all duration-300",
-              isCompleted && "text-color-1 font-ProximaNovaSemiBold text-sm",
-              isActive && "text-color-2 font-ProximaNovaBold text-[15px]",
-              isPending && "text-color-5 font-ProximaNovaMed text-sm"
+              "text-[11px] font-ProximaNovaThin tabular-nums text-center mt-6",
+              isActive ? "text-color-2" : "text-color-5"
             )}
           >
-            {t(step.label)}
-          </p>
-          {timeLabel && (
-            <span
-              className={cn(
-                "text-[11px] font-ProximaNovaThin tabular-nums shrink-0",
-                isActive ? "text-color-2" : "text-color-5"
-              )}
-            >
-              {timeLabel}
-            </span>
-          )}
-        </div>
-        {(isCompleted || isActive) && (
-          <p className="text-xs text-color-5 font-ProximaNovaThin mt-0.5 leading-tight">
-            {t(step.sublabel)}
-          </p>
+            {timeLabel}
+          </span>
         )}
       </div>
     </div>
@@ -249,6 +256,8 @@ const OrderSidebar = () => {
     driverLocation: liveLocation,
     deliveryLatlng,
     restaurantLatlng,
+    prepTimeMin: currentRes?.operations?.cookTime?.[0],
+    prepTimeMax: currentRes?.operations?.cookTime?.[1],
   });
   const mapPoints: ([number, number] | null)[] = [
     restaurantLatlng,
@@ -389,13 +398,28 @@ const OrderSidebar = () => {
         {!isError && (
           <>
             {/* Status hero */}
-            <div className="relative overflow-hidden rounded-2xl p-4 mb-4 text-white bg-gradient-to-br from-color-2 to-[#ffab4a] shadow-sm">
+            <div className="relative rounded-2xl p-4 mb-4 text-white bg-gradient-to-br from-color-2 to-[#ffab4a] shadow-sm">
               <div className="absolute -right-8 -top-10 size-28 rounded-full bg-white/15" />
               <div className="absolute -right-1 top-2 size-14 rounded-full bg-white/10" />
               <div className="relative">
-                <p className="text-[11px] font-ProximaNovaThin uppercase tracking-widest opacity-90">
-                  {t("Order Tracking")}
-                </p>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-[11px] font-ProximaNovaThin uppercase tracking-widest opacity-90">
+                    {t("Order Tracking")}
+                  </p>
+                  {!eta.isArrived && eta.minutes !== null && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-ProximaNovaSemiBold whitespace-nowrap">
+                      <ClockIcon className="size-3.5 shrink-0" />
+                      {eta.isEnRoute && eta.minutes <= 5
+                        ? t("Arriving soon")
+                        : `${t("Estimated arrival")}: ${
+                            eta.minutesMax !== null &&
+                            eta.minutesMax !== eta.minutes
+                              ? `${eta.minutes}-${eta.minutesMax}`
+                              : eta.minutes
+                          } ${t("min")}`}
+                    </span>
+                  )}
+                </div>
                 <p className="font-ProximaNovaBold text-lg leading-tight mt-0.5">
                   {t(activeStep.sublabel)}
                 </p>
@@ -406,7 +430,7 @@ const OrderSidebar = () => {
             </div>
 
             {/* Timeline */}
-            <div className="rounded-2xl border border-color-7 bg-white p-4 shadow-sm mb-4">
+            <div className="rounded-2xl border border-color-7 bg-white p-4 shadow-sm mb-4 flex items-start">
               {STEPS.map((step, index) => (
                 <StepIndicator
                   key={step.key}
