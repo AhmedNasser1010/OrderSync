@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+} from "react";
+import { createPortal } from "react-dom";
 import {
   MenuIcon,
   XIcon,
@@ -50,18 +57,42 @@ function LanguageSwitcher({
   const pathname = usePathname();
   const dispatch = useAppDispatch();
   const [open, setOpen] = useState(false);
+  const [menuStyle, setMenuStyle] = useState<CSSProperties>({});
   const ref = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const onClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      const node = e.target as Node;
+      const inside =
+        (ref.current && ref.current.contains(node)) ||
+        (menuRef.current && menuRef.current.contains(node));
+      if (!inside) setOpen(false);
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
   }, [open]);
+
+  const toggleMenu = () => {
+    const next = !open;
+    if (next && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const isRtl = locale === "ar";
+      const gap = 8;
+      const menuHeight = 96;
+      const openUpward = rect.bottom + gap + menuHeight > window.innerHeight;
+      setMenuStyle({
+        position: "fixed",
+        insetInlineStart: isRtl ? window.innerWidth - rect.right : rect.left,
+        zIndex: 60,
+        ...(openUpward
+          ? { bottom: window.innerHeight - rect.top + gap }
+          : { top: rect.bottom + gap }),
+      });
+    }
+    setOpen(next);
+  };
 
   const changeLanguage = (lng: string) => {
     dispatch(toggleLng(lng));
@@ -74,7 +105,7 @@ function LanguageSwitcher({
     <div ref={ref} className={cn("relative", className)}>
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggleMenu}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t("Language")}
@@ -87,30 +118,34 @@ function LanguageSwitcher({
         <span className="uppercase">{locale}</span>
         <ChevronDownIcon className="size-3.5 text-color-5" />
       </button>
-      {open && (
-        <div
-          role="menu"
-          className="absolute end-0 top-full z-50 mt-2 w-32 overflow-hidden rounded-2xl border border-color-7 bg-white py-1.5 shadow-xl"
-        >
-          {(["en", "ar"] as const).map((lng) => (
-            <button
-              key={lng}
-              type="button"
-              role="menuitem"
-              onClick={() => changeLanguage(lng)}
-              className={cn(
-                "flex w-full cursor-pointer items-center justify-between px-4 py-2.5 text-sm transition-colors hover:bg-color-7/40",
-                locale === lng
-                  ? "font-ProximaNovaSemiBold text-color-2"
-                  : "font-ProximaNovaMed text-color-6"
-              )}
-            >
-              {lng === "en" ? "English" : "العربية"}
-              {locale === lng && <span className="size-1.5 rounded-full bg-color-2" />}
-            </button>
-          ))}
-        </div>
-      )}
+      {open &&
+        createPortal(
+          <div
+            ref={menuRef}
+            role="menu"
+            style={menuStyle}
+            className="w-32 overflow-hidden rounded-2xl border border-color-7 bg-white py-1.5 shadow-xl"
+          >
+            {(["en", "ar"] as const).map((lng) => (
+              <button
+                key={lng}
+                type="button"
+                role="menuitem"
+                onClick={() => changeLanguage(lng)}
+                className={cn(
+                  "flex w-full cursor-pointer items-center justify-between px-4 py-2.5 text-sm transition-colors hover:bg-color-7/40",
+                  locale === lng
+                    ? "font-ProximaNovaSemiBold text-color-2"
+                    : "font-ProximaNovaMed text-color-6"
+                )}
+              >
+                {lng === "en" ? "English" : "العربية"}
+                {locale === lng && <span className="size-1.5 rounded-full bg-color-2" />}
+              </button>
+            ))}
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
