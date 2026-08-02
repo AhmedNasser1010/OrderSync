@@ -212,62 +212,6 @@ function LivePill() {
   );
 }
 
-function formatEtaClock(
-  arrivalTime: number,
-  locale: string
-): string {
-  return new Date(arrivalTime).toLocaleTimeString(
-    locale === "ar" ? "ar-EG" : "en-US",
-    { hour: "2-digit", minute: "2-digit" }
-  );
-}
-
-/**
- * Badge shown inside the status hero card. Renders an absolute "arrives by"
- * clock time while the order is still being prepared/en route, and an
- * "Arrived" label once delivered.
- */
-function EtaBadge({
-  eta,
-  locale,
-}: {
-  eta: ReturnType<typeof useEta>;
-  locale: string;
-}) {
-  const t = useTranslations();
-
-  if (eta.isArrived) {
-    return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm px-2.5 py-1 mt-2">
-        <CheckCheckIcon className="size-3.5 text-white" />
-        <span className="text-[11px] font-ProximaNovaSemiBold text-white">
-          {t("Arrived")}
-        </span>
-      </span>
-    );
-  }
-
-  if (eta.minutes === null || eta.arrivalTime === null) return null;
-
-  const isSoon = eta.minutes <= 5;
-  const clockLabel = formatEtaClock(eta.arrivalTime, locale);
-
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 backdrop-blur-sm px-2.5 py-1 mt-2">
-      <ClockIcon className="size-3.5 text-white" />
-      {isSoon ? (
-        <span className="text-[11px] font-ProximaNovaSemiBold text-white">
-          {t("Arriving soon")} · {eta.minutes} {t("min")}
-        </span>
-      ) : (
-        <span className="text-[11px] font-ProximaNovaSemiBold text-white">
-          {t("Arrives by")} {clockLabel} · {eta.minutes} {t("min")}
-        </span>
-      )}
-    </span>
-  );
-}
-
 const OrderSidebar = () => {
   const dispatch = useAppDispatch();
   const locale = useLocale();
@@ -458,7 +402,6 @@ const OrderSidebar = () => {
                 <p className="font-ProximaNovaThin text-sm opacity-90 mt-1">
                   {t(activeStep.label)}
                 </p>
-                <EtaBadge eta={eta} locale={locale} />
               </div>
             </div>
 

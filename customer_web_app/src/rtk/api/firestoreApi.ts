@@ -24,6 +24,10 @@ interface TrackedOrderArg {
   uid?: string | null;
 }
 
+const trackedOrderCacheReader: {
+  read?: (arg: TrackedOrderArg, state: unknown) => Partial<OrderType> | undefined;
+} = {};
+
 export interface PlaceOrderInput {
   customerUid: string;
   business: {
@@ -127,7 +131,10 @@ export const firestoreApi = createApi({
     }),
 
     fetchOrderTrackingData: builder.query<Partial<OrderType>, TrackedOrderArg>({
-      queryFn: () => ({ data: {} as Partial<OrderType> }),
+      queryFn: (_arg, { getState }) => {
+        const existing = trackedOrderCacheReader.read?.(_arg, getState());
+        return { data: existing ?? ({} as Partial<OrderType>) };
+      },
       async onCacheEntryAdded(
         { orderId },
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch }
@@ -171,7 +178,6 @@ export const firestoreApi = createApi({
         await cacheEntryRemoved;
         unsubscribe();
       },
-      providesTags: ["OrderTracking"],
     }),
 
     // =====================================================================
@@ -567,3 +573,10 @@ export const {
   useSetUserOrderIdToNullMutation,
   useFinalizePendingLoyaltyMutation,
 } = firestoreApi;
+
+trackedOrderCacheReader.read = (arg, state) => {
+  const result = firestoreApi.endpoints.fetchOrderTrackingData.select(arg)(
+    state as never
+  );
+  return result?.data as Partial<OrderType> | undefined;
+};

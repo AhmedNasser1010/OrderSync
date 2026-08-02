@@ -294,7 +294,7 @@ export default function CartPage() {
   const resName = locale === "ar" ? resInfo?.profile?.nameInAr : resInfo?.profile?.name;
 
   return (
-    <div className="mx-auto min-h-screen max-w-6xl px-4 pb-40 pt-24 sm:px-6 lg:pt-28">
+    <div className="mx-auto min-h-screen max-w-6xl px-4 pb-40 pt-6 sm:px-6 lg:pt-8">
       <div className="mb-6 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link
