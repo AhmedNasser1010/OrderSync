@@ -311,9 +311,15 @@ const OrderSidebar = () => {
       : currentRes?.profile?.name || trackedOrderData?.business?.name;
   const resAddress = currentRes?.profile?.address;
   const resIcon = currentRes?.branding?.icon;
-  const resPhone = currentRes?.business?.contactNumbers?.[0]
-    ?.slice(2)
-    ?.trim();
+  const resPhones = useMemo(() => {
+    const phones = new Set<string>();
+    currentRes?.business?.contactNumbers?.forEach((p) => p && phones.add(p));
+    const orderPhone = trackedOrderData?.business?.phone;
+    if (orderPhone) phones.add(orderPhone);
+    if (currentRes?.owner?.phone) phones.add(currentRes.owner.phone);
+    if (currentRes?.owner?.secondPhone) phones.add(currentRes.owner.secondPhone);
+    return [...phones].map((p) => p.trim()).filter(Boolean);
+  }, [currentRes, trackedOrderData?.business?.phone]);
 
   const handleCloseSidebar = () => {
     dispatch(toggleOrderSidebar());
@@ -600,9 +606,18 @@ const OrderSidebar = () => {
                   {t("Cancellations and modifications")}
                 </span>
               </span>
-              {resPhone && (
-                <span className="block text-color-2 font-ProximaNovaBold text-base mt-0.5">
-                  {resPhone}
+              {resPhones.length > 0 && (
+                <span className="flex items-center justify-center gap-2 mt-0.5">
+                  {resPhones.map((phone) => (
+                    <a
+                      key={phone}
+                      href={`tel:${phone}`}
+                      dir="ltr"
+                      className="text-color-2 font-ProximaNovaBold text-base underline-offset-4 hover:underline"
+                    >
+                      {phone}
+                    </a>
+                  ))}
                 </span>
               )}
             </button>
