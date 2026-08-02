@@ -275,7 +275,7 @@ function Header() {
                 className={cn("transition-all", scrolled ? "md:h-10 h-9" : "md:h-14 h-12")}
               />
             </Link>
-            <Link href="/" className="hidden sm:block">
+            <Link href="/">
               <h1
                 className={cn(
                   "font-Beiruti transition-all",

@@ -1,12 +1,9 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
-import {
-  addToCart,
-  setRestaurant,
-} from "@/rtk/slices/cartSlice";
+import { addToCart, setRestaurant } from "@/rtk/slices/cartSlice";
 import {
   setShowItemsAlreadyInCartPopup,
   setShowTrackedOrderLockPopup,
@@ -16,17 +13,8 @@ import type { ItemType, SizeType } from "@ordersync/types";
 
 type ItemWithSelection = ItemType & { selectedSize?: SizeType | null };
 
-const PlaceItemBtn = ({
-  item,
-  status,
-  resID,
-}: {
-  item: ItemWithSelection;
-  status: string;
-  resID: string;
-}) => {
+const useAddToCart = (resID: string, status: string) => {
   const t = useTranslations();
-  const locale = useLocale();
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector((state) => state.cart.items);
   const currentResId = useAppSelector((state) => state.cart.restaurant);
@@ -65,42 +53,35 @@ const PlaceItemBtn = ({
         position: "top-center",
         duration: 1500,
       });
+      return;
+    }
+
+    if (isSameRes) {
+      toast.success(t("Added to the Cart"), {
+        position: "top-center",
+        duration: 1500,
+      });
+      dispatch(
+        addToCart({
+          id: menuItem.id,
+          quantity: 1,
+          selectedSize: menuItem?.selectedSize?.size || null,
+        })
+      );
+      dispatch(setRestaurant(resID));
+      dispatch(setShowItemsAlreadyInCartPopup(false));
+      dispatch(setShowTrackedOrderLockPopup(false));
+      return;
+    }
+
+    if (hasActiveTrackedOrder) {
+      dispatch(setShowTrackedOrderLockPopup(true));
     } else {
-      if (isSameRes) {
-        toast.success(t("Added to the Cart"), {
-          position: "top-center",
-          duration: 1500,
-        });
-        dispatch(
-          addToCart({
-            id: menuItem.id,
-            quantity: 1,
-            selectedSize: menuItem?.selectedSize?.size || null,
-          })
-        );
-        dispatch(setRestaurant(resID));
-        dispatch(setShowItemsAlreadyInCartPopup(false));
-        dispatch(setShowTrackedOrderLockPopup(false));
-      } else {
-        if (hasActiveTrackedOrder) {
-          dispatch(setShowTrackedOrderLockPopup(true));
-        } else {
-          dispatch(setShowItemsAlreadyInCartPopup(true));
-        }
-      }
+      dispatch(setShowItemsAlreadyInCartPopup(true));
     }
   };
 
-  return (
-    <button
-      onClick={() => handleAddItem(item)}
-      className={`absolute -bottom-2 left-1/2 -translate-x-1/2 z-[1] w-24 h-9 shadow-md shadow-color-7 bg-white text-center inline-block rounded text-[#60b246] text-sm ${
-        locale === "ar" ? "font-Beiruti font-bold" : "font-ProximaNovaSemiBold"
-      } uppercase`}
-    >
-      {t("Add")}
-    </button>
-  );
+  return { handleAddItem };
 };
 
-export default PlaceItemBtn;
+export default useAddToCart;

@@ -1,0 +1,101 @@
+"use client";
+
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import ItemAvailability from "@/components/RestaurantMenu/ItemAvailability";
+import ItemTitle from "@/components/RestaurantMenu/ItemTitle";
+import DiscountMsg from "@/components/RestaurantMenu/DiscountMsg";
+import ItemPrice from "@/components/RestaurantMenu/ItemPrice";
+import ItemDescription from "@/components/RestaurantMenu/ItemDescription";
+import ItemSizesBar from "@/components/RestaurantMenu/ItemSizesBar";
+import QuantityStepper from "@/components/RestaurantMenu/QuantityStepper";
+import ImageViewer from "@/components/RestaurantMenu/ImageViewer";
+import useItemInfo from "@/hooks/useItemInfo";
+import type { ItemType, SizeType } from "@ordersync/types";
+
+type ItemWithSelection = ItemType & { selectedSize?: SizeType | null };
+
+const MenuItemCard = ({
+  item,
+  resID,
+  status,
+}: {
+  item: ItemWithSelection;
+  resID: string;
+  status: string;
+}) => {
+  const t = useTranslations();
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const {
+    selectedSize,
+    itemPrice,
+    afterDiscount,
+    discountIncluded,
+    handleSetSelectedSize,
+  } = useItemInfo(item, resID);
+
+  const percentOff =
+    discountIncluded && itemPrice > 0 && afterDiscount?.finalPrice
+      ? Math.round((1 - afterDiscount.finalPrice / itemPrice) * 100)
+      : 0;
+
+  return (
+    <div className="flex items-start justify-between gap-4 py-6">
+      <div className="min-w-0 flex-1">
+        <ItemAvailability />
+        <ItemTitle title={item?.title} discountIncluded={discountIncluded} />
+        <DiscountMsg
+          discountMsg={discountIncluded ? item?.discount?.message : null}
+          discountIncluded={discountIncluded}
+        />
+        <ItemPrice
+          price={itemPrice}
+          finalPrice={afterDiscount?.finalPrice}
+          discountIncluded={discountIncluded}
+        />
+        <ItemDescription description={item?.description} />
+        <ItemSizesBar
+          item={item}
+          selectedSize={selectedSize}
+          handleSetSelectedSize={handleSetSelectedSize}
+        />
+      </div>
+
+      <div className="relative shrink-0">
+        <button
+          type="button"
+          onClick={() => setViewerOpen(true)}
+          aria-label={t("View image")}
+          className="group relative block h-28 w-32 cursor-zoom-in overflow-hidden rounded-2xl bg-color-7 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none sm:h-36 sm:w-44"
+        >
+          <img
+            src={item?.backgrounds?.[0] || "/assets/FoodAndDrinkDesign.svg"}
+            alt={item?.title || "menu-img"}
+            loading="lazy"
+            className="h-full w-full rounded-2xl object-cover transition-transform duration-300 group-hover:scale-110"
+          />
+          {percentOff > 0 && (
+            <span className="absolute top-2 start-2 rounded-md bg-color-2/95 px-2 py-0.5 font-ProximaNovaBold text-xs uppercase text-white shadow-sm">
+              {percentOff}% {t("OFF")}
+            </span>
+          )}
+        </button>
+        <QuantityStepper
+          item={item}
+          selectedSize={selectedSize}
+          status={status}
+          resID={resID}
+        />
+      </div>
+
+      <ImageViewer
+        src={item?.backgrounds?.[0] || "/assets/FoodAndDrinkDesign.svg"}
+        alt={item?.title}
+        onClose={() => setViewerOpen(false)}
+        open={viewerOpen}
+      />
+    </div>
+  );
+};
+
+export default MenuItemCard;
