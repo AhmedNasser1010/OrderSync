@@ -1,6 +1,17 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  MenuIcon,
+  XIcon,
+  MapPinIcon,
+  BikeIcon,
+  ChevronDownIcon,
+  LogOutIcon,
+  ShoppingCartIcon,
+  GlobeIcon,
+  UserIcon,
+} from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import {
   toggleLoginSidebar,
@@ -9,38 +20,123 @@ import {
 } from "@/rtk/slices/toggleSlice";
 import { LOGO_URL } from "@/utils/constants";
 import { useTranslations, useLocale } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { initUser } from "@/rtk/slices/userSlice";
 import { initServices } from "@/rtk/slices/servicesSlice";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import DeliveryLocation from "@/components/DeliveryLocation";
+import ProfileAvatar from "@/components/Sidebar/ProfileAvatar";
+import { cn } from "@/lib/utils";
 
 const emptySubscribe = () => () => {};
 
-const Header = () => {
+function LanguageSwitcher({
+  onNavigate,
+  className,
+  fullWidth,
+}: {
+  onNavigate?: () => void;
+  className?: string;
+  fullWidth?: boolean;
+}) {
+  const t = useTranslations();
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
+  const dispatch = useAppDispatch();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [open]);
+
+  const changeLanguage = (lng: string) => {
+    dispatch(toggleLng(lng));
+    router.replace(pathname, { locale: lng });
+    setOpen(false);
+    onNavigate?.();
+  };
+
+  return (
+    <div ref={ref} className={cn("relative", className)}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={t("Language")}
+        className={cn(
+          "flex items-center gap-1.5 rounded-full border border-color-7 px-3 py-2 text-sm font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none cursor-pointer",
+          fullWidth && "w-full justify-center"
+        )}
+      >
+        <GlobeIcon className="size-4 text-color-5" />
+        <span className="uppercase">{locale}</span>
+        <ChevronDownIcon className="size-3.5 text-color-5" />
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute end-0 top-full z-50 mt-2 w-32 overflow-hidden rounded-2xl border border-color-7 bg-white py-1.5 shadow-xl"
+        >
+          {(["en", "ar"] as const).map((lng) => (
+            <button
+              key={lng}
+              type="button"
+              role="menuitem"
+              onClick={() => changeLanguage(lng)}
+              className={cn(
+                "flex w-full cursor-pointer items-center justify-between px-4 py-2.5 text-sm transition-colors hover:bg-color-7/40",
+                locale === lng
+                  ? "font-ProximaNovaSemiBold text-color-2"
+                  : "font-ProximaNovaMed text-color-6"
+              )}
+            >
+              {lng === "en" ? "English" : "العربية"}
+              {locale === lng && <span className="size-1.5 rounded-full bg-color-2" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Header() {
   const t = useTranslations();
   const locale = useLocale();
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector((state) => state.cart.items);
   const user = useAppSelector((state) => state.user);
+  const { logout } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const isRTL = locale === "ar";
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
   const mounted = useSyncExternalStore(
     emptySubscribe,
     () => true,
     () => false
   );
 
-  const handleOrderSidebar = () => {
-    dispatch(toggleOrderSidebar());
-    document.body.classList.add("overflow-hidden");
-  };
-
-  const handleLoginSidebar = () => {
-    dispatch(toggleLoginSidebar());
-    document.body.classList.add("overflow-hidden");
-  };
+  const isHome = pathname === `/${locale}` || pathname === "/";
+  const isLoggedIn = !!user?.userInfo?.uid;
 
   useEffect(() => {
     let unsub: (() => void) | null = null;
@@ -89,96 +185,349 @@ const Header = () => {
     dispatch(toggleLng(locale));
   }, [locale, dispatch]);
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!profileOpen) return;
+    const onClick = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [profileOpen]);
+
+  useEffect(() => {
+    document.body.classList.toggle("overflow-hidden", menuOpen);
+    return () => document.body.classList.remove("overflow-hidden");
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
+
+  const handleOrderSidebar = () => {
+    dispatch(toggleOrderSidebar());
+    document.body.classList.add("overflow-hidden");
+  };
+
+  const handleLoginSidebar = () => {
+    dispatch(toggleLoginSidebar());
+    document.body.classList.add("overflow-hidden");
+  };
+
+  const handleOrderNow = () => {
+    setMenuOpen(false);
+    if (isHome) {
+      document.getElementById("restaurants")?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      router.push("/");
+    }
+  };
+
+  const handleLogout = async () => {
+    setProfileOpen(false);
+    setMenuOpen(false);
+    await logout();
+  };
+
+  const avatarUrl =
+    (user?.userInfo as { avatar?: string } | undefined)?.avatar;
+
   return (
-    <header className="shadow-md w-full fixed left-0 top-0 right-0 h-20 z-40 md:px-5 text-color-1 bg-white px-3">
-      <div className="flex justify-between items-center h-full container mx-auto">
-        <div className="flex items-center md:gap-5 gap-2">
-          <Link href="/">
-            <img src={LOGO_URL} alt="logo" className="md:h-14 h-12" />
-          </Link>
-          <Link href="/">
-            <h1 className="font-Beiruti md:text-3xl text-2xl">{t("Zack's Eats")}</h1>
-          </Link>
+    <>
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:bg-color-2 focus:px-4 focus:py-2 focus:text-white focus:font-ProximaNovaSemiBold"
+      >
+        {t("Skip to content")}
+      </a>
+      <header
+        className={cn(
+          "shadow-md w-full fixed left-0 top-0 right-0 z-40 bg-white transition-all duration-300",
+          scrolled ? "h-14 md:px-5 px-3" : "h-20 md:px-5 px-3"
+        )}
+      >
+        <div className="flex justify-between items-center h-full container mx-auto">
+          <div className="flex items-center md:gap-5 gap-2">
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label={t("Menu")}
+              className="lg:hidden grid size-9 place-items-center rounded-full text-color-1 hover:bg-color-7/40 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none"
+            >
+              <MenuIcon className="size-5" />
+            </button>
+            <Link href="/" aria-label={t("Home")}>
+              <img
+                src={LOGO_URL}
+                alt="logo"
+                className={cn("transition-all", scrolled ? "md:h-10 h-9" : "md:h-14 h-12")}
+              />
+            </Link>
+            <Link href="/" className="hidden sm:block">
+              <h1
+                className={cn(
+                  "font-Beiruti transition-all",
+                  scrolled ? "md:text-2xl text-xl" : "md:text-3xl text-2xl"
+                )}
+              >
+                {t("Zack's Eats")}
+              </h1>
+            </Link>
+          </div>
+
+          <div className="hidden lg:block">
+            <DeliveryLocation variant="compact" />
+          </div>
+
+          <ul className="flex items-center gap-1 sm:gap-2.5">
+            {isHome && (
+              <li className="hidden lg:block">
+                <button
+                  type="button"
+                  onClick={handleOrderNow}
+                  className="hidden md:flex items-center gap-1.5 rounded-full bg-color-2 px-5 py-2 text-sm font-ProximaNovaSemiBold text-white transition-all hover:bg-color-2/90 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none cursor-pointer"
+                >
+                  {t("Order now")}
+                </button>
+              </li>
+            )}
+
+            {user?.trackedOrder?.id && (
+              <li>
+                <button
+                  type="button"
+                  onClick={handleOrderSidebar}
+                  aria-label={t("Order Tracking")}
+                  className="order-pulse flex items-center gap-1.5 rounded-full bg-color-11/10 px-3 py-2 text-sm font-ProximaNovaSemiBold text-color-11 transition-colors hover:bg-color-11/20 focus-visible:ring-2 focus-visible:ring-color-11/50 outline-none cursor-pointer"
+                >
+                  <BikeIcon className="size-4" />
+                  <span className="hidden sm:inline">{t("Order Track")}</span>
+                </button>
+              </li>
+            )}
+
+            <li className="hidden md:block">
+              <LanguageSwitcher />
+            </li>
+
+            {isLoggedIn ? (
+              <li>
+                <div ref={profileRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setProfileOpen((v) => !v)}
+                    aria-haspopup="menu"
+                    aria-expanded={profileOpen}
+                    aria-label={t("Your account")}
+                    className="flex items-center gap-2 rounded-full border border-color-7 py-1.5 ps-1.5 pe-2 transition-colors hover:bg-color-7/40 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none cursor-pointer"
+                  >
+                    <ProfileAvatar
+                      name={user?.userInfo?.name}
+                      photoUrl={avatarUrl}
+                      size="sm"
+                    />
+                    <ChevronDownIcon className="size-3.5 text-color-5" />
+                  </button>
+                  {profileOpen && (
+                    <div
+                      role="menu"
+                      className="absolute end-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-color-7 bg-white py-2 shadow-xl"
+                    >
+                      <div className="border-b border-color-7 px-4 py-3">
+                        <p className="truncate text-sm font-ProximaNovaSemiBold text-color-1">
+                          {user?.userInfo?.name || t("Guest")}
+                        </p>
+                        <p className="truncate text-xs font-ProximaNovaThin text-color-5" dir="ltr">
+                          {user?.userInfo?.phone || t("No phone number added")}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          setProfileOpen(false);
+                          handleLoginSidebar();
+                        }}
+                        className="flex w-full cursor-pointer items-center gap-2.5 px-4 py-2.5 text-sm font-ProximaNovaMed text-color-6 transition-colors hover:bg-color-7/40"
+                      >
+                        <UserIcon className="size-4 text-color-5" />
+                        {t("Your account")}
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={handleLogout}
+                        className="flex w-full cursor-pointer items-center gap-2.5 px-4 py-2.5 text-sm font-ProximaNovaMed text-red-500 transition-colors hover:bg-red-50"
+                      >
+                        <LogOutIcon className="size-4" />
+                        {t("Logout")}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </li>
+            ) : (
+              <li>
+                <button
+                  type="button"
+                  onClick={handleLoginSidebar}
+                  className="flex items-center gap-1.5 rounded-full border border-color-7 px-4 py-2 text-sm font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none cursor-pointer"
+                >
+                  <UserIcon className="size-4 text-color-5" />
+                  <span className="hidden md:inline">{t("Sign In")}</span>
+                </button>
+              </li>
+            )}
+
+            <li>
+              <Link
+                href="/cart"
+                aria-label={t("Cart")}
+                className="flex items-center gap-1.5 rounded-full px-2 py-2 text-sm font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none"
+              >
+                <span className="relative">
+                  <ShoppingCartIcon className="size-5" />
+                  {mounted && cartItems.length > 0 && (
+                    <span className="absolute -top-2 -end-2 grid min-w-4.5 min-h-4.5 place-items-center rounded-full bg-color-2 px-1 text-[10px] font-ProximaNovaBold text-white">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </span>
+                <span className="hidden sm:inline">{t("Cart")}</span>
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </header>
+
+      {/* Mobile drawer */}
+      <div
+        className={cn(
+          "fixed inset-0 z-[55] bg-color-1/60 transition-opacity duration-300 lg:hidden",
+          menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        )}
+        onClick={() => setMenuOpen(false)}
+      />
+      <div
+        className={cn(
+          "fixed top-0 bottom-0 z-[56] flex w-[82%] max-w-sm flex-col bg-white shadow-2xl transition-transform duration-300 lg:hidden",
+          isRTL ? "right-0" : "left-0",
+          menuOpen ? "translate-x-0" : isRTL ? "translate-x-full" : "-translate-x-full"
+        )}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("Menu")}
+      >
+        <div className="flex items-center justify-between border-b border-color-7 px-5 py-4">
+          <div className="flex items-center gap-2">
+            <img src={LOGO_URL} alt="logo" className="h-9 w-9 object-contain" />
+            <span className="font-Beiruti text-2xl text-color-1">
+              {t("Zack's Eats")}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setMenuOpen(false)}
+            aria-label={t("Close")}
+            className="grid size-9 place-items-center rounded-full bg-color-7/60 hover:bg-color-7 transition-colors cursor-pointer"
+          >
+            <XIcon className="size-5 text-color-1" />
+          </button>
         </div>
 
-        <ul className="font-ProximaNovaMed flex items-center md:gap-5 gap-4">
-          {user?.trackedOrder?.id && (
-            <BikeIconButton onClick={handleOrderSidebar} />
-          )}
+        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
           <button
-            onClick={handleLoginSidebar}
-            className="flex items-center gap-2 group hover:text-color-2"
+            type="button"
+            onClick={handleOrderNow}
+            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-color-2 py-3.5 font-ProximaNovaSemiBold text-white transition-colors hover:bg-color-2/90 cursor-pointer"
           >
-            <div>
-              <svg
-                className="group-hover:fill-color-2"
-                viewBox="6 0 12 24"
-                height="19"
-                width="18"
-                fill="#686b78"
-              >
-                <path d="M11.9923172,11.2463768 C8.81761115,11.2463768 6.24400341,8.72878961 6.24400341,5.62318841 C6.24400341,2.5175872 8.81761115,0 11.9923172,0 C15.1670232,0 17.740631,2.5175872 17.740631,5.62318841 C17.740631,8.72878961 15.1670232,11.2463768 11.9923172,11.2463768 Z M11.9923172,9.27536232 C14.0542397,9.27536232 15.7257581,7.64022836 15.7257581,5.62318841 C15.7257581,3.60614845 14.0542397,1.97101449 11.9923172,1.97101449 C9.93039471,1.97101449 8.25887628,3.60614845 8.25887628,5.62318841 C8.25887628,7.64022836 9.93039471,9.27536232 11.9923172,9.27536232 Z M24,24 L0,24 L1.21786143,19.7101449 L2.38352552,15.6939891 C2.85911209,14.0398226 4.59284263,12.7536232 6.3530098,12.7536232 L17.6316246,12.7536232 C19.3874139,12.7536232 21.1256928,14.0404157 21.6011089,15.6939891 L22.9903494,20.5259906 C23.0204168,20.63057 23.0450458,20.7352884 23.0641579,20.8398867 L24,24 Z M21.1127477,21.3339312 L21.0851024,21.2122487 C21.0772161,21.1630075 21.0658093,21.1120821 21.0507301,21.0596341 L19.6614896,16.2276325 C19.4305871,15.4245164 18.4851476,14.7246377 17.6316246,14.7246377 L6.3530098,14.7246377 C5.4959645,14.7246377 4.55444948,15.4231177 4.32314478,16.2276325 L2.75521062,21.6811594 L2.65068631,22.0289855 L21.3185825,22.0289855 L21.1127477,21.3339312 Z"></path>
-              </svg>
-            </div>
-            {!user?.userInfo ? (
-              <span className="md:inline hidden">{t("Sign In")}</span>
-            ) : (
-              <span className="md:inline hidden">{user?.userInfo?.name}</span>
-            )}
+            <MapPinIcon className="size-4" />
+            {t("Order now")}
           </button>
-          <Link href="/cart" className="flex items-center gap-2 group hover:text-color-2">
-            <div className="relative overflow-hidden font-ProximaNovaSemiBold">
-              {mounted && cartItems.length > 0 ? (
-                <>
-                  <svg
-                    className="stroke-color-11 fill-color-11 stroke-2"
-                    viewBox="-1 0 37 32"
-                    height="20"
-                    width="20"
-                  >
-                    <path d="M4.438 0l-2.598 5.11-1.84 26.124h34.909l-1.906-26.124-2.597-5.11z"></path>
-                  </svg>
-                  <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm text-white">
-                    {mounted ? cartItems.length : 0}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <svg
-                    className="stroke-color-1 fill-white stroke-2 group-hover:stroke-color-2"
-                    viewBox="-1 0 37 32"
-                    height="20"
-                    width="20"
-                  >
-                    <path d="M4.438 0l-2.598 5.11-1.84 26.124h34.909l-1.906-26.124-2.597-5.11z"></path>
-                  </svg>
-                  <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm">
-                    {mounted ? cartItems.length : 0}
-                  </span>
-                </>
-              )}
-            </div>
-            <span>{t("Cart")}</span>
-          </Link>
-        </ul>
-      </div>
-    </header>
-  );
-};
 
-function BikeIconButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button onClick={onClick} aria-label="Track order">
-      <svg
-        className="text-color-11"
-        viewBox="0 0 24 24"
-        width="28"
-        height="28"
-        fill="currentColor"
-      >
-        <path d="M5.5 5.5h3l2 4h6.5l2.6-3.1c.4-.5.9-.9 1.4-.9 1.1 0 2 .9 2 2s-.9 2-2 2c-.5 0-.9-.2-1.3-.5L18.5 10l-1 4.5-5.5 1-2.5-3.5h-4L5.5 5.5z" />
-      </svg>
-    </button>
+          {user?.trackedOrder?.id && (
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                handleOrderSidebar();
+              }}
+              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-color-11/10 py-3.5 font-ProximaNovaSemiBold text-color-11 transition-colors hover:bg-color-11/20 cursor-pointer"
+            >
+              <BikeIcon className="size-4" />
+              {t("Order Track")}
+            </button>
+          )}
+
+          <div className="border-t border-color-7 pt-4 space-y-3">
+            {isLoggedIn ? (
+              <div className="flex items-center gap-3 rounded-2xl border border-color-7 p-3">
+                <ProfileAvatar
+                  name={user?.userInfo?.name}
+                  photoUrl={avatarUrl}
+                  size="sm"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-ProximaNovaSemiBold text-color-1">
+                    {user?.userInfo?.name || t("Guest")}
+                  </p>
+                  <p className="truncate text-xs font-ProximaNovaThin text-color-5" dir="ltr">
+                    {user?.userInfo?.phone || t("No phone number added")}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleLoginSidebar();
+                }}
+                className="w-full flex items-center justify-center gap-2 rounded-2xl border border-color-7 py-3 font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40 cursor-pointer"
+              >
+                <UserIcon className="size-4 text-color-5" />
+                {t("Sign In")}
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <LanguageSwitcher onNavigate={() => setMenuOpen(false)} fullWidth />
+            <Link
+              href="/cart"
+              onClick={() => setMenuOpen(false)}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-color-7 py-2 font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40"
+            >
+              <ShoppingCartIcon className="size-4" />
+              {t("Cart")}
+            </Link>
+          </div>
+
+          {isLoggedIn && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 py-3 font-ProximaNovaSemiBold text-red-500 transition-colors hover:bg-red-100 cursor-pointer"
+            >
+              <LogOutIcon className="size-4" />
+              {t("Logout")}
+            </button>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 

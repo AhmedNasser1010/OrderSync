@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
 import { XIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { addFilter, removeFilter } from "@/rtk/slices/filterSlice";
@@ -14,16 +13,11 @@ function Filter({
   filterId: string;
 }) {
   const dispatch = useAppDispatch();
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [isActive, setIsActive] = useState(false);
   const filter = useAppSelector((state) => state.filter);
 
-  useEffect(() => {
-    setIsActive(filter.includes(filterId));
-  }, [filter, filterId]);
+  const isActive = filter.includes(filterId);
 
   const handleActive = () => {
-    setIsActive(!isActive);
     if (isActive) {
       dispatch(removeFilter(filterId));
     } else {
@@ -38,7 +32,6 @@ function Filter({
         isActive && "active"
       )}
       onClick={handleActive}
-      ref={buttonRef}
     >
       {children}
       <span className="text-lg ml-1 mb-[2px] hidden">

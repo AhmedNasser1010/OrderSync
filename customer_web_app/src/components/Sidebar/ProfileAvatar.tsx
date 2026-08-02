@@ -14,17 +14,24 @@ function ProfileAvatar({
   name,
   photoUrl,
   className,
+  size = "md",
 }: {
   name?: string;
   photoUrl?: string;
   className?: string;
+  size?: "sm" | "md";
 }) {
   const initials = getInitials(name);
+  const sizeClass =
+    size === "sm"
+      ? "size-8 rounded-full text-xs"
+      : "size-14 rounded-2xl text-lg";
 
   return (
     <div
       className={cn(
-        "relative size-14 shrink-0 grid place-items-center overflow-hidden rounded-2xl bg-gradient-to-br from-color-2 to-[#ffab4a] text-white font-ProximaNovaBold text-lg shadow-md shadow-color-2/30 ring-2 ring-white",
+        "relative shrink-0 grid place-items-center overflow-hidden bg-gradient-to-br from-color-2 to-[#ffab4a] text-white font-ProximaNovaBold shadow-md shadow-color-2/30 ring-2 ring-white",
+        sizeClass,
         className
       )}
     >

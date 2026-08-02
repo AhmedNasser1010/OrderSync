@@ -4,6 +4,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   onSnapshot,
   query,
   setDoc,
@@ -92,35 +93,19 @@ export const firestoreApi = createApi({
     // =====================================================================
 
     fetchBusinesses: builder.query<unknown[], void>({
-      queryFn: () => ({ data: [] }),
-      async onCacheEntryAdded(
-        _arg,
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
-      ) {
-        const businessesRef = collection(db, "businesses");
-
-        await cacheDataLoaded;
-
-        const unsubscribe = onSnapshot(
-          businessesRef,
-          (snapshot) => {
-            updateCachedData((draft: unknown[]) => {
-              draft.length = 0;
-              snapshot.docs.forEach((doc) => {
-                draft.push({ id: doc.id, ...doc.data() });
-              });
-            });
-          },
-          (error) => {
-            console.error(
-              "Error in real-time listener [fetchBusinesses]:",
-              error?.message
-            );
-          }
-        );
-
-        await cacheEntryRemoved;
-        unsubscribe();
+      async queryFn() {
+        try {
+          const businessesRef = collection(db, "businesses");
+          const snapshot = await getDocs(businessesRef);
+          return {
+            data: snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })),
+          };
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
+        }
       },
       providesTags: ["Restaurants"],
     }),
@@ -450,7 +435,7 @@ export const firestoreApi = createApi({
           return { error: message };
         }
       },
-      invalidatesTags: ["OrderTracking"],
+      invalidatesTags: ["OrderTracking", "Restaurants"],
     }),
 
     setUserOrderIdToNull: builder.mutation<null, string | null | undefined>({

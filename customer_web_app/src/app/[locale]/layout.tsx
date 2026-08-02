@@ -27,7 +27,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <HtmlAttributes locale={locale} />
       <PopupProvider>
         <Header />
-        <main className="pt-20 min-h-screen bg-white">{children}</main>
+        <main id="main-content" className="pt-20 min-h-screen bg-white">{children}</main>
         <LoginSidebar />
         <OrderSidebar />
       </PopupProvider>

@@ -1,32 +1,43 @@
 "use client";
 
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { useLocale } from "next-intl";
-import { useTranslations } from "next-intl";
-import { useAppDispatch } from "@/rtk/hooks";
+import { useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { addFilter, clearAll } from "@/rtk/slices/filterSlice";
-import { cn } from "@/lib/utils";
+import SectionHeader from "@/components/Home/SectionHeader";
+import type { RestaurantDocument } from "@/types/restaurant";
 
-const categories = [
-  { id: "italian-pizza", img: "https://i.imgur.com/avMww3r.jpg" },
-  { id: "sandwiches", img: "https://i.imgur.com/jh2GEIS.jpg" },
-  { id: "pasta", img: "https://i.imgur.com/y44eLlr.jpg" },
-];
+const CATEGORY_IMAGES: Record<string, string> = {
+  "italian-pizza": "https://i.imgur.com/avMww3r.jpg",
+  sandwiches: "https://i.imgur.com/jh2GEIS.jpg",
+  pasta: "https://i.imgur.com/y44eLlr.jpg",
+  crepes: "https://i.imgur.com/y44eLlr.jpg",
+};
 
 function WhatsOnYourMind() {
   const dispatch = useAppDispatch();
   const locale = useLocale();
   const t = useTranslations();
   const isRTL = locale === "ar";
+  const restaurants = useAppSelector((state) => state.restaurants);
 
-  const handleFoodScrollLeft = () => {
-    const foodCategory = document.querySelector(".food-category");
-    foodCategory && (foodCategory.scrollLeft = foodCategory.scrollLeft - 250);
-  };
+  const categories = useMemo(() => {
+    const map = new Map<string, string>();
+    restaurants.forEach((res: RestaurantDocument) => {
+      (res?.metadata || []).forEach((tag) => {
+        if (!map.has(tag)) {
+          map.set(tag, CATEGORY_IMAGES[tag] || res?.branding?.cover || "");
+        }
+      });
+    });
+    return Array.from(map.entries()).map(([id, img]) => ({ id, img }));
+  }, [restaurants]);
 
-  const handleFoodScrollRight = () => {
-    const foodCategory = document.querySelector(".food-category");
-    foodCategory && (foodCategory.scrollLeft = foodCategory.scrollLeft + 250);
+  if (categories.length === 0) return null;
+
+  const scrollBy = (dir: number) => {
+    const el = document.querySelector<HTMLElement>(".food-category");
+    el?.scrollBy({ left: dir * 250, behavior: "smooth" });
   };
 
   const handleTriggerFilter = (tag: string) => {
@@ -36,46 +47,43 @@ function WhatsOnYourMind() {
   };
 
   return (
-    <section id="img-carousel" className="relative">
-      <h2 className="font-GrotBlack text-2xl pb-5">{t("What's on your mind?")}</h2>
-      <div
-        className={cn(
-          "scroll-buttons absolute top-0 flex gap-2",
-          isRTL ? "left-10" : "right-10"
-        )}
-      >
-        <button
-          onClick={handleFoodScrollLeft}
-          className={cn(
-            "flex justify-center cursor-pointer rounded-full border border-color-7 p-2.5 hover:bg-color-7/30",
-            isRTL && "order-1"
-          )}
-        >
-          <ChevronLeftIcon className="size-4" />
-        </button>
-        <button
-          onClick={handleFoodScrollRight}
-          className="flex justify-center cursor-pointer rounded-full border border-color-7 p-2.5 hover:bg-color-7/30"
-        >
-          <ChevronRightIcon className="size-4" />
-        </button>
-      </div>
-      <div className="food-category overflow-x-scroll scroll-smooth scrollbar-hide max-w-[1500px]">
-        <div className="flex gap-6">
-          {categories?.map((category) => (
-            <div
-              className="cursor-pointer"
-              key={category?.id}
-              onMouseUp={() => handleTriggerFilter(category.id)}
-            >
-              <div className="w-36">
-                <img src={category?.img} alt="category" />
-              </div>
-            </div>
-          ))}
+    <>
+      <div className="divider"></div>
+      <section id="img-carousel" className="relative">
+        <SectionHeader
+          title={t("What's on your mind?")}
+          arrows
+          onLeft={() => scrollBy(isRTL ? 250 : -250)}
+          onRight={() => scrollBy(isRTL ? -250 : 250)}
+        />
+        <div className="food-category overflow-x-auto scroll-smooth scrollbar-hide max-w-[1500px] pb-2">
+          <div className="flex gap-6">
+            {categories.map((category) => (
+              <button
+                type="button"
+                key={category?.id}
+                onClick={() => handleTriggerFilter(category.id)}
+                className="group flex shrink-0 cursor-pointer flex-col items-center gap-2 focus-visible:ring-2 focus-visible:ring-color-2/50 rounded-xl outline-none"
+              >
+                <span className="block w-36">
+                  {category?.img && (
+                    <img
+                      src={category.img}
+                      alt={t(category.id)}
+                      loading="lazy"
+                      className="h-36 w-36 rounded-full object-cover ring-4 ring-transparent transition-all duration-300 group-hover:scale-105 group-hover:ring-color-7"
+                    />
+                  )}
+                </span>
+                <span className="font-GrotMed text-color-3 text-sm tracking-tight">
+                  {t(category.id)}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 

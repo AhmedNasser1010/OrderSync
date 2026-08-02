@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import RestaurantsFilter from "@/components/Home/RestaurantsFilter";
 import RestaurantCard from "@/components/ui/custom/RestaurantCard";
 import NoRestaurants from "@/components/Home/NoRestaurants";
+import { toCardInfo } from "@/components/Home/cardInfo";
 import type { RestaurantDocument } from "@/types/restaurant";
 
 function Restaurants() {
@@ -35,23 +36,11 @@ function Restaurants() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-10">
           {filteredRestaurants.map((res: RestaurantDocument) => (
             <Link
-              className="relative transition-all hover:scale-95"
+              className="relative block transition-all hover:scale-95"
               key={res?.accessToken}
               href={`/${res?.profile.name.split(" ").join("-")}`}
             >
-              <RestaurantCard
-                info={{
-                  areaName: t("El-Ayat"),
-                  name: res?.profile?.name,
-                  nameInAr: res?.profile?.nameInAr || res?.profile?.name,
-                  avgRating: "4.5",
-                  cloudinaryImageId: res?.branding?.cover,
-                  sla: `${res.operations.cookTime[0]}-${res.operations.cookTime[1]} ${t("min")}`,
-                  cuisines: res?.profile?.cuisines,
-                  status: res?.status,
-                  promotionalSubtitle: res?.branding?.promotionalSubtitle,
-                }}
-              />
+              <RestaurantCard info={toCardInfo(res, t)} />
             </Link>
           ))}
         </div>
