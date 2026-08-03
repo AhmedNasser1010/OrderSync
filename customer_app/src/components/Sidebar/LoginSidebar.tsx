@@ -150,7 +150,7 @@ const LoginSidebar = () => {
           <div className="flex items-center gap-2">
             <img src={LOGO_URL} alt="logo" className="h-9 w-9 object-contain" />
             <span className="font-Beiruti text-2xl text-color-1">
-              {t("Zack's Eats")}
+              {t("Zajil")}
             </span>
           </div>
           <button

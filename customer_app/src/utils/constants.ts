@@ -21,4 +21,4 @@ export const RES_MENU_IMG =
 export const RES_CART_IMG =
   "https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_100,h_100,c_fill/";
 
-export const RESTAURANT_PHONE = "+20 112 776 6764";
+export const RESTAURANT_PHONE = "01117073085";

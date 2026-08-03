@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { Link } from "@/i18n/routing";
 import { StarIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import SectionHeader from "@/components/Home/SectionHeader";
@@ -80,13 +79,6 @@ function Reviews({ restaurants }: { restaurants: RestaurantDocument[] }) {
               );
             })}
           </div>
-
-          <Link
-            href={`/${best.profile.name.split(" ").join("-")}`}
-            className="shrink-0 rounded-full bg-color-2 px-6 py-3 text-sm font-ProximaNovaSemiBold text-white transition-all hover:bg-color-2/90 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none"
-          >
-            {t("Rate this Restaurant!")}
-          </Link>
         </div>
       </section>
     </>

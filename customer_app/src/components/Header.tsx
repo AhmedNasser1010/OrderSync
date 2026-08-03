@@ -359,7 +359,7 @@ function Header() {
                   scrolled ? "md:text-2xl text-xl" : "md:text-3xl text-2xl"
                 )}
               >
-                {t("Zack's Eats")}
+                {t("Zajil")}
               </h1>
             </Link>
           </div>
@@ -515,7 +515,7 @@ function Header() {
           <div className="flex items-center gap-2">
             <img src={LOGO_URL} alt="logo" className="h-9 w-9 object-contain" />
             <span className="font-Beiruti text-2xl text-color-1">
-              {t("Zack's Eats")}
+              {t("Zajil")}
             </span>
           </div>
           <button

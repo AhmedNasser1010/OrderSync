@@ -62,9 +62,9 @@ const Beiruti = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "زاكس ايتس",
+  title: "زاجل",
   description:
-    "اطلب أكل لذيذ أونلاين من مطاعمك المحلية المفضلة مع زاكس إيتس. توصيل أكل سريع وموثوق لحد بابك.",
+    "اطلب أكل لذيذ أونلاين من مطاعمك المحلية المفضلة مع زاجل. توصيل أكل سريع وموثوق لحد بابك.",
 };
 
 export default function RootLayout({

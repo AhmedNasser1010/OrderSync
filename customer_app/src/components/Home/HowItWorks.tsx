@@ -33,7 +33,7 @@ function HowItWorks() {
       <div className="divider"></div>
       <section id="how-it-works">
         <SectionHeader
-          title={t("How Zack's Eats works")}
+          title={t("How Zajil works")}
           className="justify-center text-center"
           titleClassName="text-center"
         />

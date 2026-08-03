@@ -32,7 +32,7 @@ function HeroBanner({ restaurants }: { restaurants: RestaurantDocument[] }) {
       <div className="absolute inset-0 bg-gradient-to-l from-transparent to-black/30" />
       <div className="relative flex flex-col items-start gap-4 px-6 py-10 sm:px-12 sm:py-14">
         <p className="rounded-full bg-white/20 px-3 py-1 text-[11px] font-ProximaNovaSemiBold uppercase tracking-widest text-white backdrop-blur-sm">
-          {t("Zack's Eats")}
+          {t("Zajil")}
         </p>
         <h2 className="max-w-xl font-ProximaNovaBlack text-3xl leading-tight text-white sm:text-5xl">
           {t("Hero title")}

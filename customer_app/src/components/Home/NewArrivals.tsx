@@ -14,7 +14,7 @@ function NewArrivals({ restaurants }: { restaurants: RestaurantDocument[] }) {
       <div className="divider"></div>
       <RestaurantCarousel
         id="new-arrivals"
-        title={t("New on Zack's Eats")}
+        title={t("New on Zajil")}
         subtitle={t("New arrivals subtitle")}
         restaurants={restaurants}
       />
