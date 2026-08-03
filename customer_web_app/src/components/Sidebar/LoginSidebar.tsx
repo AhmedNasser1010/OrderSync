@@ -136,7 +136,7 @@ const LoginSidebar = () => {
     <>
       <div
         className={cn(
-          "login-sidebar fixed top-0 h-full overflow-y-scroll bg-white transition-all duration-500 z-40 px-5 py-5 w-full sm:px-8 sm:py-6 flex flex-col sm:w-[500px]",
+          "login-sidebar fixed top-0 h-full overflow-y-scroll bg-card transition-all duration-500 z-40 px-5 py-5 w-full sm:px-8 sm:py-6 flex flex-col sm:w-[500px]",
           isRTL ? "left-0" : "right-0",
           isLoginSidebarOpen
             ? "translate-x-0"
@@ -187,7 +187,7 @@ const LoginSidebar = () => {
             {/* Google sign-in */}
             <button
               onClick={signInWithGoogle}
-              className="group w-full flex items-center justify-center gap-3 rounded-2xl border border-color-7 bg-white py-4 px-4 text-base font-ProximaNovaSemiBold text-color-1 shadow-sm transition-all duration-200 hover:border-color-2/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer"
+              className="group w-full flex items-center justify-center gap-3 rounded-2xl border border-color-7 bg-card py-4 px-4 text-base font-ProximaNovaSemiBold text-color-1 shadow-sm transition-all duration-200 hover:border-color-2/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer"
             >
               <GoogleLogo className="size-5 shrink-0" />
               {t("Login With Google")}
@@ -200,7 +200,7 @@ const LoginSidebar = () => {
         ) : (
           <div className="flex-1 space-y-5">
             {/* Profile card */}
-            <div className="flex items-center gap-4 rounded-2xl border border-color-7 bg-white p-4 shadow-sm">
+            <div className="flex items-center gap-4 rounded-2xl border border-color-7 bg-card p-4 shadow-sm">
               <ProfileAvatar
                 name={user?.userInfo?.name}
                 photoUrl={avatarUrl}
@@ -219,7 +219,7 @@ const LoginSidebar = () => {
             </div>
 
             {/* Completion progress */}
-            <div className="rounded-2xl border border-color-7 bg-white p-4 shadow-sm">
+            <div className="rounded-2xl border border-color-7 bg-card p-4 shadow-sm">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] uppercase tracking-wider text-color-5 font-ProximaNovaSemiBold">
                   {t("Profile completion")}
@@ -349,7 +349,7 @@ const LoginSidebar = () => {
                   </button>
                   <button
                     onClick={() => setConfirmLogout(false)}
-                    className="flex-1 rounded-xl border border-red-200 bg-white py-3 text-color-6 font-ProximaNovaSemiBold text-sm transition-colors hover:bg-red-50 cursor-pointer"
+                    className="flex-1 rounded-xl border border-red-200 bg-card py-3 text-color-6 font-ProximaNovaSemiBold text-sm transition-colors hover:bg-red-50 cursor-pointer"
                   >
                     {t("Cancel")}
                   </button>
@@ -361,7 +361,7 @@ const LoginSidebar = () => {
 
       <div
         className={cn(
-          "login-sidebar-overlay z-30 top-0 left-0 right-0 bottom-0 bg-color-1 opacity-[0.7] overflow-hidden",
+          "login-sidebar-overlay z-30 top-0 left-0 right-0 bottom-0 bg-black/70 transition-opacity overflow-hidden",
           isLoginSidebarOpen ? "fixed" : "hidden"
         )}
         onClick={handleCloseSidebar}

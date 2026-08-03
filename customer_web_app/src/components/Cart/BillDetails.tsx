@@ -47,7 +47,7 @@ const BillDetails = ({
   const t = useTranslations();
 
   return (
-    <div className="rounded-2xl border border-color-7 bg-white p-5 sm:p-6">
+    <div className="rounded-2xl border border-color-7 bg-card p-5 sm:p-6">
       <h3 className="flex items-center gap-2 font-ProximaNovaBold text-lg text-color-1">
         <ReceiptText className="size-5 text-color-2" />
         {t("Bill Details")}
@@ -103,7 +103,7 @@ const BillDetails = ({
           onChange={(e) => onCommentChange(e.target.value)}
           disabled={disabled}
           placeholder={t("Comment, extras")}
-          className="w-full rounded-xl border border-color-7 bg-color-7/30 py-3 ps-10 pe-4 font-ProximaNovaMed text-sm text-color-1 transition-colors placeholder:text-color-5 focus:border-color-2 focus:bg-white focus:ring-2 focus:ring-color-2/20 disabled:opacity-50"
+          className="w-full rounded-xl border border-color-7 bg-color-7/30 py-3 ps-10 pe-4 font-ProximaNovaMed text-sm text-color-1 transition-colors placeholder:text-color-5 focus:border-color-2 focus:bg-background focus:ring-2 focus:ring-color-2/20 disabled:opacity-50"
         />
       </div>
 

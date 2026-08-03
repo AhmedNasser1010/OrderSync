@@ -48,7 +48,7 @@ const RestaurantHero = ({
       : null;
 
   return (
-    <div className="relative overflow-hidden bg-color-1">
+    <div className="relative overflow-hidden bg-[#282c3f]">
       <div className="relative mx-auto w-full max-w-5xl px-4 pt-24 sm:px-7">
         <nav aria-label="Breadcrumb" className="relative z-10">
           <ol className="inline-flex items-center gap-1.5">
@@ -141,8 +141,8 @@ const RestaurantHero = ({
           className="absolute inset-0 h-full w-full object-cover opacity-30"
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-color-1 via-color-1/80 to-color-1/40" />
-      <div className="absolute inset-0 bg-gradient-to-r from-color-1/40 to-color-2/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#282c3f] via-[#282c3f]/80 to-[#282c3f]/40" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#282c3f]/40 to-[#fc8019]/10" />
     </div>
   );
 };

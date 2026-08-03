@@ -330,7 +330,7 @@ const OrderSidebar = () => {
     <>
       <div
         className={cn(
-          "order-sidebar fixed top-0 h-full overflow-y-scroll bg-white transition-all duration-500 z-40 px-5 py-5 w-full sm:py-6 flex flex-col sm:w-[500px]",
+          "order-sidebar fixed top-0 h-full overflow-y-scroll bg-card transition-all duration-500 z-40 px-5 py-5 w-full sm:py-6 flex flex-col sm:w-[500px]",
           isRTL ? "left-0" : "right-0",
           isOrderSidebarOpen
             ? "translate-x-0"
@@ -359,7 +359,7 @@ const OrderSidebar = () => {
 
         {/* Restaurant card */}
         {resName && (
-          <div className="flex items-center gap-3 rounded-2xl border border-color-7 bg-white p-3.5 shadow-sm mb-4">
+          <div className="flex items-center gap-3 rounded-2xl border border-color-7 bg-card p-3.5 shadow-sm mb-4">
             <div className="size-12 grid place-items-center rounded-xl bg-color-7/50 overflow-hidden shrink-0">
               {resIcon ? (
                 <img
@@ -436,7 +436,7 @@ const OrderSidebar = () => {
             </div>
 
             {/* Timeline */}
-            <div className="rounded-2xl border border-color-7 bg-white p-4 shadow-sm mb-4 flex items-start">
+            <div className="rounded-2xl border border-color-7 bg-card p-4 shadow-sm mb-4 flex items-start">
               {STEPS.map((step, index) => (
                 <StepIndicator
                   key={step.key}
@@ -453,7 +453,7 @@ const OrderSidebar = () => {
         )}
 
         {/* Map */}
-        <div className="relative shrink-0 overflow-hidden rounded-2xl border border-color-7 bg-white shadow-sm mb-4">
+        <div className="relative shrink-0 overflow-hidden rounded-2xl border border-color-7 bg-card shadow-sm mb-4">
           <OrderTrackingMap
             center={
               (user?.locations?.home?.latlng as [number, number]) ||
@@ -495,7 +495,7 @@ const OrderSidebar = () => {
             </div>
           )}
           {!isMapLive && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-color-1/20 backdrop-blur-[1.5px]">
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20 backdrop-blur-[1.5px]">
               <div className="bg-white/95 backdrop-blur-sm rounded-2xl px-5 py-3.5 shadow-lg text-center">
                 <p className="text-color-1 font-ProximaNovaSemiBold text-sm text-center">
                   {t("Live tracking available soon")}
@@ -510,7 +510,7 @@ const OrderSidebar = () => {
 
         {/* Order summary */}
         {trackedOrderData && (
-          <div className="rounded-2xl border border-color-7 bg-white p-4 shadow-sm mb-4">
+          <div className="rounded-2xl border border-color-7 bg-card p-4 shadow-sm mb-4">
             <p className="text-[11px] uppercase tracking-wider text-color-5 font-ProximaNovaSemiBold mb-3">
               {t("Order summary")}
             </p>
@@ -599,7 +599,7 @@ const OrderSidebar = () => {
               {t("Order Cancel")}
             </button>
           ) : (
-            <button className="w-full rounded-2xl border border-color-7 bg-white p-3.5 hover:bg-color-7/40 transition-colors cursor-pointer">
+            <button className="w-full rounded-2xl border border-color-7 bg-card p-3.5 hover:bg-color-7/40 transition-colors cursor-pointer">
               <span className="flex items-center justify-center gap-2">
                 <PhoneIcon className="size-4 text-color-2" />
                 <span className="text-color-1 font-ProximaNovaSemiBold text-sm">
@@ -627,7 +627,7 @@ const OrderSidebar = () => {
 
       <div
         className={cn(
-          "order-sidebar-overlay z-30 top-0 left-0 right-0 bottom-0 bg-color-1 opacity-[0.7] overflow-hidden",
+          "order-sidebar-overlay z-30 top-0 left-0 right-0 bottom-0 bg-black/70 transition-opacity overflow-hidden",
           isOrderSidebarOpen ? "fixed" : "hidden"
         )}
         onClick={handleCloseSidebar}

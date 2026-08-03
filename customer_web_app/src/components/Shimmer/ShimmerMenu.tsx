@@ -3,7 +3,7 @@
 const ShimmerMenu = () => {
   return (
     <div className="-mt-20 min-h-screen pb-10">
-      <div className="relative overflow-hidden bg-color-1">
+      <div className="relative overflow-hidden bg-[#282c3f]">
         <div className="mx-auto w-full max-w-5xl px-4 pt-24 sm:px-7">
           <div className="h-3 w-56 animate-pulse rounded bg-white/20" />
           <div className="flex flex-col gap-6 py-8 sm:flex-row sm:items-end sm:justify-between">
@@ -20,7 +20,7 @@ const ShimmerMenu = () => {
         </div>
       </div>
 
-      <div className="sticky top-14 z-30 border-b border-color-7 bg-white/95 py-2.5">
+      <div className="sticky top-14 z-30 border-b border-color-7 bg-background/95 py-2.5">
         <div className="mx-auto flex w-full items-center gap-3 px-4 2xl:max-w-5xl">
           <div className="flex flex-1 gap-2 overflow-hidden">
             {[...Array(4)].map((_, i) => (

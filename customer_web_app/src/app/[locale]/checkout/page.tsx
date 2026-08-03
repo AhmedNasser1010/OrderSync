@@ -103,8 +103,8 @@ export default function CheckoutPage() {
         <CheckPoints
           steps={[t("Contact"), t("Address"), t("Payment")]}
           progress={barProgress}
-          themeColorFill="#60b246"
-          themeColorEmpty="#eee"
+          themeColorFill="var(--color-11)"
+          themeColorEmpty="var(--border)"
         />
       </div>
       {currentState === "ON_USER_INFO" && (

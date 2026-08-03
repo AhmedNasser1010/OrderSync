@@ -29,7 +29,7 @@ const InputWrapper = ({
       className={`relative block ${error ? "text-[#d32f2f]" : ""}`}
     >
       <span
-        className={`absolute -top-[7px] left-[15px] bg-white text-[13px] px-[10px] h-[8px] ${
+        className={`absolute -top-[7px] left-[15px] bg-background text-[13px] px-[10px] h-[8px] ${
           error ? "text-[#d32f2f]" : ""
         }`}
       >

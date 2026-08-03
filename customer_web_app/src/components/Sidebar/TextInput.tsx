@@ -39,7 +39,7 @@ function TextInput({
       )}
       <div
         className={cn(
-          "flex items-center gap-2.5 rounded-xl bg-white px-4 py-3 ring-1 transition-all duration-200",
+          "flex items-center gap-2.5 rounded-xl bg-card px-4 py-3 ring-1 transition-all duration-200",
           variant === "standard" && "ring-color-7 focus-within:ring-2 focus-within:ring-color-2",
           variant === "error" && "!ring-2 !ring-red-500",
           variant === "warning" && "!ring-2 !ring-yellow-500"

@@ -26,7 +26,7 @@ function DishCard({
   return (
     <Link
       href={`/${res.profile.name.split(" ").join("-")}`}
-      className="group flex items-center gap-3 rounded-2xl border border-color-7 bg-white p-3 transition-all hover:border-color-2/40 hover:shadow-md"
+      className="group flex items-center gap-3 rounded-2xl border border-color-7 bg-card p-3 transition-all hover:border-color-2/40 hover:shadow-md"
     >
       <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-color-7">
         {dish.backgrounds?.[0] && (

@@ -30,7 +30,7 @@ function MapButton({
         "flex items-center gap-2 rounded-[5px] border p-2.5 text-sm outline-none",
         status === "active"
           ? "border-[#434343] bg-color-11 text-white"
-          : "border-[#ccc] bg-white"
+          : "border-input bg-card"
       )}
     >
       {startIcon}

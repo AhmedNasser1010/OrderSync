@@ -24,7 +24,7 @@ const CheckoutMainButton = ({
       {backEventCallback && (
         <button
           onMouseUp={backEventCallback}
-          className="p-[10px] border border-[#979797] rounded cursor-pointer w-full text-center flex items-center justify-center transition hover:bg-gray-100"
+          className="p-[10px] border border-input rounded cursor-pointer w-full text-center flex items-center justify-center transition hover:bg-muted"
         >
           {backLabel}
         </button>
@@ -33,7 +33,7 @@ const CheckoutMainButton = ({
         type="submit"
         onMouseUp={handleNext}
         className={`p-[10px] rounded cursor-pointer w-full text-center flex items-center justify-center transition text-white ${
-          nextBtnIsDisable ? "bg-black/45" : "bg-[#60b246] hover:brightness-95"
+          nextBtnIsDisable ? "bg-black/45" : "bg-color-11 hover:brightness-95"
         }`}
       >
         {nextLabel}

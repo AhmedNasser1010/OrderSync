@@ -27,7 +27,7 @@ const RadioInputWrapper = ({
 }) => (
   <label
     htmlFor={htmlFor}
-    className="flex flex-col items-center gap-4 border border-[#979797] rounded-[6px] py-8 w-[calc(100%/2-10px)] cursor-pointer transition-colors"
+    className="flex flex-col items-center gap-4 border border-input rounded-[6px] py-8 w-[calc(100%/2-10px)] cursor-pointer transition-colors"
     style={{ borderColor: selected ? "blue" : undefined }}
   >
     {children}

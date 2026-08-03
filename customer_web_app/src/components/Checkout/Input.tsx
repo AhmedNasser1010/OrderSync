@@ -14,7 +14,7 @@ const Input = ({
     <Comp
       {...props}
       className={`w-[calc(100%-20px)] p-[10px] block rounded border text-base ${
-        error ? "border-[#d32f2f]" : "border-[#979797]"
+        error ? "border-destructive" : "border-input"
       } placeholder:text-xs focus:outline-none`}
     />
   );

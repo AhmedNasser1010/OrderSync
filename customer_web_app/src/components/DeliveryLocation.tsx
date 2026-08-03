@@ -70,7 +70,7 @@ function DeliveryLocation({ variant = "bar", className }: DeliveryLocationProps)
         type="button"
         onClick={handleClick}
         className={cn(
-          "group flex items-center gap-2.5 rounded-full border border-color-7 bg-white shadow-sm transition-all hover:border-color-2/40 hover:shadow-md focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none cursor-pointer",
+          "group flex items-center gap-2.5 rounded-full border border-color-7 bg-card shadow-sm transition-all hover:border-color-2/40 hover:shadow-md focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none cursor-pointer",
           variant === "compact"
             ? "py-1.5 ps-3 pe-2"
             : "py-2.5 ps-4 pe-3",

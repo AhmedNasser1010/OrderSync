@@ -81,7 +81,7 @@ const FloatingCartBar = ({ resID }: { resID: string }) => {
     <div className="fixed bottom-5 inset-x-0 z-40 px-4">
       <Link
         href="/cart"
-        className="mx-auto flex w-full max-w-xl items-center justify-between gap-4 rounded-full bg-color-1 py-3 pe-3 ps-5 text-white shadow-2xl shadow-color-1/40 transition-transform hover:scale-[1.02]"
+        className="mx-auto flex w-full max-w-xl items-center justify-between gap-4 rounded-full bg-[#282c3f] py-3 pe-3 ps-5 text-white shadow-2xl shadow-black/40 transition-transform hover:scale-[1.02]"
       >
         <span className="flex items-center gap-3">
           <span className="relative">

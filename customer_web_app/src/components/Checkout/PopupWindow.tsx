@@ -27,7 +27,7 @@ const PopupWindow = ({
           className="fixed top-0 left-0 w-full h-full bg-black/20 wrapper"
           onMouseUp={handleOnClose}
         >
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-5 rounded-lg">
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card p-5 rounded-lg">
             {children}
           </div>
         </div>

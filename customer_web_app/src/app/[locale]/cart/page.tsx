@@ -300,7 +300,7 @@ export default function CartPage() {
           <Link
             href="/"
             aria-label={t("Back")}
-            className="grid size-10 shrink-0 place-items-center rounded-full border border-color-7 bg-white text-color-6 transition-colors hover:bg-color-7/40"
+            className="grid size-10 shrink-0 place-items-center rounded-full border border-color-7 bg-card text-color-6 transition-colors hover:bg-color-7/40"
           >
             <ArrowLeft className="size-5 rtl:rotate-180" />
           </Link>
@@ -330,7 +330,7 @@ export default function CartPage() {
       <div className="grid gap-8 lg:grid-cols-[1fr_380px] xl:grid-cols-[1fr_400px]">
         <div className="space-y-6">
           {resInfo && (
-            <div className="flex items-center gap-4 rounded-2xl border border-color-7 bg-white p-4">
+            <div className="flex items-center gap-4 rounded-2xl border border-color-7 bg-card p-4">
               {resInfo?.branding?.cover && (
                 <img
                   src={resInfo.branding.cover}
@@ -362,7 +362,7 @@ export default function CartPage() {
             </div>
           )}
 
-          <div className="rounded-2xl border border-color-7 bg-white px-4 sm:px-6">
+          <div className="rounded-2xl border border-color-7 bg-card px-4 sm:px-6">
             {selectedItems?.map((item) => {
               const info = getItemPriceInfo(item);
               return (
@@ -443,7 +443,7 @@ export default function CartPage() {
         </div>
       ) : (
         <div className="fixed inset-x-0 bottom-4 z-40 px-4 lg:hidden">
-          <div className="mx-auto flex max-w-xl items-center justify-between gap-4 rounded-full bg-color-1 p-2 ps-5 text-white shadow-2xl shadow-color-1/40">
+          <div className="mx-auto flex max-w-xl items-center justify-between gap-4 rounded-full bg-[#282c3f] p-2 ps-5 text-white shadow-2xl shadow-black/40">
             <span className="flex flex-col">
               <span className="font-ProximaNovaThin text-xs text-white/70">
                 {t("Total Price")}

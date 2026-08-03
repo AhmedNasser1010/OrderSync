@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { RootState } from "@/rtk/store";
 
 export interface ToggleState {
   isLoginSidebarOpen: boolean;
@@ -12,6 +13,7 @@ export interface ToggleState {
   rateIsOpen: boolean;
   cancellationNoticeIsOpen: boolean;
   hasOrder: boolean;
+  theme: "light" | "dark";
 }
 
 const initialState: ToggleState = {
@@ -26,6 +28,7 @@ const initialState: ToggleState = {
   rateIsOpen: false,
   cancellationNoticeIsOpen: false,
   hasOrder: true,
+  theme: "light",
 };
 
 const toggleSlice = createSlice({
@@ -78,6 +81,26 @@ const toggleSlice = createSlice({
       state.cancellationNoticeIsOpen =
         payload === undefined ? !state.cancellationNoticeIsOpen : payload;
     },
+    initTheme: (state) => {
+      let saved: string | null = null;
+      if (typeof window !== "undefined") {
+        saved = window.localStorage.getItem("theme");
+      }
+      if (saved === "dark" || saved === "light") {
+        state.theme = saved;
+      } else if (
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      ) {
+        state.theme = "dark";
+      }
+    },
+    setTheme: (state, { payload }: PayloadAction<"light" | "dark">) => {
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("theme", payload);
+      }
+      state.theme = payload;
+    },
   },
 });
 
@@ -94,6 +117,10 @@ export const {
   setRateIsOpen,
   setHasOrder,
   setCancellationNoticeIsOpen,
+  initTheme,
+  setTheme,
 } = toggleSlice.actions;
+
+export const selectTheme = (state: RootState) => state.toggle.theme;
 
 export default toggleSlice.reducer;

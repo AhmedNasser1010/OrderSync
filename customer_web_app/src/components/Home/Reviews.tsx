@@ -42,7 +42,7 @@ function Reviews({ restaurants }: { restaurants: RestaurantDocument[] }) {
           title={t("Loved by our customers")}
           subtitle={t("Reviews subtitle")}
         />
-        <div className="flex flex-col items-center gap-8 rounded-3xl border border-color-7 bg-white p-8 shadow-sm sm:flex-row">
+        <div className="flex flex-col items-center gap-8 rounded-3xl border border-color-7 bg-card p-8 shadow-sm sm:flex-row">
           <div className="flex flex-col items-center gap-2 sm:w-52 shrink-0">
             <span className="grid size-20 place-items-center rounded-full bg-color-11 text-white">
               <span className="flex items-center gap-1.5 font-ProximaNovaBold text-2xl">

@@ -41,7 +41,7 @@ function HowItWorks() {
           {steps.map((step, i) => (
             <div
               key={step.titleKey}
-              className="relative flex flex-col items-center gap-3 rounded-2xl border border-color-7 bg-white p-7 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+              className="relative flex flex-col items-center gap-3 rounded-2xl border border-color-7 bg-card p-7 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
             >
               <span className="absolute top-4 start-4 text-xs font-ProximaNovaBlack text-color-8">
                 {String(i + 1).padStart(2, "0")}

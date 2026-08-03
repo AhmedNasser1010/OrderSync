@@ -51,7 +51,7 @@ const StickyMenuNav = ({
   const currentActive = query ? null : activeId;
 
   return (
-    <div className="sticky top-14 z-30 border-b border-color-7 bg-white/95 shadow-sm backdrop-blur-md">
+    <div className="sticky top-14 z-30 border-b border-color-7 bg-background/95 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex w-full items-center gap-3 px-4 py-2.5 2xl:max-w-5xl">
         <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {categories.map((category) => (
@@ -62,7 +62,7 @@ const StickyMenuNav = ({
               className={cn(
                 "shrink-0 rounded-full px-4 py-1.5 font-ProximaNovaSemiBold text-sm transition-all cursor-pointer",
                 currentActive === category.id
-                  ? "bg-color-1 text-white shadow-sm"
+                  ? "bg-foreground text-background shadow-sm"
                   : "bg-color-7 text-color-6 hover:bg-color-7/60"
               )}
             >
@@ -79,7 +79,7 @@ const StickyMenuNav = ({
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t("Search menu")}
             aria-label={t("Search menu")}
-            className="w-40 rounded-full border border-color-7 bg-color-7/50 py-2 ps-9 pe-8 text-sm font-ProximaNovaMed text-color-1 placeholder:text-color-5 focus:border-color-2/50 focus:bg-white focus:ring-2 focus:ring-color-2/30 outline-none sm:w-56"
+            className="w-40 rounded-full border border-color-7 bg-color-7/50 py-2 ps-9 pe-8 text-sm font-ProximaNovaMed text-color-1 placeholder:text-color-5 focus:border-color-2/50 focus:bg-background focus:ring-2 focus:ring-color-2/30 outline-none sm:w-56"
           />
           {query && (
             <button

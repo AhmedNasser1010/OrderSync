@@ -38,7 +38,7 @@ const ImageViewer = ({
       aria-modal="true"
       aria-label={alt || t("Menu")}
       onClick={onClose}
-      className="fixed inset-0 z-[60] grid cursor-zoom-out place-items-center bg-color-1/95 p-4 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-[60] grid cursor-zoom-out place-items-center bg-black/95 p-4 backdrop-blur-sm animate-in fade-in duration-200"
     >
       <button
         type="button"

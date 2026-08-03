@@ -21,10 +21,10 @@ const MenuPopup = ({
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4">
       <div
-        className="absolute inset-0 bg-color-1/50 backdrop-blur-sm popup-anim"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm popup-anim"
         onClick={closeCallback}
       />
-      <div className="popup-anim relative flex w-full max-w-md flex-col rounded-2xl bg-white p-6 shadow-2xl">
+      <div className="popup-anim relative flex w-full max-w-md flex-col rounded-2xl bg-card p-6 shadow-2xl">
         <h3 className="font-ProximaNovaSemiBold text-xl text-color-1">
           {title}
         </h3>

@@ -78,7 +78,7 @@ const UserForm = () => {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-color-7 bg-white p-4 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-color-7 bg-card p-4 shadow-sm space-y-4">
         <p className="text-[11px] uppercase tracking-wider text-color-5 font-ProximaNovaSemiBold">
           {t("Contact Information")}
         </p>
@@ -114,7 +114,7 @@ const UserForm = () => {
         />
       </div>
 
-      <div className="rounded-2xl border border-color-7 bg-white p-4 shadow-sm space-y-4">
+      <div className="rounded-2xl border border-color-7 bg-card p-4 shadow-sm space-y-4">
         <p className="text-[11px] uppercase tracking-wider text-color-5 font-ProximaNovaSemiBold">
           {t("Address & Location")}
         </p>

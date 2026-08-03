@@ -28,7 +28,7 @@ const RadioInputWrapper = ({
 }) => (
   <label
     htmlFor={htmlFor}
-    className="flex flex-col items-center gap-4 border border-[#979797] rounded-[6px] py-8 w-[calc(100%/2-10px)] cursor-pointer transition-colors"
+    className="flex flex-col items-center gap-4 border border-input rounded-[6px] py-8 w-[calc(100%/2-10px)] cursor-pointer transition-colors"
     style={{ borderColor: selected ? "blue" : undefined }}
   >
     {children}
@@ -267,7 +267,7 @@ const CheckoutUserPayment = ({
             onChange={(e) => setPromoCodeInput(e.target.value)}
             placeholder={t("Enter promo code")}
             onKeyDown={(e) => e.key === "Enter" && handleApplyPromoCode()}
-            className="flex-1 px-3 py-2.5 border border-[#979797] rounded-[6px] text-sm uppercase tracking-wider focus:outline-none focus:border-[#2196F3]"
+            className="flex-1 px-3 py-2.5 border border-input rounded-[6px] text-sm uppercase tracking-wider focus:outline-none focus:border-[#2196F3]"
           />
           <button
             onClick={handleApplyPromoCode}
@@ -283,7 +283,7 @@ const CheckoutUserPayment = ({
             type="text"
             value={appliedOrderDiscount.code}
             disabled
-            className="flex-1 px-3 py-2.5 border border-[#979797] rounded-[6px] text-sm uppercase tracking-wider bg-[#f5f5f5] text-[#4CAF50] font-semibold"
+            className="flex-1 px-3 py-2.5 border border-input rounded-[6px] text-sm uppercase tracking-wider bg-muted text-[#4CAF50] font-semibold"
           />
           <button
             onClick={handleRemovePromoCode}

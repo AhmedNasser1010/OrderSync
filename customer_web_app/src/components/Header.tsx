@@ -18,12 +18,15 @@ import {
   ShoppingCartIcon,
   GlobeIcon,
   UserIcon,
+  SunIcon,
+  MoonIcon,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import {
   toggleLoginSidebar,
   toggleOrderSidebar,
   toggleLng,
+  setTheme,
 } from "@/rtk/slices/toggleSlice";
 import { LOGO_URL } from "@/utils/constants";
 import { useTranslations, useLocale } from "next-intl";
@@ -124,7 +127,7 @@ function LanguageSwitcher({
             ref={menuRef}
             role="menu"
             style={menuStyle}
-            className="w-32 overflow-hidden rounded-2xl border border-color-7 bg-white py-1.5 shadow-xl"
+            className="w-32 overflow-hidden rounded-2xl border border-color-7 bg-card py-1.5 shadow-xl"
           >
             {(["en", "ar"] as const).map((lng) => (
               <button
@@ -147,6 +150,45 @@ function LanguageSwitcher({
           document.body
         )}
     </div>
+  );
+}
+
+function ThemeToggle({
+  onNavigate,
+  fullWidth,
+}: {
+  onNavigate?: () => void;
+  fullWidth?: boolean;
+}) {
+  const t = useTranslations();
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector((state) => state.toggle.theme);
+
+  const toggleTheme = () => {
+    dispatch(setTheme(theme === "dark" ? "light" : "dark"));
+    onNavigate?.();
+  };
+
+  const isDark = theme === "dark";
+
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      aria-label={t(isDark ? "Light mode" : "Dark mode")}
+      title={t(isDark ? "Light mode" : "Dark mode")}
+      className={cn(
+        "flex items-center gap-1.5 rounded-full border border-color-7 px-3 py-2 text-sm font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none cursor-pointer",
+        fullWidth && "w-full justify-center"
+      )}
+    >
+      {isDark ? (
+        <SunIcon className="size-4 text-color-2" />
+      ) : (
+        <MoonIcon className="size-4 text-color-5" />
+      )}
+      <span>{t(isDark ? "Light mode" : "Dark mode")}</span>
+    </button>
   );
 }
 
@@ -289,7 +331,7 @@ function Header() {
       </a>
       <header
         className={cn(
-          "shadow-md w-full fixed left-0 top-0 right-0 z-40 bg-white transition-all duration-300",
+          "shadow-md w-full fixed left-0 top-0 right-0 z-40 bg-background transition-all duration-300",
           scrolled ? "h-14 md:px-5 px-3" : "h-20 md:px-5 px-3"
         )}
       >
@@ -357,6 +399,10 @@ function Header() {
               <LanguageSwitcher />
             </li>
 
+            <li className="hidden md:block">
+              <ThemeToggle />
+            </li>
+
             {isLoggedIn ? (
               <li>
                 <div ref={profileRef} className="relative">
@@ -378,7 +424,7 @@ function Header() {
                   {profileOpen && (
                     <div
                       role="menu"
-                      className="absolute end-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-color-7 bg-white py-2 shadow-xl"
+                      className="absolute end-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-color-7 bg-card py-2 shadow-xl"
                     >
                       <div className="border-b border-color-7 px-4 py-3">
                         <p className="truncate text-sm font-ProximaNovaSemiBold text-color-1">
@@ -450,14 +496,14 @@ function Header() {
       {/* Mobile drawer */}
       <div
         className={cn(
-          "fixed inset-0 z-[55] bg-color-1/60 transition-opacity duration-300 lg:hidden",
+          "fixed inset-0 z-[55] bg-black/60 transition-opacity duration-300 lg:hidden",
           menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
         )}
         onClick={() => setMenuOpen(false)}
       />
       <div
         className={cn(
-          "fixed top-0 bottom-0 z-[56] flex w-[82%] max-w-sm flex-col bg-white shadow-2xl transition-transform duration-300 lg:hidden",
+          "fixed top-0 bottom-0 z-[56] flex w-[82%] max-w-sm flex-col bg-card shadow-2xl transition-transform duration-300 lg:hidden",
           isRTL ? "right-0" : "left-0",
           menuOpen ? "translate-x-0" : isRTL ? "translate-x-full" : "-translate-x-full"
         )}
@@ -539,6 +585,7 @@ function Header() {
           </div>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle onNavigate={() => setMenuOpen(false)} fullWidth />
             <LanguageSwitcher onNavigate={() => setMenuOpen(false)} fullWidth />
             <Link
               href="/cart"

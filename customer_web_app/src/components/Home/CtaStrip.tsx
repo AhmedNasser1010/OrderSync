@@ -16,7 +16,7 @@ function CtaStrip() {
   return (
     <>
       <div className="divider"></div>
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-color-1 via-color-9 to-color-1 p-8 sm:p-10">
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#282c3f] via-[#3e4152] to-[#282c3f] p-8 sm:p-10">
         <div className="absolute -top-10 -end-10 size-40 rounded-full bg-color-2/20 blur-2xl" />
         <div className="relative flex flex-col items-start justify-between gap-8 md:flex-row md:items-center">
           <div className="max-w-lg">

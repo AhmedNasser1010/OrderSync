@@ -15,7 +15,7 @@ const DiscountMsg = ({
         className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-ProximaNovaSemiBold text-xs ${
           discountIncluded
             ? "bg-color-11/10 text-color-11"
-            : "bg-color-7/60 text-[#3e4152a1]"
+            : "bg-color-7/60 text-color-9/65"
         }`}
       >
         <BadgePercent className="size-3.5" />

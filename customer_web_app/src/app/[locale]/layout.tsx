@@ -2,7 +2,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { HtmlAttributes } from "@/components/HtmlAttributes";
-import { Toaster } from "sonner";
+import { ThemedToaster } from "@/components/ThemedToaster";
 import Header from "@/components/Header";
 import LoginSidebar from "@/components/Sidebar/LoginSidebar";
 import OrderSidebar from "@/components/Sidebar/OrderSidebar";
@@ -27,11 +27,11 @@ export default async function LocaleLayout({ children, params }: Props) {
       <HtmlAttributes locale={locale} />
       <PopupProvider>
         <Header />
-        <main id="main-content" className="pt-20 min-h-screen bg-white">{children}</main>
+        <main id="main-content" className="pt-20 min-h-screen bg-background">{children}</main>
         <LoginSidebar />
         <OrderSidebar />
       </PopupProvider>
-      <Toaster position="top-center" />
+      <ThemedToaster />
     </NextIntlClientProvider>
   );
 }

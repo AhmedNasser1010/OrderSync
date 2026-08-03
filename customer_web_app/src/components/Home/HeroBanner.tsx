@@ -43,7 +43,7 @@ function HeroBanner({ restaurants }: { restaurants: RestaurantDocument[] }) {
         <button
           type="button"
           onClick={scrollToRestaurants}
-          className="mt-2 flex items-center gap-2 rounded-full bg-white px-6 py-3 font-ProximaNovaSemiBold text-color-1 shadow-lg transition-transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-white/60 outline-none cursor-pointer"
+          className="mt-2 flex items-center gap-2 rounded-full bg-white px-6 py-3 font-ProximaNovaSemiBold text-[#282c3f] shadow-lg transition-transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-white/60 outline-none cursor-pointer"
         >
           {t("Order now")}
           <ArrowDownIcon className="size-4" />
