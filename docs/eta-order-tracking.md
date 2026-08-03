@@ -1,6 +1,6 @@
 # ETA (Estimated Time to Arrive) — Order Tracking
 
-This document describes how the customer-facing Estimated Time to Arrive (ETA) is calculated and displayed in the order tracking sidebar of `customer_web_app`.
+This document describes how the customer-facing Estimated Time to Arrive (ETA) is calculated and displayed in the order tracking sidebar of `customer_app`.
 
 ## Overview
 
@@ -111,7 +111,7 @@ The same corrected straight-line distance ÷ assumed speed, measured from the re
 ---
 ## Tuning Constants
 
-All constants are exported from `customer_web_app/src/utils/getEta.ts` for easy adjustment:
+All constants are exported from `customer_app/src/utils/getEta.ts` for easy adjustment:
 
 | Constant | Value | Purpose |
 |---|---|---|
@@ -142,7 +142,7 @@ The `useEta` hook memoizes this on its inputs and adds convenience booleans (`is
 ---
 ## UI Integration
 
-**File:** `customer_web_app/src/components/Sidebar/OrderSidebar.tsx`
+**File:** `customer_app/src/components/Sidebar/OrderSidebar.tsx`
 
 The ETA surfaces in two places inside the order tracking sidebar:
 
@@ -161,11 +161,11 @@ The `useEta` hook is called alongside the existing `useDriverLocation` hook and 
 
 | File | Role |
 |---|---|
-| `customer_web_app/src/utils/getEta.ts` | Pure `computeEta()` function + tuning constants |
-| `customer_web_app/src/hooks/useEta.ts` | React hook wrapping `computeEta` with `useMemo` |
-| `customer_web_app/src/components/Sidebar/OrderSidebar.tsx` | UI — `EtaBadge` + live map overlay |
-| `customer_web_app/src/utils/getDistanceFromLatlngInKm.ts` | Haversine distance util (reused) |
-| `customer_web_app/src/hooks/useDriverLocation.ts` | Live driver GPS subscription (reused) |
+| `customer_app/src/utils/getEta.ts` | Pure `computeEta()` function + tuning constants |
+| `customer_app/src/hooks/useEta.ts` | React hook wrapping `computeEta` with `useMemo` |
+| `customer_app/src/components/Sidebar/OrderSidebar.tsx` | UI — `EtaBadge` + live map overlay |
+| `customer_app/src/utils/getDistanceFromLatlngInKm.ts` | Haversine distance util (reused) |
+| `customer_app/src/hooks/useDriverLocation.ts` | Live driver GPS subscription (reused) |
 | `messages/en.json`, `messages/ar.json` | i18n keys (`Arrived`, `Arriving soon`, `Arrives by`, `Estimated arrival`, `Estimated time to arrive`) |
 
 ---
