@@ -66,6 +66,7 @@ function PopupContent({
 function PopupHeader({
   className,
   closePopupCallback,
+  children,
   ...props
 }: React.ComponentProps<"div"> & { closePopupCallback?: () => void }) {
   return (
@@ -84,6 +85,7 @@ function PopupHeader({
           <XIcon className="size-6" />
         </button>
       )}
+      {children}
     </div>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import {
@@ -15,6 +14,7 @@ import { setCancellationNoticeIsOpen } from "@/rtk/slices/toggleSlice";
 import useOrder from "@/hooks/useOrder";
 import { useRouter } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
+import { XIcon } from "lucide-react";
 
 function OrderCancellationNotice() {
   const dispatch = useAppDispatch();
@@ -23,20 +23,14 @@ function OrderCancellationNotice() {
     (state) => state.toggle.cancellationNoticeIsOpen
   );
   const { trackedOrderData } = useOrder();
-  const [cancellationReason, setCancellationReason] = useState("");
   const t = useTranslations();
   const status = trackedOrderData?.status?.current;
+  const cancellationReason = trackedOrderData?.status?.cancellationReason || "";
   const noticeTitles: Record<string, string> = {
     CANCELED: "Your Order Has Been Canceled!",
     REJECTED: "Your Order Has Been Rejected!",
     VOIDED: "Your Order Has Been Voided!",
   };
-
-  useEffect(() => {
-    if (trackedOrderData?.status?.cancellationReason) {
-      setCancellationReason(trackedOrderData?.status?.cancellationReason);
-    }
-  }, [trackedOrderData?.status?.cancellationReason]);
 
   const handleClick = () => {
     dispatch(setCancellationNoticeIsOpen(false));
@@ -45,15 +39,26 @@ function OrderCancellationNotice() {
 
   return (
     <Popup open={isOpen} onOpenChange={(open) => !open && handleClick()}>
-      <PopupContent>
-        <PopupHeader closePopupCallback={handleClick}>
+      <PopupContent className="pt-8">
+        <PopupHeader closePopupCallback={handleClick} className="pt-2">
+          <div className="mx-auto grid size-14 place-items-center rounded-full bg-red-100 shrink-0 mb-1">
+            <XIcon className="size-7 text-red-500" />
+          </div>
           <PopupTitle>
             {t(noticeTitles[status || ""] || "Your Order Has Been Canceled!")}
           </PopupTitle>
-          <PopupDescription>
-            {cancellationReason ||
-              t("orderCancellationNotice")}
-          </PopupDescription>
+          {cancellationReason ? (
+            <div className="border border-red-200 bg-red-50 rounded-xl px-4 py-3 mt-1">
+              <p className="text-[11px] uppercase tracking-wide text-red-400 font-ProximaNovaSemiBold">
+                {t("Cancellation Reason")}
+              </p>
+              <p className="text-red-600 font-ProximaNovaSemiBold text-sm leading-relaxed mt-1">
+                {cancellationReason}
+              </p>
+            </div>
+          ) : (
+            <PopupDescription>{t("orderCancellationNotice")}</PopupDescription>
+          )}
         </PopupHeader>
 
         <PopupFooter>
