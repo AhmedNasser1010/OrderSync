@@ -15,7 +15,6 @@ import TopRated from "@/components/Home/TopRated";
 import NewArrivals from "@/components/Home/NewArrivals";
 import PopularDishes from "@/components/Home/PopularDishes";
 import Restaurants from "@/components/Home/Restaurants";
-import HowItWorks from "@/components/Home/HowItWorks";
 import Reviews from "@/components/Home/Reviews";
 import CtaStrip from "@/components/Home/CtaStrip";
 import type { RestaurantDocument } from "@/types/restaurant";
@@ -81,7 +80,6 @@ export default function HomePage() {
       <PopularDishes restaurants={restaurants} />
       <div className="divider"></div>
       <Restaurants />
-      <HowItWorks />
       <Reviews restaurants={restaurants} />
       <CtaStrip />
     </div>
