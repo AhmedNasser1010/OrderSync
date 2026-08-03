@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Edit, Trash2, Loader2, EyeOff } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Loader2, EyeOff, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
 import type { BusinessDocument, RestaurantStatusTypes } from "@ordersync/types";
 import { useSetRestaurantStatusMutation } from "@/rtk/api/firestoreApi";
@@ -292,6 +292,14 @@ export function RestaurantsTable({
                         <DropdownMenuItem className="cursor-pointer">
                           <Edit className="mr-2 h-4 w-4" />
                           <span>Edit</span>
+                        </DropdownMenuItem>
+                      </Link>
+                      <Link
+                        href={`/restaurants/${restaurant.accessToken}/menu`}
+                      >
+                        <DropdownMenuItem className="cursor-pointer">
+                          <UtensilsCrossed className="mr-2 h-4 w-4" />
+                          <span>Menu</span>
                         </DropdownMenuItem>
                       </Link>
                       <DropdownMenuSeparator />

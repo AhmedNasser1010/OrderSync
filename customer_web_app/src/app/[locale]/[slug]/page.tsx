@@ -87,6 +87,7 @@ export default function RestaurantMenuPage() {
     const normalized = query.trim().toLowerCase();
     if (!normalized) return [];
     return menu.items
+      .filter((item) => item.visibility !== false)
       .filter(
         (item) =>
           item.title?.toLowerCase().includes(normalized) ||
@@ -103,6 +104,11 @@ export default function RestaurantMenuPage() {
 
   const isSearching = query.trim().length > 0;
 
+  const visibleCategories = useMemo(
+    () => menu.categories.filter((category) => category.visibility !== false),
+    [menu.categories]
+  );
+
   if (!isMenuLoaded) return <ShimmerMenu />;
 
   return (
@@ -112,7 +118,7 @@ export default function RestaurantMenuPage() {
       )}
 
       <StickyMenuNav
-        categories={menu.categories}
+        categories={visibleCategories}
         query={query}
         onSearchChange={setQuery}
       />
@@ -173,7 +179,7 @@ export default function RestaurantMenuPage() {
           </div>
         ) : (
           <div className="space-y-2">
-            {menu.categories.map((category) => (
+            {visibleCategories.map((category) => (
               <MenuSection
                 key={category.id}
                 category={category}

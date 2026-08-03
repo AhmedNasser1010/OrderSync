@@ -78,7 +78,7 @@ service cloud.firestore {
     }
 
     function partnerOwnsToken(token) {
-      return hasUsersDoc() && token in getUsersDoc().businesses;
+      return hasUsersDoc() && token in getUsersDoc().data.businesses;
     }
 
     function isPartnerOwner(partnerUid) {

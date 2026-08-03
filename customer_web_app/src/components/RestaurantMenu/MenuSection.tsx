@@ -24,7 +24,8 @@ const MenuSection = ({
 
   const filteredMenuItems = useMemo<ItemWithSelection[]>(() => {
     const menu = menuItems.filter(
-      (item: ItemType) => item.category === category.id
+      (item: ItemType) =>
+        item.category === category.id && item.visibility !== false
     );
     return menu.map((item) => ({
       ...item,

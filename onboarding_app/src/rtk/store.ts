@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { firestoreApi } from './api/firestoreApi';
 import constantsSlice from './slices/constantsSlice';
 import uiSlice from './slices/uiSlice';
+import menuSlice from './slices/menuSlice';
 
 export const makeStore = () => {
   return configureStore({
@@ -9,6 +10,7 @@ export const makeStore = () => {
     reducer: {
       constants: constantsSlice,
       ui: uiSlice,
+      menu: menuSlice,
       [firestoreApi.reducerPath]: firestoreApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>

@@ -28,6 +28,7 @@ import type {
   CustomerFeedbackType,
   CustomerType,
   OrderType,
+  MainMenuType,
 } from "@ordersync/types";
 
 export interface UpdateBusinessInput {
@@ -49,7 +50,7 @@ function getErrorMessage(error: unknown): string {
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["User", "Businesses", "Drivers", "Customers", "Reviews", "Orders"],
+  tagTypes: ["User", "Businesses", "Menu", "Drivers", "Customers", "Reviews", "Orders"],
   endpoints: (builder) => ({
     // Query Endpoints
     fetchUserData: builder.query({
@@ -86,6 +87,22 @@ export const firestoreApi = createApi({
         }
       },
       providesTags: ["Businesses"],
+    }),
+    fetchMenuData: builder.query<MainMenuType | undefined, string>({
+      async queryFn(resId) {
+        try {
+          const menuRef = doc(db, "menus", resId);
+          const menuSnapshot = await getDoc(menuRef);
+          const menu = menuSnapshot.data() as MainMenuType | undefined;
+          console.log("Read Operation [fetchMenuData]");
+          return { data: menu };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
+        }
+      },
+      providesTags: ["Menu"],
     }),
     fetchBusinesses: builder.query<BusinessDocument[], string[] | undefined>({
       async queryFn(accessTokens) {
@@ -458,6 +475,30 @@ export const firestoreApi = createApi({
         }
       },
       invalidatesTags: ["User", "Businesses"],
+    }),
+    syncMenuData: builder.mutation<
+      { synced: true },
+      { resId: string; menu: MainMenuType }
+    >({
+      async queryFn({ resId, menu }) {
+        try {
+          if (!resId) {
+            throw new Error("Restaurant ID is required.");
+          }
+
+          const batch = writeBatch(db);
+          const menuRef = doc(db, "menus", resId);
+          batch.set(menuRef, menu);
+          await batch.commit();
+          console.log("Write Operation [syncMenuData]");
+          return { data: { synced: true } };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error syncing menu:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Menu"],
     }),
     setRestaurantStatus: builder.mutation<
       null,
@@ -922,6 +963,7 @@ export const firestoreApi = createApi({
 export const {
   useFetchUserDataQuery,
   useFetchRestaurantDataQuery,
+  useFetchMenuDataQuery,
   useFetchBusinessesQuery,
   useFetchManagersQuery,
   useFetchDriverUsersQuery,
@@ -934,6 +976,7 @@ export const {
   useCreateBusinessMutation,
   useUpdateBusinessMutation,
   useDeleteBusinessMutation,
+  useSyncMenuDataMutation,
   useDeleteManagerMutation,
   useSetRestaurantStatusMutation,
   useCreateDriverDocumentMutation,
