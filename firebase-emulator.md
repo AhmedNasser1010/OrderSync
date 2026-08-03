@@ -37,19 +37,19 @@ Once started, the Emulator Suite UI is available at [http://127.0.0.1:4000](http
 
 ## Seeding Data from Production
 
-The [`scripts/`](scripts/) directory contains utilities for cloning production Firestore and Auth data into the local emulators. See [`scripts/README.md`](scripts/README.md) for full documentation.
+The [`firebase-data-clone/`](firebase-data-clone/) directory contains utilities for cloning production Firestore and Auth data into the local emulators. See [`firebase-data-clone/README.md`](firebase-data-clone/README.md) for full documentation.
 
 Quick start:
 
 ```bash
-cd scripts
+cd firebase-data-clone
 npm run clone        # Clone Firestore data only
 npm run clone:auth   # Clone Firestore + Auth data
 ```
 
 Requirements:
 - Node.js >= 18
-- A Firebase service account key at `scripts/serviceAccount.json`
+- A Firebase service account key at `firebase-data-clone/serviceAccount.json`
 - The emulators must be running locally
 
 ## Accessing Emulators from Apps

@@ -1,19 +1,19 @@
-# Scripts
+# Firebase Data Clone
 
 This directory contains utility scripts for exporting and importing Firestore and Firebase Authentication data. These scripts facilitate cloning production data into a local Firebase Emulator Suite environment for development and testing.
 
 ## Prerequisites
 
 - **Node.js** >= 18
-- A Firebase service account JSON file at `scripts/serviceAccount.json` (used for production access)
+- A Firebase service account JSON file at `firebase-data-clone/serviceAccount.json` (used for production access)
 - The [Firebase Emulator Suite](https://firebase.google.com/docs/emulator-suite) running locally:
   - Firestore emulator on `127.0.0.1:8080` (default)
   - Auth emulator on `127.0.0.1:9099` (default)
-- A `.env` file in the `scripts/` directory (optional, for environment overrides)
+- A `.env` file in the `firebase-data-clone/` directory (optional, for environment overrides)
 
 ## Available Commands
 
-Run these via `npm run <command>` from within the `scripts/` directory.
+Run these via `npm run <command>` from within the `firebase-data-clone/` directory.
 
 | Command          | Description                                                                                             |
 |------------------|---------------------------------------------------------------------------------------------------------|

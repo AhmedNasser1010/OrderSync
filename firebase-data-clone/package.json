@@ -1,5 +1,5 @@
 {
-  "name": "scripts",
+  "name": "firebase-data-clone",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
