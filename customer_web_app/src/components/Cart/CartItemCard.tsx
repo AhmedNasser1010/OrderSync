@@ -114,7 +114,7 @@ const CartItemCard = ({
             className="h-full w-full rounded-2xl object-cover transition-transform duration-300 group-hover:scale-110"
           />
           {percentOff > 0 && (
-            <span className="absolute top-2 start-2 rounded-md bg-color-2/95 px-2 py-0.5 font-ProximaNovaBold text-xs uppercase text-white shadow-sm">
+            <span className="absolute top-2 start-2 z-10 rounded-full bg-gradient-to-r from-color-2 to-[#ffab4a] px-3 py-1 font-ProximaNovaBold text-xs uppercase tracking-wide text-white shadow-lg shadow-color-2/30">
               {percentOff}% {t("OFF")}
             </span>
           )}

@@ -10,7 +10,7 @@ const ItemTitle = ({
   return (
     <h4
       className={`text-base ${
-        discountIncluded ? "text-color-2" : "text-color-9"
+        discountIncluded ? "text-color-11" : "text-color-9"
       } font-ProximaNovaMed`}
     >
       {title}

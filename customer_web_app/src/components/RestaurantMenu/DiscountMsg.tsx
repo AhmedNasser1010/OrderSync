@@ -1,5 +1,7 @@
 "use client";
 
+import { BadgePercent } from "lucide-react";
+
 const DiscountMsg = ({
   discountMsg,
   discountIncluded,
@@ -10,10 +12,13 @@ const DiscountMsg = ({
   if (discountMsg) {
     return (
       <span
-        className={`text-sm font-ProximaNovaMed block ${
-          discountIncluded ? "text-color-2" : "text-[#3e4152a1]"
-        } mt-2`}
+        className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-ProximaNovaSemiBold text-xs ${
+          discountIncluded
+            ? "bg-color-11/10 text-color-11"
+            : "bg-color-7/60 text-[#3e4152a1]"
+        }`}
       >
+        <BadgePercent className="size-3.5" />
         {discountMsg}
       </span>
     );
