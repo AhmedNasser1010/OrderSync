@@ -199,7 +199,7 @@ function ErrorBanner({
         </p>
         {reason && (
           <p className="text-red-400 font-ProximaNovaThin text-xs mt-1">
-            {t(reason)}
+            {reason}
           </p>
         )}
       </div>

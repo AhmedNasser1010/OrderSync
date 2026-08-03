@@ -32,7 +32,13 @@ export function useDriverLocation(
         }
       },
       (error) => {
-        console.error("Error subscribing to driver location:", error);
+        // When the driver completes the delivery, they remove this customer from
+        // trackingCustomerIds, which revokes read access to the driver document.
+        // That is expected (location sharing has ended), so don't surface it as a
+        // permission error — just clear the live location.
+        if ((error as { code?: string } | undefined)?.code !== "permission-denied") {
+          console.error("Error subscribing to driver location:", error);
+        }
         setLiveLocation(null);
       }
     );
