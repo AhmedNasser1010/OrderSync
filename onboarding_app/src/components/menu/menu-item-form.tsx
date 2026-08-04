@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 
 interface MenuItemFormProps {
   categoryName: string;
@@ -11,12 +12,14 @@ interface MenuItemFormProps {
     description: string,
     price: number,
     sizes?: { size: string; price: string }[],
+    topMenu?: boolean,
   ) => void;
   onCancel: () => void;
   initialTitle?: string;
   initialDescription?: string;
   initialPrice?: number;
   initialSizes?: { size: string; price: string }[];
+  initialTopMenu?: boolean;
   isEditing?: boolean;
   submitLabel?: string;
 }
@@ -47,6 +50,7 @@ export function MenuItemForm({
   initialDescription = "",
   initialPrice,
   initialSizes,
+  initialTopMenu = false,
   isEditing = false,
   submitLabel,
 }: MenuItemFormProps) {
@@ -70,6 +74,7 @@ export function MenuItemForm({
       getSizePrice(initialSizes, ["M", "MEDIUM", "MD"]) !== "" ||
       getSizePrice(initialSizes, ["L", "LARGE", "LG"]) !== "",
   );
+  const [topMenu, setTopMenu] = useState<boolean>(initialTopMenu);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,7 +86,7 @@ export function MenuItemForm({
             { size: "L", price: largePrice },
           ]
         : undefined;
-      onSubmit(title.trim(), description.trim(), parseFloat(price), sizes);
+      onSubmit(title.trim(), description.trim(), parseFloat(price), sizes, topMenu);
       setTitle("");
       setDescription("");
       setPrice("");
@@ -89,6 +94,7 @@ export function MenuItemForm({
       setMediumPrice("");
       setLargePrice("");
       setSizesEnabled(false);
+      setTopMenu(false);
     }
   };
 
@@ -197,6 +203,13 @@ export function MenuItemForm({
             >
               Enable Sizes
             </Button>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium text-foreground">
+              Mark as popular
+            </label>
+            <Switch checked={topMenu} onCheckedChange={setTopMenu} />
           </div>
 
           <div className="flex flex-col gap-2 pt-4">

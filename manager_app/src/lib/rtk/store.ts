@@ -2,10 +2,6 @@ import { configureStore } from "@reduxjs/toolkit";
 import { firestoreApi } from "./api/firestoreApi";
 import constantsSlice from "./slices/constantsSlice";
 import toggleSlice from "./slices/toggleSlice";
-import menuSlice from "./slices/menuSlice";
-import conditionalValuesSlice from "./slices/conditionalValuesSlice";
-import promoCodesSlice from "./slices/promoCodesSlice";
-import discountAnalyticsSlice from "./slices/discountAnalyticsSlice";
 
 export const makeStore = () => {
   return configureStore({
@@ -13,10 +9,6 @@ export const makeStore = () => {
     reducer: {
       constants: constantsSlice,
       toggle: toggleSlice,
-      menu: menuSlice,
-      conditionalValues: conditionalValuesSlice,
-      promoCodes: promoCodesSlice,
-      discountAnalytics: discountAnalyticsSlice,
       [firestoreApi.reducerPath]: firestoreApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>

@@ -81,7 +81,6 @@
     "bottomNav": {
       "analytics": "Analytics",
       "today": "Today",
-      "menu": "Menu",
       "settings": "Settings"
     },
     "kpis": {
@@ -258,90 +257,6 @@
       }
     }
   },
-  "Menu": {
-    "page": {
-      "title": "Restaurant Menu",
-      "subtitle": "Manage categories, items, and promotions",
-      "addCategory": "Add Category",
-      "sync": "Sync",
-      "syncing": "Syncing...",
-      "unsavedChanges": "Unsaved changes",
-      "revertChanges": "Revert",
-      "noCategories": "No categories yet",
-      "createFirstCategory": "Create First Category",
-      "noItems": "No items in this category",
-      "addFirstItem": "Add First Item",
-      "addItem": "+ Add Item",
-      "lastSynced": "Last synced:",
-      "orderDiscounts": "Cart Discounts",
-      "addOrderDiscount": "Add Cart Discount",
-      "noOrderDiscounts": "No cart discounts yet",
-      "editDiscount": "Edit Discount",
-      "enableDiscount": "Enable Discount",
-      "disableDiscount": "Disable Discount",
-      "disabled": "Disabled",
-      "removeDiscount": "Remove Discount"
-    },
-    "categoryForm": {
-      "editTitle": "Edit Category",
-      "newTitle": "New Category",
-      "titleLabel": "Category Title *",
-      "titlePlaceholder": "e.g., Appetizers",
-      "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Brief description of this category",
-      "saveChanges": "Save Changes",
-      "createCategory": "Create Category"
-    },
-    "itemForm": {
-      "editTitle": "Edit Item in {categoryName}",
-      "addTitle": "Add Item to {categoryName}",
-      "itemTitleLabel": "Item Title *",
-      "itemTitlePlaceholder": "e.g., Grilled Salmon",
-      "descriptionLabel": "Description",
-      "descriptionPlaceholder": "Brief description of the item",
-      "priceLabel": "Price *",
-      "pricePlaceholder": "0.00",
-      "sizesLabel": "Sizes (tiered pricing)",
-      "smallPlaceholder": "Small Price",
-      "mediumPlaceholder": "Medium Price",
-      "largePlaceholder": "Large Price",
-      "enableSizes": "Enable Sizes",
-      "saveItem": "Save Item",
-      "addItem": "Add Item"
-    },
-    "categoryHeader": {
-      "hideFromMenu": "Hide from menu",
-      "showInMenu": "Show in menu",
-      "moveUp": "Move category up",
-      "moveDown": "Move category down",
-      "edit": "Edit category",
-      "delete": "Delete category",
-      "items": "items",
-      "addDiscount": "Add Discount",
-      "editDiscount": "Edit Discount",
-      "enableDiscount": "Enable Discount",
-      "disableDiscount": "Disable Discount",
-      "removeDiscount": "Remove Discount"
-    },
-    "itemCard": {
-      "moveUp": "Move item up",
-      "moveDown": "Move item down",
-      "edit": "Edit item",
-      "hideFromMenu": "Hide from menu",
-      "showInMenu": "Show in menu",
-      "delete": "Delete item",
-      "addDiscount": "Add Discount",
-      "editDiscount": "Edit Discount",
-      "enableDiscount": "Enable Discount",
-      "disableDiscount": "Disable Discount",
-      "removeDiscount": "Remove Discount"
-    },
-    "sync": {
-      "success": "Menu synced successfully!",
-      "failed": "Failed to sync menu",
-      "restaurantIdUnavailable": "Restaurant ID is unavailable."
-    }
-  },
   "Settings": {
     "title": "Settings",
     "subtitle": "Manage your app preferences",
@@ -355,85 +270,8 @@
     "loggingOut": "Logging out...",
     "cancel": "Cancel"
   },
-  "ImageEditor": {
-    "title": "Edit Images",
-    "imageLabel": "Image {number}",
-    "urlPlaceholder": "https://..."
-  },
   "Metadata": {
     "title": "OrderSync | Home",
     "description": "Track your restaurant performance and analytics"
-  },
-  "DiscountDialog": {
-    "addTitle": "Add Discount",
-    "editTitle": "Edit Discount",
-    "enabled": "Enabled",
-    "messageLabel": "Message",
-    "messagePlaceholder": "e.g. 20% off your order!",
-    "typeLabel": "Type",
-    "typePercentage": "Percentage (%)",
-    "typeFixed": "Fixed Amount",
-    "valueLabel": "Value",
-    "minOrderTotal": "Min Order Total",
-    "minCartItems": "Min Cart Items",
-    "startDate": "Start Date",
-    "endDate": "End Date",
-    "timeRules": "Time-Based Rules",
-    "startTime": "Start Time",
-    "endTime": "End Time",
-    "targetSegments": "Target Segments",
-    "segmentsAll": "Applies to all customers",
-    "segmentsCount": "{count} segment(s) selected",
-    "stackingMode": "Stacking Mode",
-    "priorityLabel": "Priority",
-    "saveChanges": "Save Changes",
-    "addDiscount": "Add Discount",
-    "cancel": "Cancel",
-    "deleteDiscount": "Delete Discount",
-    "autoFillButton": "Auto Fill",
-    "autoFill": {
-      "off": "off",
-      "yourOrder": "your order",
-      "onOrdersOver": "on orders over $",
-      "withMinItems": "with ",
-      "items": "+ items",
-      "for": "for",
-      "during": "during",
-      "currency": "EGP"
-    },
-    "days": {
-      "sun": "Sun",
-      "mon": "Mon",
-      "tue": "Tue",
-      "wed": "Wed",
-      "thu": "Thu",
-      "fri": "Fri",
-      "sat": "Sat"
-    },
-    "segments": {
-      "new": "New",
-      "active": "Active",
-      "inactive": "Inactive",
-      "vip": "VIP",
-      "at_risk": "At Risk"
-    },
-    "stacking": {
-      "highest": "Highest",
-      "lowest": "Lowest",
-      "stack": "Stack",
-      "priority": "Priority",
-      "exclusive": "Exclusive"
-    }
-  },
-  "ConditionsEditor": {
-    "title": "Conditions",
-    "firstPurchase": "First Purchase",
-    "totalSpent": "Total Spent (>=)",
-    "totalItems": "Total Items (>=)",
-    "totalOrders": "Total Orders (>=)",
-    "accountAge": "Account Age (days >=)",
-    "daysSinceLastOrder": "Days Since Last Order (>=)",
-    "valuePlaceholder": "Value",
-    "addCondition": "Add Condition"
   }
 }

@@ -11,6 +11,7 @@ import {
   Percent,
   Tag,
   Power,
+  Star,
 } from "lucide-react";
 import { ActionsMenu } from "@/components/ui/actions-menu";
 import { ImageEditDialog } from "@/components/ui/image-edit-dialog";
@@ -19,6 +20,7 @@ import type { ItemType } from "@ordersync/types";
 interface MenuItemCardProps {
   item: ItemType;
   onToggleVisibility: () => void;
+  onToggleTopMenu?: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onEdit: () => void;
@@ -32,6 +34,7 @@ interface MenuItemCardProps {
 export function MenuItemCard({
   item,
   onToggleVisibility,
+  onToggleTopMenu,
   onMoveUp,
   onMoveDown,
   onEdit,
@@ -73,6 +76,12 @@ export function MenuItemCard({
                 <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/10 px-2 py-0.5 text-xs text-muted-foreground">
                   <EyeOff size={14} />
                   Hidden
+                </span>
+              )}
+              {item.topMenu && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+                  <Star size={12} />
+                  Popular
                 </span>
               )}
               {item.discount && (
@@ -123,6 +132,14 @@ export function MenuItemCard({
                 label: item.visibility ? "Hide from menu" : "Show in menu",
                 onClick: onToggleVisibility,
                 icon: item.visibility ? <Eye size={14} /> : <EyeOff size={14} />,
+              },
+              {
+                key: "toggleTopMenu",
+                label: item.topMenu
+                  ? "Remove from Popular dishes"
+                  : "Mark as Popular",
+                onClick: () => onToggleTopMenu && onToggleTopMenu(),
+                icon: <Star size={14} />,
               },
               {
                 key: "addDiscount",

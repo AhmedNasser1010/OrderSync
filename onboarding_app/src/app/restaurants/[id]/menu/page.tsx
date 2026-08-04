@@ -120,9 +120,10 @@ export default function MenuManagementPage() {
     description: string,
     price: number,
     sizes?: { size: string; price: string }[],
+    topMenu = false,
   ) => {
     if (selectedCategoryForItem) {
-      addMenuItem(selectedCategoryForItem, title, description, price, sizes);
+      addMenuItem(selectedCategoryForItem, title, description, price, sizes, topMenu);
       setShowItemForm(false);
       setSelectedCategoryForItem(null);
     }
@@ -133,9 +134,10 @@ export default function MenuManagementPage() {
     description: string,
     price: number,
     sizes?: { size: string; price: string }[],
+    topMenu = false,
   ) => {
     if (editingItemId) {
-      updateMenuItem(editingItemId, { title, description, price, sizes });
+      updateMenuItem(editingItemId, { title, description, price, sizes, topMenu });
       setEditingItemId(null);
     }
   };
@@ -502,6 +504,11 @@ export default function MenuManagementPage() {
                           onMoveDown={() => moveItem(item.id, "down")}
                           onEdit={() => openEditItemDialog(item.id)}
                           onDelete={() => deleteItem(item.id)}
+                          onToggleTopMenu={() =>
+                            updateMenuItem(item.id, {
+                              topMenu: !item.topMenu,
+                            })
+                          }
                           onUpdateBackgrounds={(backgrounds) =>
                             updateMenuItem(item.id, { backgrounds })
                           }
@@ -603,6 +610,11 @@ export default function MenuManagementPage() {
             menuData.categories
               .flatMap((category) => category.items)
               .find((item) => item.id === editingItemId)?.sizes
+          }
+          initialTopMenu={
+            menuData.categories
+              .flatMap((category) => category.items)
+              .find((item) => item.id === editingItemId)?.topMenu ?? false
           }
           isEditing
           submitLabel="Save Item"

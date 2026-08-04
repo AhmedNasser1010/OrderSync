@@ -81,7 +81,6 @@
     "bottomNav": {
       "analytics": "التحليلات",
       "today": "اليوم",
-      "menu": "القائمة",
       "settings": "الإعدادات"
     },
     "kpis": {
@@ -258,90 +257,6 @@
       }
     }
   },
-  "Menu": {
-    "page": {
-      "title": "قائمة المطعم",
-      "subtitle": "إدارة الفئات والعناصر والعروض الترويجية",
-      "addCategory": "إضافة فئة",
-      "sync": "مزامنة",
-      "syncing": "جارٍ المزامنة...",
-      "unsavedChanges": "تغييرات غير محفوظة",
-      "revertChanges": "تراجع",
-      "noCategories": "لا توجد فئات بعد",
-      "createFirstCategory": "إنشاء أول فئة",
-      "noItems": "لا توجد عناصر في هذه الفئة",
-      "addFirstItem": "إضافة أول عنصر",
-      "addItem": "+ إضافة عنصر",
-      "lastSynced": "آخر مزامنة:",
-      "orderDiscounts": "خصومات السلة",
-      "addOrderDiscount": "إضافة خصم على السلة",
-      "noOrderDiscounts": "لا توجد خصومات على السلة بعد",
-      "editDiscount": "تعديل الخصم",
-      "enableDiscount": "تفعيل الخصم",
-      "disableDiscount": "تعطيل الخصم",
-      "disabled": "معطل",
-      "removeDiscount": "إزالة الخصم"
-    },
-    "categoryForm": {
-      "editTitle": "تعديل الفئة",
-      "newTitle": "فئة جديدة",
-      "titleLabel": "عنوان الفئة *",
-      "titlePlaceholder": "مثال: مقبلات",
-      "descriptionLabel": "الوصف",
-      "descriptionPlaceholder": "وصف مختصر لهذه الفئة",
-      "saveChanges": "حفظ التغييرات",
-      "createCategory": "إنشاء فئة"
-    },
-    "itemForm": {
-      "editTitle": "تعديل عنصر في {categoryName}",
-      "addTitle": "إضافة عنصر إلى {categoryName}",
-      "itemTitleLabel": "عنوان العنصر *",
-      "itemTitlePlaceholder": "مثال: سمك مشوي",
-      "descriptionLabel": "الوصف",
-      "descriptionPlaceholder": "وصف مختصر للعنصر",
-      "priceLabel": "السعر *",
-      "pricePlaceholder": "0.00",
-      "sizesLabel": "الأحجام (تسعير متدرج)",
-      "smallPlaceholder": "سعر صغير",
-      "mediumPlaceholder": "سعر متوسط",
-      "largePlaceholder": "سعر كبير",
-      "enableSizes": "تفعيل الأحجام",
-      "saveItem": "حفظ العنصر",
-      "addItem": "إضافة عنصر"
-    },
-    "categoryHeader": {
-      "hideFromMenu": "إخفاء من القائمة",
-      "showInMenu": "إظهار في القائمة",
-      "moveUp": "نقل الفئة لأعلى",
-      "moveDown": "نقل الفئة لأسفل",
-      "edit": "تعديل الفئة",
-      "delete": "حذف الفئة",
-      "items": "عناصر",
-      "addDiscount": "إضافة خصم",
-      "editDiscount": "تعديل الخصم",
-      "enableDiscount": "تفعيل الخصم",
-      "disableDiscount": "تعطيل الخصم",
-      "removeDiscount": "إزالة الخصم"
-    },
-    "itemCard": {
-      "moveUp": "نقل العنصر لأعلى",
-      "moveDown": "نقل العنصر لأسفل",
-      "edit": "تعديل العنصر",
-      "hideFromMenu": "إخفاء من القائمة",
-      "showInMenu": "إظهار في القائمة",
-      "delete": "حذف العنصر",
-      "addDiscount": "إضافة خصم",
-      "editDiscount": "تعديل الخصم",
-      "enableDiscount": "تفعيل الخصم",
-      "disableDiscount": "تعطيل الخصم",
-      "removeDiscount": "إزالة الخصم"
-    },
-    "sync": {
-      "success": "تمت مزامنة القائمة بنجاح!",
-      "failed": "فشلت مزامنة القائمة",
-      "restaurantIdUnavailable": "معرف المطعم غير متاح."
-    }
-  },
   "Settings": {
     "title": "الإعدادات",
     "subtitle": "إدارة تفضيلات التطبيق",
@@ -355,85 +270,8 @@
     "loggingOut": "جارٍ تسجيل الخروج...",
     "cancel": "إلغاء"
   },
-  "ImageEditor": {
-    "title": "تعديل الصور",
-    "imageLabel": "صورة {number}",
-    "urlPlaceholder": "https://..."
-  },
   "Metadata": {
     "title": "أوردرسينك | الرئيسية",
     "description": "تتبع أداء مطعمك وتحليلاته"
-  },
-  "DiscountDialog": {
-    "addTitle": "إضافة خصم",
-    "editTitle": "تعديل الخصم",
-    "enabled": "مفعّل",
-    "messageLabel": "الرسالة",
-    "messagePlaceholder": "مثال: خصم 20% على طلبك!",
-    "typeLabel": "النوع",
-    "typePercentage": "نسبة مئوية (%)",
-    "typeFixed": "مبلغ ثابت",
-    "valueLabel": "القيمة",
-    "minOrderTotal": "الحد الأدنى لمبلغ الطلب",
-    "minCartItems": "الحد الأدنى لعناصر السلة",
-    "startDate": "تاريخ البدء",
-    "endDate": "تاريخ الانتهاء",
-    "timeRules": "قواعد مبنية على الوقت",
-    "startTime": "وقت البدء",
-    "endTime": "وقت الانتهاء",
-    "targetSegments": "شرائح العملاء المستهدفة",
-    "segmentsAll": "ينطبق على جميع العملاء",
-    "segmentsCount": "{count} شريحة محددة",
-    "stackingMode": "وضع التراكم",
-    "priorityLabel": "الأولوية",
-    "saveChanges": "حفظ التغييرات",
-    "addDiscount": "إضافة خصم",
-    "cancel": "إلغاء",
-    "deleteDiscount": "حذف الخصم",
-    "autoFillButton": "ملء تلقائي",
-    "autoFill": {
-      "off": "خصم",
-      "yourOrder": "على طلبك",
-      "onOrdersOver": "على الطلبات فوق $",
-      "withMinItems": "مع ",
-      "items": "+ عنصر",
-      "for": "لـ",
-      "during": "خلال",
-      "currency": "جنيه"
-    },
-    "days": {
-      "sun": "أحد",
-      "mon": "إثن",
-      "tue": "ثلا",
-      "wed": "أرب",
-      "thu": "خمي",
-      "fri": "جمع",
-      "sat": "سبت"
-    },
-    "segments": {
-      "new": "جديد",
-      "active": "نشط",
-      "inactive": "غير نشط",
-      "vip": "مميز",
-      "at_risk": "معرض للخطر"
-    },
-    "stacking": {
-      "highest": "الأعلى",
-      "lowest": "الأدنى",
-      "stack": "تجميع",
-      "priority": "الأولوية",
-      "exclusive": "حصري"
-    }
-  },
-  "ConditionsEditor": {
-    "title": "الشروط",
-    "firstPurchase": "الشراء الأول",
-    "totalSpent": "إجمالي المشتريات (>=)",
-    "totalItems": "إجمالي العناصر (>=)",
-    "totalOrders": "إجمالي الطلبات (>=)",
-    "accountAge": "عمر الحساب (أيام >=)",
-    "daysSinceLastOrder": "الأيام منذ آخر طلب (>=)",
-    "valuePlaceholder": "القيمة",
-    "addCondition": "إضافة شرط"
   }
 }

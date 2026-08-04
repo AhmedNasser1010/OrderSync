@@ -409,6 +409,7 @@ export function useMenuData(resId?: string, partnerUid?: string) {
       description: string,
       price: number,
       sizes?: ItemType["sizes"],
+      topMenu = false,
     ) => {
       const now = Date.now();
       const newItem: ItemType = {
@@ -418,7 +419,7 @@ export function useMenuData(resId?: string, partnerUid?: string) {
         price,
         category: categoryId,
         visibility: true,
-        topMenu: false,
+        topMenu,
         sizes,
         backgrounds: [],
         createdAt: now,

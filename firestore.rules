@@ -130,7 +130,6 @@ service cloud.firestore {
     // =====================================================================
     match /menus/{menuId} {
       allow read: if true;
-      allow update, delete: if isManagerOf(menuId);
       allow create: if isPartnerOwner(incomingData().partnerUid);
       allow update, delete: if isPartner() &&
         partnerOwnsToken(resourceData().accessToken);

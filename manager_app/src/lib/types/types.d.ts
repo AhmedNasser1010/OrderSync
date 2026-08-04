@@ -1,5 +1,3 @@
-import type { CategoryType, ItemType, DiscountObject } from "@ordersync/types";
-
 export type StatusType = "good" | "warning" | "alert";
 
 export interface KPIData {
@@ -146,15 +144,3 @@ export interface TodayData {
     avgDeliveryTime: number;
   };
 }
-
-export interface MenuCategory extends CategoryType {
-  items: ItemType[];
-}
-
-export interface MenuData {
-  categories: MenuCategory[];
-  orderDiscounts?: DiscountObject[];
-  lastSynced: string;
-}
-
-export type { ItemType, CategoryType };

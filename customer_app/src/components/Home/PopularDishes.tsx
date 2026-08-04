@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import SectionHeader from "@/components/Home/SectionHeader";
@@ -56,29 +57,28 @@ function DishCard({
   );
 }
 
-function RestaurantDishes({ res }: { res: RestaurantDocument }) {
+function RestaurantDishes({
+  res,
+  onHasDishes,
+}: {
+  res: RestaurantDocument;
+  onHasDishes: (accessToken: string) => void;
+}) {
   const locale = useLocale();
   const { data } = useFetchMenuDataQuery(res.accessToken);
 
-  if (!data) return null;
-
-  const menu = data as unknown as MainMenuType;
+  const menu = data as MainMenuType | undefined;
   const visible = (menu?.items || []).filter((item) => item.visibility);
   const dishes = visible.filter((item) => item.topMenu).slice(0, 4);
+  const hasDishes = dishes.length > 0;
 
-  if (dishes.length === 0) {
-    dishes.push(
-      ...visible
-        .slice()
-        .sort(
-          (a, b) =>
-            Number(Boolean(b.discount)) - Number(Boolean(a.discount))
-        )
-        .slice(0, 4)
-    );
-  }
+  useEffect(() => {
+    if (hasDishes) {
+      onHasDishes(res.accessToken);
+    }
+  }, [hasDishes, onHasDishes, res.accessToken]);
 
-  if (dishes.length === 0) return null;
+  if (!data || !hasDishes) return null;
 
   const resName = locale === "ar" ? res.profile?.nameInAr : res.profile?.name;
 
@@ -109,30 +109,54 @@ function RestaurantDishes({ res }: { res: RestaurantDocument }) {
 
 function PopularDishes({ restaurants }: { restaurants: RestaurantDocument[] }) {
   const t = useTranslations();
+  const [reported, setReported] = useState<Set<string>>(new Set());
 
-  const featured = restaurants
-    .filter((r) => r.status !== "hidden")
-    .slice()
-    .sort(
-      (a, b) =>
-        Number(b.reviewSummary?.averageRating ?? 0) -
-        Number(a.reviewSummary?.averageRating ?? 0)
-    )
-    .slice(0, 3);
+  const featured = useMemo(
+    () =>
+      restaurants
+        .filter((r) => r.status !== "hidden")
+        .slice()
+        .sort(
+          (a, b) =>
+            Number(b.reviewSummary?.averageRating ?? 0) -
+            Number(a.reviewSummary?.averageRating ?? 0)
+        )
+        .slice(0, 3),
+    [restaurants]
+  );
+
+  const handleHasDishes = useCallback((accessToken: string) => {
+    setReported((prev) => {
+      if (prev.has(accessToken)) return prev;
+      const next = new Set(prev);
+      next.add(accessToken);
+      return next;
+    });
+  }, []);
+
+  const hasPopularDishes = featured.some((res) =>
+    reported.has(res.accessToken)
+  );
 
   if (featured.length === 0) return null;
 
   return (
     <>
-      <div className="divider"></div>
-      <section id="popular-dishes">
-        <SectionHeader
-          title={t("Popular dishes")}
-          subtitle={t("Popular dishes subtitle")}
-        />
+      {hasPopularDishes && <div className="divider"></div>}
+      <section id="popular-dishes" className={hasPopularDishes ? "" : "hidden"}>
+        {hasPopularDishes && (
+          <SectionHeader
+            title={t("Popular dishes")}
+            subtitle={t("Popular dishes subtitle")}
+          />
+        )}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {featured.map((res) => (
-            <RestaurantDishes key={res.accessToken} res={res} />
+            <RestaurantDishes
+              key={res.accessToken}
+              res={res}
+              onHasDishes={handleHasDishes}
+            />
           ))}
         </div>
       </section>

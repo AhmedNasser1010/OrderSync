@@ -14,6 +14,9 @@ import {
   PopupFooter,
 } from "@/components/ui/custom/Popup";
 import useUserForm from "@/hooks/useUserForm";
+import TextInput from "@/components/Sidebar/TextInput";
+import DB_UPDATE_NESTED_VALUE from "@/utils/DB_UPDATE_NESTED_VALUE";
+import { updateUserAddress } from "@/rtk/slices/userSlice";
 import { cn } from "@/lib/utils";
 
 const FindUserLocationMap = dynamic(
@@ -40,6 +43,9 @@ function DeliveryLocation({ variant = "bar", className }: DeliveryLocationProps)
   const { saveLocation } = useUserForm();
   const [open, setOpen] = useState(false);
   const [picked, setPicked] = useState<[number, number] | null>(null);
+  const [addressText, setAddressText] = useState(
+    user?.locations?.home?.address || ""
+  );
 
   const isLoggedIn = !!user?.userInfo?.uid;
   const address = user?.locations?.home?.address || t("El-Ayat");
@@ -54,12 +60,24 @@ function DeliveryLocation({ variant = "bar", className }: DeliveryLocationProps)
         ? (user.locations.home.latlng as [number, number])
         : null
     );
+    setAddressText(user?.locations?.home?.address || "");
     setOpen(true);
   };
 
   const handleSave = async () => {
     if (picked) {
       await saveLocation(picked);
+    }
+    if (user?.userInfo?.uid && addressText) {
+      const res = await DB_UPDATE_NESTED_VALUE(
+        "customers",
+        user.userInfo.uid,
+        "locations.home.address",
+        addressText
+      );
+      if (res) {
+        dispatch(updateUserAddress(addressText));
+      }
     }
     setOpen(false);
   };
@@ -102,6 +120,15 @@ function DeliveryLocation({ variant = "bar", className }: DeliveryLocationProps)
               userLocation={picked}
               defaultLocation={DEFAULT_LOCATION}
               onChange={(value) => setPicked(value)}
+            />
+          </div>
+          <div className="pt-3">
+            <TextInput
+              label={t("Address")}
+              placeholder={t("Street, village, or well known place")}
+              icon={<MapPinIcon />}
+              value={addressText}
+              onChange={(e) => setAddressText(e.target.value)}
             />
           </div>
           <PopupFooter>
