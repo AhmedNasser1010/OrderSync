@@ -29,6 +29,7 @@ import type {
   CustomerType,
   OrderType,
   MainMenuType,
+  HeroBanner,
 } from "@ordersync/types";
 
 export interface UpdateBusinessInput {
@@ -50,9 +51,93 @@ function getErrorMessage(error: unknown): string {
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["User", "Businesses", "Menu", "Drivers", "Customers", "Reviews", "Orders"],
+  tagTypes: ["User", "Businesses", "Menu", "Drivers", "Customers", "Reviews", "Orders", "Banners"],
   endpoints: (builder) => ({
     // Query Endpoints
+    fetchBanners: builder.query<HeroBanner[], void>({
+      async queryFn() {
+        try {
+          const ref = collection(db, "banners");
+          const q = query(ref, orderBy("sortOrder", "asc"));
+          const snapshot = await getDocs(q);
+          const banners: HeroBanner[] = snapshot.docs.map(
+            (docSnap) =>
+              ({
+                id: docSnap.id,
+                ...docSnap.data(),
+              }) as HeroBanner,
+          );
+          console.log("Read Operation [fetchBanners]");
+          return { data: banners };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
+        }
+      },
+      providesTags: ["Banners"],
+    }),
+    createBanner: builder.mutation<
+      null,
+      { banner: Omit<HeroBanner, "id" | "createdAt" | "updatedAt"> }
+    >({
+      async queryFn({ banner }) {
+        try {
+          const bannerRef = doc(collection(db, "banners"));
+          await setDoc(bannerRef, {
+            ...banner,
+            id: bannerRef.id,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          });
+          console.log("Write Operation [createBanner]");
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error creating banner:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Banners"],
+    }),
+    updateBanner: builder.mutation<
+      null,
+      { id: string; updates: Partial<HeroBanner> }
+    >({
+      async queryFn({ id, updates }) {
+        try {
+          if (!id) throw new Error("Banner id is required.");
+          const bannerRef = doc(db, "banners", id);
+          await updateDoc(bannerRef, {
+            ...updates,
+            updatedAt: Date.now(),
+          });
+          console.log("Write Operation [updateBanner]");
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error updating banner:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Banners"],
+    }),
+    deleteBanner: builder.mutation<null, string>({
+      async queryFn(id) {
+        try {
+          if (!id) throw new Error("Banner id is required.");
+          const bannerRef = doc(db, "banners", id);
+          await deleteDoc(bannerRef);
+          console.log("Write Operation [deleteBanner]");
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error deleting banner:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Banners"],
+    }),
     fetchUserData: builder.query({
       async queryFn(userUid) {
         try {
@@ -971,6 +1056,11 @@ export const {
   useFetchActiveOrdersQuery,
   useFetchReceivedOrdersQuery,
   useFetchReviewsQuery,
+
+  useFetchBannersQuery,
+  useCreateBannerMutation,
+  useUpdateBannerMutation,
+  useDeleteBannerMutation,
 
   useCreateUserDocumentMutation,
   useCreateBusinessMutation,

@@ -584,17 +584,19 @@ function Header() {
             )}
           </div>
 
-          <div className="flex items-center gap-3">
-            <ThemeToggle onNavigate={() => setMenuOpen(false)} fullWidth />
-            <LanguageSwitcher onNavigate={() => setMenuOpen(false)} fullWidth />
+          <div className="space-y-3">
             <Link
               href="/cart"
               onClick={() => setMenuOpen(false)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-color-7 py-2 font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40"
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-color-7 py-2 font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40"
             >
               <ShoppingCartIcon className="size-4" />
               {t("Cart")}
             </Link>
+            <div className="flex items-center gap-3">
+              <ThemeToggle onNavigate={() => setMenuOpen(false)} fullWidth />
+              <LanguageSwitcher onNavigate={() => setMenuOpen(false)} fullWidth />
+            </div>
           </div>
 
           {isLoggedIn && (

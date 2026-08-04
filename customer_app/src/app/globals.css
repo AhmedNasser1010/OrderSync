@@ -1,3 +1,4 @@
+@import "slick-carousel/slick/slick.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -317,4 +318,46 @@
 }
 .dark .leaflet-container {
   background: var(--background);
+}
+
+/* React Slick hero banner dots (slick-theme.css is not imported, style manually) */
+/* Hero banner slider card spacing */
+.hero-banner-slider .slick-slide {
+  padding: 0 8px;
+}
+.hero-banner-slider .slick-track {
+  margin-left: -8px;
+  margin-right: -8px;
+}
+
+.slick-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.slick-dots li {
+  margin: 0;
+}
+
+.slick-dots li button {
+  display: block;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  cursor: pointer;
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.slick-dots li.slick-active button {
+  width: 20px;
+  background: var(--color-2);
 }

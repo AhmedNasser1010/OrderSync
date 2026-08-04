@@ -137,6 +137,17 @@ service cloud.firestore {
     }
 
     // =====================================================================
+    // /banners/{bannerId}
+    //
+    // Global homepage hero cards. Publicly readable so the customer app can
+    // show them to everyone; only partners can manage them.
+    // =====================================================================
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow create, update, delete: if isPartner();
+    }
+
+    // =====================================================================
     // /customers/{userId}
     // =====================================================================
     match /customers/{userId} {

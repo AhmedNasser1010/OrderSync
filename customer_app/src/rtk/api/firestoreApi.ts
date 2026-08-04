@@ -6,15 +6,21 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
+  orderBy,
   query,
   setDoc,
   updateDoc,
+  where,
   writeBatch,
   runTransaction,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { canTransition, getTimelineField } from "@ordersync/order-utils";
-import type { OrderType, OrderStatusType } from "@ordersync/types";
+import type {
+  HeroBanner,
+  OrderType,
+  OrderStatusType,
+} from "@ordersync/types";
 import randomOrderNumber from "@/utils/randomOrderId";
 import { setRateIsOpen, setHasOrder } from "@/rtk/slices/toggleSlice";
 
@@ -90,11 +96,36 @@ interface OrderFeedbackArg {
 export const firestoreApi = createApi({
   reducerPath: "firestoreApi",
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["OrderTracking", "User", "Restaurants", "Menu"],
+  tagTypes: ["OrderTracking", "User", "Restaurants", "Menu", "Banners"],
   endpoints: (builder) => ({
     // =====================================================================
     // Query Endpoints
     // =====================================================================
+
+    fetchBanners: builder.query<HeroBanner[], void>({
+      async queryFn() {
+        try {
+          const bannersRef = collection(db, "banners");
+          const q = query(
+            bannersRef,
+            where("active", "==", true),
+            orderBy("sortOrder", "asc"),
+          );
+          const snapshot = await getDocs(q);
+          return {
+            data: snapshot.docs.map(
+              (doc) => ({ id: doc.id, ...doc.data() }) as HeroBanner,
+            ),
+          };
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
+        }
+      },
+      providesTags: ["Banners"],
+    }),
 
     fetchBusinesses: builder.query<unknown[], void>({
       async queryFn() {
@@ -564,6 +595,7 @@ export const firestoreApi = createApi({
 });
 
 export const {
+  useFetchBannersQuery,
   useFetchBusinessesQuery,
   useFetchMenuDataQuery,
   useFetchOrderTrackingDataQuery,

@@ -1,4 +1,5 @@
 export type { RestaurantStatusTypes, BusinessDocument } from "./business";
+export type { BannerCta, HeroBanner } from "./banner";
 export type { CustomersRes, CustomerType } from "./customer";
 export type { CustomerFeedbackType } from "./review";
 export type { Driver, LiveLocation } from "./driver";
