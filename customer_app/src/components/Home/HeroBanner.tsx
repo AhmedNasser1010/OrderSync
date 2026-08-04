@@ -144,10 +144,22 @@ function BannerCard({ banner }: { banner: HeroBannerType }) {
   );
 }
 
+function HeroBannerSkeleton() {
+  return (
+    <section className="mt-6" id="hero">
+      <div className="relative h-55 w-full overflow-hidden rounded-3xl bg-secondary animate-pulse sm:h-52">
+        <div className="absolute top-4 left-4 size-16 rounded-2xl bg-color-7/70" />
+      </div>
+    </section>
+  );
+}
+
 function HeroBanner() {
   const locale = useLocale();
   const isRTL = locale === "ar";
-  const { data: banners } = useFetchBannersQuery();
+  const { data: banners, isLoading } = useFetchBannersQuery();
+
+  if (isLoading) return <HeroBannerSkeleton />;
 
   if (!banners || banners.length === 0) return <DefaultHero />;
 

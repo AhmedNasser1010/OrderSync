@@ -20,6 +20,7 @@ interface RestaurantCardInfo {
   promotionalSubtitle?: string;
   status?: string;
   openingHours?: OpeningHours;
+  openNowUntil?: number;
   className?: string;
 }
 
@@ -57,6 +58,7 @@ function RestaurantCard({ info }: { info: RestaurantCardInfo }) {
     promotionalSubtitle,
     status,
     openingHours,
+    openNowUntil,
     className,
   } = info;
   const locale = useLocale();
@@ -117,7 +119,11 @@ function RestaurantCard({ info }: { info: RestaurantCardInfo }) {
           </p>
         )}
         <span className="absolute top-2 start-2">
-          <OpenBadge status={status} openingHours={openingHours} />
+          <OpenBadge
+            status={status}
+            openingHours={openingHours}
+            openNowUntil={openNowUntil}
+          />
         </span>
       </div>
       <div className="mx-3">

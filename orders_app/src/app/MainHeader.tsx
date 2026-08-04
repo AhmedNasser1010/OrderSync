@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { usePathname } from "@/i18n/routing";
 import ResStatusBtn from "./ResStatusBtn";
+import WorkingHoursBadge from "./WorkingHoursBadge";
 import useOrders from "@/hooks/useOrders";
 import { useAppSelector } from "@/rtk/hooks";
 import { activeTab } from "@/rtk/slices/toggleSlice";
@@ -57,6 +58,7 @@ export default function MainHeader() {
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
+              <WorkingHoursBadge />
               <ResStatusBtn />
             </div>
           </div>
@@ -92,6 +94,7 @@ function HomeHeader() {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <WorkingHoursBadge />
             <ResStatusBtn />
           </div>
         </div>

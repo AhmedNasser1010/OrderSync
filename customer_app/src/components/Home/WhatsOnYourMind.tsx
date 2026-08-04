@@ -24,7 +24,7 @@ function WhatsOnYourMind() {
   const categories = useMemo(() => {
     const map = new Map<string, string>();
     restaurants.forEach((res: RestaurantDocument) => {
-      (res?.metadata || []).forEach((tag) => {
+      (res?.profile?.cuisines || []).forEach((tag) => {
         if (!map.has(tag)) {
           map.set(tag, CATEGORY_IMAGES[tag] || res?.branding?.cover || "");
         }

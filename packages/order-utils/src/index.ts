@@ -34,6 +34,8 @@ export {
   getSessionRangeForDate,
   getBusinessDayOfTimestamp,
   getActiveSessionBounds,
+  isOpenNow,
+  getNextOpeningTime,
 } from "./businessDay";
 
 export {

@@ -10,12 +10,13 @@ type OpeningHours = BusinessDocument["operations"]["openingHours"];
 interface OpenBadgeProps {
   status?: string;
   openingHours?: OpeningHours;
+  openNowUntil?: number;
   className?: string;
 }
 
-function OpenBadge({ status, openingHours, className }: OpenBadgeProps) {
+function OpenBadge({ status, openingHours, openNowUntil, className }: OpenBadgeProps) {
   const t = useTranslations();
-  const isOpenNow = workingDaysChecker(openingHours);
+  const isOpenNow = workingDaysChecker(openingHours, undefined, openNowUntil);
 
   let label = t("active");
   let color = "bg-color-11/10 text-color-11";

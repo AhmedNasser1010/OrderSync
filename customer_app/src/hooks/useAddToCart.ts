@@ -9,6 +9,7 @@ import {
   setShowTrackedOrderLockPopup,
   setShowResClosedPopup,
 } from "@/rtk/slices/toggleSlice";
+import workingDaysChecker from "@/utils/workingDaysChecker";
 import type { ItemType, SizeType } from "@ordersync/types";
 
 type ItemWithSelection = ItemType & { selectedSize?: SizeType | null };
@@ -20,9 +21,20 @@ const useAddToCart = (resID: string, status: string) => {
   const currentResId = useAppSelector((state) => state.cart.restaurant);
   const trackedOrder = useAppSelector((state) => state.user?.trackedOrder);
   const menuItems = useAppSelector((state) => state.menu.items);
+  const restaurants = useAppSelector((state) => state.restaurants);
 
   const handleAddItem = (item: ItemWithSelection) => {
-    if (status === "inactive" || status === "pause") {
+    const resDoc = restaurants?.find(
+      (restaurant) => restaurant.accessToken === resID
+    );
+    const resOpeningHours = resDoc?.operations?.openingHours;
+    const resOpenNowUntil = resDoc?.operations?.openNowUntil;
+
+    if (
+      status === "inactive" ||
+      status === "pause" ||
+      workingDaysChecker(resOpeningHours, undefined, resOpenNowUntil) === false
+    ) {
       dispatch(setShowResClosedPopup(true));
       return;
     }

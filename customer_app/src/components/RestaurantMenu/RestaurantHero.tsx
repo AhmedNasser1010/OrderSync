@@ -88,6 +88,7 @@ const RestaurantHero = ({
                 <OpenBadge
                   status={res?.status}
                   openingHours={res?.operations?.openingHours}
+                  openNowUntil={res?.operations?.openNowUntil}
                 />
               </div>
               {cuisines?.length ? (

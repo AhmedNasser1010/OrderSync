@@ -17,5 +17,6 @@ export function toCardInfo(
     status: res?.status,
     promotionalSubtitle: res?.branding?.promotionalSubtitle,
     openingHours: res?.operations?.openingHours,
+    openNowUntil: res?.operations?.openNowUntil,
   };
 }

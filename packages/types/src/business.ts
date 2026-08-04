@@ -33,6 +33,7 @@ export type BusinessDocument = {
         closed: boolean;
       }
     >;
+    openNowUntil?: number;
     cookTime: [number, number];
     paymentMethods: {
       cash: boolean;

@@ -39,7 +39,12 @@ export default function CheckoutPage() {
   );
 
   const isAvailable = useMemo(
-    () => workingDaysChecker(res?.operations?.openingHours),
+    () =>
+      workingDaysChecker(
+        res?.operations?.openingHours,
+        undefined,
+        res?.operations?.openNowUntil
+      ),
     [res]
   );
 

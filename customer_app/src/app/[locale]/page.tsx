@@ -68,8 +68,8 @@ export default function HomePage() {
 
   return (
     <div className="container mx-auto mb-10 px-2 sm:px-10 overflow-x-hidden">
-      <LocationBar />
-      <HeroBanner />
+      <LocationBar /> {/* Checked */}
+      <HeroBanner /> {/* Checked */}
       <QuickReorder restaurants={restaurants} />
       <Offers restaurants={sections.offers} />
       <WhatsOnYourMind />

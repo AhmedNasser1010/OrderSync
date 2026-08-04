@@ -9,6 +9,7 @@ import {
   arrayUnion,
   query,
   where,
+  deleteField,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { OrderType, OrderStatusType, RestaurantStatusTypes, BusinessDocument } from "@ordersync/types";
@@ -298,6 +299,28 @@ export const firestoreApi = createApi({
       invalidatesTags: ["Restaurant"],
     }),
 
+    setOpenNow: builder.mutation({
+      async queryFn({ resId, openNowUntil }: { resId: string; openNowUntil: number }) {
+        try {
+          if (!resId) throw new Error("Restaurant ID is required.");
+          if (!openNowUntil || openNowUntil <= Date.now()) {
+            throw new Error("Invalid open-now window.");
+          }
+
+          await updateDoc(doc(db, "businesses", resId), {
+            "operations.openNowUntil": openNowUntil,
+            status: "active",
+          });
+          return { data: null };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error("Error opening restaurant now:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Restaurant"],
+    }),
+
     setCloseDay: builder.mutation({
       async queryFn({ resId }: { resId: string }) {
         try {
@@ -305,6 +328,7 @@ export const firestoreApi = createApi({
 
           await updateDoc(doc(db, "businesses", resId), {
             status: "inactive",
+            "operations.openNowUntil": deleteField(),
           });
 
           console.log("Close day completed. Restaurant set to inactive.");
@@ -369,6 +393,7 @@ export const {
   useSetOrderStatusMutation,
   useSetCancelOrderMutation,
   useSetRestaurantStatusMutation,
+  useSetOpenNowMutation,
   useSetCloseDayMutation,
   useSetDisplaySettingsMutation,
   useSetOrderWorkflowSettingsMutation,

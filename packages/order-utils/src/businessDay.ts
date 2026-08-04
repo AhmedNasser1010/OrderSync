@@ -137,3 +137,30 @@ export function getActiveSessionBounds(
   ).getTime();
   return { startMs, endMs: startMs + MINUTES_PER_DAY * 60_000 };
 }
+
+export function isOpenNow(
+  ts: number,
+  openingHours?: OpeningHours,
+  openNowUntil?: number,
+): boolean {
+  if (openNowUntil && ts < openNowUntil) return true;
+  return getBusinessDayOfTimestamp(ts, openingHours) !== null;
+}
+
+export function getNextOpeningTime(
+  ts: number,
+  openingHours?: OpeningHours,
+): number | null {
+  if (!openingHours) return null;
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(ts);
+    date.setDate(date.getDate() + i);
+    const session = getSessionRangeForDate(date, openingHours);
+    if (session && session.startMs > ts) {
+      return session.startMs;
+    }
+  }
+
+  return null;
+}

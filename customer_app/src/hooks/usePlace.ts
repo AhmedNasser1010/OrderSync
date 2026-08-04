@@ -10,6 +10,7 @@ import {
 } from "@/rtk/slices/toggleSlice";
 import filterObject from "@/utils/filterObject";
 import getUserSource from "@/utils/getUserSource";
+import workingDaysChecker from "@/utils/workingDaysChecker";
 import {
   priceAfterDiscount,
   resolveItemDiscount,
@@ -123,6 +124,20 @@ const usePlace = () => {
   const checkIfUserIsActive = () => {
     if (user?.isActive === false) {
       showError("accountSuspendedMessage");
+      return false;
+    }
+    return true;
+  };
+
+  const checkIfRestaurantIsOpen = () => {
+    if (
+      workingDaysChecker(
+        currentRes?.operations?.openingHours,
+        undefined,
+        currentRes?.operations?.openNowUntil
+      ) === false
+    ) {
+      dispatch(setShowRestaurantUnavailablePopup(true));
       return false;
     }
     return true;
@@ -337,6 +352,7 @@ const usePlace = () => {
       if (
         checkIfUserIsLoggedIn() &&
         checkIfUserIsActive() &&
+        checkIfRestaurantIsOpen() &&
         checkUserInformation() &&
         checkIfUserHasLocation() &&
         checkIfUserHasCart() &&
