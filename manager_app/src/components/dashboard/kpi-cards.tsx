@@ -22,7 +22,7 @@ const iconMap: Record<string, React.ComponentType<any>> = {
 
 export function KPICards({ kpis }: KPICardsProps) {
   return (
-    <div className="grid grid-cols-2 gap-3 px-4 py-4">
+    <div className="grid grid-cols-2 gap-3 px-4">
       {kpis.map((kpi, idx) => {
         const Icon = iconMap[kpi.icon] || DollarSign;
         const changeColor =

@@ -10,6 +10,7 @@ import AuthGuard from "../AuthProvider";
 import PopupProvider from "../PopupProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { HtmlAttributes } from "@/components/HtmlAttributes";
+import { PwaInstallButton } from "@/components/pwa-install-button";
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -57,6 +58,7 @@ export default async function LocaleLayout({
             <AuthProvider>
               <AuthGuard>
                 <PopupProvider>{children}</PopupProvider>
+                <PwaInstallButton />
               </AuthGuard>
             </AuthProvider>
           </ThemeProvider>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, ReactNode } from "react";
+import { ReactNode } from "react";
 import useFcmToken from "@/hooks/useFcmToken";
 import useForegroundMessage from "@/hooks/useForegroundMessage";
 
@@ -25,19 +25,6 @@ function playNotificationSound() {
 }
 
 function ServiceWorkerRegistrator() {
-  useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      "serviceWorker" in navigator &&
-      "Notification" in window
-    ) {
-      navigator.serviceWorker
-        .register("/firebase-messaging-sw.js")
-        .then(() => {})
-        .catch(() => {});
-    }
-  }, []);
-
   return null;
 }
 

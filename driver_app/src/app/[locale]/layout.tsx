@@ -3,6 +3,7 @@ import { getMessages } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
 import { HtmlAttributes } from "@/components/HtmlAttributes";
+import { PwaInstallButton } from "@/components/pwa-install-button";
 
 type Props = {
   children: React.ReactNode;
@@ -21,6 +22,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <HtmlAttributes locale={locale} />
+      <PwaInstallButton />
       {children}
     </NextIntlClientProvider>
   );

@@ -1,8 +1,10 @@
 import { ReactNode } from "react";
 import Script from "next/script";
 import localFont from "next/font/local";
+import type { Metadata, Viewport } from "next";
 import "@/globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SerwistProvider } from "./serwist";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -14,6 +16,50 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
   weight: "100 900",
 });
+
+const APP_NAME = "OrderSync Orders";
+const APP_DEFAULT_TITLE = "OrderSync Orders";
+const APP_TITLE_TEMPLATE = "%s - OrderSync Orders";
+const APP_DESCRIPTION =
+  "Restaurant Order Management - Accept, prepare, and track orders in real time";
+
+export const metadata: Metadata = {
+  applicationName: APP_NAME,
+  title: {
+    default: APP_DEFAULT_TITLE,
+    template: APP_TITLE_TEMPLATE,
+  },
+  description: APP_DESCRIPTION,
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: APP_DEFAULT_TITLE,
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    siteName: APP_NAME,
+    title: {
+      default: APP_DEFAULT_TITLE,
+      template: APP_TITLE_TEMPLATE,
+    },
+    description: APP_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary",
+    title: {
+      default: APP_DEFAULT_TITLE,
+      template: APP_TITLE_TEMPLATE,
+    },
+    description: APP_DESCRIPTION,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2563EB",
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -46,7 +92,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <SerwistProvider swUrl="/serwist/sw.js">{children}</SerwistProvider>
         </ThemeProvider>
       </body>
     </html>

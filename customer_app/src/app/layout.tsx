@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { SerwistProvider } from "./serwist";
 
 const GrotThin = localFont({
   src: "./fonts/BasisGrotesquePro-Thin.ttf",
@@ -62,9 +63,35 @@ const Beiruti = localFont({
 });
 
 export const metadata: Metadata = {
+  applicationName: "زاجل",
   title: "زاجل",
   description:
     "اطلب أكل لذيذ أونلاين من مطاعمك المحلية المفضلة مع زاجل. توصيل أكل سريع وموثوق لحد بابك.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "زاجل",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    siteName: "زاجل",
+    title: "زاجل",
+    description:
+      "اطلب أكل لذيذ أونلاين من مطاعمك المحلية المفضلة مع زاجل. توصيل أكل سريع وموثوق لحد بابك.",
+  },
+  twitter: {
+    card: "summary",
+    title: "زاجل",
+    description:
+      "اطلب أكل لذيذ أونلاين من مطاعمك المحلية المفضلة مع زاجل. توصيل أكل سريع وموثوق لحد بابك.",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#9333EA",
 };
 
 export default function RootLayout({
@@ -82,11 +109,13 @@ export default function RootLayout({
       <body
         className={`${GrotThin.variable} ${GrotReg.variable} ${GrotMed.variable} ${GrotBold.variable} ${GrotBlack.variable} ${ProximaThin.variable} ${ProximaMed.variable} ${ProximaSemiBold.variable} ${ProximaBold.variable} ${ProximaBlack.variable} ${Beiruti.variable} min-h-full flex flex-col`}
       >
-        <StoreProvider>
-          <ThemeProvider>
-            <AuthProvider>{children}</AuthProvider>
-          </ThemeProvider>
-        </StoreProvider>
+        <SerwistProvider swUrl="/serwist/sw.js">
+          <StoreProvider>
+            <ThemeProvider>
+              <AuthProvider>{children}</AuthProvider>
+            </ThemeProvider>
+          </StoreProvider>
+        </SerwistProvider>
       </body>
     </html>
   );

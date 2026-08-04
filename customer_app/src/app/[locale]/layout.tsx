@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import LoginSidebar from "@/components/Sidebar/LoginSidebar";
 import OrderSidebar from "@/components/Sidebar/OrderSidebar";
 import PopupProvider from "@/components/PopupProvider";
+import { PwaInstallButton } from "@/components/pwa-install-button";
 
 type Props = {
   children: React.ReactNode;
@@ -30,6 +31,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <main id="main-content" className="pt-20 min-h-screen bg-background">{children}</main>
         <LoginSidebar />
         <OrderSidebar />
+        <PwaInstallButton />
       </PopupProvider>
       <ThemedToaster />
     </NextIntlClientProvider>

@@ -94,8 +94,8 @@ export default function Component() {
         icon={<BarChart3 className="w-5 h-5" />}
       />
 
-      <div className="flex-1 px-4 pt-6 pb-24 max-w-5xl mx-auto w-full space-y-6">
-        <div className="flex items-center gap-2">
+      <div className="flex-1 pt-6 pb-24 max-w-5xl mx-auto w-full space-y-6">
+        <div className="flex items-center gap-2 px-4">
           <Select
             value={timeRangeValue}
             onValueChange={(value) => dispatch(setTimeRange(value))}
@@ -106,7 +106,11 @@ export default function Component() {
                 <SelectValue placeholder={t("selectRange")} />
               </div>
             </SelectTrigger>
-            <SelectContent position="popper" align="end" className="min-w-[140px]">
+            <SelectContent
+              position="popper"
+              align="end"
+              className="min-w-[140px]"
+            >
               {timeRangeOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -153,7 +157,10 @@ export default function Component() {
         {loading ? (
           <DashboardSkeleton />
         ) : !hasData ? (
-          <NoData title={tNoData("title")} description={tNoData("description")} />
+          <NoData
+            title={tNoData("title")}
+            description={tNoData("description")}
+          />
         ) : (
           <>
             <KPICards kpis={dashboardData.kpis} />

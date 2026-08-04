@@ -1,4 +1,5 @@
 import createNextIntlPlugin from "next-intl/plugin";
+import { withSerwist } from "@serwist/turbopack";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -15,4 +16,4 @@ const nextConfig = {
   allowedDevOrigins: ['*.ngrok-free.app'],
 };
 
-export default withNextIntl(nextConfig);
+export default withSerwist(withNextIntl(nextConfig));
