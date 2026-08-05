@@ -171,21 +171,21 @@ export default function OrderDetailPage({
               />
               <button
                 onClick={handleOpenMaps}
-                className="absolute right-3 top-3 z-[1000] flex h-10 items-center gap-2 rounded-xl bg-background px-3 py-2 text-sm font-medium shadow-lg transition-all hover:bg-muted active:scale-[0.96]"
+                className="absolute right-0 top-3 z-1000 flex h-10 items-center gap-2 rounded-xl bg-background px-3 py-2 text-sm font-medium shadow-lg transition-all hover:bg-muted active:scale-[0.96]"
               >
                 <Navigation className="h-4 w-4" />
                 {t("navigate")}
               </button>
               <button
                 onClick={() => router.back()}
-                className="absolute start-3 top-3 z-[1000] flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-lg transition-all hover:bg-muted active:scale-[0.95]"
+                className="absolute inset-s-0 top-3 z-1000 flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-lg transition-all hover:bg-muted active:scale-[0.95]"
                 aria-label={t("goBack")}
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
             </div>
           ) : (
-            <div className="flex h-[200px] w-full items-center justify-center rounded-2xl bg-muted/30 ring-1 ring-foreground/5">
+            <div className="flex h-50 w-full items-center justify-center rounded-2xl bg-muted/30 ring-1 ring-foreground/5">
               <div className="text-center">
                 <MapPin className="mx-auto h-8 w-8 text-muted-foreground/40" />
                 <p className="mt-2 text-sm text-muted-foreground">
@@ -339,7 +339,7 @@ export default function OrderDetailPage({
       </main>
 
       {/* Sticky Action Bar - above BottomNav (z-50) */}
-      <div className="fixed bottom-20 left-0 right-0 z-[60]">
+      <div className="fixed bottom-20 left-0 right-0 z-60">
         <div className="mx-auto flex max-w-lg flex-col gap-2 px-4">
           <div className="rounded-2xl border border-border/50 bg-background p-3 shadow-xl">
             {/* Primary Action */}

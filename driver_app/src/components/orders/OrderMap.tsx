@@ -27,6 +27,7 @@ export function OrderMap({ orderLocation, driverLocation, restaurantLocation }: 
         center={orderLocation}
         zoom={13}
         scrollWheelZoom={true}
+        zoomControl={false}
         style={{ height: "100%", width: "100%" }}
       >
         <TileLayer
