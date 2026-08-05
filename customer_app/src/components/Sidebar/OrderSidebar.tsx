@@ -404,9 +404,11 @@ const OrderSidebar = () => {
         {!isError && (
           <>
             {/* Status hero */}
-            <div className="relative rounded-2xl p-4 mb-4 text-white bg-gradient-to-br from-color-2 to-[#ffab4a] shadow-sm hidden">
-              <div className="absolute -right-8 -top-10 size-28 rounded-full bg-white/15" />
-              <div className="absolute -right-1 top-2 size-14 rounded-full bg-white/10" />
+            <div className="relative rounded-2xl p-4 mb-4 text-white bg-linear-to-br from-color-2 to-[#ffab4a] shadow-sm">
+              <div className="absolute inset-0 overflow-hidden rounded-2xl">
+                <div className="absolute -right-8 -top-10 size-28 rounded-full bg-white/15" />
+                <div className="absolute -right-1 top-2 size-14 rounded-full bg-white/10" />
+              </div>
               <div className="relative">
                 <div className="flex items-start justify-between gap-3">
                   <p className="text-[11px] font-ProximaNovaThin uppercase tracking-widest opacity-90">
@@ -471,7 +473,7 @@ const OrderSidebar = () => {
             className="h-56 sm:h-64"
           />
           {isMapLive && (
-            <div className="absolute top-3 start-3 pointer-events-none z-[900]">
+            <div className="absolute top-3 inset-s-3 pointer-events-none z-900">
               {eta.isEnRoute && eta.minutes !== null ? (
                 <div className="flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md px-3 py-1.5">
                   <ClockIcon className="size-3.5 text-color-2" />
