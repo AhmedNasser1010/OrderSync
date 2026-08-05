@@ -6,7 +6,6 @@ import useRestaurants from "@/hooks/useRestaurants";
 import ShimmerHome from "@/components/Shimmer/ShimmerHome";
 import LocationBar from "@/components/Home/LocationBar";
 import HeroBanner from "@/components/Home/HeroBanner";
-import QuickReorder from "@/components/Home/QuickReorder";
 import Offers from "@/components/Home/Offers";
 import WhatsOnYourMind from "@/components/Home/WhatsOnYourMind";
 import FastDelivery from "@/components/Home/FastDelivery";
@@ -70,7 +69,6 @@ export default function HomePage() {
     <div className="container mx-auto mb-10 px-2 sm:px-10 overflow-x-hidden">
       <LocationBar />
       <HeroBanner />
-      <QuickReorder restaurants={restaurants} />
       <Offers restaurants={sections.offers} />
       <WhatsOnYourMind />
       <FastDelivery restaurants={sections.fast} />
