@@ -133,12 +133,14 @@ function StepIndicator({
             "relative flex items-center justify-center rounded-full shrink-0 z-10 transition-all duration-500",
             isCompleted && "size-7 bg-color-11",
             isActive && "size-8 bg-color-2 order-pulse",
-            isPending && "size-7 border-2 border-color-7 bg-white"
+            isPending && "size-7 border-2 border-color-7 bg-white dark:bg-transparent"
           )}
         >
           {isCompleted && <CheckCheckIcon className="text-white text-sm" />}
           {isActive && <Icon className="text-white text-sm" />}
-          {isPending && <Icon className="text-color-5 text-xs" />}
+          {isPending && (
+            <Icon className="text-color-5 dark:text-color-6 text-xs" />
+          )}
         </div>
         <div
           className={cn(
@@ -155,7 +157,7 @@ function StepIndicator({
             locale === "ar" ? "rotate-45" : "-rotate-45",
             isCompleted && "text-color-1 font-ProximaNovaSemiBold text-sm",
             isActive && "text-color-2 font-ProximaNovaBold text-[15px]",
-            isPending && "text-color-5 font-ProximaNovaMed text-sm"
+            isPending && "text-color-5 dark:text-color-8 font-ProximaNovaMed text-sm"
           )}
         >
           {t(step.label)}
@@ -164,7 +166,7 @@ function StepIndicator({
           <span
             className={cn(
               "text-[11px] font-ProximaNovaThin tabular-nums text-center mt-6",
-              isActive ? "text-color-2" : "text-color-5"
+              isActive ? "text-color-2" : "text-color-5 dark:text-color-8"
             )}
           >
             {timeLabel}
@@ -199,7 +201,7 @@ function ErrorBanner({
           {t(labels[status || ""] || "Your Order Has Been Canceled!")}
         </p>
         {reason && (
-          <p className="text-red-400 font-ProximaNovaThin text-xs mt-1">
+          <p className="text-red-400 dark:text-red-500 font-ProximaNovaThin text-xs mt-1">
             {reason}
           </p>
         )}
@@ -371,7 +373,7 @@ const OrderSidebar = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <StoreIcon className="size-6 text-color-5" />
+                <StoreIcon className="size-6 text-color-5 dark:text-color-6" />
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -478,7 +480,7 @@ const OrderSidebar = () => {
           {isMapLive && (
             <div className="absolute top-3 inset-s-3 pointer-events-none z-900">
               {eta.isEnRoute && eta.minutes !== null ? (
-                <div className="flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-sm shadow-md px-3 py-1.5">
+                <div className="flex items-center gap-1.5 rounded-full bg-white/95 dark:bg-card/95 backdrop-blur-sm shadow-md px-3 py-1.5">
                   <ClockIcon className="size-3.5 text-color-2" />
                   <span className="text-xs font-ProximaNovaSemiBold text-color-1">
                     {eta.minutes <= 5
@@ -487,7 +489,7 @@ const OrderSidebar = () => {
                   </span>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md px-3 py-1.5">
+                <div className="flex items-center gap-2 rounded-full bg-white/95 dark:bg-card/95 backdrop-blur-sm shadow-md px-3 py-1.5">
                   <span className="relative flex size-2.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-color-2 opacity-75" />
                     <span className="relative inline-flex size-2.5 rounded-full bg-color-2" />
@@ -501,11 +503,11 @@ const OrderSidebar = () => {
           )}
           {!isMapLive && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20 backdrop-blur-[1.5px]">
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl px-5 py-3.5 shadow-lg text-center">
+              <div className="bg-white/95 dark:bg-card/95 backdrop-blur-sm rounded-2xl px-5 py-3.5 shadow-lg text-center">
                 <p className="text-color-1 font-ProximaNovaSemiBold text-sm text-center">
                   {t("Live tracking available soon")}
                 </p>
-                <p className="text-color-5 font-ProximaNovaThin text-xs text-center mt-0.5">
+                <p className="text-color-5 dark:text-color-8 font-ProximaNovaThin text-xs text-center mt-0.5">
                   {t("You'll see your driver in real time")}
                 </p>
               </div>
