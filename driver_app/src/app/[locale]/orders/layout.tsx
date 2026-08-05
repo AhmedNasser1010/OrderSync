@@ -9,6 +9,7 @@ import { FinanceWarningBanner } from "@/components/FinanceWarningBanner";
 import { BottomNav } from "@/components/orders/BottomNav";
 import { OrdersHeader } from "@/components/orders/Header";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { SettingsSync } from "@/components/SettingsSync";
 import { BusinessNamesProvider } from "@/contexts/BusinessNamesContext";
 
 export default function OrdersLayout({ children }: { children: ReactNode }) {
@@ -17,6 +18,7 @@ export default function OrdersLayout({ children }: { children: ReactNode }) {
 
   return (
     <ThemeProvider>
+      <SettingsSync />
       <BusinessNamesProvider>
       <div className="flex min-h-dvh flex-col">
         <NotificationPermissionBanner />

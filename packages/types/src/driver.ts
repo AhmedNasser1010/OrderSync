@@ -38,4 +38,7 @@ export type Driver = {
   };
   fcmTokens?: string[];
   notifyPush?: boolean;
+  theme?: "light" | "dark";
+  locale?: "en" | "ar";
+  skipStartRoute?: boolean;
 };

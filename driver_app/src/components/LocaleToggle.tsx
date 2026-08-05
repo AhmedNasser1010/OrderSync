@@ -4,6 +4,9 @@ import { useLocale } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { useTransition } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const LOCALES = [
   { code: "en", label: "English" },
@@ -14,10 +17,16 @@ export function LocaleToggle() {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+  const { user } = useAuth();
   const [isPending, startTransition] = useTransition();
 
   const handleSwitch = (nextLocale: string) => {
     if (nextLocale === locale) return;
+    if (user?.uid) {
+      updateDoc(doc(db, "drivers", user.uid), { locale: nextLocale }).catch(
+        () => {},
+      );
+    }
     startTransition(() => {
       router.replace(pathname, { locale: nextLocale });
     });

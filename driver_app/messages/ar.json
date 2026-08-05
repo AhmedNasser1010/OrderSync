@@ -202,7 +202,9 @@
     "logoutConfirmDesc": "هل أنت متأكد من تسجيل الخروج؟",
     "loggingOut": "جارٍ تسجيل الخروج...",
     "notifications": "الإشعارات",
-    "notificationsDesc": "استلام إشعارات لحظية للطلبات الجديدة."
+    "notificationsDesc": "استلام إشعارات لحظية للطلبات الجديدة.",
+    "skipRoute": "تخطي خطوة بدء المسار",
+    "skipRouteDesc": "تخطي خطوة \"بدء المسار\" بعد استلام الطلب."
   },
   "mapOrderPopup": {
     "processing": "جارٍ المعالجة...",

@@ -6,7 +6,9 @@ import type { Driver } from "@ordersync/types";
 
 type UseUserResult = {
   name: string;
-  userData: Pick<Driver, "userInfo" | "online" | "finance"> | undefined;
+  userData:
+    | Pick<Driver, "userInfo" | "online" | "finance" | "theme" | "locale" | "notifyPush" | "skipStartRoute">
+    | undefined;
   isLoading: boolean;
   isError: boolean;
   refetch?: () => void;

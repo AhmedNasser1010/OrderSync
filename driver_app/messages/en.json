@@ -202,7 +202,9 @@
     "logoutConfirmDesc": "Are you sure you want to log out?",
     "loggingOut": "Logging out...",
     "notifications": "Notifications",
-    "notificationsDesc": "Receive push notifications for new orders."
+    "notificationsDesc": "Receive push notifications for new orders.",
+    "skipRoute": "Skip Start Route",
+    "skipRouteDesc": "Skip the \"Start Route\" step after picking up an order."
   },
   "mapOrderPopup": {
     "processing": "Processing...",

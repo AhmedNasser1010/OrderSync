@@ -26,7 +26,10 @@ export const firestoreApi = createApi({
   tagTypes: ["UserData", "DriverProfile", "MarketplaceOrders", "MyOrders", "BusinessNames"],
   endpoints: (builder) => ({
     fetchUserData: builder.query<
-      Pick<Driver, "userInfo" | "online" | "finance">,
+      Pick<
+        Driver,
+        "userInfo" | "online" | "finance" | "theme" | "locale" | "notifyPush" | "skipStartRoute"
+      >,
       { uid: string }
     >({
       queryFn: () => ({ data: { userInfo: {} as Driver["userInfo"], online: { byManager: false, byUser: false }, finance: { currentCash: 0, warningLimit: 0, blockLimit: 0 } } }),
@@ -49,6 +52,10 @@ export const firestoreApi = createApi({
                 userInfo: data.userInfo,
                 online: data.online,
                 finance: data.finance,
+                theme: data.theme,
+                locale: data.locale,
+                notifyPush: data.notifyPush,
+                skipStartRoute: data.skipStartRoute,
               }));
             }
           },
@@ -322,9 +329,9 @@ export const firestoreApi = createApi({
       invalidatesTags: ["MarketplaceOrders", "MyOrders"],
     }),
 
-    // Transactional: Start delivery (RESERVED -> PICKED_UP)
+    // Transactional: Start delivery (RESERVED -> PICKED_UP, or -> ON_ROUTE when skipStartRoute)
     startDelivery: builder.mutation({
-      async queryFn({ orderId, driverUid }: { orderId: string; driverUid: string }) {
+      async queryFn({ orderId, driverUid, skipStartRoute }: { orderId: string; driverUid: string; skipStartRoute?: boolean }) {
         try {
           if (!orderId || !driverUid) throw new Error("Order ID and Driver UID required.");
 
@@ -348,16 +355,29 @@ export const firestoreApi = createApi({
 
             const now = Date.now();
 
-            transaction.update(orderRef, {
-              "status.current": "PICKED_UP",
-              "status.history": arrayUnion({
-                status: "PICKED_UP",
-                timestamp: now,
-                by: `driver:${driverUid}`,
-              }),
-              "timeline.pickedUpAt": now,
-              updatedAt: now,
-            });
+            if (skipStartRoute) {
+              transaction.update(orderRef, {
+                "status.current": "ON_ROUTE",
+                "status.history": arrayUnion(
+                  { status: "PICKED_UP", timestamp: now, by: `driver:${driverUid}` },
+                  { status: "ON_ROUTE", timestamp: now, by: `driver:${driverUid}` },
+                ),
+                "timeline.pickedUpAt": now,
+                "timeline.onRouteAt": now,
+                updatedAt: now,
+              });
+            } else {
+              transaction.update(orderRef, {
+                "status.current": "PICKED_UP",
+                "status.history": arrayUnion({
+                  status: "PICKED_UP",
+                  timestamp: now,
+                  by: `driver:${driverUid}`,
+                }),
+                "timeline.pickedUpAt": now,
+                updatedAt: now,
+              });
+            }
           });
 
           return { data: null };
