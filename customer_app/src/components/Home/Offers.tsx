@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import SectionHeader from "@/components/Home/SectionHeader";
+import isRestaurantAvailable from "@/utils/isRestaurantAvailable";
 import type { RestaurantDocument } from "@/types/restaurant";
 
 function Offers({ restaurants }: { restaurants: RestaurantDocument[] }) {
@@ -31,6 +32,15 @@ function Offers({ restaurants }: { restaurants: RestaurantDocument[] }) {
                   fill
                   sizes="(min-width: 640px) 340px, 320px"
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  style={{
+                    filter: isRestaurantAvailable({
+                      status: res?.status,
+                      openingHours: res?.operations?.openingHours,
+                      openNowUntil: res?.operations?.openNowUntil,
+                    })
+                      ? "grayscale(0)"
+                      : "grayscale(1)",
+                  }}
                 />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />

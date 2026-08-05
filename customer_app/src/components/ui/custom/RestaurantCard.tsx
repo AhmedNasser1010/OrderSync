@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import OpenBadge from "@/components/Home/OpenBadge";
 import { cn } from "@/lib/utils";
+import isRestaurantAvailable from "@/utils/isRestaurantAvailable";
 import type { BusinessDocument } from "@ordersync/types";
 
 type OpeningHours = BusinessDocument["operations"]["openingHours"];
@@ -66,7 +67,7 @@ function RestaurantCard({ info }: { info: RestaurantCardInfo }) {
   const t = useTranslations();
   const resName = locale === "ar" ? nameInAr || name : name;
 
-  const isAvailable = status === "active" || status === "busy";
+  const isAvailable = isRestaurantAvailable({ status, openingHours, openNowUntil });
 
   const renderRatings = () => {
     if (avgRating === undefined) return null;

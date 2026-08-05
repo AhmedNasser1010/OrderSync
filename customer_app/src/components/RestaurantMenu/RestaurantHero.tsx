@@ -5,6 +5,7 @@ import { Bike, MapPin, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import OpenBadge from "@/components/Home/OpenBadge";
+import isRestaurantAvailable from "@/utils/isRestaurantAvailable";
 import type { RestaurantDocument } from "@/types/restaurant";
 
 const BreadcrumbArrow = () => (
@@ -145,6 +146,15 @@ const RestaurantHero = ({
           fill
           sizes="100vw"
           className="object-cover opacity-30"
+          style={{
+            filter: isRestaurantAvailable({
+              status: res?.status,
+              openingHours: res?.operations?.openingHours,
+              openNowUntil: res?.operations?.openNowUntil,
+            })
+              ? "grayscale(0)"
+              : "grayscale(1)",
+          }}
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-[#282c3f] via-[#282c3f]/80 to-[#282c3f]/40" />

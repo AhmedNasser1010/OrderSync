@@ -28,6 +28,7 @@ import { toggleOrderSidebar } from "@/rtk/slices/toggleSlice";
 import { priceAfterDiscount, resolveItemDiscount, applyOrderDiscounts } from "@ordersync/order-utils";
 import getDistanceFromLatlngInKm from "@/utils/getDistanceFromLatlngInKm";
 import getDeliveryFees from "@/utils/getDeliveryFees";
+import isRestaurantAvailable from "@/utils/isRestaurantAvailable";
 import CartEmptyState from "@/components/Cart/CartEmptyState";
 import CartItemCard from "@/components/Cart/CartItemCard";
 import BillDetails from "@/components/Cart/BillDetails";
@@ -339,6 +340,15 @@ export default function CartPage() {
                   width={56}
                   height={56}
                   className="size-14 shrink-0 rounded-xl object-cover"
+                  style={{
+                    filter: isRestaurantAvailable({
+                      status: resInfo?.status,
+                      openingHours: resInfo?.operations?.openingHours,
+                      openNowUntil: resInfo?.operations?.openNowUntil,
+                    })
+                      ? "grayscale(0)"
+                      : "grayscale(1)",
+                  }}
                 />
               )}
               <div className="min-w-0 flex-1">
