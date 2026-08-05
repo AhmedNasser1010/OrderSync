@@ -33,7 +33,7 @@ function Restaurants() {
       <RestaurantsFilter />
 
       {filteredRestaurants && filteredRestaurants.length ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-10 px-6">
           {filteredRestaurants.map((res: RestaurantDocument) => (
             <Link
               className="relative block transition-all hover:scale-95"

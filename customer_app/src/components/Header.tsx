@@ -347,15 +347,6 @@ function Header() {
               <MenuIcon className="size-5" />
             </button>
             <Link href="/" aria-label={t("Home")}>
-              <Image
-                src={LOGO_URL}
-                alt="logo"
-                width={56}
-                height={56}
-                className={cn("transition-all", scrolled ? "md:h-10 h-9" : "md:h-14 h-12")}
-              />
-            </Link>
-            <Link href="/">
               <h1
                 className={cn(
                   "font-Beiruti transition-all",

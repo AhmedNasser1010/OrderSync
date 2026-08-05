@@ -9,7 +9,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
-import { useRouter } from "@/i18n/routing";
+import { useRouter, usePathname } from "@/i18n/routing";
 import { useAppDispatch } from "@/rtk/hooks";
 import { auth, db } from "@/lib/firebase";
 import {
@@ -40,6 +40,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const dispatch = useAppDispatch();
 
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -50,6 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const mountedRef = useRef(true);
   const initialCheckDone = useRef(false);
   const isSigningUp = useRef(false);
+
+  const isAuthPage =
+    pathname?.startsWith("/login") || pathname?.startsWith("/signup");
 
   const clearAuthError = useCallback(() => {
     setAuthError(null);
@@ -120,19 +124,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(currentUser);
           setIsAuthLoading(false);
 
-          if (!initialCheckDone.current) {
-            initialCheckDone.current = true;
+          if (isAuthPage) {
+            if (!initialCheckDone.current) {
+              initialCheckDone.current = true;
+            }
             router.push("/");
+          } else if (!initialCheckDone.current) {
+            initialCheckDone.current = true;
           }
         } else {
           dispatch(setUserUid(null));
           setUser(null);
           setIsAuthLoading(false);
 
-          if (!initialCheckDone.current) {
+          if (!isAuthPage && !initialCheckDone.current) {
             initialCheckDone.current = true;
-            router.push("/login");
-          } else {
             router.push("/login");
           }
         }

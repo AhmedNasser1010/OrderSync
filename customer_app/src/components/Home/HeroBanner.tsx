@@ -133,7 +133,7 @@ function HeroBanner() {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 1,
+    slidesToShow: 1.15,
     slidesToScroll: 1,
     autoplay: banners.length > 1,
     autoplaySpeed: AUTO_SCROLL_INTERVAL,
@@ -141,6 +141,8 @@ function HeroBanner() {
     pauseOnFocus: true,
     arrows: false,
     rtl: isRTL,
+    centerMode: true,
+    centerPadding: "0px",
     customPaging: (i: number) => (
       <button type="button" aria-label={`Go to slide ${i + 1}`} />
     ),
@@ -151,6 +153,14 @@ function HeroBanner() {
         </ul>
       </div>
     ),
+    responsive: [
+      {
+        breakpoint: 640,
+        settings: {
+          slidesToShow: 1.05,
+        },
+      },
+    ],
   };
 
   return (

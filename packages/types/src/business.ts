@@ -46,6 +46,7 @@ export type BusinessDocument = {
     skipAccepted?: boolean;
   };
   status: RestaurantStatusTypes;
+  hasOffers?: boolean;
   updatedAt: number;
   createdAt: number;
   topChains: boolean;

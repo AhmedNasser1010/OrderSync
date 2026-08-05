@@ -14,6 +14,16 @@ const nextConfig = {
     root: path.resolve(__dirname, ".."),
   },
   allowedDevOrigins: ['*.ngrok-free.app'],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "i.postimg.cc",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
 export default withSerwist(withNextIntl(nextConfig));

@@ -7,7 +7,7 @@ import type { RestaurantDocument } from "@/types/restaurant";
 function TopRestaurant({ restaurants }: { restaurants: RestaurantDocument[] }) {
   const t = useTranslations();
 
-  if (!restaurants || restaurants.length < 4) return null;
+  if (!restaurants || restaurants.length < 1) return null;
 
   return (
     <>

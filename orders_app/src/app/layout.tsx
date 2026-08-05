@@ -82,6 +82,25 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             `,
           }}
         />
+        {process.env.NODE_ENV !== "production" && (
+          <Script
+            id="serwist-unregister"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(){
+                  if ("serviceWorker" in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(function(registrations){
+                      for (var i = 0; i < registrations.length; i++) {
+                        registrations[i].unregister();
+                      }
+                    });
+                  }
+                })();
+              `,
+            }}
+          />
+        )}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

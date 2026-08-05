@@ -17,6 +17,7 @@ import {
   FirestoreError,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { menuHasOffers } from "@/lib/menuHasOffers";
 import { deleteAuthUser } from "@/app/actions/deleteAuthUser";
 import { getUserProvider } from "@/app/actions/getUserProvider";
 import { setUserRoleClaim } from "@/app/actions/setUserRoleClaim";
@@ -322,6 +323,7 @@ export const firestoreApi = createApi({
               ...business,
               owner: normalizedOwner,
               partnerUid: user.uid,
+              hasOffers: false,
               createdAt: now,
               updatedAt: now,
             };
@@ -574,6 +576,10 @@ export const firestoreApi = createApi({
           const batch = writeBatch(db);
           const menuRef = doc(db, "menus", resId);
           batch.set(menuRef, menu);
+          batch.update(doc(db, "businesses", resId), {
+            hasOffers: menuHasOffers(menu),
+            updatedAt: Date.now(),
+          });
           await batch.commit();
           console.log("Write Operation [syncMenuData]");
           return { data: { synced: true } };
