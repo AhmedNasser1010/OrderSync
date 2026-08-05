@@ -340,6 +340,18 @@ const usePlace = () => {
       return;
     }
 
+    if (
+      error?.code === "ALREADY_HAS_ACTIVE_ORDER" ||
+      error?.data?.code === "ALREADY_HAS_ACTIVE_ORDER"
+    ) {
+      toast.error(t("You already have an order in progress"), {
+        position: "top-center",
+        duration: 4000,
+      });
+      dispatch(toggleOrderSidebar());
+      return;
+    }
+
     toast.error(t("Error placing order"), {
       position: "top-center",
       duration: 4000,
