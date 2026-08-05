@@ -46,90 +46,11 @@ function DefaultHero() {
   );
 }
 
-function BannerCta({ banner }: { banner: HeroBannerType }) {
-  const locale = useLocale();
-
-  const label = locale === "ar" ? banner.cta.labelAr : banner.cta.labelEn;
-  const href = banner.cta.href;
-
-  const buttonStyle = {
-    backgroundColor: banner.cta.backgroundColor || "#fc8019",
-    color: banner.cta.textColor || "#ffffff",
-    borderColor: banner.cta.borderColor || undefined,
-    borderWidth: banner.cta.borderWidth ? `${banner.cta.borderWidth}px` : undefined,
-    borderStyle: banner.cta.borderWidth ? "solid" as const : undefined,
-    borderRadius: banner.cta.borderRadius !== undefined ? `${banner.cta.borderRadius}px` : "9999px",
-    fontFamily: banner.cta.fontFamily || undefined,
-    fontSize: banner.cta.fontSize ? `${banner.cta.fontSize}px` : undefined,
-    fontWeight: banner.cta.fontWeight || "600",
-  };
-
-  const baseClass =
-    "mt-2 flex items-center gap-2 px-5 py-2.5 shadow-lg transition-transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-white/60 outline-none cursor-pointer";
-
-  let cta: ReactNode = null;
-  if (label && href) {
-    if (/^https?:\/\//i.test(href)) {
-      cta = (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={baseClass}
-          style={buttonStyle}
-        >
-          {label}
-        </a>
-      );
-    } else if (href.startsWith("#")) {
-      cta = (
-        <button
-          type="button"
-          onClick={() =>
-            document
-              .getElementById(href.slice(1))
-              ?.scrollIntoView({ behavior: "smooth" })
-          }
-          className={baseClass}
-          style={buttonStyle}
-        >
-          {label}
-        </button>
-      );
-    } else {
-      cta = (
-        <Link href={href} className={baseClass} style={buttonStyle}>
-          {label}
-        </Link>
-      );
-    }
-  }
-
-  return cta;
-}
-
 function BannerCard({ banner }: { banner: HeroBannerType }) {
-  const posX = banner.ctaPosition?.x ?? 16;
-  const posY = banner.ctaPosition?.y ?? 16;
-  const corner = banner.ctaPosition?.corner ?? "top-left";
+  const href = banner.href;
 
-  const positionStyle: Record<string, string> = {};
-  if (corner === "top-left") {
-    positionStyle.left = `${posX}px`;
-    positionStyle.top = `${posY}px`;
-  } else if (corner === "top-right") {
-    positionStyle.right = `${posX}px`;
-    positionStyle.top = `${posY}px`;
-  } else if (corner === "bottom-left") {
-    positionStyle.left = `${posX}px`;
-    positionStyle.bottom = `${posY}px`;
-  } else {
-    positionStyle.right = `${posX}px`;
-    positionStyle.bottom = `${posY}px`;
-  }
-
-  return (
-    <div className="relative h-55 w-full overflow-hidden rounded-3xl bg-secondary sm:h-52">
+  const content = (
+    <>
       {banner.imageUrl && (
         <Image
           src={banner.imageUrl}
@@ -140,10 +61,52 @@ function BannerCard({ banner }: { banner: HeroBannerType }) {
           className="object-cover"
         />
       )}
-      <div className="absolute" style={positionStyle}>
-        <BannerCta banner={banner} />
-      </div>
-    </div>
+    </>
+  );
+
+  const baseClass =
+    "relative h-55 w-full overflow-hidden rounded-3xl bg-secondary sm:h-52 outline-none";
+
+  if (!href) {
+    return <div className={baseClass}>{content}</div>;
+  }
+
+  const actionClass =
+    "block transition-transform hover:scale-[1.02] focus-visible:ring-2 focus-visible:ring-color-2/60 cursor-pointer";
+
+  if (/^https?:\/\//i.test(href)) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`${baseClass} ${actionClass}`}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  if (href.startsWith("#")) {
+    return (
+      <button
+        type="button"
+        onClick={() =>
+          document
+            .getElementById(href.slice(1))
+            ?.scrollIntoView({ behavior: "smooth" })
+        }
+        className={`${baseClass} ${actionClass}`}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link href={href} className={`${baseClass} ${actionClass}`}>
+      {content}
+    </Link>
   );
 }
 

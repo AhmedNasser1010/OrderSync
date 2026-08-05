@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -21,32 +20,9 @@ import { BannerPreview } from "./BannerPreview";
 import { AlertCircle, Loader2 } from "lucide-react";
 import type { HeroBanner } from "@ordersync/types";
 
-const FONT_WEIGHTS = [
-  { label: "Normal", value: "normal" },
-  { label: "Medium", value: "500" },
-  { label: "Semibold", value: "600" },
-  { label: "Bold", value: "bold" },
-];
-
 interface BannerDraft {
   imageUrl: string;
-  cta: {
-    labelEn: string;
-    labelAr: string;
-    href: string;
-    openInNewTab: boolean;
-    backgroundColor: string;
-    textColor: string;
-    borderColor: string;
-    borderWidth: number;
-    borderRadius: number;
-    fontFamily: string;
-    fontSize: number;
-    fontWeight: string;
-  };
-  ctaPositionX: number;
-  ctaPositionY: number;
-  ctaPositionCorner: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+  href: string;
   active: boolean;
   sortOrder: number;
 }
@@ -54,23 +30,7 @@ interface BannerDraft {
 function emptyDraft(sortOrder: number): BannerDraft {
   return {
     imageUrl: "",
-    cta: {
-      labelEn: "",
-      labelAr: "",
-      href: "",
-      openInNewTab: false,
-      backgroundColor: "#fc8019",
-      textColor: "#ffffff",
-      borderColor: "",
-      borderWidth: 0,
-      borderRadius: 9999,
-      fontFamily: "",
-      fontSize: 14,
-      fontWeight: "600",
-    },
-    ctaPositionX: 16,
-    ctaPositionY: 16,
-    ctaPositionCorner: "top-left" as const,
+    href: "",
     active: true,
     sortOrder,
   };
@@ -79,23 +39,7 @@ function emptyDraft(sortOrder: number): BannerDraft {
 function fromBanner(banner: HeroBanner): BannerDraft {
   return {
     imageUrl: banner.imageUrl,
-    cta: {
-      labelEn: banner.cta.labelEn,
-      labelAr: banner.cta.labelAr,
-      href: banner.cta.href,
-      openInNewTab: banner.cta.openInNewTab ?? false,
-      backgroundColor: banner.cta.backgroundColor ?? "#fc8019",
-      textColor: banner.cta.textColor ?? "#ffffff",
-      borderColor: banner.cta.borderColor ?? "",
-      borderWidth: banner.cta.borderWidth ?? 0,
-      borderRadius: banner.cta.borderRadius ?? 9999,
-      fontFamily: banner.cta.fontFamily ?? "",
-      fontSize: banner.cta.fontSize ?? 14,
-      fontWeight: banner.cta.fontWeight ?? "600",
-    },
-    ctaPositionX: banner.ctaPosition?.x ?? 16,
-    ctaPositionY: banner.ctaPosition?.y ?? 16,
-    ctaPositionCorner: banner.ctaPosition?.corner ?? "top-left",
+    href: banner.href,
     active: banner.active,
     sortOrder: banner.sortOrder,
   };
@@ -122,16 +66,6 @@ function BannerFormContent({
   const [createBanner] = useCreateBannerMutation();
   const [updateBanner] = useUpdateBannerMutation();
 
-  const setCtaField = <K extends keyof BannerDraft["cta"]>(
-    key: K,
-    value: BannerDraft["cta"][K]
-  ) => {
-    setDraft((prev) => ({
-      ...prev,
-      cta: { ...prev.cta, [key]: value },
-    }));
-  };
-
   const handleSubmit = async () => {
     if (isSubmitting) return;
     if (!draft.imageUrl.trim()) {
@@ -142,38 +76,9 @@ function BannerFormContent({
     setIsSubmitting(true);
     setError(null);
 
-    const ctaPayload: {
-      labelEn: string;
-      labelAr: string;
-      href: string;
-      openInNewTab: boolean;
-      borderRadius: number;
-      fontSize: number;
-      fontWeight: string;
-      backgroundColor?: string;
-      textColor?: string;
-      borderColor?: string;
-      borderWidth?: number;
-      fontFamily?: string;
-    } = {
-      labelEn: draft.cta.labelEn.trim(),
-      labelAr: draft.cta.labelAr.trim(),
-      href: draft.cta.href.trim(),
-      openInNewTab: draft.cta.openInNewTab,
-      borderRadius: draft.cta.borderRadius,
-      fontSize: draft.cta.fontSize,
-      fontWeight: draft.cta.fontWeight,
-    };
-    if (draft.cta.backgroundColor) ctaPayload.backgroundColor = draft.cta.backgroundColor;
-    if (draft.cta.textColor) ctaPayload.textColor = draft.cta.textColor;
-    if (draft.cta.borderColor) ctaPayload.borderColor = draft.cta.borderColor;
-    if (draft.cta.borderWidth) ctaPayload.borderWidth = draft.cta.borderWidth;
-    if (draft.cta.fontFamily) ctaPayload.fontFamily = draft.cta.fontFamily;
-
     const payload = {
       imageUrl: draft.imageUrl.trim(),
-      cta: ctaPayload,
-      ctaPosition: { x: draft.ctaPositionX, y: draft.ctaPositionY, corner: draft.ctaPositionCorner },
+      href: draft.href.trim(),
       active: draft.active,
       sortOrder: draft.sortOrder,
     };
@@ -219,281 +124,30 @@ function BannerFormContent({
               />
               <p className="text-sm text-muted-foreground mt-1.5">
                 Paste the URL of your banner image (designed in Canva or other
-                tool).
+                tool). The whole card acts as the button.
               </p>
             </div>
           </div>
 
           <div className="space-y-3 rounded-xl border border-border p-4">
-            <h3 className="font-semibold text-foreground">CTA Button - Text</h3>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="banner-cta-label-en">Label (English)</Label>
-                <Input
-                  id="banner-cta-label-en"
-                  value={draft.cta.labelEn}
-                  onChange={(e) => setCtaField("labelEn", e.target.value)}
-                  placeholder="e.g. Order now"
-                  className="mt-1.5"
-                />
-              </div>
-              <div>
-                <Label htmlFor="banner-cta-label-ar">Label (Arabic)</Label>
-                <Input
-                  id="banner-cta-label-ar"
-                  value={draft.cta.labelAr}
-                  onChange={(e) => setCtaField("labelAr", e.target.value)}
-                  placeholder="e.g. اطلب دلوقتي"
-                  className="mt-1.5"
-                />
-              </div>
-            </div>
+            <h3 className="font-semibold text-foreground">CTA action</h3>
             <div>
-              <Label htmlFor="banner-cta-href">Link</Label>
+              <Label htmlFor="banner-href">Link</Label>
               <Input
-                id="banner-cta-href"
-                value={draft.cta.href}
-                onChange={(e) => setCtaField("href", e.target.value)}
+                id="banner-href"
+                value={draft.href}
+                onChange={(e) =>
+                  setDraft((prev) => ({ ...prev, href: e.target.value }))
+                }
                 placeholder="#restaurants"
                 className="mt-1.5"
               />
               <p className="text-sm text-muted-foreground mt-1.5">
-                Section: <code>#restaurants</code>. Restaurant item:{" "}
+                Tapping anywhere on the banner opens this link. Section:{" "}
+                <code>#restaurants</code>. Restaurant item:{" "}
                 <code>Burger-Station#beef-burger</code>. External:{" "}
                 <code>https://...</code>
               </p>
-            </div>
-            <label className="flex items-center gap-2 text-sm text-foreground cursor-pointer">
-              <Checkbox
-                checked={draft.cta.openInNewTab}
-                onCheckedChange={(checked) =>
-                  setCtaField("openInNewTab", Boolean(checked))
-                }
-              />
-              Open external links in a new tab
-            </label>
-          </div>
-
-          <div className="space-y-3 rounded-xl border border-border p-4">
-            <h3 className="font-semibold text-foreground">
-              CTA Button - Colors
-            </h3>
-            <div className="space-y-3">
-              <div>
-                <Label htmlFor="bg-color">Background Color (HEX)</Label>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <input
-                    type="color"
-                    value={draft.cta.backgroundColor || "#fc8019"}
-                    onChange={(e) =>
-                      setCtaField("backgroundColor", e.target.value)
-                    }
-                    className="h-9 w-9 shrink-0 cursor-pointer rounded border border-border"
-                  />
-                  <Input
-                    id="bg-color"
-                    value={draft.cta.backgroundColor}
-                    onChange={(e) =>
-                      setCtaField("backgroundColor", e.target.value)
-                    }
-                    placeholder="#fc8019"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="text-color">Text Color (HEX)</Label>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <input
-                    type="color"
-                    value={draft.cta.textColor || "#ffffff"}
-                    onChange={(e) =>
-                      setCtaField("textColor", e.target.value)
-                    }
-                    className="h-9 w-9 shrink-0 cursor-pointer rounded border border-border"
-                  />
-                  <Input
-                    id="text-color"
-                    value={draft.cta.textColor}
-                    onChange={(e) =>
-                      setCtaField("textColor", e.target.value)
-                    }
-                    placeholder="#ffffff"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3 rounded-xl border border-border p-4">
-            <h3 className="font-semibold text-foreground">
-              CTA Button - Border
-            </h3>
-            <div className="space-y-3">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div>
-                  <Label htmlFor="border-color">Color (HEX)</Label>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <input
-                      type="color"
-                      value={draft.cta.borderColor || "#000000"}
-                      onChange={(e) =>
-                        setCtaField("borderColor", e.target.value)
-                      }
-                      className="h-9 w-9 shrink-0 cursor-pointer rounded border border-border"
-                    />
-                    <Input
-                      id="border-color"
-                      value={draft.cta.borderColor}
-                      onChange={(e) =>
-                        setCtaField("borderColor", e.target.value)
-                      }
-                      placeholder="#000000"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor="border-width">Width (px)</Label>
-                  <Input
-                    id="border-width"
-                    type="number"
-                    min={0}
-                    max={10}
-                    value={draft.cta.borderWidth}
-                    onChange={(e) =>
-                      setCtaField("borderWidth", Number(e.target.value) || 0)
-                    }
-                    className="mt-1.5"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="border-radius">Radius (px)</Label>
-                  <Input
-                    id="border-radius"
-                    type="number"
-                    min={0}
-                    max={50}
-                    value={draft.cta.borderRadius}
-                    onChange={(e) =>
-                      setCtaField("borderRadius", Number(e.target.value) || 0)
-                    }
-                    className="mt-1.5"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3 rounded-xl border border-border p-4">
-            <h3 className="font-semibold text-foreground">
-              CTA Button - Typography
-            </h3>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div className="sm:col-span-2">
-                <Label htmlFor="font-family">Font Family</Label>
-                <Input
-                  id="font-family"
-                  value={draft.cta.fontFamily}
-                  onChange={(e) => setCtaField("fontFamily", e.target.value)}
-                  placeholder="e.g. Inter, Arial, or leave empty for default"
-                  className="mt-1.5"
-                />
-              </div>
-              <div>
-                <Label htmlFor="font-size">Size (px)</Label>
-                <Input
-                  id="font-size"
-                  type="number"
-                  min={12}
-                  max={24}
-                  value={draft.cta.fontSize}
-                  onChange={(e) =>
-                    setCtaField("fontSize", Number(e.target.value) || 14)
-                  }
-                  className="mt-1.5"
-                />
-              </div>
-            </div>
-            <div>
-              <Label>Weight</Label>
-              <div className="flex flex-wrap gap-2 mt-1.5">
-                {FONT_WEIGHTS.map((w) => (
-                  <button
-                    key={w.value}
-                    type="button"
-                    onClick={() => setCtaField("fontWeight", w.value)}
-                    className={`px-3 py-1.5 rounded-lg text-sm border transition-colors cursor-pointer ${
-                      draft.cta.fontWeight === w.value
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    {w.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3 rounded-xl border border-border p-4">
-            <h3 className="font-semibold text-foreground">
-              CTA Button - Position
-            </h3>
-            <div>
-              <Label>Corner</Label>
-              <div className="grid grid-cols-2 gap-2 mt-1.5">
-                {(["top-left", "top-right", "bottom-left", "bottom-right"] as const).map((corner) => (
-                  <button
-                    key={corner}
-                    type="button"
-                    onClick={() =>
-                      setDraft((prev) => ({ ...prev, ctaPositionCorner: corner }))
-                    }
-                    className={`px-3 py-2 rounded-lg text-sm border transition-colors cursor-pointer capitalize ${
-                      draft.ctaPositionCorner === corner
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    {corner.replace("-", " ")}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="cta-pos-x">X offset (px)</Label>
-                <Input
-                  id="cta-pos-x"
-                  type="number"
-                  min={0}
-                  max={500}
-                  value={draft.ctaPositionX}
-                  onChange={(e) =>
-                    setDraft((prev) => ({
-                      ...prev,
-                      ctaPositionX: Number(e.target.value) || 0,
-                    }))
-                  }
-                  className="mt-1.5"
-                />
-              </div>
-              <div>
-                <Label htmlFor="cta-pos-y">Y offset (px)</Label>
-                <Input
-                  id="cta-pos-y"
-                  type="number"
-                  min={0}
-                  max={500}
-                  value={draft.ctaPositionY}
-                  onChange={(e) =>
-                    setDraft((prev) => ({
-                      ...prev,
-                      ctaPositionY: Number(e.target.value) || 0,
-                    }))
-                  }
-                  className="mt-1.5"
-                />
-              </div>
             </div>
           </div>
 

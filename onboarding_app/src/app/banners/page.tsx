@@ -264,10 +264,7 @@ export default function BannersPage() {
                   <BannerPreview
                     data={{
                       imageUrl: banner.imageUrl,
-                      cta: banner.cta,
-                      ctaPositionX: banner.ctaPosition?.x,
-                      ctaPositionY: banner.ctaPosition?.y,
-                      ctaPositionCorner: banner.ctaPosition?.corner,
+                      href: banner.href,
                     }}
                     lang="en"
                     className="w-full"
@@ -276,10 +273,10 @@ export default function BannersPage() {
                   <div className="flex items-center justify-between gap-2 pt-1">
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-foreground">
-                        {banner.cta.labelEn || "No CTA label"}
+                        {banner.href || "No link set"}
                       </p>
                       <p className="truncate text-xs text-muted-foreground">
-                        {banner.cta.href || "No link set"}
+                        Tap anywhere on the banner to open this link.
                       </p>
                     </div>
                     <div className="flex items-center gap-1">
