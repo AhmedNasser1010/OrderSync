@@ -44,6 +44,7 @@ const OrderCard = ({
         status={order.status}
         placedAt={order.placedAt}
         isFirstOrder={order.isFirstOrder}
+        note={order.note}
       />
       <OrderContent
         total={order.total}

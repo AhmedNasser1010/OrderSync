@@ -175,6 +175,7 @@ const useOrders = (): UseOrders => {
         placedAt: order.timeline.placedAt,
         preparingAt: order.timeline.preparingAt,
         isFirstOrder: order.customer.totalOrders === 1,
+        note: order.delivery?.note,
       })) || null
     );
   }, [filteredOrders, getOrderMenu]);

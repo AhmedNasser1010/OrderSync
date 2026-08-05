@@ -70,6 +70,7 @@
       "completedOrders": "orders fulfilled",
       "voidedOrders": "orders cancelled",
       "firstOrder": "First Order",
+      "note": "Note",
       "outOfWorkingHours": "Out of working hours",
       "openNowTitle": "Open your restaurant now?",
       "openNowDescription": "You're currently outside working hours. Opening now will accept orders until the next scheduled opening.",

@@ -70,6 +70,7 @@
       "completedOrders": "طلبات مكتملة",
       "voidedOrders": "طلبات ملغية",
       "firstOrder": "الطلب الأول",
+      "note": "ملاحظة",
       "outOfWorkingHours": "خارج أوقات العمل",
       "openNowTitle": "فتح مطعمك الآن؟",
       "openNowDescription": "أنت خارج أوقات العمل حالياً. الفتح الآن سيقبل الطلبات حتى موعد الافتتاح القادم.",

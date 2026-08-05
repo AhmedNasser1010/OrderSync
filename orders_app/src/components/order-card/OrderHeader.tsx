@@ -14,6 +14,7 @@ import {
   Star,
   PackageCheck,
   Sparkles,
+  StickyNote,
 } from "lucide-react";
 import type { OrderStatusType } from "@ordersync/types";
 import { useEffect, useState, useCallback } from "react";
@@ -79,11 +80,13 @@ export default function OrderHeader({
   status,
   placedAt,
   isFirstOrder,
+  note,
 }: {
   orderNumber: number;
   status: OrderStatusType;
   placedAt: number;
   isFirstOrder?: boolean;
+  note?: string;
 }) {
   const t = useTranslations("Orders.header");
   const st = useTranslations("Orders.statuses");
@@ -105,6 +108,14 @@ export default function OrderHeader({
       <div className="flex items-center gap-2">
         <span className="text-sm font-semibold">#{orderNumber}</span>
         <span className="text-xs text-muted-foreground">{timeAgo}</span>
+        {note && (
+          <Badge
+            className="flex items-center gap-1 text-xs border-amber-300 bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:border-amber-800/50 dark:text-amber-300"
+          >
+            <StickyNote className="h-3 w-3" />
+            <span>{t("note")}</span>
+          </Badge>
+        )}
       </div>
       <div className="flex items-center gap-1.5">
         {isFirstOrder && (

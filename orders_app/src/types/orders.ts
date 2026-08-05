@@ -21,4 +21,5 @@ export type FormattedOrderType = {
   placedAt: number;
   preparingAt?: number;
   isFirstOrder: boolean;
+  note?: string;
 };
