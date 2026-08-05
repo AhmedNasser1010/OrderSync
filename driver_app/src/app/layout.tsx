@@ -93,7 +93,10 @@ export default function RootLayout({
         />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-full flex flex-col`}>
-        <SerwistProvider swUrl="/serwist/sw.js">
+        <SerwistProvider
+          swUrl="/serwist/sw.js"
+          disable={process.env.NODE_ENV !== "production"}
+        >
           <StoreProvider>
             <AuthProvider>
               <AuthGuard>

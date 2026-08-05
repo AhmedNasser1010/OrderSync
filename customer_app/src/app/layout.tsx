@@ -109,7 +109,10 @@ export default function RootLayout({
       <body
         className={`${GrotThin.variable} ${GrotReg.variable} ${GrotMed.variable} ${GrotBold.variable} ${GrotBlack.variable} ${ProximaThin.variable} ${ProximaMed.variable} ${ProximaSemiBold.variable} ${ProximaBold.variable} ${ProximaBlack.variable} ${Beiruti.variable} min-h-full flex flex-col`}
       >
-        <SerwistProvider swUrl="/serwist/sw.js">
+        <SerwistProvider
+          swUrl="/serwist/sw.js"
+          disable={process.env.NODE_ENV !== "production"}
+        >
           <StoreProvider>
             <ThemeProvider>
               <AuthProvider>{children}</AuthProvider>

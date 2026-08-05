@@ -8,6 +8,7 @@ const revision =
 export const { dynamic, dynamicParams, revalidate, generateStaticParams, GET } =
   createSerwistRoute({
     additionalPrecacheEntries: [{ url: "/~offline", revision }],
+    globPatterns: process.env.NODE_ENV === "development" ? [] : undefined,
     swSrc: "src/app/sw.ts",
     useNativeEsbuild: true,
   });

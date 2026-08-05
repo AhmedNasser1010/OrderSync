@@ -404,7 +404,7 @@ const OrderSidebar = () => {
         {!isError && (
           <>
             {/* Status hero */}
-            <div className="relative rounded-2xl p-4 mb-4 text-white bg-gradient-to-br from-color-2 to-[#ffab4a] shadow-sm">
+            <div className="relative rounded-2xl p-4 mb-4 text-white bg-gradient-to-br from-color-2 to-[#ffab4a] shadow-sm hidden">
               <div className="absolute -right-8 -top-10 size-28 rounded-full bg-white/15" />
               <div className="absolute -right-1 top-2 size-14 rounded-full bg-white/10" />
               <div className="relative">

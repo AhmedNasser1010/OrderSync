@@ -92,7 +92,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          <SerwistProvider swUrl="/serwist/sw.js">{children}</SerwistProvider>
+          <SerwistProvider
+            swUrl="/serwist/sw.js"
+            disable={process.env.NODE_ENV !== "production"}
+          >
+            {children}
+          </SerwistProvider>
         </ThemeProvider>
       </body>
     </html>
