@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { useLocale } from "next-intl";
 import { useTranslations } from "next-intl";
 import {
@@ -362,9 +363,11 @@ const OrderSidebar = () => {
           <div className="flex items-center gap-3 rounded-2xl border border-color-7 bg-card p-3.5 shadow-sm mb-4">
             <div className="size-12 grid place-items-center rounded-xl bg-color-7/50 overflow-hidden shrink-0">
               {resIcon ? (
-                <img
+                <Image
                   src={resIcon}
                   alt={resName}
+                  width={48}
+                  height={48}
                   className="w-full h-full object-cover"
                 />
               ) : (

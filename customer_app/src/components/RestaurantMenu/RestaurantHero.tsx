@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Bike, MapPin, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
@@ -73,10 +74,12 @@ const RestaurantHero = ({
         <div className="relative z-10 flex flex-col gap-6 py-8 sm:flex-row sm:items-end sm:justify-between">
           <div className="flex items-start gap-4">
             {res?.branding?.icon && (
-              <img
+              <Image
                 src={res.branding.icon}
                 alt={name || "restaurant"}
                 loading="lazy"
+                width={80}
+                height={80}
                 className="size-16 shrink-0 rounded-2xl object-cover shadow-lg ring-2 ring-white/30 sm:size-20"
               />
             )}
@@ -135,11 +138,13 @@ const RestaurantHero = ({
       </div>
 
       {res?.branding?.cover && (
-        <img
+        <Image
           src={res.branding.cover}
           alt=""
           loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover opacity-30"
+          fill
+          sizes="100vw"
+          className="object-cover opacity-30"
         />
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-[#282c3f] via-[#282c3f]/80 to-[#282c3f]/40" />

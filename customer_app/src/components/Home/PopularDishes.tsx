@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { useLocale, useTranslations } from "next-intl";
 import SectionHeader from "@/components/Home/SectionHeader";
@@ -31,11 +32,13 @@ function DishCard({
     >
       <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-color-7">
         {dish.backgrounds?.[0] && (
-          <img
+          <Image
             src={dish.backgrounds[0]}
             alt={dish.title}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+            fill
+            sizes="64px"
+            className="object-cover transition-transform duration-300 group-hover:scale-110"
           />
         )}
       </div>
@@ -89,10 +92,12 @@ function RestaurantDishes({
         className="flex items-center gap-2 font-ProximaNovaSemiBold text-color-1 transition-colors hover:text-color-2"
       >
         {res.branding?.icon && (
-          <img
+          <Image
             src={res.branding.icon}
             alt=""
             loading="lazy"
+            width={24}
+            height={24}
             className="size-6 rounded-md object-cover ring-1 ring-color-7"
           />
         )}

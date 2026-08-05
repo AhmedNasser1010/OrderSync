@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import ItemAvailability from "@/components/RestaurantMenu/ItemAvailability";
@@ -107,11 +108,13 @@ const CartItemCard = ({
           aria-label={t("View image")}
           className="group relative block h-24 w-28 cursor-zoom-in overflow-hidden rounded-2xl bg-color-7 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none sm:h-28 sm:w-32"
         >
-          <img
+          <Image
             src={item?.backgrounds?.[0] || "/assets/FoodAndDrinkDesign.svg"}
             alt={item?.title || "menu-img"}
             loading="lazy"
-            className="h-full w-full rounded-2xl object-cover transition-transform duration-300 group-hover:scale-110"
+            fill
+            sizes="(min-width: 640px) 128px, 112px"
+            className="rounded-2xl object-cover transition-transform duration-300 group-hover:scale-110"
           />
           {percentOff > 0 && (
             <span className="absolute top-2 start-2 z-10 rounded-full bg-gradient-to-r from-color-2 to-[#ffab4a] px-3 py-1 font-ProximaNovaBold text-xs uppercase tracking-wide text-white shadow-lg shadow-color-2/30">

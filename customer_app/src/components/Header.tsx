@@ -8,6 +8,7 @@ import {
   type CSSProperties,
 } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import {
   MenuIcon,
   XIcon,
@@ -346,9 +347,11 @@ function Header() {
               <MenuIcon className="size-5" />
             </button>
             <Link href="/" aria-label={t("Home")}>
-              <img
+              <Image
                 src={LOGO_URL}
                 alt="logo"
+                width={56}
+                height={56}
                 className={cn("transition-all", scrolled ? "md:h-10 h-9" : "md:h-14 h-12")}
               />
             </Link>
@@ -513,7 +516,7 @@ function Header() {
       >
         <div className="flex items-center justify-between border-b border-color-7 px-5 py-4">
           <div className="flex items-center gap-2">
-            <img src={LOGO_URL} alt="logo" className="h-9 w-9 object-contain" />
+            <Image src={LOGO_URL} alt="logo" width={36} height={36} className="h-9 w-9 object-contain" />
             <span className="font-Beiruti text-2xl text-color-1">
               {t("Zajil")}
             </span>

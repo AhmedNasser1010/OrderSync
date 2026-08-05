@@ -325,10 +325,6 @@
 .hero-banner-slider .slick-slide {
   padding: 0 8px;
 }
-.hero-banner-slider .slick-track {
-  margin-left: -8px;
-  margin-right: -8px;
-}
 
 .slick-dots {
   position: absolute;

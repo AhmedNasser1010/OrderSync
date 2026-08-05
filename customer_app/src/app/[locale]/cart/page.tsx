@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
@@ -332,9 +333,11 @@ export default function CartPage() {
           {resInfo && (
             <div className="flex items-center gap-4 rounded-2xl border border-color-7 bg-card p-4">
               {resInfo?.branding?.cover && (
-                <img
+                <Image
                   src={resInfo.branding.cover}
                   alt={resName || "restaurant"}
+                  width={56}
+                  height={56}
                   className="size-14 shrink-0 rounded-xl object-cover"
                 />
               )}

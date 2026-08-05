@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 function getInitials(name?: string): string {
@@ -36,11 +37,13 @@ function ProfileAvatar({
       )}
     >
       {photoUrl ? (
-        <img
+        <Image
           src={photoUrl}
           alt={name || "avatar"}
           referrerPolicy="no-referrer"
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          sizes="56px"
+          className="object-cover"
         />
       ) : (
         <span aria-hidden>{initials}</span>

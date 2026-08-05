@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import ItemAvailability from "@/components/RestaurantMenu/ItemAvailability";
 import ItemTitle from "@/components/RestaurantMenu/ItemTitle";
@@ -68,11 +69,13 @@ const MenuItemCard = ({
           aria-label={t("View image")}
           className="group relative block h-28 w-32 cursor-zoom-in overflow-hidden rounded-2xl bg-color-7 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none sm:h-36 sm:w-44"
         >
-          <img
+          <Image
             src={item?.backgrounds?.[0] || "/assets/FoodAndDrinkDesign.svg"}
             alt={item?.title || "menu-img"}
             loading="lazy"
-            className="h-full w-full rounded-2xl object-cover transition-transform duration-300 group-hover:scale-110"
+            fill
+            sizes="(min-width: 640px) 176px, 128px"
+            className="rounded-2xl object-cover transition-transform duration-300 group-hover:scale-110"
           />
           {percentOff > 0 && (
             <span className="absolute top-2 start-2 z-10 rounded-full bg-gradient-to-r from-color-2 to-[#ffab4a] px-3 py-1 font-ProximaNovaBold text-xs uppercase tracking-wide text-white shadow-lg shadow-color-2/30">

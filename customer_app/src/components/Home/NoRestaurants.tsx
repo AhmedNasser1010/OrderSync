@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { cn } from "@/lib/utils";
 
@@ -16,9 +17,11 @@ const NoRestaurants = () => {
       >
         {t("No Restaurants found, try another filter")}
       </span>
-      <img
+      <Image
         src="/assets/restaurant.png"
         alt="no restaurants"
+        width={224}
+        height={166}
         className="w-56 mx-auto pb-28 grayscale"
       />
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import {
   XIcon,
@@ -148,7 +149,7 @@ const LoginSidebar = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6 shrink-0">
           <div className="flex items-center gap-2">
-            <img src={LOGO_URL} alt="logo" className="h-9 w-9 object-contain" />
+            <Image src={LOGO_URL} alt="logo" width={36} height={36} className="h-9 w-9 object-contain" />
             <span className="font-Beiruti text-2xl text-color-1">
               {t("Zajil")}
             </span>

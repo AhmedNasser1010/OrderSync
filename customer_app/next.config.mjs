@@ -20,6 +20,7 @@ const nextConfig = {
         hostname: "**",
       },
     ],
+    qualities: [75, 100],
   },
   transpilePackages: ["@ordersync/order-utils", "@ordersync/types"],
   allowedDevOrigins: ["*.ngrok-free.app", "1952-196-130-150-25.ngrok-free.app"],

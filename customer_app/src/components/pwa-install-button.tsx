@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
 import {
   DownloadIcon,
   SmartphoneIcon,
@@ -133,9 +134,11 @@ export function PwaInstallButton() {
         <PopupContent className="w-full max-w-sm rounded-2xl p-6 text-center">
           <PopupHeader closePopupCallback={() => setShowSheet(false)}>
             <div className="flex items-center justify-center gap-2 pt-1.5">
-              <img
+              <Image
                 src={LOGO_URL}
                 alt="logo"
+                width={32}
+                height={32}
                 className="size-8 rounded-xl object-contain"
               />
               <span className="font-Beiruti text-2xl text-color-1">

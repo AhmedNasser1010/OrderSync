@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { addFilter, clearAll } from "@/rtk/slices/filterSlice";
@@ -67,10 +68,12 @@ function WhatsOnYourMind() {
               >
                 <span className="block w-36">
                   {category?.img && (
-                    <img
+                    <Image
                       src={category.img}
                       alt={t(category.id)}
                       loading="lazy"
+                      width={144}
+                      height={144}
                       className="h-36 w-36 rounded-full object-cover ring-4 ring-transparent transition-all duration-300 group-hover:scale-105 group-hover:ring-color-7"
                     />
                   )}

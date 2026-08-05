@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -48,11 +49,15 @@ const ImageViewer = ({
       >
         <X className="size-6" />
       </button>
-      <img
+      <Image
         src={src}
         alt={alt || "menu-img"}
+        width={0}
+        height={0}
+        sizes="100vw"
+        quality={100}
         onClick={(e) => e.stopPropagation()}
-        className="max-h-full max-w-full cursor-default rounded-xl object-contain shadow-2xl animate-in zoom-in-95 duration-200"
+        className="max-h-full max-w-full w-auto h-auto cursor-default rounded-xl object-contain shadow-2xl animate-in zoom-in-95 duration-200"
       />
     </div>
   );

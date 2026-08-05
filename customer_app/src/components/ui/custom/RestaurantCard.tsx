@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import OpenBadge from "@/components/Home/OpenBadge";
 import { cn } from "@/lib/utils";
@@ -94,19 +95,23 @@ function RestaurantCard({ info }: { info: RestaurantCardInfo }) {
     <div className={cn("flex flex-col gap-3 cursor-pointer", className)}>
       <div className="w-full h-56 relative rounded-xl overflow-hidden bg-color-7">
         {cloudinaryImageId && (
-          <img
+          <Image
             src={cloudinaryImageId}
             alt={resName || name}
             loading="lazy"
-            className="rounded-xl w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            fill
+            sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
             style={{ filter: isAvailable ? "grayscale(0)" : "grayscale(1)" }}
           />
         )}
         {icon && (
-          <img
+          <Image
             src={icon}
             alt=""
             loading="lazy"
+            width={40}
+            height={40}
             className="absolute bottom-2 end-2 size-10 rounded-lg object-cover shadow-md ring-2 ring-white bg-white"
           />
         )}

@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Image from "next/image";
 import Slider from "react-slick";
 import { ArrowDownIcon } from "lucide-react";
 import { Link } from "@/i18n/routing";
@@ -130,11 +131,13 @@ function BannerCard({ banner }: { banner: HeroBannerType }) {
   return (
     <div className="relative h-55 w-full overflow-hidden rounded-3xl bg-secondary sm:h-52">
       {banner.imageUrl && (
-        <img
+        <Image
           src={banner.imageUrl}
           alt=""
           loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover"
+          fill
+          sizes="100vw"
+          className="object-cover"
         />
       )}
       <div className="absolute" style={positionStyle}>

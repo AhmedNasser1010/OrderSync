@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import SectionHeader from "@/components/Home/SectionHeader";
@@ -23,11 +24,13 @@ function Offers({ restaurants }: { restaurants: RestaurantDocument[] }) {
               className="group relative block shrink-0 w-80 sm:w-[340px] h-44 rounded-2xl overflow-hidden transition-all hover:scale-[0.98]"
             >
               {res?.branding?.cover && (
-                <img
+                <Image
                   src={res.branding.cover}
                   alt={res?.profile?.name}
                   loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  fill
+                  sizes="(min-width: 640px) 340px, 320px"
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
