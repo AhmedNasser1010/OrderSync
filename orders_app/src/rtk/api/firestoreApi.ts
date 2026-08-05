@@ -56,8 +56,19 @@ export const firestoreApi = createApi({
       providesTags: ["Menu"],
     }),
 
-    fetchRestaurantData: builder.query<BusinessDocument, string>({
-      queryFn: () => ({ data: {} as BusinessDocument }),
+    fetchRestaurantData: builder.query<BusinessDocument | undefined, string>({
+      async queryFn(resId) {
+        try {
+          if (!resId) return { error: "Restaurant ID is required." };
+          const resRef = doc(db, "businesses", resId);
+          const resSnapshot = await getDoc(resRef);
+          return { data: resSnapshot.data() as BusinessDocument | undefined };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
+        }
+      },
       async onCacheEntryAdded(
         resId,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
@@ -73,7 +84,7 @@ export const firestoreApi = createApi({
           (docSnapshot) => {
             if (docSnapshot.exists()) {
               updateCachedData((draft) => {
-                Object.assign(draft, docSnapshot.data());
+                if (draft) Object.assign(draft, docSnapshot.data());
               });
             }
           },

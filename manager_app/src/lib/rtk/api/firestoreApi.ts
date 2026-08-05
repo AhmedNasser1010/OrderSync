@@ -63,7 +63,18 @@ export const firestoreApi = createApi({
     }),
 
     fetchRestaurantData: builder.query<BusinessDocument | undefined, string>({
-      queryFn: () => ({ data: {} as BusinessDocument }),
+      async queryFn(resId) {
+        try {
+          if (!resId) return { error: "Restaurant ID is required." };
+          const resRef = doc(db, "businesses", resId);
+          const resSnapshot = await getDoc(resRef);
+          return { data: resSnapshot.data() as BusinessDocument | undefined };
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
+        }
+      },
       async onCacheEntryAdded(
         resId,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
