@@ -2,9 +2,6 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
-import StoreProvider from "./StoreProvider";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { AuthGuard } from "./AuthProvider";
 import { SerwistProvider } from "./serwist";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -97,13 +94,7 @@ export default function RootLayout({
           swUrl="/serwist/sw.js"
           disable={process.env.NODE_ENV !== "production"}
         >
-          <StoreProvider>
-            <AuthProvider>
-              <AuthGuard>
-                {children}
-              </AuthGuard>
-            </AuthProvider>
-          </StoreProvider>
+          {children}
         </SerwistProvider>
       </body>
     </html>

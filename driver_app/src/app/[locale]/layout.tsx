@@ -1,9 +1,11 @@
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
-import { setRequestLocale } from "next-intl/server";
 import { HtmlAttributes } from "@/components/HtmlAttributes";
 import { PwaInstallButton } from "@/components/pwa-install-button";
+import StoreProvider from "../StoreProvider";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthGuard } from "../AuthProvider";
 
 type Props = {
   children: React.ReactNode;
@@ -21,9 +23,13 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <HtmlAttributes locale={locale} />
-      <PwaInstallButton />
-      {children}
+      <StoreProvider>
+        <AuthProvider>
+          <HtmlAttributes locale={locale} />
+          <PwaInstallButton />
+          <AuthGuard>{children}</AuthGuard>
+        </AuthProvider>
+      </StoreProvider>
     </NextIntlClientProvider>
   );
 }
