@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ButtonGuard } from "@/components/ui/button-guard";
 import { Eye, EyeOff } from "lucide-react";
 
 interface HideDialogProps {
@@ -54,9 +55,9 @@ export function HideDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button variant="secondary" onClick={onConfirm}>
+          <ButtonGuard variant="secondary" onClick={onConfirm}>
             {hiding ? "Hide Restaurant" : "Show Restaurant"}
-          </Button>
+          </ButtonGuard>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ButtonGuard } from "@/components/ui/button-guard";
 import { AlertTriangle } from "lucide-react";
 
 interface DeleteDialogProps {
@@ -41,9 +42,9 @@ export function DeleteDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
+          <ButtonGuard variant="destructive" onClick={onConfirm}>
             Delete
-          </Button>
+          </ButtonGuard>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -26,6 +26,7 @@ import { useSetRestaurantStatusMutation } from "@/rtk/api/firestoreApi";
 import { cn } from "@/lib/utils";
 import { DeleteDialog } from "./DeleteDialog";
 import { HideDialog } from "./HideDialog";
+import { useClickGuard } from "@/hooks/useClickGuard";
 import { format } from "date-fns";
 
 const statusOptions: { value: RestaurantStatusTypes; label: string; dotColor: string; badgeClass: string }[] = [
@@ -74,27 +75,45 @@ export function RestaurantsTable({
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [setRestaurantStatus] = useSetRestaurantStatusMutation();
 
-  const handleStatusChange = async (
+  // Guard against rapid status switching (double-click on a menu item or the
+  // hide confirm) so the restaurant doesn't bounce between states.
+  const { run: guardedHandleStatusChange } = useClickGuard(
+    async (
+      accessToken: string,
+      currentStatus: RestaurantStatusTypes,
+      status: RestaurantStatusTypes,
+      restaurantName: string,
+    ) => {
+      if (currentStatus === "hidden" && status !== "hidden") {
+        setHideDialog({
+          open: true,
+          accessToken,
+          name: restaurantName,
+          nextStatus: status,
+        });
+        return;
+      }
+      setUpdatingStatus(accessToken);
+      try {
+        await setRestaurantStatus({ resId: accessToken, status }).unwrap();
+      } finally {
+        setUpdatingStatus(null);
+      }
+    },
+  );
+
+  const handleStatusChange = (
     accessToken: string,
     currentStatus: RestaurantStatusTypes,
     status: RestaurantStatusTypes,
     restaurantName: string,
   ) => {
-    if (currentStatus === "hidden" && status !== "hidden") {
-      setHideDialog({
-        open: true,
-        accessToken,
-        name: restaurantName,
-        nextStatus: status,
-      });
-      return;
-    }
-    setUpdatingStatus(accessToken);
-    try {
-      await setRestaurantStatus({ resId: accessToken, status }).unwrap();
-    } finally {
-      setUpdatingStatus(null);
-    }
+    void guardedHandleStatusChange(
+      accessToken,
+      currentStatus,
+      status,
+      restaurantName,
+    );
   };
 
   const handleToggleHide = (restaurant: BusinessDocument) => {
@@ -127,10 +146,13 @@ export function RestaurantsTable({
     }
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (deleteDialog.accessToken) {
-      onDelete(deleteDialog.accessToken);
-      setDeleteDialog({ open: false, accessToken: null });
+      try {
+        await onDelete(deleteDialog.accessToken);
+      } finally {
+        setDeleteDialog({ open: false, accessToken: null });
+      }
     }
   };
 

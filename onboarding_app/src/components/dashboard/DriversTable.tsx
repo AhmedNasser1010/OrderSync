@@ -25,6 +25,7 @@ import type { Driver } from "@ordersync/types";
 import { EditDriverDialog } from "./EditDriverDialog";
 import { useUpdateDriverDocumentMutation } from "@/rtk/api/firestoreApi";
 import { Badge } from "@/components/ui/badge";
+import { ButtonGuard } from "@/components/ui/button-guard";
 import { cn } from "@/lib/utils";
 
 interface DriversTableProps {
@@ -63,10 +64,13 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
     }
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (deleteDialog.driver) {
-      onDelete(deleteDialog.driver.uid);
-      setDeleteDialog({ open: false, driver: null });
+      try {
+        await onDelete(deleteDialog.driver.uid);
+      } finally {
+        setDeleteDialog({ open: false, driver: null });
+      }
     }
   };
 
@@ -249,10 +253,10 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>
+            <ButtonGuard variant="destructive" onClick={handleDeleteConfirm}>
               <Trash2 className="mr-2 h-4 w-4" />
               Delete Driver
-            </Button>
+            </ButtonGuard>
           </DialogFooter>
         </DialogContent>
       </Dialog>

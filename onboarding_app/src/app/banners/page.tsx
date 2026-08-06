@@ -5,6 +5,7 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { BannerFormDialog } from "@/components/banners/BannerFormDialog";
 import { BannerPreview } from "@/components/banners/BannerPreview";
 import { Button } from "@/components/ui/button";
+import { ButtonGuard } from "@/components/ui/button-guard";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -362,10 +363,10 @@ export default function BannersPage() {
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>
+            <ButtonGuard variant="destructive" onClick={handleDeleteConfirm}>
               <Trash2 className="mr-2 h-4 w-4" />
               Delete Banner
-            </Button>
+            </ButtonGuard>
           </DialogFooter>
         </DialogContent>
       </Dialog>

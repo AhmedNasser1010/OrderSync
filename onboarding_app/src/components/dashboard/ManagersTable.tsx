@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ButtonGuard } from "@/components/ui/button-guard";
 import { Trash2, UserX } from "lucide-react";
 import {
   Dialog,
@@ -43,10 +44,13 @@ export function ManagersTable({
     uid: string | null;
   }>({ open: false, uid: null });
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (deleteDialog.uid) {
-      onDelete(deleteDialog.uid);
-      setDeleteDialog({ open: false, uid: null });
+      try {
+        await onDelete(deleteDialog.uid);
+      } finally {
+        setDeleteDialog({ open: false, uid: null });
+      }
     }
   };
 
@@ -204,10 +208,10 @@ export function ManagersTable({
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>
+            <ButtonGuard variant="destructive" onClick={handleDeleteConfirm}>
               <UserX className="mr-2 h-4 w-4" />
               Remove Manager
-            </Button>
+            </ButtonGuard>
           </DialogFooter>
         </DialogContent>
       </Dialog>
