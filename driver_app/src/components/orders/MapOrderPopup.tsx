@@ -43,7 +43,7 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
   const router = useRouter();
   const { user } = useAuth();
   const driverUid = user?.uid ?? "";
-  const { claim, start, startRoute, complete, isLoading } = useOrderActions();
+  const { claim, start, startRoute, complete, isLoading, isLocked } = useOrderActions();
   const { isBlocked } = useDriverFinance();
   const t = useTranslations("orderCard");
   const p = useTranslations("mapOrderPopup");
@@ -108,7 +108,7 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
             : null;
 
   const isActionDisabled =
-    isLoading || (status === "READY" && isBlocked);
+    isLoading || isLocked(order.id) || (status === "READY" && isBlocked);
 
   const deliveryLatLng = order.delivery?.latlng;
   const hasLocation =

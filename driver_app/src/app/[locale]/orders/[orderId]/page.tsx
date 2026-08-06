@@ -64,7 +64,7 @@ export default function OrderDetailPage({
   const allOrders = [...(marketplaceOrders ?? []), ...(myOrders ?? [])];
   const order = allOrders.find((o) => o.id === orderId);
 
-  const { claim, start, startRoute, complete, release, isLoading } =
+  const { claim, start, startRoute, complete, release, isLoading, isLocked } =
     useOrderActions();
   const { isBlocked } = useDriverFinance();
 
@@ -359,7 +359,7 @@ export default function OrderDetailPage({
                 size="lg"
                 className="h-12 w-full text-sm font-semibold"
                 onClick={handleClaim}
-                disabled={isLoading || isBlocked}
+                disabled={isLoading || isLocked(order.id) || isBlocked}
               >
                 {isLoading ? (
                   <>
@@ -378,7 +378,7 @@ export default function OrderDetailPage({
                 size="lg"
                 className="h-12 w-full text-sm font-semibold"
                 onClick={handleStartDelivery}
-                disabled={isLoading}
+                disabled={isLoading || isLocked(order.id)}
               >
                 {isLoading ? (
                   <>
@@ -395,7 +395,7 @@ export default function OrderDetailPage({
                 size="lg"
                 className="h-12 w-full text-sm font-semibold"
                 onClick={handleStartRoute}
-                disabled={isLoading}
+                disabled={isLoading || isLocked(order.id)}
               >
                 {isLoading ? (
                   <>
@@ -412,7 +412,7 @@ export default function OrderDetailPage({
                 size="lg"
                 className="h-12 w-full bg-green-600 text-white hover:bg-green-700 text-sm font-semibold"
                 onClick={handleCompleteDelivery}
-                disabled={isLoading}
+                disabled={isLoading || isLocked(order.id)}
               >
                 {isLoading ? (
                   <>
@@ -435,7 +435,7 @@ export default function OrderDetailPage({
                     size="lg"
                     variant="outline"
                     className="h-10 w-full gap-1.5 text-sm"
-                    disabled={isLoading}
+                    disabled={isLoading || isLocked(order.id)}
                   >
                     <Phone className="h-3.5 w-3.5" />
                     {t("call")}
@@ -446,7 +446,7 @@ export default function OrderDetailPage({
                   variant="outline"
                   className="h-10 flex-1 text-sm"
                   onClick={() => setConfirmReturnOpen(true)}
-                  disabled={isLoading}
+                  disabled={isLoading || isLocked(order.id)}
                 >
                   {isLoading ? (
                     <>
@@ -475,13 +475,13 @@ export default function OrderDetailPage({
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel disabled={isLoading}>
+                  <AlertDialogCancel disabled={isLoading || isLocked(order.id)}>
                     {t("cancel")}
                   </AlertDialogCancel>
                   <AlertDialogAction
                     variant="default"
                     onClick={handleRelease}
-                    disabled={isLoading}
+                    disabled={isLoading || isLocked(order.id)}
                   >
                     {isLoading ? t("returning") : t("returnToReady")}
                   </AlertDialogAction>

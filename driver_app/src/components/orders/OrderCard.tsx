@@ -336,7 +336,7 @@ export function OrderCard({
             onClick={(e) =>
               handleAction(e, () => actions.start(order.id, driverUid))
             }
-            disabled={actions.isLoading}
+            disabled={actions.isLoading || actions.isLocked(order.id)}
           >
             {t("startDelivery")}
           </Button>
@@ -357,7 +357,7 @@ export function OrderCard({
               onClick={(e) =>
                 handleAction(e, () => actions.startRoute(order.id, driverUid))
               }
-              disabled={actions.isLoading}
+              disabled={actions.isLoading || actions.isLocked(order.id)}
             >
               {t("startRoute")}
             </Button>
@@ -379,7 +379,7 @@ export function OrderCard({
               onClick={(e) =>
                 handleAction(e, () => actions.complete(order.id, driverUid))
               }
-              disabled={actions.isLoading}
+              disabled={actions.isLoading || actions.isLocked(order.id)}
             >
               {t("completeDelivery")}
             </Button>

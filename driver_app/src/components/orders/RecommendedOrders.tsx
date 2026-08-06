@@ -7,6 +7,7 @@ import {
   useClaimOrdersBatchMutation,
 } from "@/rtk/api/firestoreApi";
 import { useRecommendedOrders } from "@/hooks/useRecommendedOrders";
+import { useClickGuard } from "@/hooks/useClickGuard";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn, formatRelativeTime } from "@/lib/utils";
@@ -54,6 +55,22 @@ function IndividualOrder({
   const t = useTranslations("recommendedOrders");
   const [claimOrder, { isLoading }] = useClaimOrderMutation();
   const [error, setError] = useState<string | null>(null);
+  const { run: runClaim, busy: isClaimingGuard } = useClickGuard(
+    async () => {
+      setError(null);
+      try {
+        const result = await claimOrder({ orderId: order.id, driverUid });
+        if ("error" in result) {
+          setError(t("alreadyTaken"));
+          return;
+        }
+        onClaim(order.id);
+      } catch {
+        setError(t("failedToClaim"));
+      }
+    },
+    { cooldown: 0, resetOnError: true },
+  );
 
   const readyAt = order.timeline?.readyAt ?? order.createdAt;
   const [staleLevel, setStaleLevel] = useState<StaleLevel>(
@@ -70,20 +87,6 @@ function IndividualOrder({
   const isWarning = staleLevel === "warning";
   const isCritical = staleLevel === "critical";
   const isStale = isWarning || isCritical;
-
-  const handleClaim = useCallback(async () => {
-    setError(null);
-    try {
-      const result = await claimOrder({ orderId: order.id, driverUid });
-      if ("error" in result) {
-        setError(t("alreadyTaken"));
-        return;
-      }
-      onClaim(order.id);
-    } catch {
-      setError(t("failedToClaim"));
-    }
-  }, [claimOrder, order.id, driverUid, onClaim, t]);
 
   const itemCount = order.cart?.length ?? 0;
   const totalPrice = order.pricing?.total ?? 0;
@@ -147,8 +150,8 @@ function IndividualOrder({
         <Button
           size="sm"
           className="w-full"
-          onClick={handleClaim}
-          disabled={isLoading}
+          onClick={() => void runClaim()}
+          disabled={isLoading || isClaimingGuard}
         >
           {isLoading ? t("claiming") : t("claim")}
         </Button>
@@ -169,22 +172,22 @@ export function RecommendedOrders() {
   const [claimOrdersBatch, { isLoading: isClaimingBatch }] =
     useClaimOrdersBatchMutation();
   const [claimError, setClaimError] = useState<string | null>(null);
-
-  const handleClaimAll = useCallback(async () => {
-    if (!recommended || !driverUid) return;
-
-    setClaimError(null);
-
-    try {
-      const orderIds = recommended.orders.map((o) => o.id);
-      const result = await claimOrdersBatch({ orderIds, driverUid });
-      if ("error" in result) {
-        setClaimError(t("batchClaimFailed"));
+  const { run: runClaimAll, busy: batchClaimingGuard } = useClickGuard(
+    async () => {
+      if (!recommended || !driverUid) return;
+      setClaimError(null);
+      try {
+        const orderIds = recommended.orders.map((o) => o.id);
+        const result = await claimOrdersBatch({ orderIds, driverUid });
+        if ("error" in result) {
+          setClaimError(t("batchClaimFailed"));
+        }
+      } catch {
+        setClaimError(t("somethingWentWrong"));
       }
-    } catch {
-      setClaimError(t("somethingWentWrong"));
-    }
-  }, [recommended, driverUid, claimOrdersBatch, t]);
+    },
+    { cooldown: 500, resetOnError: true },
+  );
 
   const handleIndividualClaim = useCallback(() => {
     setClaimError(null);
@@ -258,8 +261,8 @@ export function RecommendedOrders() {
           <Button
             size="lg"
             className="w-full gap-2"
-            onClick={handleClaimAll}
-            disabled={isClaimingBatch}
+            onClick={() => void runClaimAll()}
+            disabled={isClaimingBatch || batchClaimingGuard}
           >
             {isClaimingBatch ? (
               <>

@@ -2,6 +2,7 @@
 
 import { useToggleOnlineStatusMutation } from "@/rtk/api/firestoreApi";
 import { useAuth } from "@/contexts/AuthContext";
+import { useClickGuard } from "@/hooks/useClickGuard";
 import { useTranslations } from "next-intl";
 
 interface OnlineToggleProps {
@@ -9,6 +10,9 @@ interface OnlineToggleProps {
   byUser: boolean;
   permissionState: "granted" | "prompt" | "denied" | "unsupported";
 }
+
+/** Short cooldown so rapid online/offline tapping doesn't spam Firestore writes. */
+const TOGGLE_COOLDOWN_MS = 500;
 
 export function OnlineToggle({
   byManager,
@@ -20,9 +24,18 @@ export function OnlineToggle({
   const driverUid = user?.uid ?? "";
   const [toggleOnline, { isLoading }] = useToggleOnlineStatusMutation();
 
+  const { run: runToggle, busy } = useClickGuard(
+    async () => {
+      if (!driverUid || !byManager) return;
+      await toggleOnline({ uid: driverUid, byUser: !byUser });
+    },
+    { cooldown: TOGGLE_COOLDOWN_MS, resetOnError: true },
+  );
+
   const isOnline = byManager && byUser;
   const canToggle = byManager;
   const isTracking = isOnline && permissionState === "granted";
+  const isToggling = isLoading || busy;
 
   const label = (() => {
     if (isTracking) return t("online");
@@ -42,15 +55,10 @@ export function OnlineToggle({
     return "bg-muted-foreground/50";
   })();
 
-  const handleToggle = async () => {
-    if (!driverUid || !canToggle || isLoading) return;
-    await toggleOnline({ uid: driverUid, byUser: !byUser });
-  };
-
   return (
     <button
-      onClick={handleToggle}
-      disabled={!canToggle || isLoading}
+      onClick={() => void runToggle()}
+      disabled={!canToggle || isToggling}
       className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition-colors ${
         isTracking
           ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
