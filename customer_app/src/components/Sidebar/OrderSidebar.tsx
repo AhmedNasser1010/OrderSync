@@ -236,7 +236,11 @@ const OrderSidebar = () => {
   ) as RestaurantDocument | undefined;
   const { cancelOrder, trackedOrderData } = useOrder();
   const defaultCenter: [number, number] = [29.620106778124843, 31.255811811669496];
-  const liveLocation = useDriverLocation(
+  const {
+    liveLocation,
+    driverName,
+    driverPhone,
+  } = useDriverLocation(
     trackedOrderData?.assignment?.driverUid,
     trackedOrderData?.status?.current
   );
@@ -456,6 +460,36 @@ const OrderSidebar = () => {
                 />
               ))}
             </div>
+
+            {/* Driver contact */}
+            {driverPhone && (
+              <div className="flex items-center justify-between gap-3 rounded-2xl border border-color-7 bg-card p-4 shadow-sm mb-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="size-11 shrink-0 grid place-items-center rounded-full bg-color-2/10">
+                    <BikeIcon className="size-5 text-color-2" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] uppercase tracking-wider text-color-5 font-ProximaNovaSemiBold">
+                      {t("Your driver")}
+                    </p>
+                    {driverName && (
+                      <p className="text-color-1 font-ProximaNovaSemiBold text-sm truncate mt-0.5">
+                        {driverName}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <a
+                  href={`tel:${driverPhone}`}
+                  dir="ltr"
+                  aria-label={t("Call your driver")}
+                  className="inline-flex items-center gap-2 rounded-full bg-color-2 px-4 py-2.5 text-white font-ProximaNovaSemiBold text-sm shrink-0 hover:bg-color-2/90 transition-colors cursor-pointer"
+                >
+                  <PhoneIcon className="size-4 shrink-0" />
+                  <span className="tabular-nums">{driverPhone}</span>
+                </a>
+              </div>
+            )}
           </>
         )}
 

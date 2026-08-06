@@ -193,6 +193,8 @@
   "cannotClearDeliveredOrderItems": "لا يمكنك مسح هذه الطلبات لأن طلبك من هذا المطعم تم تأكيده بالفعل وهو في الطريق إليك.",
   "You'll see your driver in real time": "هتشوف السواق بتاعك في الوقت الحقيقي",
   "Your account": "حسابك",
+  "Your driver": "السواق بتاعك",
+  "Call your driver": "اتصل بالسواق",
   "accountSuspendedMessage": "تم تعليق حسابك. يرجى التواصل مع الدعم للحصول على المساعدة.",
   "resetCartConfirmation": "سلتك فيها طلبات من مطعم تاني. تحب تفضي السلة عشان تضيف طلبات من المطعم ده؟",
   "Your cart is empty": "سلتك فاضية",

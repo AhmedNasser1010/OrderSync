@@ -70,7 +70,7 @@ const QuantityStepper = ({
       <button
         type="button"
         onClick={() => handleAddItem(item)}
-        className="absolute -bottom-3 end-2 z-10 flex h-9 w-24 items-center justify-center rounded-md border border-color-11 bg-white font-ProximaNovaBold text-sm uppercase text-color-11 shadow-md shadow-color-7 transition-all hover:bg-color-11 hover:text-white focus-visible:ring-2 focus-visible:ring-color-11/50 outline-none cursor-pointer"
+        className="absolute -bottom-3 end-2 z-10 flex h-9 w-24 items-center justify-center rounded-md border border-color-11 bg-white font-ProximaNovaBold text-sm uppercase text-color-11 shadow-md shadow-color-7 transition-all hover:bg-color-11 hover:text-white focus-visible:ring-2 focus-visible:ring-color-11/50 outline-none cursor-pointer dark:bg-card"
       >
         {t("Add")}
       </button>
@@ -78,7 +78,7 @@ const QuantityStepper = ({
   }
 
   return (
-    <div className="absolute -bottom-3 end-2 z-10 flex h-9 items-center overflow-hidden rounded-md border border-color-11 bg-white shadow-md shadow-color-7">
+    <div className="absolute -bottom-3 end-2 z-10 flex h-9 items-center overflow-hidden rounded-md border border-color-11 bg-white shadow-md shadow-color-7 dark:bg-card">
       <button
         type="button"
         onClick={handleDecrease}

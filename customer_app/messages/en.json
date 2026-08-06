@@ -193,6 +193,8 @@
   "cannotClearDeliveredOrderItems": "You cannot clear these items because your order from this restaurant is already placed and being delivered to you.",
   "You'll see your driver in real time": "You'll see your driver in real time",
   "Your account": "Your account",
+  "Your driver": "Your driver",
+  "Call your driver": "Call your driver",
   "accountSuspendedMessage": "Your account has been suspended. Please contact support for assistance.",
   "resetCartConfirmation": "Your cart contains items from other restaurant. Would you like to reset your cart for adding items from this restaurant?",
   "Your cart is empty": "Your cart is empty",

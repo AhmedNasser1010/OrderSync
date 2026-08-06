@@ -64,7 +64,7 @@ const CartItemCard = ({
         <ItemSizesBar item={item} selectedSize={item?.selectedSize} />
 
         <div className="mt-4 flex items-center gap-3">
-          <div className="flex h-9 items-center overflow-hidden rounded-md border border-color-11 bg-white shadow-sm">
+          <div className="flex h-9 items-center overflow-hidden rounded-md border border-color-11 bg-white shadow-sm dark:bg-card">
             <button
               type="button"
               onClick={onDecrease}
