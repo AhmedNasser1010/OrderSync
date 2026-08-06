@@ -39,6 +39,11 @@ const useAddToCart = (resID: string, status: string) => {
       return;
     }
 
+    if (trackedOrder?.id) {
+      dispatch(setShowTrackedOrderLockPopup(true));
+      return;
+    }
+
     const itemFromCart = menuItems.find(
       (menuItem) => menuItem.id === item.id
     ) as ItemWithSelection | undefined;
@@ -58,7 +63,6 @@ const useAddToCart = (resID: string, status: string) => {
     );
 
     const isSameRes = currentResId === "" ? true : resID === currentResId;
-    const hasActiveTrackedOrder = Boolean(trackedOrder?.id);
 
     if (isItemInCart) {
       toast.error(t("Already added to the Cart"), {
@@ -82,15 +86,10 @@ const useAddToCart = (resID: string, status: string) => {
       );
       dispatch(setRestaurant(resID));
       dispatch(setShowItemsAlreadyInCartPopup(false));
-      dispatch(setShowTrackedOrderLockPopup(false));
       return;
     }
 
-    if (hasActiveTrackedOrder) {
-      dispatch(setShowTrackedOrderLockPopup(true));
-    } else {
-      dispatch(setShowItemsAlreadyInCartPopup(true));
-    }
+    dispatch(setShowItemsAlreadyInCartPopup(true));
   };
 
   return { handleAddItem };

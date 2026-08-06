@@ -4,6 +4,7 @@ import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { quantityHandle } from "@/rtk/slices/cartSlice";
+import { setShowTrackedOrderLockPopup } from "@/rtk/slices/toggleSlice";
 import useAddToCart from "@/hooks/useAddToCart";
 import type { ItemType, SizeType } from "@ordersync/types";
 
@@ -24,6 +25,9 @@ const QuantityStepper = ({
   const dispatch = useAppDispatch();
   const { handleAddItem } = useAddToCart(resID, status);
   const cartItems = useAppSelector((state) => state.cart.items);
+  const trackedOrder = useAppSelector((state) => state.user?.trackedOrder);
+
+  const hasActiveTrackedOrder = Boolean(trackedOrder?.id);
 
   const cartItem = cartItems.find(
     (cartItem) =>
@@ -34,6 +38,10 @@ const QuantityStepper = ({
   const quantity = cartItem?.quantity ?? 0;
 
   const handleIncrease = () => {
+    if (hasActiveTrackedOrder) {
+      dispatch(setShowTrackedOrderLockPopup(true));
+      return;
+    }
     dispatch(
       quantityHandle({
         id: item.id,
@@ -44,6 +52,10 @@ const QuantityStepper = ({
   };
 
   const handleDecrease = () => {
+    if (hasActiveTrackedOrder) {
+      dispatch(setShowTrackedOrderLockPopup(true));
+      return;
+    }
     dispatch(
       quantityHandle({
         id: item.id,
