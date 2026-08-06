@@ -17,6 +17,7 @@ import {
   Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ButtonGuard } from "@/components/ui/button-guard";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -197,15 +198,17 @@ export default function OrderDetails({
                 <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", statusConfig.dot)} />
                 {st(order.status.current)}
               </Badge>
-              <Button
+              <ButtonGuard
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
                 onClick={printOrder}
                 disabled={!orderCart || !restaurant}
+                cooldown={1000}
+                showSpinner={false}
               >
                 <Printer className="h-4 w-4" />
-              </Button>
+              </ButtonGuard>
             </div>
           </div>
         </div>

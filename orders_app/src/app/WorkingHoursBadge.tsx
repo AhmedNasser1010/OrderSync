@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Clock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { badgeVariants } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { ButtonGuard } from "@/components/ui/button-guard";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -91,10 +91,10 @@ function WorkingHoursBadge() {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{t("openNowCancel")}</AlertDialogCancel>
-          <Button onClick={handleOpenNow} disabled={isLoading} className="gap-2">
+          <ButtonGuard onClick={handleOpenNow} disabled={isLoading} cooldown={1000} className="gap-2">
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             {t("openNowAction")}
-          </Button>
+          </ButtonGuard>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

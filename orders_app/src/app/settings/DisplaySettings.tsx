@@ -13,6 +13,7 @@ import {
 import { useAppSelector } from "@/rtk/hooks";
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useClickGuard } from "@/hooks/useClickGuard";
 
 export default function DisplaySettings() {
   const t = useTranslations("Settings.display");
@@ -26,14 +27,21 @@ export default function DisplaySettings() {
   );
   const [setDisplaySettings] = useSetDisplaySettingsMutation();
 
+  // Debounce blur-saves so tabbing through fields can't spam mutations.
+  const { run: guardedSetDisplay } = useClickGuard(
+    (settingName: string, value: string) =>
+      setDisplaySettings({
+        resId: userData?.accessToken,
+        settingName,
+        value,
+      }),
+    { cooldown: 500, resetOnError: true }
+  );
+
   const handleOnBlur = (
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setDisplaySettings({
-      resId: userData?.accessToken,
-      settingName: e.target.name,
-      value: e.target.value,
-    });
+    guardedSetDisplay(e.target.name, e.target.value);
   };
 
   return (

@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button"
+import { ButtonGuard } from "@/components/ui/button-guard"
 import { Input } from "@/components/ui/input"
 import {
   Dialog,
@@ -84,14 +85,15 @@ export default function ReasonDialog() {
           )}
         </div>
         <DialogFooter>
-          <Button
+          <ButtonGuard
             type="button"
             variant="destructive"
             onClick={handleConfirm}
             disabled={reasonDialogValue?.error || isCanceling ? true : false}
+            cooldown={1000}
           >
             {isCancel ? t("confirmCancel") : t("confirmReject")}
-          </Button>
+          </ButtonGuard>
           <Button
             type="button"
             variant="outline"

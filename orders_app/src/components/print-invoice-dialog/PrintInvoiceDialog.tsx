@@ -9,7 +9,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import InvoiceDialogTrigger from "./InvoiceDialogTrigger";
 import type { MainTabTypes } from "@/types/orders";
-import { Button } from "@/components/ui/button";
+import { ButtonGuard } from "@/components/ui/button-guard";
 import { Printer } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Invoice from "./Invoice";
@@ -65,10 +65,10 @@ export default function PrintInvoiceDialog({
             orderMenu={orderMenu}
           />
         </ScrollArea>
-        <Button onClick={reactToPrintFn}>
+        <ButtonGuard onClick={reactToPrintFn} cooldown={1000}>
           <Printer className="mr-2 h-4 w-4" />
           {ct("printInvoice")}
-        </Button>
+        </ButtonGuard>
       </DialogContent>
     </Dialog>
   );

@@ -11,8 +11,10 @@ import type { OrderType, OrderStatusType } from "@ordersync/types";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { canTransition, canReverseTransition, getNextStatuses, getPreviousStatuses, isDriverOwned } from "@ordersync/order-utils";
 import { sendMarketplacePush } from "@/app/actions/sendMarketplacePush";
+import { useClickGuard } from "@/hooks/useClickGuard";
 
 const DESTRUCTIVE_STATUSES: OrderStatusType[] = ["CANCELED", "REJECTED", "VOIDED"];
+const STATUS_CHANGE_COOLDOWN_MS = 800;
 
 const RESTAURANT_DESTRUCTIVE_STATUSES: Record<OrderStatusType, OrderStatusType[]> = {
   RECEIVED: ["REJECTED"],
@@ -42,6 +44,7 @@ const isReadyCancelAllowed = (order: OrderType): boolean =>
 type OrderHandler = {
   handleChangeStatus: (orderId: string, nextStatus: OrderStatusType, reason?: string) => void;
   isCanceling: boolean;
+  isUpdating: boolean;
   getPossibleNextStatuses: (orderId: string) => OrderStatusType[];
   getPossiblePreviousStatuses: (orderId: string) => OrderStatusType[];
 };
@@ -61,7 +64,7 @@ const useOrderHandler = (): OrderHandler => {
     canReverseTransition(current, next) ||
     (skipAccepted && current === "PREPARING" && next === "RECEIVED");
 
-  const handleChangeStatus = (orderId: string, nextStatus: OrderStatusType, reason?: string) => {
+  const applyStatusChange = (orderId: string, nextStatus: OrderStatusType, reason?: string) => {
     if (!orders?.length || !orderId) return;
 
     const orderToUpdate = orders.find((order: OrderType) => order.id === orderId);
@@ -99,19 +102,28 @@ const useOrderHandler = (): OrderHandler => {
       return;
     }
 
+    // For cancel/reject we use a dedicated mutation that already exposes
+    // an isLoading flag; keep it awaited so the guard locks across the call.
     if (nextStatus === "CANCELED" || nextStatus === "REJECTED") {
-      setCancelOrder({ orderId, reason, status: nextStatus });
-    } else {
-      setOrderStatus({ orderId, updatedStatus: nextStatus })
-        .unwrap()
-        .then(() => {
-          if (nextStatus === "READY") {
-            sendMarketplacePush(orderToUpdate.orderNumber).catch(() => {});
-          }
-        })
-        .catch(() => {});
+      return setCancelOrder({ orderId, reason, status: nextStatus }).unwrap();
     }
+
+    return setOrderStatus({ orderId, updatedStatus: nextStatus })
+      .unwrap()
+      .then(() => {
+        if (nextStatus === "READY") {
+          sendMarketplacePush(orderToUpdate.orderNumber).catch(() => {});
+        }
+      })
+      .catch(() => {});
   };
+
+  // Wrap the raw transition in an in-flight + cooldown guard so rapid
+  // double-clicks can't fire duplicate/conflicting status mutations.
+  const { run: handleChangeStatus, busy: isUpdating } = useClickGuard(
+    applyStatusChange,
+    { cooldown: STATUS_CHANGE_COOLDOWN_MS, resetOnError: true }
+  );
 
   const getPossibleNextStatuses = (orderId: string): OrderStatusType[] => {
     const order = orders?.find((o) => o.id === orderId);
@@ -154,6 +166,7 @@ const useOrderHandler = (): OrderHandler => {
   return {
     handleChangeStatus,
     isCanceling: orderCancellationIsLoading,
+    isUpdating,
     getPossibleNextStatuses,
     getPossiblePreviousStatuses,
   };

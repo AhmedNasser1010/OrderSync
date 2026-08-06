@@ -19,6 +19,7 @@ import {
   Printer,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ButtonGuard } from "@/components/ui/button-guard";
 import { useState } from "react";
 import { useAppDispatch } from "@/rtk/hooks";
 import { setReasonDialog } from "@/rtk/slices/toggleSlice";
@@ -44,6 +45,7 @@ type Props = {
   onStatusChange: (status: OrderStatusType) => void;
   showPrintInvoice: boolean;
   restaurant?: BusinessDocument;
+  isUpdating?: boolean;
 };
 
 export default function ControlMenu({
@@ -55,6 +57,7 @@ export default function ControlMenu({
   onStatusChange,
   showPrintInvoice,
   restaurant,
+  isUpdating = false,
 }: Props) {
   const ct = useTranslations("Common");
   const ot = useTranslations("Orders.controlMenu");
@@ -99,6 +102,7 @@ export default function ControlMenu({
             variant="ghost"
             size="icon"
             className="h-10 w-10"
+            disabled={isUpdating}
             onClick={(e) => e.stopPropagation()}
           >
             <MoreVertical className="h-4 w-4" />
@@ -192,10 +196,10 @@ export default function ControlMenu({
               orderMenu={orderMenu}
             />
           </ScrollArea>
-          <Button onClick={reactToPrintFn}>
+          <ButtonGuard onClick={reactToPrintFn} cooldown={1000}>
             <Printer className="ms-2 h-4 w-4" />
             {ct("printInvoice")}
-          </Button>
+          </ButtonGuard>
         </DialogContent>
       </Dialog>
     </>

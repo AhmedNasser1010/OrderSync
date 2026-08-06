@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button"
+import { ButtonGuard } from "@/components/ui/button-guard"
 import {
   Dialog,
   DialogContent,
@@ -116,15 +117,16 @@ export default function CloseDayPopup() {
           >
             {ct("cancel")}
           </Button>
-          <Button
+          <ButtonGuard
             type="button"
             variant={ordersIsPassed ? "default" : "destructive"}
             onClick={closeDay}
             disabled={!ordersIsPassed || isLoading || closeDayPopupValues.result.type === "success"}
+            cooldown={1200}
             className="w-full sm:w-auto"
           >
             {t("confirm")}
-          </Button>
+          </ButtonGuard>
         </DialogFooter>
       </DialogContent>
     </Dialog>

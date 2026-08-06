@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Loader2 } from "lucide-react";
 import useResStatus from "@/hooks/useResStatus";
+import { useClickGuard } from "@/hooks/useClickGuard";
 import type { RestaurantStatusTypes } from "@ordersync/types";
 import { cn } from "@/lib/utils";
 
@@ -24,6 +25,13 @@ function ResStatusBtn() {
   const t = useTranslations("ResStatus");
   const { setResStatus, isLoading, currentStatus } = useResStatus();
   const current = statuses.find((s) => s.value === currentStatus) ?? statuses[3];
+
+  // Guard against rapid status switches (double-click on a menu item) so the
+  // restaurant doesn't bounce between online/offline states.
+  const { run: guardedSetResStatus } = useClickGuard(
+    (status: RestaurantStatusTypes) => setResStatus(status),
+    { cooldown: 800, resetOnError: true }
+  );
 
   return (
     <DropdownMenu>
@@ -41,7 +49,7 @@ function ResStatusBtn() {
         {statuses.map((status) => (
           <DropdownMenuItem
             key={status.value}
-            onClick={() => setResStatus(status.value)}
+            onClick={() => guardedSetResStatus(status.value)}
             className={cn(
               currentStatus === status.value && "bg-accent text-accent-foreground"
             )}

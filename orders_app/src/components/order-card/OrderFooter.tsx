@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import type { OrderStatusType, BusinessDocument } from "@ordersync/types";
 import type { MainTabTypes } from "@/types/orders";
 import { CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { ButtonGuard } from "@/components/ui/button-guard";
 import { useFetchRestaurantDataQuery } from "@/rtk/api/firestoreApi";
 import { accessToken } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
@@ -72,7 +72,7 @@ export default function OrderFooter({ id, activeTabValue, status, returnedByDriv
   const resAccessToken = useAppSelector(accessToken);
   const { data: restaurant } = useFetchRestaurantDataQuery(resAccessToken ?? skipToken, { skip: !resAccessToken });
   const printInvoice = restaurant?.settings?.printInvoice ?? false;
-  const { handleChangeStatus, getPossibleNextStatuses, getPossiblePreviousStatuses } = useOrderHandler();
+  const { handleChangeStatus, isUpdating, getPossibleNextStatuses, getPossiblePreviousStatuses } = useOrderHandler();
 
   const possibleStatuses = getPossibleNextStatuses(id);
   const previousStatuses = getPossiblePreviousStatuses(id);
@@ -126,10 +126,13 @@ export default function OrderFooter({ id, activeTabValue, status, returnedByDriv
           </div>
         ) : isReceived ? (
           <>
-            <Button
+            <ButtonGuard
               size="default"
               variant="default"
               className="h-9"
+              disabled={isUpdating}
+              busyLabel=""
+              cooldown={0}
               onClick={(e) => {
                 e.stopPropagation();
                 handleChangeStatus(id, "PREPARING");
@@ -137,28 +140,34 @@ export default function OrderFooter({ id, activeTabValue, status, returnedByDriv
             >
               <Play className="mr-1.5 h-4 w-4" />
               {ft("start")}
-            </Button>
+            </ButtonGuard>
             {primaryForward && primaryForward !== "PREPARING" && (
-              <Button
+              <ButtonGuard
                 size="default"
                 variant="outline"
                 className="h-9"
+                disabled={isUpdating}
+                busyLabel=""
+                cooldown={0}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleChangeStatus(id, primaryForward);
                 }}
               >
                 {primaryLabel}
-              </Button>
+              </ButtonGuard>
             )}
           </>
         ) : (
           primaryForward &&
           PrimaryIcon && (
-            <Button
+            <ButtonGuard
               size="default"
               variant={status === "ON_ROUTE" ? "success" : "default"}
               className="h-9"
+              disabled={isUpdating}
+              busyLabel=""
+              cooldown={0}
               onClick={(e) => {
                 e.stopPropagation();
                 handleChangeStatus(id, primaryForward);
@@ -166,22 +175,25 @@ export default function OrderFooter({ id, activeTabValue, status, returnedByDriv
             >
               <PrimaryIcon className="mr-1.5 h-4 w-4" />
               {primaryLabel}
-            </Button>
+            </ButtonGuard>
           )
         )}
 
         {!isReceived && secondaryForward && (
-          <Button
+          <ButtonGuard
             size="default"
             variant="outline"
             className="h-9"
+            disabled={isUpdating}
+            busyLabel=""
+            cooldown={0}
             onClick={(e) => {
               e.stopPropagation();
               handleChangeStatus(id, secondaryForward);
             }}
           >
             {FORWARD_LABEL_KEYS[secondaryForward] ? ft(FORWARD_LABEL_KEYS[secondaryForward]) : st(secondaryForward)}
-          </Button>
+          </ButtonGuard>
         )}
       </div>
 
@@ -195,6 +207,7 @@ export default function OrderFooter({ id, activeTabValue, status, returnedByDriv
           onStatusChange={(nextStatus) => handleChangeStatus(id, nextStatus)}
           showPrintInvoice={showPrintInvoice}
           restaurant={restaurant as BusinessDocument | undefined}
+          isUpdating={isUpdating}
         />
       )}
     </CardFooter>

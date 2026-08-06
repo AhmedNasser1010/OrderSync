@@ -1,10 +1,10 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { ButtonGuard } from "@/components/ui/button-guard";
 import { useSetOrderStatusMutation } from "@/rtk/api/firestoreApi";
 import type { OrderType } from "@ordersync/types";
-import { CheckCheck, Loader2 } from "lucide-react";
+import { CheckCheck } from "lucide-react";
 
 type Props = {
   receivedOrders: OrderType[];
@@ -26,18 +26,16 @@ export default function BatchActions({ receivedOrders }: Props) {
   };
 
   return (
-    <Button
+    <ButtonGuard
       variant="outline"
       className="w-full border-dashed border-primary/40 text-primary hover:bg-primary/5"
       onClick={handleAcceptAll}
       disabled={isLoading}
+      cooldown={1000}
+      busyLabel={t("acceptAll", { count })}
     >
-      {isLoading ? (
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-      ) : (
-        <CheckCheck className="mr-2 h-4 w-4" />
-      )}
+      <CheckCheck className="mr-2 h-4 w-4" />
       {t("acceptAll", { count })}
-    </Button>
+    </ButtonGuard>
   );
 }

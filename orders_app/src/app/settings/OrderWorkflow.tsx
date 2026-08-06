@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Printer, Zap } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { useClickGuard } from "@/hooks/useClickGuard";
 import {
   useSetOrderWorkflowSettingsMutation,
   useFetchUserDataQuery,
@@ -27,20 +28,23 @@ export default function OrderWorkflow() {
   const skipAccepted = resData?.settings?.skipAccepted ?? false;
   const [setOrderWorkflowSettings] = useSetOrderWorkflowSettingsMutation();
 
+  // Throttle rapid toggles so a flurry of switch flips can't spam mutations.
+  const { run: guardedSetWorkflow } = useClickGuard(
+    (settingName: "printInvoice" | "skipAccepted", value: boolean) =>
+      setOrderWorkflowSettings({
+        resId: userData?.accessToken,
+        settingName,
+        value,
+      }),
+    { cooldown: 500, resetOnError: true }
+  );
+
   const handlePrintInvoice = (checked: boolean) => {
-    setOrderWorkflowSettings({
-      resId: userData?.accessToken,
-      settingName: "printInvoice",
-      value: checked,
-    });
+    guardedSetWorkflow("printInvoice", checked);
   };
 
   const handleSkipAccepted = (checked: boolean) => {
-    setOrderWorkflowSettings({
-      resId: userData?.accessToken,
-      settingName: "skipAccepted",
-      value: checked,
-    });
+    guardedSetWorkflow("skipAccepted", checked);
   };
 
   return (
