@@ -145,15 +145,18 @@
     "starting": "جارٍ البدء...",
     "startingRoute": "جارٍ بدء المسار...",
     "completing": "جارٍ الإكمال...",
-    "canceling": "جارٍ الإلغاء...",
+    "returning": "جارٍ الإرجاع...",
     "claiming2": "جارٍ الاستلام...",
     "call": "اتصال",
     "cancel": "إلغاء",
+    "returnToReady": "إرجاع",
+    "returnConfirmTitle": "إرجاع الطلب؟",
+    "returnConfirmDesc": "سيتم إرسال الطلب مرة أخرى إلى المطعم بحالة جاهز وإزالته من طلباتك النشطة.",
     "failedToClaim": "فشل استلام الطلب",
     "failedToStartDelivery": "فشل بدء التوصيل",
     "failedToStartRoute": "فشل بدء المسار",
     "failedToComplete": "فشل إكمال التوصيل",
-    "failedToCancel": "فشل إلغاء الطلب"
+    "failedToReturn": "فشل إرجاع الطلب"
   },
   "mapPage": {
     "loadingMap": "جارٍ تحميل الخريطة...",

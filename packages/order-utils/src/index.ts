@@ -22,6 +22,7 @@ export {
   isCustomerCancelable,
   isRestaurantCancelable,
   isDriverCancelable,
+  wasReturnedByDriver,
   getNextStatuses,
   canReverseTransition,
   getPreviousStatuses,

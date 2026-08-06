@@ -145,15 +145,18 @@
     "starting": "Starting...",
     "startingRoute": "Starting Route...",
     "completing": "Completing...",
-    "canceling": "Canceling...",
+    "returning": "Returning...",
     "claiming2": "Claiming...",
     "call": "Call",
     "cancel": "Cancel",
+    "returnToReady": "Return",
+    "returnConfirmTitle": "Return order?",
+    "returnConfirmDesc": "The order will be sent back to the restaurant as Ready and removed from your active orders.",
     "failedToClaim": "Failed to claim order",
     "failedToStartDelivery": "Failed to start delivery",
     "failedToStartRoute": "Failed to start route",
     "failedToComplete": "Failed to complete delivery",
-    "failedToCancel": "Failed to cancel order"
+    "failedToReturn": "Failed to return order"
   },
   "mapPage": {
     "loadingMap": "Loading map...",

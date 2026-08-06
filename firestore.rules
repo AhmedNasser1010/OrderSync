@@ -209,9 +209,12 @@ service cloud.firestore {
           && resourceData().businessId in partnerBusinessIds());
 
       // Drivers can read READY orders (marketplace browsing).
+      // Returned orders (status.returnedByDriverUid != null) are restaurant-only
+      // until the restaurant re-releases them.
       allow read: if resource == null
         || (isRider()
-          && resourceData().status.current == 'READY');
+          && resourceData().status.current == 'READY'
+          && resourceData().status.returnedByDriverUid == null);
 
       // Drivers can read orders assigned to them.
       allow read: if resource == null
@@ -250,19 +253,24 @@ service cloud.firestore {
             .hasOnly(['status', 'timeline', 'updatedAt']);
 
       // Drivers can claim a READY order (RESERVED transition).
-      // The driver must not already own another active order.
+      // Returned orders are not claimable until the restaurant re-releases them.
       allow update: if isRider()
         && resourceData().status.current == 'READY'
+        && resourceData().status.returnedByDriverUid == null
         && incomingData().status.current == 'RESERVED'
         && incomingData().assignment.driverUid == request.auth.uid
         && incomingData().diff(resourceData()).affectedKeys()
             .hasOnly(['status', 'timeline', 'assignment', 'updatedAt']);
 
-      // Drivers can update their assigned orders (PICKED_UP, ON_ROUTE, DELIVERED, CANCELED).
+      // Drivers can update their assigned orders (PICKED_UP, ON_ROUTE, DELIVERED).
+      // A driver may only reach READY by returning the order (returnedByDriverUid
+      // must be set to their uid), never by silently releasing it to the marketplace.
       allow update: if isRider()
         && resourceData().assignment.driverUid == request.auth.uid
+        && (incomingData().status.current != 'READY'
+          || incomingData().status.returnedByDriverUid == request.auth.uid)
         && incomingData().diff(resourceData()).affectedKeys()
-            .hasOnly(['status', 'timeline', 'updatedAt']);
+            .hasOnly(['status', 'timeline', 'assignment', 'updatedAt']);
 
       // Customers can submit feedback on delivered orders.
       allow update: if isCustomer()

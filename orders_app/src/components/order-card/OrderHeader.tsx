@@ -15,6 +15,7 @@ import {
   PackageCheck,
   Sparkles,
   StickyNote,
+  RotateCcw,
 } from "lucide-react";
 import type { OrderStatusType } from "@ordersync/types";
 import { useEffect, useState, useCallback } from "react";
@@ -81,12 +82,14 @@ export default function OrderHeader({
   placedAt,
   isFirstOrder,
   note,
+  returnedByDriver,
 }: {
   orderNumber: number;
   status: OrderStatusType;
   placedAt: number;
   isFirstOrder?: boolean;
   note?: string;
+  returnedByDriver?: boolean;
 }) {
   const t = useTranslations("Orders.header");
   const st = useTranslations("Orders.statuses");
@@ -125,6 +128,12 @@ export default function OrderHeader({
           >
             <Sparkles className="h-3 w-3" />
             <span>{t("firstOrder")}</span>
+          </Badge>
+        )}
+        {returnedByDriver && (
+          <Badge className="flex items-center gap-1 text-xs border-amber-300 bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:border-amber-800/50 dark:text-amber-300">
+            <RotateCcw className="h-3 w-3" />
+            <span>{t("returnedByDriver")}</span>
           </Badge>
         )}
         <Badge

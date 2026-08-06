@@ -12,6 +12,7 @@ import { skipToken } from "@reduxjs/toolkit/query";
 import ControlMenu from "./ControlMenu";
 import useOrderHandler from "@/hooks/order-handlers/useOrderHandlers";
 import { isFinalStatus } from "@ordersync/order-utils";
+import { cn } from "@/lib/utils";
 import {
   CheckCircle,
   CookingPot,
@@ -62,9 +63,10 @@ type Props = {
   id: string;
   activeTabValue: MainTabTypes;
   status: OrderStatusType;
+  returnedByDriver?: boolean;
 };
 
-export default function OrderFooter({ id, activeTabValue, status }: Props) {
+export default function OrderFooter({ id, activeTabValue, status, returnedByDriver }: Props) {
   const ft = useTranslations("Orders.footer");
   const st = useTranslations("Orders.statuses");
   const resAccessToken = useAppSelector(accessToken);
@@ -97,11 +99,30 @@ export default function OrderFooter({ id, activeTabValue, status }: Props) {
         {isReady ? (
           <div className="flex items-center gap-1.5">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
+              <span
+                className={cn(
+                  "absolute inline-flex h-full w-full animate-ping rounded-full opacity-75",
+                  returnedByDriver ? "bg-amber-400" : "bg-green-400",
+                )}
+              />
+              <span
+                className={cn(
+                  "relative inline-flex h-2.5 w-2.5 rounded-full",
+                  returnedByDriver ? "bg-amber-500" : "bg-green-500",
+                )}
+              />
             </span>
-            <span className="text-sm font-medium">{ft("ready")}</span>
-            <span className="text-xs text-muted-foreground">{ft("waitingForDriver")}</span>
+            {returnedByDriver ? (
+              <>
+                <span className="text-sm font-medium">{ft("returnedByDriver")}</span>
+                <span className="text-xs text-muted-foreground">{ft("awaitingReassignment")}</span>
+              </>
+            ) : (
+              <>
+                <span className="text-sm font-medium">{ft("ready")}</span>
+                <span className="text-xs text-muted-foreground">{ft("waitingForDriver")}</span>
+              </>
+            )}
           </div>
         ) : isReceived ? (
           <>

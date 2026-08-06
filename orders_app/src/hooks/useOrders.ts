@@ -4,6 +4,7 @@ import type { ItemType } from "@ordersync/types";
 import {
   getBusinessDayOfTimestamp,
   localDateKey,
+  wasReturnedByDriver,
 } from "@ordersync/order-utils";
 import type { FormattedOrderType, CartItemType, MainTabTypes } from "@/types/orders";
 import {
@@ -176,6 +177,7 @@ const useOrders = (): UseOrders => {
         preparingAt: order.timeline.preparingAt,
         isFirstOrder: order.customer.totalOrders === 1,
         note: order.delivery?.note,
+        returnedByDriver: wasReturnedByDriver(order),
       })) || null
     );
   }, [filteredOrders, getOrderMenu]);

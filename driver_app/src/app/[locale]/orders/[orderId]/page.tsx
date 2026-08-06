@@ -16,6 +16,16 @@ import { cn, formatPrice, formatRelativeTime } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import {
   ArrowLeft,
   MapPin,
   Phone,
@@ -24,7 +34,7 @@ import {
   ChevronDown,
   Clock,
   Loader2,
-  X,
+  Undo2,
   ExternalLink,
 } from "lucide-react";
 import type { LiveLocation, OrderStatusType } from "@ordersync/types";
@@ -54,7 +64,7 @@ export default function OrderDetailPage({
   const allOrders = [...(marketplaceOrders ?? []), ...(myOrders ?? [])];
   const order = allOrders.find((o) => o.id === orderId);
 
-  const { claim, start, startRoute, complete, cancel, isLoading } =
+  const { claim, start, startRoute, complete, release, isLoading } =
     useOrderActions();
   const { isBlocked } = useDriverFinance();
 
@@ -62,6 +72,7 @@ export default function OrderDetailPage({
     null,
   );
   const [notesExpanded, setNotesExpanded] = useState(false);
+  const [confirmReturnOpen, setConfirmReturnOpen] = useState(false);
 
   const handleClaim = useCallback(async () => {
     if (!order || !driverUid) return;
@@ -101,15 +112,15 @@ export default function OrderDetailPage({
     }
   }, [order, driverUid, complete, router, t]);
 
-  const handleCancel = useCallback(async () => {
+  const handleRelease = useCallback(async () => {
     if (!order || !driverUid) return;
     try {
-      await cancel(order.id, driverUid);
-      router.push("/orders/active");
+      await release(order.id, driverUid);
+      router.push("/orders");
     } catch {
-      alert(t("failedToCancel"));
+      alert(t("failedToReturn"));
     }
-  }, [order, driverUid, cancel, router, t]);
+  }, [order, driverUid, release, router, t]);
 
   const handleOpenMaps = useCallback(() => {
     const loc = order?.delivery?.latlng;
@@ -432,25 +443,51 @@ export default function OrderDetailPage({
                 </a>
                 <Button
                   size="lg"
-                  variant="destructive"
+                  variant="outline"
                   className="h-10 flex-1 text-sm"
-                  onClick={handleCancel}
+                  onClick={() => setConfirmReturnOpen(true)}
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      {t("canceling")}
+                      {t("returning")}
                     </>
                   ) : (
                     <>
-                      <X className="h-3.5 w-3.5" />
-                      {t("cancel")}
+                      <Undo2 className="h-3.5 w-3.5" />
+                      {t("returnToReady")}
                     </>
                   )}
                 </Button>
               </div>
             )}
+
+            <AlertDialog
+              open={confirmReturnOpen}
+              onOpenChange={setConfirmReturnOpen}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t("returnConfirmTitle")}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("returnConfirmDesc")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={isLoading}>
+                    {t("cancel")}
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    variant="default"
+                    onClick={handleRelease}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? t("returning") : t("returnToReady")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </div>

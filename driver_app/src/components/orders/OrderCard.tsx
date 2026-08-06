@@ -213,7 +213,6 @@ export function OrderCard({
   const [staleLevel, setStaleLevel] = useState<StaleLevel>(
     variant === "marketplace" ? getStaleLevel(readyAt) : "none",
   );
-
   useEffect(() => {
     if (variant !== "marketplace") return;
     const id = setInterval(() => {
@@ -331,28 +330,16 @@ export function OrderCard({
     variant === "active" && actions && driverUid ? (
       <div className="flex gap-2 pt-1">
         {status === "RESERVED" && (
-          <>
-            <Button
-              size="lg"
-              className="flex-1"
-              onClick={(e) =>
-                handleAction(e, () => actions.start(order.id, driverUid))
-              }
-              disabled={actions.isLoading}
-            >
-              {t("startDelivery")}
-            </Button>
-            <Button
-              size="lg"
-              variant="destructive"
-              onClick={(e) =>
-                handleAction(e, () => actions.cancel(order.id, driverUid))
-              }
-              disabled={actions.isLoading}
-            >
-              {t("cancel")}
-            </Button>
-          </>
+          <Button
+            size="lg"
+            className="flex-1"
+            onClick={(e) =>
+              handleAction(e, () => actions.start(order.id, driverUid))
+            }
+            disabled={actions.isLoading}
+          >
+            {t("startDelivery")}
+          </Button>
         )}
         {status === "PICKED_UP" && (
           <>
@@ -373,16 +360,6 @@ export function OrderCard({
               disabled={actions.isLoading}
             >
               {t("startRoute")}
-            </Button>
-            <Button
-              size="lg"
-              variant="destructive"
-              onClick={(e) =>
-                handleAction(e, () => actions.cancel(order.id, driverUid))
-              }
-              disabled={actions.isLoading}
-            >
-              {t("cancel")}
             </Button>
           </>
         )}
@@ -405,16 +382,6 @@ export function OrderCard({
               disabled={actions.isLoading}
             >
               {t("completeDelivery")}
-            </Button>
-            <Button
-              size="lg"
-              variant="destructive"
-              onClick={(e) =>
-                handleAction(e, () => actions.cancel(order.id, driverUid))
-              }
-              disabled={actions.isLoading}
-            >
-              {t("cancel")}
             </Button>
           </>
         )}

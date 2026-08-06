@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 
 interface AlertDialogProps {
@@ -56,7 +57,7 @@ function AlertDialogContent({
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]"
       onClick={() => onOpenChange?.(false)}
@@ -67,7 +68,8 @@ function AlertDialogContent({
       >
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -130,10 +132,20 @@ function AlertDialogCancel({
 
 function AlertDialogAction({
   children,
+  onClick,
+  variant = "destructive",
   ...props
-}: React.ComponentProps<typeof Button>) {
+}: React.ComponentProps<typeof Button> & { variant?: React.ComponentProps<typeof Button>["variant"] }) {
+  const context = React.useContext(AlertDialogContext);
   return (
-    <Button variant="destructive" {...props}>
+    <Button
+      variant={variant}
+      onClick={(e) => {
+        onClick?.(e);
+        context?.onOpenChange?.(false);
+      }}
+      {...props}
+    >
       {children}
     </Button>
   );

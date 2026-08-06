@@ -6,7 +6,7 @@ import {
   useStartDeliveryMutation,
   useCompleteDeliveryMutation,
   useStartRouteMutation,
-  useCancelOrderMutation,
+  useReleaseOrderMutation,
   useFetchUserDataQuery,
 } from "@/rtk/api/firestoreApi";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,7 +22,7 @@ export function useOrderActions() {
   const [startDelivery, { isLoading: isStarting }] = useStartDeliveryMutation();
   const [completeDelivery, { isLoading: isCompleting }] = useCompleteDeliveryMutation();
   const [startRouteMutation, { isLoading: isStartingRoute }] = useStartRouteMutation();
-  const [cancelOrder, { isLoading: isCanceling }] = useCancelOrderMutation();
+  const [releaseOrder, { isLoading: isReleasing }] = useReleaseOrderMutation();
 
   const skipStartRoute = userData?.skipStartRoute !== false;
 
@@ -58,12 +58,12 @@ export function useOrderActions() {
     [completeDelivery],
   );
 
-  const cancel = useCallback(
+  const release = useCallback(
     async (orderId: string, driverUid: string) => {
-      const result = await cancelOrder({ orderId, driverUid });
-      if ("error" in result) throw new Error("Failed to cancel order");
+      const result = await releaseOrder({ orderId, driverUid });
+      if ("error" in result) throw new Error("Failed to return order to ready");
     },
-    [cancelOrder],
+    [releaseOrder],
   );
 
   return {
@@ -71,7 +71,7 @@ export function useOrderActions() {
     start,
     startRoute,
     complete,
-    cancel,
-    isLoading: isClaiming || isStarting || isCompleting || isStartingRoute || isCanceling,
+    release,
+    isLoading: isClaiming || isStarting || isCompleting || isStartingRoute || isReleasing,
   };
 }

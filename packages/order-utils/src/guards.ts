@@ -55,6 +55,13 @@ export function isDriverCancelable(order: OrderType): boolean {
   return true;
 }
 
+export function wasReturnedByDriver(order: OrderType): boolean {
+  return (
+    order.status.current === "READY" &&
+    order.status.returnedByDriverUid != null
+  );
+}
+
 export function getNextStatuses(
   current: OrderStatusType,
 ): OrderStatusType[] {

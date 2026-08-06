@@ -34,6 +34,11 @@ const isRestaurantDestructiveStatusAllowed = (
   next: OrderStatusType,
 ): boolean => RESTAURANT_DESTRUCTIVE_STATUSES[current]?.includes(next) ?? false;
 
+// A READY order may only be canceled directly when a driver returned it
+// (normal marketplace READY orders remain non-yankable by the restaurant).
+const isReadyCancelAllowed = (order: OrderType): boolean =>
+  order.status.current === "READY" && order.status.returnedByDriverUid != null;
+
 type OrderHandler = {
   handleChangeStatus: (orderId: string, nextStatus: OrderStatusType, reason?: string) => void;
   isCanceling: boolean;
@@ -77,7 +82,11 @@ const useOrderHandler = (): OrderHandler => {
       return;
     }
 
-    if (DESTRUCTIVE_STATUSES.includes(nextStatus) && !isRestaurantDestructiveStatusAllowed(currentStatus, nextStatus)) {
+    const destructiveAllowed =
+      isRestaurantDestructiveStatusAllowed(currentStatus, nextStatus) ||
+      (currentStatus === "READY" && nextStatus === "CANCELED" && isReadyCancelAllowed(orderToUpdate));
+
+    if (DESTRUCTIVE_STATUSES.includes(nextStatus) && !destructiveAllowed) {
       console.error(`Invalid transition: ${currentStatus} -> ${nextStatus}`);
       return;
     }
@@ -115,6 +124,12 @@ const useOrderHandler = (): OrderHandler => {
       (next) => {
         if (skipAccepted && order.status.current === "RECEIVED" && next === "ACCEPTED") {
           return false;
+        }
+        if (
+          order.status.current === "READY" &&
+          next === "CANCELED"
+        ) {
+          return isReadyCancelAllowed(order);
         }
         return (
           !DESTRUCTIVE_STATUSES.includes(next) ||

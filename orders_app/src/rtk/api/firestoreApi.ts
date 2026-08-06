@@ -202,6 +202,10 @@ export const firestoreApi = createApi({
               updateData[`timeline.${timelineField}`] = now;
             }
 
+            if (updatedStatus === "READY") {
+              updateData["status.returnedByDriverUid"] = null;
+            }
+
             transaction.update(orderRef, updateData);
           });
 
@@ -251,7 +255,15 @@ export const firestoreApi = createApi({
               );
             }
 
-            if (status === "CANCELED" && currentStatus !== "ACCEPTED" && currentStatus !== "PREPARING") {
+            const canCancelReady =
+              currentStatus === "READY" && order.status.returnedByDriverUid != null;
+
+            if (
+              status === "CANCELED" &&
+              currentStatus !== "ACCEPTED" &&
+              currentStatus !== "PREPARING" &&
+              !canCancelReady
+            ) {
               throw new Error(
                 `Order in status ${currentStatus} can only be rejected, not canceled`,
               );

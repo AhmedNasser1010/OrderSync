@@ -18,7 +18,7 @@ import {
   increment,
 } from "firebase/firestore";
 import type { Driver, OrderType, OrderStatusType } from "@ordersync/types";
-import { canTransition, getTimelineField, isMarketplaceVisible, isFinalStatus } from "@ordersync/order-utils";
+import { canTransition } from "@ordersync/order-utils";
 
 export const firestoreApi = createApi({
   reducerPath: "firestoreApi",
@@ -108,6 +108,7 @@ export const firestoreApi = createApi({
         const q = query(
           ordersRef,
           where("status.current", "==", "READY"),
+          where("status.returnedByDriverUid", "==", null),
           orderBy("createdAt", "desc"),
         );
 
@@ -494,9 +495,11 @@ export const firestoreApi = createApi({
       },
     }),
 
-    // Transactional: Cancel order (any active status -> CANCELED)
-    cancelOrder: builder.mutation({
-      async queryFn({ orderId, driverUid, reason }: { orderId: string; driverUid: string; reason?: string }) {
+    // Transactional: Return an order to the restaurant (RESERVED/PICKED_UP/ON_ROUTE -> READY).
+    // The order is marked as returned by this driver and stays restaurant-only
+    // until the restaurant re-releases it back to the marketplace.
+    releaseOrder: builder.mutation({
+      async queryFn({ orderId, driverUid }: { orderId: string; driverUid: string }) {
         try {
           if (!orderId || !driverUid) throw new Error("Order ID and Driver UID required.");
 
@@ -509,33 +512,28 @@ export const firestoreApi = createApi({
 
             const order = orderSnap.data() as OrderType;
 
-            if (!canTransition(order.status.current, "CANCELED")) {
-              throw new Error(`Cannot cancel order in status: ${order.status.current}`);
+            if (!["RESERVED", "PICKED_UP", "ON_ROUTE"].includes(order.status.current)) {
+              throw new Error(`Cannot return order in status: ${order.status.current}`);
             }
             if (order.assignment?.driverUid !== driverUid) {
               throw new Error("You are not assigned to this order.");
             }
 
             const now = Date.now();
-            const timelineField = getTimelineField("CANCELED");
             const customerUid = order.customer?.uid;
 
-            const updateData: Record<string, unknown> = {
-              "status.current": "CANCELED",
+            transaction.update(orderRef, {
+              "status.current": "READY",
+              "status.returnedByDriverUid": driverUid,
               "status.history": arrayUnion({
-                status: "CANCELED",
+                status: "READY",
                 timestamp: now,
                 by: `driver:${driverUid}`,
               }),
-              [`timeline.${timelineField}`]: now,
+              "timeline.readyAt": now,
+              "assignment.driverUid": null,
               updatedAt: now,
-            };
-
-            if (reason) {
-              updateData["status.cancellationReason"] = reason;
-            }
-
-            transaction.update(orderRef, updateData);
+            });
 
             const driverUpdate: Record<string, unknown> = {
               accessToken: deleteField(),
@@ -549,10 +547,11 @@ export const firestoreApi = createApi({
           return { data: null };
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error);
-          console.error("Error canceling order:", message);
+          console.error("Error returning order:", message);
           return { error: { message, data: "" } };
         }
       },
+      invalidatesTags: ["MarketplaceOrders", "MyOrders"],
     }),
 
     fetchBusinessNames: builder.query<
@@ -625,7 +624,7 @@ export const {
   useStartDeliveryMutation,
   useCompleteDeliveryMutation,
   useStartRouteMutation,
-  useCancelOrderMutation,
+  useReleaseOrderMutation,
   useToggleOnlineStatusMutation,
   useFetchBusinessNamesQuery,
 } = firestoreApi;

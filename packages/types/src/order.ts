@@ -25,6 +25,7 @@ export type OrderType = {
   status: {
     current: OrderStatusType;
     cancellationReason?: string;
+    returnedByDriverUid?: string | null;
     history: {
       status: OrderStatusType;
       timestamp: number;

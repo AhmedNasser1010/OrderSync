@@ -22,4 +22,5 @@ export type FormattedOrderType = {
   preparingAt?: number;
   isFirstOrder: boolean;
   note?: string;
+  returnedByDriver?: boolean;
 };

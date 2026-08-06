@@ -71,6 +71,7 @@
       "voidedOrders": "orders cancelled",
       "firstOrder": "First Order",
       "note": "Note",
+      "returnedByDriver": "Returned by driver",
       "outOfWorkingHours": "Out of working hours",
       "openNowTitle": "Open your restaurant now?",
       "openNowDescription": "You're currently outside working hours. Opening now will accept orders until the next scheduled opening.",
@@ -115,7 +116,9 @@
       "pickedUp": "Picked Up",
       "startRoute": "Start Route",
       "delivered": "Delivered",
-      "waitingForDriver": "Waiting for driver"
+      "waitingForDriver": "Waiting for driver",
+      "returnedByDriver": "Returned by driver",
+      "awaitingReassignment": "Awaiting reassignment"
     },
     "controlMenu": {
       "moveTo": "Move to {status}",

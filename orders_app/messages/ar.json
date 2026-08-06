@@ -71,6 +71,7 @@
       "voidedOrders": "طلبات ملغية",
       "firstOrder": "الطلب الأول",
       "note": "ملاحظة",
+      "returnedByDriver": "أُعيد بواسطة السائق",
       "outOfWorkingHours": "خارج أوقات العمل",
       "openNowTitle": "فتح مطعمك الآن؟",
       "openNowDescription": "أنت خارج أوقات العمل حالياً. الفتح الآن سيقبل الطلبات حتى موعد الافتتاح القادم.",
@@ -115,7 +116,9 @@
       "pickedUp": "تم الاستلام",
       "startRoute": "بدء التوصيل",
       "delivered": "تم التوصيل",
-      "waitingForDriver": "انتظار السائق"
+      "waitingForDriver": "انتظار السائق",
+      "returnedByDriver": "أُعيد بواسطة السائق",
+      "awaitingReassignment": "بانتظار إعادة التوجيه"
     },
     "controlMenu": {
       "moveTo": "نقل إلى {status}",

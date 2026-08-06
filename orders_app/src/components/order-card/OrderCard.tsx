@@ -45,6 +45,7 @@ const OrderCard = ({
         placedAt={order.placedAt}
         isFirstOrder={order.isFirstOrder}
         note={order.note}
+        returnedByDriver={order.returnedByDriver}
       />
       <OrderContent
         total={order.total}
@@ -55,6 +56,7 @@ const OrderCard = ({
         id={order.id}
         activeTabValue={activeTabValue}
         status={order.status}
+        returnedByDriver={order.returnedByDriver}
       />
     </Card>
   );
