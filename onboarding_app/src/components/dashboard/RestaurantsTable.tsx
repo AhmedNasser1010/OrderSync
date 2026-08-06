@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Edit, Trash2, Loader2, EyeOff, UtensilsCrossed } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Loader2, Eye, EyeOff, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
 import type { BusinessDocument, RestaurantStatusTypes } from "@ordersync/types";
 import { useSetRestaurantStatusMutation } from "@/rtk/api/firestoreApi";
@@ -64,24 +64,28 @@ export function RestaurantsTable({
     open: boolean;
     accessToken: string | null;
     name: string;
+    nextStatus: RestaurantStatusTypes;
   }>({
     open: false,
     accessToken: null,
     name: "",
+    nextStatus: "hidden",
   });
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [setRestaurantStatus] = useSetRestaurantStatusMutation();
 
   const handleStatusChange = async (
     accessToken: string,
+    currentStatus: RestaurantStatusTypes,
     status: RestaurantStatusTypes,
     restaurantName: string,
   ) => {
-    if (status === "hidden") {
+    if (currentStatus === "hidden" && status !== "hidden") {
       setHideDialog({
         open: true,
         accessToken,
         name: restaurantName,
+        nextStatus: status,
       });
       return;
     }
@@ -93,17 +97,32 @@ export function RestaurantsTable({
     }
   };
 
+  const handleToggleHide = (restaurant: BusinessDocument) => {
+    const isHidden = restaurant.status === "hidden";
+    setHideDialog({
+      open: true,
+      accessToken: restaurant.accessToken,
+      name: restaurant.profile.name,
+      nextStatus: isHidden ? "active" : "hidden",
+    });
+  };
+
   const handleHideConfirm = async () => {
     if (hideDialog.accessToken) {
       setUpdatingStatus(hideDialog.accessToken);
       try {
         await setRestaurantStatus({
           resId: hideDialog.accessToken,
-          status: "hidden",
+          status: hideDialog.nextStatus,
         }).unwrap();
       } finally {
         setUpdatingStatus(null);
-        setHideDialog({ open: false, accessToken: null, name: "" });
+        setHideDialog({
+          open: false,
+          accessToken: null,
+          name: "",
+          nextStatus: "hidden",
+        });
       }
     }
   };
@@ -244,12 +263,15 @@ export function RestaurantsTable({
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start">
-                        {statusOptions.map((option) => (
+                        {statusOptions
+                          .filter((option) => option.value !== "hidden")
+                          .map((option) => (
                           <DropdownMenuItem
                             key={option.value}
                             onClick={() =>
                               handleStatusChange(
                                 restaurant.accessToken,
+                                restaurant.status,
                                 option.value,
                                 restaurant.profile.name,
                               )
@@ -304,6 +326,22 @@ export function RestaurantsTable({
                       </Link>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => handleToggleHide(restaurant)}
+                      >
+                        {restaurant.status === "hidden" ? (
+                          <Eye className="mr-2 h-4 w-4" />
+                        ) : (
+                          <EyeOff className="mr-2 h-4 w-4" />
+                        )}
+                        <span>
+                          {restaurant.status === "hidden"
+                            ? "Show Restaurant"
+                            : "Hide Restaurant"}
+                        </span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
                         className="text-destructive cursor-pointer"
                         onClick={() =>
                           setDeleteDialog({
@@ -333,7 +371,7 @@ export function RestaurantsTable({
         onConfirm={handleDeleteConfirm}
       />
 
-      {/* Hide Dialog */}
+      {/* Hide/Show Dialog */}
       <HideDialog
         open={hideDialog.open}
         onOpenChange={(open) =>
@@ -341,10 +379,12 @@ export function RestaurantsTable({
             open,
             accessToken: hideDialog.accessToken,
             name: hideDialog.name,
+            nextStatus: hideDialog.nextStatus,
           })
         }
         onConfirm={handleHideConfirm}
         restaurantName={hideDialog.name}
+        hiding={hideDialog.nextStatus === "hidden"}
       />
     </>
   );

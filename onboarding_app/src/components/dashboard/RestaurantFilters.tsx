@@ -62,6 +62,7 @@ export function RestaurantFilters({
             <SelectItem value="busy">Busy</SelectItem>
             <SelectItem value="inactive">Inactive</SelectItem>
             <SelectItem value="pause">Pause</SelectItem>
+            <SelectItem value="hidden">Hidden</SelectItem>
           </SelectContent>
         </Select>
       </div>

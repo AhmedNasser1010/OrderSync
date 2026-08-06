@@ -178,7 +178,8 @@ export async function placeOrderServer(args: {
         const restaurantStatus = restaurantData.status || "pause";
         if (
           restaurantStatus === "inactive" ||
-          restaurantStatus === "pause"
+          restaurantStatus === "pause" ||
+          restaurantStatus === "hidden"
         ) {
           return { error: { code: "RESTAURANT_NOT_ACCEPTING_ORDERS" } };
         }

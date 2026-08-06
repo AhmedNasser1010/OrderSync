@@ -33,6 +33,7 @@ const useAddToCart = (resID: string, status: string) => {
     if (
       status === "inactive" ||
       status === "pause" ||
+      status === "hidden" ||
       workingDaysChecker(resOpeningHours, undefined, resOpenNowUntil) === false
     ) {
       dispatch(setShowResClosedPopup(true));
