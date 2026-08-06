@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import {
@@ -14,10 +14,10 @@ import {
 import RatingWithComment from "@/components/RatingWithComment";
 import {
   useSetOrderFeedbackMutation,
-  useSetUserOrderIdToNullMutation,
+  useClearTrackedOrderMutation,
   useFetchOrderTrackingDataQuery,
 } from "@/rtk/api/firestoreApi";
-import { setRateIsOpen } from "@/rtk/slices/toggleSlice";
+import { setRateIsOpen, setRateDismissedOrderId } from "@/rtk/slices/toggleSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { Button } from "@/components/ui/button";
 
@@ -25,7 +25,7 @@ function FeedbackPopup() {
   const dispatch = useAppDispatch();
   const isOpen = useAppSelector((state) => state.toggle.rateIsOpen);
   const user = useAppSelector((state) => state.user);
-  const { data: trackedOrderData } = useFetchOrderTrackingDataQuery(
+  const { currentData: trackedOrderData } = useFetchOrderTrackingDataQuery(
     user?.trackedOrder?.restaurant && user?.trackedOrder?.id && user?.uid
       ? {
           resId: user.trackedOrder.restaurant,
@@ -37,7 +37,7 @@ function FeedbackPopup() {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [setOrderFeedbackMutation] = useSetOrderFeedbackMutation();
-  const [setUserOrderIdToNull] = useSetUserOrderIdToNullMutation();
+  const [clearTrackedOrder] = useClearTrackedOrderMutation();
   const t = useTranslations();
 
   const resetFeedbackForm = () => {
@@ -56,26 +56,28 @@ function FeedbackPopup() {
         resId,
       });
     }
-    if (user?.uid) {
-      setUserOrderIdToNull(user.uid);
+    const orderId = trackedOrderData?.id;
+    if (orderId) {
+      dispatch(setRateDismissedOrderId(orderId));
+      if (user?.uid) {
+        clearTrackedOrder({ uid: user.uid, orderId });
+      }
     }
     dispatch(setRateIsOpen(false));
     resetFeedbackForm();
   };
 
   const handleClose = () => {
-    if (user?.uid) {
-      setUserOrderIdToNull(user.uid);
+    const orderId = trackedOrderData?.id;
+    if (orderId) {
+      dispatch(setRateDismissedOrderId(orderId));
+      if (user?.uid) {
+        clearTrackedOrder({ uid: user.uid, orderId });
+      }
     }
     dispatch(setRateIsOpen(false));
     resetFeedbackForm();
   };
-
-  useEffect(() => {
-    if (!isOpen) {
-      resetFeedbackForm();
-    }
-  }, [isOpen]);
 
   return (
     <Popup open={isOpen} onOpenChange={(open) => !open && handleClose()}>

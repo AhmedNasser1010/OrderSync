@@ -10,7 +10,10 @@ import {
   PopupTitle,
   PopupDescription,
 } from "@/components/ui/custom/Popup";
-import { setCancellationNoticeIsOpen } from "@/rtk/slices/toggleSlice";
+import {
+  setCancellationNoticeIsOpen,
+  setCancellationDismissedOrderId,
+} from "@/rtk/slices/toggleSlice";
 import useOrder from "@/hooks/useOrder";
 import { useRouter } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
@@ -33,6 +36,10 @@ function OrderCancellationNotice() {
   };
 
   const handleClick = () => {
+    const orderId = trackedOrderData?.id;
+    if (orderId) {
+      dispatch(setCancellationDismissedOrderId(orderId));
+    }
     dispatch(setCancellationNoticeIsOpen(false));
     router.push("/");
   };

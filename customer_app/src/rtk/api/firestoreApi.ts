@@ -15,7 +15,7 @@ import {
 import { db } from "@/lib/firebase";
 import { canTransition, getTimelineField } from "@ordersync/order-utils";
 import type { HeroBanner, OrderType, ServicesDocument } from "@ordersync/types";
-import { setRateIsOpen, setHasOrder } from "@/rtk/slices/toggleSlice";
+import { setHasOrder } from "@/rtk/slices/toggleSlice";
 
 interface TrackedOrderArg {
   orderId?: string | null;
@@ -26,6 +26,23 @@ interface TrackedOrderArg {
 const trackedOrderCacheReader: {
   read?: (arg: TrackedOrderArg, state: unknown) => Partial<OrderType> | undefined;
 } = {};
+
+const clearTrackedOrderIfMatching = async (uid: string, orderId: string) => {
+  const customerRef = doc(db, "customers", uid);
+
+  await runTransaction(db, async (transaction) => {
+    const customerSnap = await transaction.get(customerRef);
+    if (!customerSnap.exists()) return;
+
+    const customerData = customerSnap.data() as { trackedOrder?: { id?: string | null } };
+
+    if (customerData?.trackedOrder?.id === orderId) {
+      transaction.update(customerRef, {
+        "trackedOrder.id": null,
+      });
+    }
+  });
+};
 
 interface CancelOrderArg {
   orderId: string;
@@ -187,9 +204,6 @@ export const firestoreApi = createApi({
                 Object.assign(draft, data);
               });
               dispatch(setHasOrder(true));
-              if (data.status?.current === "DELIVERED") {
-                dispatch(setRateIsOpen(true));
-              }
             } else {
               updateCachedData((draft) => {
                 Object.keys(draft).forEach((k) => delete draft[k as keyof typeof draft]);
@@ -208,6 +222,7 @@ export const firestoreApi = createApi({
         await cacheEntryRemoved;
         unsubscribe();
       },
+      keepUnusedDataFor: 0,
     }),
 
     // =====================================================================
@@ -251,10 +266,7 @@ export const firestoreApi = createApi({
             });
           });
 
-          const customerRef = doc(db, "customers", uid);
-          await updateDoc(customerRef, {
-            "trackedOrder.id": null,
-          });
+          await clearTrackedOrderIfMatching(uid, orderId);
 
           return { data: null };
         } catch (error) {
@@ -275,7 +287,6 @@ export const firestoreApi = createApi({
           }
 
           const orderRef = doc(db, "orders", orderId);
-          const userRef = doc(db, "customers", uid);
           const reviewRef = doc(db, "reviews", orderId);
           const businessRef = doc(db, "businesses", resId);
 
@@ -368,9 +379,7 @@ export const firestoreApi = createApi({
             transaction.set(businessRef, { reviewSummary: newSummary }, { merge: true });
           });
 
-          await updateDoc(userRef, {
-            "trackedOrder.id": null,
-          });
+          await clearTrackedOrderIfMatching(uid, orderId);
 
           return { data: null };
         } catch (error) {
@@ -383,24 +392,23 @@ export const firestoreApi = createApi({
       invalidatesTags: ["OrderTracking", "Restaurants"],
     }),
 
-    setUserOrderIdToNull: builder.mutation<null, string | null | undefined>({
-      async queryFn(uid) {
+    clearTrackedOrder: builder.mutation<
+      null,
+      { uid?: string | null; orderId: string }
+    >({
+      async queryFn({ uid, orderId }) {
         try {
-          if (!uid) {
-            throw new Error("Missing customer uid");
+          if (!uid || !orderId) {
+            throw new Error("Missing customer uid or order id");
           }
 
-          const customerRef = doc(db, "customers", uid);
-
-          await updateDoc(customerRef, {
-            "trackedOrder.id": null,
-          });
+          await clearTrackedOrderIfMatching(uid, orderId);
 
           return { data: null };
         } catch (error) {
           const message =
             error instanceof Error ? error.message : "Unknown error";
-          console.error("Error while set customer orderId to null:", message);
+          console.error("Error while clearing tracked order:", message);
           return { error: message };
         }
       },
@@ -510,7 +518,7 @@ export const {
   useFetchOrderTrackingDataQuery,
   useCancelOrderMutation,
   useSetOrderFeedbackMutation,
-  useSetUserOrderIdToNullMutation,
+  useClearTrackedOrderMutation,
   useFinalizePendingLoyaltyMutation,
 } = firestoreApi;
 

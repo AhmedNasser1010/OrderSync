@@ -13,6 +13,8 @@ export interface ToggleState {
   showOrderPlacementErrorDialog: boolean;
   rateIsOpen: boolean;
   cancellationNoticeIsOpen: boolean;
+  rateDismissedOrderId: string | null;
+  cancellationDismissedOrderId: string | null;
   hasOrder: boolean;
   theme: "light" | "dark";
 }
@@ -29,6 +31,8 @@ const initialState: ToggleState = {
   showOrderPlacementErrorDialog: false,
   rateIsOpen: false,
   cancellationNoticeIsOpen: false,
+  rateDismissedOrderId: null,
+  cancellationDismissedOrderId: null,
   hasOrder: true,
   theme: "light",
 };
@@ -90,6 +94,18 @@ const toggleSlice = createSlice({
       state.cancellationNoticeIsOpen =
         payload === undefined ? !state.cancellationNoticeIsOpen : payload;
     },
+    setRateDismissedOrderId: (
+      state,
+      { payload }: PayloadAction<string | null>
+    ) => {
+      state.rateDismissedOrderId = payload;
+    },
+    setCancellationDismissedOrderId: (
+      state,
+      { payload }: PayloadAction<string | null>
+    ) => {
+      state.cancellationDismissedOrderId = payload;
+    },
     initTheme: (state) => {
       let saved: string | null = null;
       if (typeof window !== "undefined") {
@@ -127,6 +143,8 @@ export const {
   setRateIsOpen,
   setHasOrder,
   setCancellationNoticeIsOpen,
+  setRateDismissedOrderId,
+  setCancellationDismissedOrderId,
   initTheme,
   setTheme,
 } = toggleSlice.actions;
