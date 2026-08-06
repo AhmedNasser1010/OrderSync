@@ -23,6 +23,7 @@ interface RestaurantCardInfo {
   status?: string;
   openingHours?: OpeningHours;
   openNowUntil?: number;
+  hasOffers?: boolean;
   className?: string;
 }
 
@@ -61,6 +62,7 @@ function RestaurantCard({ info }: { info: RestaurantCardInfo }) {
     status,
     openingHours,
     openNowUntil,
+    hasOffers,
     className,
   } = info;
   const locale = useLocale();
@@ -131,6 +133,11 @@ function RestaurantCard({ info }: { info: RestaurantCardInfo }) {
             openNowUntil={openNowUntil}
           />
         </span>
+        {hasOffers && (
+          <span className="absolute top-2 end-2 z-10 rounded-full bg-gradient-to-r from-color-2 to-[#ffab4a] px-3 py-1 font-ProximaNovaBold text-xs uppercase tracking-wide text-white shadow-lg shadow-color-2/30">
+            {t("Offers")}
+          </span>
+        )}
       </div>
       <div className="mx-3">
         <div className="flex items-center justify-between gap-2">

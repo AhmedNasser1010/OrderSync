@@ -18,5 +18,6 @@ export function toCardInfo(
     promotionalSubtitle: res?.branding?.promotionalSubtitle,
     openingHours: res?.operations?.openingHours,
     openNowUntil: res?.operations?.openNowUntil,
+    hasOffers: res?.hasOffers,
   };
 }

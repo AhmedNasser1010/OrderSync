@@ -18,10 +18,12 @@ interface ReviewsFiltersProps {
   restaurantFilter: string;
   dateRange: string;
   searchQuery: string;
+  visibilityFilter: string;
   onRatingChange: (value: string) => void;
   onRestaurantChange: (value: string) => void;
   onDateRangeChange: (value: string) => void;
   onSearchChange: (value: string) => void;
+  onVisibilityChange: (value: string) => void;
 }
 
 export function ReviewsFilters({
@@ -30,10 +32,12 @@ export function ReviewsFilters({
   restaurantFilter,
   dateRange,
   searchQuery,
+  visibilityFilter,
   onRatingChange,
   onRestaurantChange,
   onDateRangeChange,
   onSearchChange,
+  onVisibilityChange,
 }: ReviewsFiltersProps) {
   return (
     <Card className="p-4 bg-card border-border">
@@ -78,6 +82,18 @@ export function ReviewsFilters({
             <SelectItem value="7">Last 7 Days</SelectItem>
             <SelectItem value="30">Last 30 Days</SelectItem>
             <SelectItem value="90">Last 90 Days</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Visibility Filter */}
+        <Select value={visibilityFilter} onValueChange={onVisibilityChange}>
+          <SelectTrigger className="w-[150px] h-9">
+            <SelectValue placeholder="All Reviews" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Reviews</SelectItem>
+            <SelectItem value="visible">Visible</SelectItem>
+            <SelectItem value="hidden">Hidden</SelectItem>
           </SelectContent>
         </Select>
 

@@ -969,6 +969,99 @@ export const firestoreApi = createApi({
       },
       providesTags: ["Reviews"],
     }),
+    setReviewVisibility: builder.mutation<
+      null,
+      { orderId: string; restaurantId: string; hidden: boolean; partnerUid: string }
+    >({
+      async queryFn({ orderId, restaurantId, hidden, partnerUid }) {
+        try {
+          if (!orderId) throw new Error("Review order ID is required.");
+          if (!restaurantId) throw new Error("Restaurant ID is required.");
+
+          await runTransaction(db, async (transaction) => {
+            const reviewRef = doc(db, "reviews", orderId);
+            const businessRef = doc(db, "businesses", restaurantId);
+
+            const reviewSnap = await transaction.get(reviewRef);
+            const businessSnap = await transaction.get(businessRef);
+
+            if (!reviewSnap.exists()) {
+              throw new Error("Review not found.");
+            }
+            if (!businessSnap.exists()) {
+              throw new Error("Business not found.");
+            }
+
+            const review = reviewSnap.data() as CustomerFeedbackType;
+            if ((review.hidden ?? false) === hidden) {
+              throw new Error(
+                hidden
+                  ? "Review is already hidden."
+                  : "Review is already visible.",
+              );
+            }
+
+            const now = Date.now();
+            transaction.update(reviewRef, {
+              hidden,
+              hiddenAt: hidden ? now : null,
+              hiddenBy: hidden ? partnerUid : null,
+              updatedAt: now,
+            });
+
+            const businessData = businessSnap.data();
+            const existingSummary = businessData?.reviewSummary ?? {
+              averageRating: 0,
+              totalReviews: 0,
+              totalRatingPoints: 0,
+              stars: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+            };
+
+            const delta = hidden ? -1 : 1;
+            const rating = review.rating ?? 0;
+            const newTotalReviews = Math.max(
+              0,
+              existingSummary.totalReviews + delta,
+            );
+            const newTotalRatingPoints = Math.max(
+              0,
+              existingSummary.totalRatingPoints + delta * rating,
+            );
+            const nextStars = { ...existingSummary.stars };
+            nextStars[rating as keyof typeof nextStars] = Math.max(
+              0,
+              (nextStars[rating as keyof typeof nextStars] || 0) + delta,
+            );
+
+            const newSummary = {
+              averageRating:
+                newTotalReviews > 0
+                  ? (newTotalRatingPoints / newTotalReviews).toFixed(1)
+                  : "0.0",
+              totalReviews: newTotalReviews,
+              totalRatingPoints: newTotalRatingPoints,
+              stars: nextStars,
+            };
+
+            transaction.set(
+              businessRef,
+              { reviewSummary: newSummary, updatedAt: now },
+              { merge: true },
+            );
+          });
+
+          console.log(
+            `Write Operation [setReviewVisibility]: ${hidden ? "hidden" : "restored"} review ${orderId}`,
+          );
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error setting review visibility:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Reviews", "Businesses"],
+    }),
     updateCustomerDocument: builder.mutation<
       null,
       { uid: string; updates: Partial<CustomerType> }
@@ -1140,4 +1233,5 @@ export const {
   useUpdateDriverDocumentMutation,
   useDeleteDriverDocumentMutation,
   useUpdateCustomerDocumentMutation,
+  useSetReviewVisibilityMutation,
 } = firestoreApi;

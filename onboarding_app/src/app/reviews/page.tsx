@@ -4,6 +4,7 @@ import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { ReviewsTable } from "@/components/dashboard/ReviewsTable";
 import { ReviewsFilters } from "@/components/dashboard/ReviewsFilters";
+import { HideReviewDialog } from "@/components/dashboard/HideReviewDialog";
 import { ExportButton } from "@/components/dashboard/ExportButton";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
@@ -14,8 +15,10 @@ import {
   useFetchBusinessesQuery,
   useFetchReviewsQuery,
   useFetchCustomersQuery,
+  useSetReviewVisibilityMutation,
 } from "@/rtk/api/firestoreApi";
 import type { ExportColumn } from "@/lib/export-utils";
+import type { CustomerFeedbackType } from "@ordersync/types";
 
 const COOLDOWN_DURATION = 5;
 const PAGE_SIZE = 15;
@@ -39,9 +42,16 @@ export default function ReviewsPage() {
   const [restaurantFilter, setRestaurantFilter] = useState("all");
   const [dateRange, setDateRange] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [visibilityFilter, setVisibilityFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [cooldown, setCooldown] = useState(0);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [busyOrderId, setBusyOrderId] = useState<string | null>(null);
+  const [hideDialog, setHideDialog] = useState<{
+    open: boolean;
+    review: CustomerFeedbackType | null;
+  }>({ open: false, review: null });
+  const [setReviewVisibility] = useSetReviewVisibilityMutation();
 
   const { data: userData } = useFetchUserDataQuery(authUser?.uid ?? "", {
     skip: !authUser?.uid,
@@ -140,6 +150,35 @@ export default function ReviewsPage() {
     setPage(1);
   }, []);
 
+  const handleVisibilityChange = useCallback((value: string) => {
+    setVisibilityFilter(value);
+    setPage(1);
+  }, []);
+
+  const handleToggleHidden = useCallback((review: CustomerFeedbackType) => {
+    setHideDialog({ open: true, review });
+  }, []);
+
+  async function handleHideConfirm() {
+    const review = hideDialog.review;
+    if (!review || !authUser?.uid) return;
+
+    setBusyOrderId(review.orderId);
+    try {
+      await setReviewVisibility({
+        orderId: review.orderId,
+        restaurantId: review.restaurantId,
+        hidden: !review.hidden,
+        partnerUid: authUser.uid,
+      }).unwrap();
+    } catch {
+      // The mutation error is surfaced via the unwrap rejection.
+    } finally {
+      setBusyOrderId(null);
+      setHideDialog({ open: false, review: null });
+    }
+  }
+
   const filteredReviews = useMemo(() => {
     // eslint-disable-next-line react-hooks/purity -- Date.now() is safe here for time-based filtering
     const now = Date.now();
@@ -161,9 +200,27 @@ export default function ReviewsPage() {
         !searchQuery ||
         review.comment?.toLowerCase().includes(searchQuery.toLowerCase());
 
-      return matchesRating && matchesRestaurant && matchesDate && matchesSearch;
+      const matchesVisibility =
+        visibilityFilter === "all" ||
+        (visibilityFilter === "hidden" && review.hidden) ||
+        (visibilityFilter === "visible" && !review.hidden);
+
+      return (
+        matchesRating &&
+        matchesRestaurant &&
+        matchesDate &&
+        matchesSearch &&
+        matchesVisibility
+      );
     });
-  }, [allReviews, ratingFilter, restaurantFilter, dateRange, searchQuery]);
+  }, [
+    allReviews,
+    ratingFilter,
+    restaurantFilter,
+    dateRange,
+    searchQuery,
+    visibilityFilter,
+  ]);
 
   const totalPages = Math.ceil(filteredReviews.length / PAGE_SIZE);
   const safePage = Math.min(page, totalPages || 1);
@@ -225,10 +282,12 @@ export default function ReviewsPage() {
           restaurantFilter={restaurantFilter}
           dateRange={dateRange}
           searchQuery={searchQuery}
+          visibilityFilter={visibilityFilter}
           onRatingChange={handleRatingChange}
           onRestaurantChange={handleRestaurantChange}
           onDateRangeChange={handleDateRangeChange}
           onSearchChange={handleSearchChange}
+          onVisibilityChange={handleVisibilityChange}
         />
 
         {/* Results count */}
@@ -243,6 +302,28 @@ export default function ReviewsPage() {
           restaurantNameMap={restaurantNameMap}
           isLoading={isLoading}
           isError={isError}
+          busyOrderId={busyOrderId}
+          onToggleHidden={handleToggleHidden}
+        />
+
+        {/* Hide/Show Review Dialog */}
+        <HideReviewDialog
+          open={hideDialog.open}
+          onOpenChange={(open) =>
+            setHideDialog((prev) => ({ ...prev, open }))
+          }
+          onConfirm={handleHideConfirm}
+          hidden={hideDialog.review?.hidden ?? false}
+          customerName={
+            hideDialog.review
+              ? customerNameMap[hideDialog.review.customerId]
+              : undefined
+          }
+          restaurantName={
+            hideDialog.review
+              ? restaurantNameMap[hideDialog.review.restaurantId]
+              : undefined
+          }
         />
 
         {/* Pagination */}

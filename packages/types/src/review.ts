@@ -6,4 +6,7 @@ export type CustomerFeedbackType = {
   comment: string;
   createdAt: number;
   updatedAt: number;
+  hidden?: boolean;
+  hiddenAt?: number;
+  hiddenBy?: string;
 };

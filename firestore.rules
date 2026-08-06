@@ -108,7 +108,17 @@ service cloud.firestore {
     match /reviews/{reviewId} {
       allow read: if true;
       allow create: if isCustomer();
-      allow update, delete: if false;
+      allow update: if ((isPartner() && partnerOwnsToken(resourceData().restaurantId))
+        || isManagerOf(resourceData().restaurantId))
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['hidden', 'hiddenAt', 'hiddenBy', 'updatedAt'])
+        && request.resource.data.hidden is bool
+        && (request.resource.data.hidden == true
+          ? (request.resource.data.hiddenAt is number
+            && request.resource.data.hiddenBy is string)
+          : (request.resource.data.hiddenAt == null
+            && request.resource.data.hiddenBy == null));
+      allow delete: if false;
     }
 
     // =====================================================================

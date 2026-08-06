@@ -10,7 +10,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Star } from "lucide-react";
+import { ActionsMenu } from "@/components/ui/actions-menu";
+import { Star, Eye, EyeOff, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { CustomerFeedbackType } from "@ordersync/types";
@@ -21,6 +22,8 @@ interface ReviewsTableProps {
   restaurantNameMap: Record<string, string>;
   isLoading?: boolean;
   isError?: boolean;
+  busyOrderId?: string | null;
+  onToggleHidden?: (review: CustomerFeedbackType) => void;
 }
 
 function StarRating({ rating }: { rating: number }) {
@@ -49,6 +52,8 @@ export function ReviewsTable({
   restaurantNameMap,
   isLoading = false,
   isError = false,
+  busyOrderId = null,
+  onToggleHidden,
 }: ReviewsTableProps) {
   if (isLoading) {
     return (
@@ -94,18 +99,29 @@ export function ReviewsTable({
               Rating
             </TableHead>
             <TableHead className="text-foreground font-semibold">
+              Status
+            </TableHead>
+            <TableHead className="text-foreground font-semibold">
               Comment
             </TableHead>
             <TableHead className="text-foreground font-semibold">
               Date
             </TableHead>
+            {onToggleHidden && (
+              <TableHead className="text-foreground font-semibold text-right">
+                Actions
+              </TableHead>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
           {reviews.map((review) => (
             <TableRow
               key={review.orderId}
-              className="border-border hover:bg-secondary/50"
+              className={cn(
+                "border-border hover:bg-secondary/50",
+                review.hidden && "opacity-60",
+              )}
             >
               <TableCell className="py-4">
                 {(() => {
@@ -154,6 +170,25 @@ export function ReviewsTable({
               <TableCell className="py-4">
                 <StarRating rating={review.rating} />
               </TableCell>
+              <TableCell className="py-4">
+                {review.hidden ? (
+                  <Badge
+                    variant="outline"
+                    className="gap-1 px-2.5 py-1 border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-400"
+                  >
+                    <EyeOff className="h-3 w-3" />
+                    Hidden
+                  </Badge>
+                ) : (
+                  <Badge
+                    variant="outline"
+                    className="gap-1 px-2.5 py-1 border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400"
+                  >
+                    <Eye className="h-3 w-3" />
+                    Visible
+                  </Badge>
+                )}
+              </TableCell>
               <TableCell className="py-4 text-sm text-foreground max-w-[300px]">
                 <p className="line-clamp-2">
                   {review.comment || "—"}
@@ -164,6 +199,32 @@ export function ReviewsTable({
                   ? format(new Date(review.createdAt), "MMM dd, yyyy")
                   : "—"}
               </TableCell>
+              {onToggleHidden && (
+                <TableCell className="py-4 text-right">
+                  <div className="flex items-center justify-end">
+                    {busyOrderId === review.orderId ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                    ) : (
+                      <ActionsMenu
+                        items={[
+                          {
+                            key: review.hidden ? "show" : "hide",
+                            label: review.hidden
+                              ? "Show review"
+                              : "Hide review",
+                            icon: review.hidden ? (
+                              <Eye className="h-4 w-4" />
+                            ) : (
+                              <EyeOff className="h-4 w-4" />
+                            ),
+                            onClick: () => onToggleHidden(review),
+                          },
+                        ]}
+                      />
+                    )}
+                  </div>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
