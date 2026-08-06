@@ -182,17 +182,17 @@ export default function OrderDetailPage({
               />
               <button
                 onClick={handleOpenMaps}
-                className="absolute right-0 top-3 z-1000 flex h-10 items-center gap-2 rounded-xl bg-background px-3 py-2 text-sm font-medium shadow-lg transition-all hover:bg-muted active:scale-[0.96]"
+                className="absolute end-3 top-3 z-[1000] flex h-10 items-center gap-2 rounded-xl bg-background px-3 py-2 text-sm font-medium shadow-lg transition-all hover:bg-muted active:scale-[0.96]"
               >
                 <Navigation className="h-4 w-4" />
                 {t("navigate")}
               </button>
               <button
                 onClick={() => router.back()}
-                className="absolute inset-s-0 top-3 z-1000 flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-lg transition-all hover:bg-muted active:scale-[0.95]"
+                className="absolute start-3 top-3 z-[1000] flex h-10 w-10 items-center justify-center rounded-xl bg-background shadow-lg transition-all hover:bg-muted active:scale-[0.95]"
                 aria-label={t("goBack")}
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
               </button>
             </div>
           ) : (
