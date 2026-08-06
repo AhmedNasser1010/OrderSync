@@ -147,6 +147,19 @@ service cloud.firestore {
     }
 
     // =====================================================================
+    // /services/{serviceId}
+    //
+    // Global platform config (e.g. delivery fee rates). Publicly readable
+    // so the customer app can display correct pricing; partners edit it
+    // from the onboarding app Settings page.
+    // =====================================================================
+    match /services/{serviceId} {
+      allow read: if true;
+      allow create, update: if isPartner();
+      allow delete: if false;
+    }
+
+    // =====================================================================
     // /customers/{userId}
     // =====================================================================
     match /customers/{userId} {
@@ -224,14 +237,9 @@ service cloud.firestore {
 
       // --- CREATE permissions ---
 
-      // Customers can create orders they placed.
-      allow create: if isCustomer()
-        && incomingData().customer.uid == request.auth.uid
-        && incomingData().status.current == 'RECEIVED';
-
-      // Customers can initialize the orders root document (lazily on first order).
-      allow create: if isCustomer()
-        && incomingData().accessToken is string;
+      // Orders are created exclusively by the Next.js server action
+      // (Admin SDK, which bypasses rules). Customers can never create
+      // order documents directly, so pricing/discounts cannot be forged.
 
       // --- UPDATE permissions ---
 

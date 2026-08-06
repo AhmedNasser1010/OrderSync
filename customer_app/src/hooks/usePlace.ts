@@ -7,6 +7,7 @@ import {
   toggleLoginSidebar,
   toggleOrderSidebar,
   setShowRestaurantUnavailablePopup,
+  setShowOrderPlacementErrorDialog,
 } from "@/rtk/slices/toggleSlice";
 import filterObject from "@/utils/filterObject";
 import getUserSource from "@/utils/getUserSource";
@@ -19,14 +20,14 @@ import {
 import getDeliveryFees from "@/utils/getDeliveryFees";
 import getDistanceFromLatlngInKm from "@/utils/getDistanceFromLatlngInKm";
 import orderYupSchema from "@/lib/orderYupSchema";
-import { useSetPlaceOrderMutation } from "@/rtk/api/firestoreApi";
-import type { PlaceOrderInput } from "@/rtk/api/firestoreApi";
+import { placeOrderServer } from "@/app/actions/placeOrder";
+import { auth } from "@/lib/firebase";
+import type { PlaceOrderInput } from "@/lib/orderTypes";
 import type { InferType } from "yup";
 import type { CartItem } from "@/rtk/slices/cartSlice";
 import type { UserLocation } from "@/rtk/slices/userSlice";
 import type {
   ItemType,
-  CategoryType,
   DiscountObject,
 } from "@ordersync/types";
 
@@ -68,11 +69,10 @@ const usePlace = () => {
           currentRes.profile.latlng
         )
       : undefined;
-  const deliveryFees = getDeliveryFees(
-    userDistanceFromRes,
-    services.deliveryFees
-  );
-  const [setPlaceOrder] = useSetPlaceOrderMutation();
+  const deliveryFees = getDeliveryFees(userDistanceFromRes, {
+    perKm: services.deliveryFees,
+    min: services.minDeliveryFees,
+  });
 
   const showError = (message: string, sidebar: "login" | "order" = "login") => {
     toast.error(t(message), {
@@ -315,12 +315,22 @@ const usePlace = () => {
     });
   };
 
-  const placeOrderMutation = (
+  const placeOrderMutation = async (
     validatedData: InferType<typeof orderYupSchema>
   ) => {
-    return setPlaceOrder(
-      validatedData as unknown as PlaceOrderInput
-    ).unwrap();
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      throw { code: "UNAUTHORIZED" };
+    }
+    const idToken = await currentUser.getIdToken();
+    const result = await placeOrderServer({
+      idToken,
+      orderData: validatedData as unknown as PlaceOrderInput,
+    });
+    if (!result.success) {
+      throw { code: result.code };
+    }
+    return result;
   };
 
   const handleOrderPlacementSuccess = () => {
@@ -349,6 +359,14 @@ const usePlace = () => {
         duration: 4000,
       });
       dispatch(toggleOrderSidebar());
+      return;
+    }
+
+    if (
+      error?.code === "PRICE_MISMATCH" ||
+      error?.data?.code === "PRICE_MISMATCH"
+    ) {
+      dispatch(setShowOrderPlacementErrorDialog(true));
       return;
     }
 

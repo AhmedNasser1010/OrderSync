@@ -60,8 +60,11 @@ export default function CheckoutPage() {
       selectedLocation.latlng as [number, number],
       res.profile.latlng
     );
-    return getDeliveryFees(distance, services.deliveryFees);
-  }, [res, user, services.deliveryFees]);
+    return getDeliveryFees(distance, {
+      perKm: services.deliveryFees,
+      min: services.minDeliveryFees,
+    });
+  }, [res, user, services.deliveryFees, services.minDeliveryFees]);
 
   const handleCurrentState = (status: string) => {
     setCurrentState(status);

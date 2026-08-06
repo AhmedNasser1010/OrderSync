@@ -8,23 +8,13 @@ import {
   onSnapshot,
   orderBy,
   query,
-  setDoc,
   updateDoc,
   where,
   runTransaction,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import {
-  TERMINAL_STATUSES,
-  canTransition,
-  getTimelineField,
-} from "@ordersync/order-utils";
-import type {
-  HeroBanner,
-  OrderType,
-  OrderStatusType,
-} from "@ordersync/types";
-import randomOrderNumber from "@/utils/randomOrderId";
+import { canTransition, getTimelineField } from "@ordersync/order-utils";
+import type { HeroBanner, OrderType, ServicesDocument } from "@ordersync/types";
 import { setRateIsOpen, setHasOrder } from "@/rtk/slices/toggleSlice";
 
 interface TrackedOrderArg {
@@ -36,53 +26,6 @@ interface TrackedOrderArg {
 const trackedOrderCacheReader: {
   read?: (arg: TrackedOrderArg, state: unknown) => Partial<OrderType> | undefined;
 } = {};
-
-export interface PlaceOrderInput {
-  customerUid: string;
-  business: {
-    id: string;
-    name: string;
-    nameInAr: string;
-    phone: string;
-    address: string;
-    latlng: number[];
-  };
-  assignment?: { driverUid?: string | null } | null;
-  delivery: {
-    address: string;
-    latlng: number[];
-    note?: string;
-  };
-  cart: {
-    id: string;
-    name: string;
-    quantity: number;
-    selectedSize?: string | null;
-    discountCode?: string;
-  }[];
-  pricing: {
-    subtotal: number;
-    discount: number;
-    deliveryFees: number;
-    total: number;
-    promoCode?: string;
-    promoDiscount?: number;
-  };
-  payment: { method: string; status: string };
-  finance?: Record<string, number>;
-  reconciliation?: Record<string, unknown>;
-  notes?: Record<string, unknown>;
-  metadata?: Record<string, unknown>;
-  customer: {
-    uid: string;
-    name: string;
-    phone: string;
-    secondPhone?: string;
-    firstOrderDate: number;
-    totalOrders: number;
-    totalOrdersValue: number;
-  };
-}
 
 interface CancelOrderArg {
   orderId: string;
@@ -99,7 +42,14 @@ interface OrderFeedbackArg {
 export const firestoreApi = createApi({
   reducerPath: "firestoreApi",
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["OrderTracking", "User", "Restaurants", "Menu", "Banners"],
+  tagTypes: [
+    "OrderTracking",
+    "User",
+    "Restaurants",
+    "Menu",
+    "Banners",
+    "Services",
+  ],
   endpoints: (builder) => ({
     // =====================================================================
     // Query Endpoints
@@ -164,6 +114,52 @@ export const firestoreApi = createApi({
       providesTags: ["Menu"],
     }),
 
+    fetchServices: builder.query<
+      {
+        deliveryFees: ServicesDocument["deliveryFeesPerKm"];
+        minDeliveryFees: ServicesDocument["minDeliveryFees"];
+      },
+      void
+    >({
+      queryFn: () => ({
+        data: { deliveryFees: 3.5, minDeliveryFees: 5 },
+      }),
+      async onCacheEntryAdded(
+        _arg,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
+      ) {
+        await cacheDataLoaded;
+
+        const servicesRef = doc(db, "services", "platform");
+
+        const unsubscribe = onSnapshot(
+          servicesRef,
+          (docSnapshot) => {
+            updateCachedData((draft) => {
+              if (docSnapshot.exists()) {
+                const data = docSnapshot.data() as Partial<ServicesDocument>;
+                draft.deliveryFees = data.deliveryFeesPerKm ?? 3.5;
+                draft.minDeliveryFees = data.minDeliveryFees ?? 5;
+              } else {
+                draft.deliveryFees = 3.5;
+                draft.minDeliveryFees = 5;
+              }
+            });
+          },
+          (error) => {
+            console.error(
+              "Error in real-time listener [services]:",
+              error?.message
+            );
+          }
+        );
+
+        await cacheEntryRemoved;
+        unsubscribe();
+      },
+      providesTags: ["Services"],
+    }),
+
     fetchOrderTrackingData: builder.query<Partial<OrderType>, TrackedOrderArg>({
       queryFn: (_arg, { getState }) => {
         const existing = trackedOrderCacheReader.read?.(_arg, getState());
@@ -217,213 +213,6 @@ export const firestoreApi = createApi({
     // =====================================================================
     // Mutation Endpoints
     // =====================================================================
-
-    setPlaceOrder: builder.mutation<null, PlaceOrderInput>({
-      async queryFn(orderData) {
-        try {
-          if (!orderData) {
-            throw new Error("Order data is required.");
-          }
-
-          const customerRef = doc(db, "customers", orderData.customer.uid);
-          const restaurantRef = doc(db, "businesses", orderData.business.id);
-
-          const activeOrdersQuery = query(
-            collection(db, "orders"),
-            where("customer.uid", "==", orderData.customerUid)
-          );
-          const activeOrdersSnapshot = await getDocs(activeOrdersQuery);
-          const activeOrder = activeOrdersSnapshot.docs
-            .map(
-              (orderDoc) =>
-                ({ id: orderDoc.id, ...orderDoc.data() }) as Partial<OrderType>
-            )
-            .find(
-              (order) =>
-                !TERMINAL_STATUSES.includes(
-                  order.status?.current as OrderStatusType
-                )
-            );
-
-          const orderRef = doc(collection(db, "orders"));
-          const now = Date.now();
-          const orderNumber = randomOrderNumber();
-
-          const buildTrackedOrder = (order: Partial<OrderType>) => ({
-            id: order.id as string,
-            orderNumber: order.orderNumber,
-            restaurant: order.businessId as string,
-            pendingLoyalty: {
-              orderId: order.id as string,
-              restaurant: order.businessId as string,
-              amount: order.pricing?.total ?? 0,
-              items: (order.cart ?? []).reduce(
-                (sum, item) => sum + (item.quantity || 0),
-                0
-              ),
-              totalOrders: 1,
-              firstOrderTime: order.customer?.firstOrderDate ?? now,
-              counted: false,
-            },
-          });
-
-          const isNonTerminal = (status: string | undefined) =>
-            !!status &&
-            !TERMINAL_STATUSES.includes(status as OrderStatusType);
-
-          const transactionResult = await runTransaction(
-            db,
-            async (transaction) => {
-              const customerSnap = await transaction.get(customerRef);
-
-              if (!customerSnap.exists()) {
-                return {
-                  error: {
-                    code: "CUSTOMER_NOT_FOUND",
-                    message: "Customer not found.",
-                  },
-                };
-              }
-
-              const restaurantSnap = await transaction.get(restaurantRef);
-
-              if (!restaurantSnap.exists()) {
-                return {
-                  error: {
-                    code: "RESTAURANT_NOT_FOUND",
-                    message: "Restaurant not found.",
-                  },
-                };
-              }
-
-              const restaurantData = restaurantSnap.data();
-              const restaurantStatus = restaurantData?.status || "pause";
-
-              if (
-                restaurantStatus === "inactive" ||
-                restaurantStatus === "pause"
-              ) {
-                return {
-                  error: {
-                    code: "RESTAURANT_NOT_ACCEPTING_ORDERS",
-                    status: restaurantStatus,
-                    message:
-                      "This restaurant is currently closed or paused right now.",
-                  },
-                };
-              }
-
-              const customerData = customerSnap.data() ?? {};
-              const trackedId = customerData?.trackedOrder?.id || null;
-
-              if (activeOrder && activeOrder.id !== trackedId) {
-                const activeOrderSnap = await transaction.get(
-                  doc(db, "orders", activeOrder.id as string)
-                );
-                const activeStatus = activeOrderSnap.exists()
-                  ? (activeOrderSnap.data() as Partial<OrderType>).status
-                      ?.current
-                  : undefined;
-
-                if (isNonTerminal(activeStatus)) {
-                  transaction.update(customerRef, {
-                    trackedOrder: buildTrackedOrder(activeOrder),
-                  });
-                  return {
-                    error: {
-                      code: "ALREADY_HAS_ACTIVE_ORDER",
-                      message: "You already have an order in progress.",
-                    },
-                  };
-                }
-              }
-
-              if (trackedId) {
-                const trackedOrderSnap = await transaction.get(
-                  doc(db, "orders", trackedId)
-                );
-                const trackedStatus = trackedOrderSnap.exists()
-                  ? (trackedOrderSnap.data() as Partial<OrderType>).status
-                      ?.current
-                  : undefined;
-
-                if (isNonTerminal(trackedStatus)) {
-                  return {
-                    error: {
-                      code: "ALREADY_HAS_ACTIVE_ORDER",
-                      message: "You already have an order in progress.",
-                    },
-                  };
-                }
-              }
-
-              const cartIsValid =
-                Array.isArray(orderData.cart) &&
-                orderData.cart.length > 0 &&
-                orderData.cart.every((item) => (item.quantity || 0) > 0);
-
-              if (!cartIsValid || !(orderData.pricing?.total > 0)) {
-                return {
-                  error: {
-                    code: "INVALID_ORDER_PAYLOAD",
-                    message: "Invalid order payload.",
-                  },
-                };
-              }
-
-              const pendingLoyalty = {
-                orderId: orderRef.id,
-                restaurant: orderData.business.id,
-                amount: orderData.pricing.total,
-                items: orderData.cart.reduce(
-                  (sum, item) => sum + (item.quantity || 0),
-                  0
-                ),
-                totalOrders: 1,
-                firstOrderTime: orderData.customer.firstOrderDate,
-                counted: false,
-              };
-
-              const newOrder = {
-                ...orderData,
-                id: orderRef.id,
-                orderNumber,
-                businessId: orderData.business.id,
-                status: {
-                  current: "RECEIVED" as OrderStatusType,
-                  history: [
-                    { status: "RECEIVED" as OrderStatusType, timestamp: now, by: "customer" },
-                  ],
-                },
-                timeline: { placedAt: now },
-                createdAt: now,
-                updatedAt: now,
-              };
-
-              transaction.set(orderRef, newOrder);
-              transaction.update(customerRef, {
-                trackedOrder: {
-                  id: orderRef.id,
-                  orderNumber,
-                  restaurant: orderData.business.id,
-                  pendingLoyalty,
-                },
-              });
-
-              return { data: null };
-            }
-          );
-
-          return transactionResult;
-        } catch (error) {
-          const message =
-            error instanceof Error ? error.message : "Unknown error";
-          console.error("Error while placing a new order:", message);
-          return { error: message };
-        }
-      },
-      invalidatesTags: ["OrderTracking"],
-    }),
 
     cancelOrder: builder.mutation<null, CancelOrderArg>({
       async queryFn({ orderId, uid }) {
@@ -717,8 +506,8 @@ export const {
   useFetchBannersQuery,
   useFetchBusinessesQuery,
   useFetchMenuDataQuery,
+  useFetchServicesQuery,
   useFetchOrderTrackingDataQuery,
-  useSetPlaceOrderMutation,
   useCancelOrderMutation,
   useSetOrderFeedbackMutation,
   useSetUserOrderIdToNullMutation,

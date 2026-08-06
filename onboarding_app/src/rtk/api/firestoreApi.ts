@@ -31,6 +31,7 @@ import type {
   OrderType,
   MainMenuType,
   HeroBanner,
+  ServicesDocument,
 } from "@ordersync/types";
 
 export interface UpdateBusinessInput {
@@ -52,7 +53,7 @@ function getErrorMessage(error: unknown): string {
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["User", "Businesses", "Menu", "Drivers", "Customers", "Reviews", "Orders", "Banners"],
+  tagTypes: ["User", "Businesses", "Menu", "Drivers", "Customers", "Reviews", "Orders", "Banners", "Services"],
   endpoints: (builder) => ({
     // Query Endpoints
     fetchBanners: builder.query<HeroBanner[], void>({
@@ -138,6 +139,63 @@ export const firestoreApi = createApi({
         }
       },
       invalidatesTags: ["Banners"],
+    }),
+    fetchServices: builder.query<
+      Pick<ServicesDocument, "deliveryFeesPerKm" | "minDeliveryFees">,
+      void
+    >({
+      async queryFn() {
+        try {
+          const ref = doc(db, "services", "platform");
+          const snapshot = await getDoc(ref);
+          const data = snapshot.exists()
+            ? (snapshot.data() as Partial<ServicesDocument>)
+            : {};
+          console.log("Read Operation [fetchServices]");
+          return {
+            data: {
+              deliveryFeesPerKm: data.deliveryFeesPerKm ?? 3.5,
+              minDeliveryFees: data.minDeliveryFees ?? 5,
+            },
+          };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
+        }
+      },
+      providesTags: ["Services"],
+    }),
+    updateServices: builder.mutation<
+      null,
+      {
+        updates: {
+          deliveryFeesPerKm?: number;
+          minDeliveryFees?: number;
+          updatedBy?: string;
+        };
+      }
+    >({
+      async queryFn({ updates }) {
+        try {
+          const ref = doc(db, "services", "platform");
+          await setDoc(
+            ref,
+            {
+              ...updates,
+              updatedAt: Date.now(),
+            },
+            { merge: true }
+          );
+          console.log("Write Operation [updateServices]");
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error updating services:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Services"],
     }),
     fetchUserData: builder.query({
       async queryFn(userUid) {
@@ -1067,6 +1125,9 @@ export const {
   useCreateBannerMutation,
   useUpdateBannerMutation,
   useDeleteBannerMutation,
+
+  useFetchServicesQuery,
+  useUpdateServicesMutation,
 
   useCreateUserDocumentMutation,
   useCreateBusinessMutation,

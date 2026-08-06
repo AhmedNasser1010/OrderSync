@@ -36,6 +36,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { initUser } from "@/rtk/slices/userSlice";
 import { initServices } from "@/rtk/slices/servicesSlice";
+import { useFetchServicesQuery } from "@/rtk/api/firestoreApi";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
@@ -216,6 +217,19 @@ function Header() {
   const isHome = pathname === `/${locale}` || pathname === "/";
   const isLoggedIn = !!user?.userInfo?.uid;
 
+  const { data: servicesConfig } = useFetchServicesQuery();
+
+  useEffect(() => {
+    if (servicesConfig) {
+      dispatch(
+        initServices({
+          deliveryFees: servicesConfig.deliveryFees,
+          minDeliveryFees: servicesConfig.minDeliveryFees,
+        })
+      );
+    }
+  }, [servicesConfig, dispatch]);
+
   useEffect(() => {
     let unsub: (() => void) | null = null;
 
@@ -252,12 +266,6 @@ function Header() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    if (user?.userInfo?.uid) {
-      dispatch(initServices({ deliveryFees: 3.5 }));
-    }
-  }, [user?.userInfo?.uid, dispatch]);
 
   useEffect(() => {
     dispatch(toggleLng(locale));

@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { Link } from "@/i18n/routing";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import SectionHeader from "@/components/Home/SectionHeader";
 import RestaurantCard from "@/components/ui/custom/RestaurantCard";
 import { toCardInfo } from "@/components/Home/cardInfo";
@@ -27,16 +27,14 @@ function RestaurantCarousel({
   cardWidth = "w-72",
 }: RestaurantCarouselProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const locale = useLocale();
   const t = useTranslations();
-  const isRTL = locale === "ar";
 
   const scrollBy = (dir: number) => {
     ref.current?.scrollBy({ left: dir * 250, behavior: "smooth" });
   };
 
-  const onLeft = () => scrollBy(isRTL ? 250 : -250);
-  const onRight = () => scrollBy(isRTL ? -250 : 250);
+  const onLeft = () => scrollBy(-250);
+  const onRight = () => scrollBy(250);
 
   return (
     <section id={id}>

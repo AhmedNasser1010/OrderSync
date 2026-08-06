@@ -6,6 +6,7 @@ export type { Driver, LiveLocation } from "./driver";
 export type { CategoryType, SizeType, ItemType, MainMenuType } from "./menu";
 export type { OrderStatusType, OrderType } from "./order";
 export type { ManagerUser, PartnerUser } from "./user";
+export type { ServicesDocument, DeliveryFeesConfig } from "./services";
 export type {
   DiscountLevel,
   DiscountType,

@@ -109,6 +109,13 @@ export default function RootLayout({
       <body
         className={`${GrotThin.variable} ${GrotReg.variable} ${GrotMed.variable} ${GrotBold.variable} ${GrotBlack.variable} ${ProximaThin.variable} ${ProximaMed.variable} ${ProximaSemiBold.variable} ${ProximaBold.variable} ${ProximaBlack.variable} ${Beiruti.variable} min-h-full flex flex-col`}
       >
+        {process.env.NODE_ENV !== "production" && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(){if(!("serviceWorker" in navigator))return;navigator.serviceWorker.getRegistrations().then(function(r){for(var i=0;i<r.length;i++)r[i].unregister();});})();`,
+            }}
+          />
+        )}
         <SerwistProvider
           swUrl="/serwist/sw.js"
           disable={process.env.NODE_ENV !== "production"}

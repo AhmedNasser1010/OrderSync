@@ -124,10 +124,13 @@ export default function CartPage() {
         selectedLocation.latlng as [number, number],
         resInfo.profile.latlng
       );
-      return getDeliveryFees(userDistanceFromRes, services.deliveryFees);
+      return getDeliveryFees(userDistanceFromRes, {
+        perKm: services.deliveryFees,
+        min: services.minDeliveryFees,
+      });
     }
     return 0;
-  }, [resInfo, user, services.deliveryFees]);
+  }, [resInfo, user, services.deliveryFees, services.minDeliveryFees]);
 
   const autoOrderDiscount = useMemo(() => {
     if (!selectedItems?.length || !orderDiscounts?.length) return null;

@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { addFilter, clearAll } from "@/rtk/slices/filterSlice";
 import SectionHeader from "@/components/Home/SectionHeader";
@@ -17,9 +17,7 @@ const CATEGORY_IMAGES: Record<string, string> = {
 
 function WhatsOnYourMind() {
   const dispatch = useAppDispatch();
-  const locale = useLocale();
   const t = useTranslations();
-  const isRTL = locale === "ar";
   const restaurants = useAppSelector((state) => state.restaurants);
 
   const categories = useMemo(() => {
@@ -54,8 +52,8 @@ function WhatsOnYourMind() {
         <SectionHeader
           title={t("What's on your mind?")}
           arrows
-          onLeft={() => scrollBy(isRTL ? 250 : -250)}
-          onRight={() => scrollBy(isRTL ? -250 : 250)}
+          onLeft={() => scrollBy(-250)}
+          onRight={() => scrollBy(250)}
         />
         <div className="food-category overflow-x-auto scroll-smooth scrollbar-hide max-w-[1500px] pb-2">
           <div className="flex gap-6">

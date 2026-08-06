@@ -10,6 +10,7 @@ export interface ToggleState {
   showResClosedPopup: boolean;
   showResPausedPopup: boolean;
   showRestaurantUnavailablePopup: boolean;
+  showOrderPlacementErrorDialog: boolean;
   rateIsOpen: boolean;
   cancellationNoticeIsOpen: boolean;
   hasOrder: boolean;
@@ -25,6 +26,7 @@ const initialState: ToggleState = {
   showResClosedPopup: false,
   showResPausedPopup: false,
   showRestaurantUnavailablePopup: false,
+  showOrderPlacementErrorDialog: false,
   rateIsOpen: false,
   cancellationNoticeIsOpen: false,
   hasOrder: true,
@@ -64,12 +66,19 @@ const toggleSlice = createSlice({
       state.showRestaurantUnavailablePopup =
         payload === undefined ? !state.showRestaurantUnavailablePopup : payload;
     },
+    setShowOrderPlacementErrorDialog: (state, { payload }) => {
+      state.showOrderPlacementErrorDialog =
+        payload === undefined
+          ? !state.showOrderPlacementErrorDialog
+          : payload;
+    },
     resetPopupStates: (state) => {
       state.showItemsAlreadyInCartPopup = false;
       state.showTrackedOrderLockPopup = false;
       state.showResClosedPopup = false;
       state.showResPausedPopup = false;
       state.showRestaurantUnavailablePopup = false;
+      state.showOrderPlacementErrorDialog = false;
     },
     setRateIsOpen: (state, { payload }) => {
       state.rateIsOpen = payload === undefined ? !state.rateIsOpen : payload;
@@ -113,6 +122,7 @@ export const {
   setShowResClosedPopup,
   setShowResPausedPopup,
   setShowRestaurantUnavailablePopup,
+  setShowOrderPlacementErrorDialog,
   resetPopupStates,
   setRateIsOpen,
   setHasOrder,
