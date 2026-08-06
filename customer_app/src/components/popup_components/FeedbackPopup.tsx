@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import {
@@ -36,9 +36,12 @@ function FeedbackPopup() {
   );
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [setOrderFeedbackMutation] = useSetOrderFeedbackMutation();
   const [clearTrackedOrder] = useClearTrackedOrderMutation();
   const t = useTranslations();
+  // In-flight guard against duplicate feedback submissions (double click).
+  const submitInFlightRef = useRef(false);
 
   const resetFeedbackForm = () => {
     setRating(0);
@@ -46,6 +49,10 @@ function FeedbackPopup() {
   };
 
   const handleSubmit = () => {
+    if (submitInFlightRef.current) return;
+    submitInFlightRef.current = true;
+    setSubmitting(true);
+
     if ((rating <= 5 && rating >= 0) || comment) {
       const uid = user?.uid;
       const resId = user?.trackedOrder?.restaurant;
@@ -54,7 +61,11 @@ function FeedbackPopup() {
         uid,
         feedback: { rating, comment },
         resId,
-      });
+      })
+        .finally(() => {
+          submitInFlightRef.current = false;
+          setSubmitting(false);
+        });
     }
     const orderId = trackedOrderData?.id;
     if (orderId) {
@@ -100,6 +111,7 @@ function FeedbackPopup() {
           <Button
             className="bg-color-2 hover:bg-color-2/90 text-white h-10 px-6"
             onClick={handleSubmit}
+            disabled={submitting}
           >
             {t("Submit Feedback")}
           </Button>

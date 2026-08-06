@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+
 const CheckoutMainButton = ({
   nextLabel = "Next",
   backLabel = "Back",
@@ -13,7 +15,14 @@ const CheckoutMainButton = ({
   nextEventCallback?: () => unknown;
   backEventCallback?: () => void;
 }) => {
+  // Prevent the next/place button from firing twice on rapid mouseup events
+  // (e.g. double-click or mouseup+click sequences) before React re-renders.
+  const lastNextAtRef = useRef(0);
+
   const handleNext = () => {
+    const now = Date.now();
+    if (now - lastNextAtRef.current < 300) return;
+    lastNextAtRef.current = now;
     if (!nextBtnIsDisable) {
       nextEventCallback();
     }

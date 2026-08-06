@@ -41,6 +41,9 @@ const useOrder = () => {
   const [clearTrackedOrder] = useClearTrackedOrderMutation();
   const [finalizePendingLoyalty] = useFinalizePendingLoyaltyMutation();
   const loyaltyMarkAttemptRef = useRef<string | null>(null);
+  // Guards against duplicate cancel requests (rapid double-click).
+  const cancelInFlightRef = useRef(false);
+  const feedbackInFlightRef = useRef(false);
 
   useEffect(() => {
     if (
@@ -121,11 +124,16 @@ const useOrder = () => {
   }, [dispatch, finalizePendingLoyalty, hasOrder, user, clearTrackedOrder]);
 
   const cancelOrder = () => {
+    if (cancelInFlightRef.current) return;
     if (trackedOrderData?.status?.current === "RECEIVED") {
+      cancelInFlightRef.current = true;
       cancelOrderMutation({
         orderId: trackedOrderData?.id ?? "",
         uid: user?.uid,
-      });
+      })
+        .finally(() => {
+          cancelInFlightRef.current = false;
+        });
     }
   };
 
@@ -133,7 +141,9 @@ const useOrder = () => {
     rating: number;
     comment?: string;
   }) => {
+    if (feedbackInFlightRef.current) return;
     if ((feedback.rating <= 5 && feedback.rating >= 0) || feedback.comment) {
+      feedbackInFlightRef.current = true;
       const uid = user.uid;
       const resId = user?.trackedOrder?.restaurant;
       const orderData = trackedOrderData;
@@ -142,7 +152,10 @@ const useOrder = () => {
         uid,
         feedback,
         resId,
-      });
+      })
+        .finally(() => {
+          feedbackInFlightRef.current = false;
+        });
     }
   };
 

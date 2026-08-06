@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
@@ -17,6 +18,8 @@ type ItemWithSelection = ItemType & { selectedSize?: SizeType | null };
 const useAddToCart = (resID: string, status: string) => {
   const t = useTranslations();
   const dispatch = useAppDispatch();
+  // Cooldown guard so "Add" cannot be spammed to push duplicate cart items.
+  const lastAddAtRef = useRef(0);
   const cartItems = useAppSelector((state) => state.cart.items);
   const currentResId = useAppSelector((state) => state.cart.restaurant);
   const trackedOrder = useAppSelector((state) => state.user?.trackedOrder);
@@ -24,6 +27,14 @@ const useAddToCart = (resID: string, status: string) => {
   const restaurants = useAppSelector((state) => state.restaurants);
 
   const handleAddItem = (item: ItemWithSelection) => {
+    // Throttle rapid "Add" taps (e.g. fast clicking/tapping) to prevent
+    // duplicate cart entries or accidental multi-adds for the same item.
+    const now = Date.now();
+    if (now - lastAddAtRef.current < 250) {
+      return;
+    }
+    lastAddAtRef.current = now;
+
     const resDoc = restaurants?.find(
       (restaurant) => restaurant.accessToken === resID
     );

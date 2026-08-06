@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import { CircleAlertIcon } from "lucide-react";
@@ -9,6 +9,7 @@ import { addCheckout, clearCheckout } from "@/rtk/slices/checkoutSlice";
 import { clearCart, applyOrderDiscount, removeOrderDiscount } from "@/rtk/slices/cartSlice";
 import { priceAfterDiscount, resolveItemDiscount } from "@ordersync/order-utils";
 import usePlace from "@/hooks/usePlace";
+import { useClickGuard } from "@/hooks/useClickGuard";
 import Divider from "@/components/Checkout/Divider";
 import Tip from "@/components/Checkout/Tip";
 import CheckoutMainButton from "@/components/Checkout/CheckoutMainButton";
@@ -68,6 +69,9 @@ const CheckoutUserPayment = ({
   const [promoCodeInput, setPromoCodeInput] = useState("");
   const [promoError, setPromoError] = useState("");
   const [promoSuccess, setPromoSuccess] = useState("");
+  // Ref-based in-flight guard so duplicate "Place Order" clicks are dropped
+  // even before React commits the disabled state.
+  const placeOrderPendingRef = useRef(false);
 
   const totals = useMemo(() => {
     let total = 0;
@@ -118,10 +122,13 @@ const CheckoutUserPayment = ({
   };
 
   const handlePlaceOrder = () => {
+    if (placeOrderPendingRef.current) return;
+    placeOrderPendingRef.current = true;
     setButtonIsDisable(true);
     placeOrder(checkout?.comment as string)
       .then((placed) => {
         if (!placed) {
+          placeOrderPendingRef.current = false;
           setButtonIsDisable(false);
           return;
         }
@@ -133,6 +140,7 @@ const CheckoutUserPayment = ({
         }, 3500);
       })
       .catch(() => {
+        placeOrderPendingRef.current = false;
         setButtonIsDisable(false);
       });
   };
@@ -219,6 +227,14 @@ const CheckoutUserPayment = ({
     setPromoError("");
   };
 
+  // Guard the promo-code Apply/Remove buttons against rapid repeated dispatches.
+  const { run: runApplyPromoCode } = useClickGuard(handleApplyPromoCode, {
+    cooldown: 500,
+  });
+  const { run: runRemovePromoCode } = useClickGuard(handleRemovePromoCode, {
+    cooldown: 500,
+  });
+
   return (
     <div>
       <CheckoutPageTitle title={t("Payment")} />
@@ -270,7 +286,7 @@ const CheckoutUserPayment = ({
             className="flex-1 px-3 py-2.5 border border-input rounded-[6px] text-sm uppercase tracking-wider focus:outline-none focus:border-[#2196F3]"
           />
           <button
-            onClick={handleApplyPromoCode}
+            onClick={() => void runApplyPromoCode()}
             className="px-4 py-2.5 bg-[#4CAF50] text-white border-0 rounded-[6px] text-sm font-semibold cursor-pointer whitespace-nowrap hover:brightness-95"
           >
             {t("Apply")}
@@ -286,7 +302,7 @@ const CheckoutUserPayment = ({
             className="flex-1 px-3 py-2.5 border border-input rounded-[6px] text-sm uppercase tracking-wider bg-muted text-[#4CAF50] font-semibold"
           />
           <button
-            onClick={handleRemovePromoCode}
+            onClick={() => void runRemovePromoCode()}
             className="px-4 py-2.5 bg-[#F44336] text-white border-0 rounded-[6px] text-sm font-semibold cursor-pointer whitespace-nowrap hover:brightness-95"
           >
             {t("Remove")}

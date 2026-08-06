@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { Minus, Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
@@ -26,6 +27,8 @@ const QuantityStepper = ({
   const { handleAddItem } = useAddToCart(resID, status);
   const cartItems = useAppSelector((state) => state.cart.items);
   const trackedOrder = useAppSelector((state) => state.user?.trackedOrder);
+  // Throttle rapid +/- taps to prevent runaway quantity inflation.
+  const lastStepAtRef = useRef(0);
 
   const hasActiveTrackedOrder = Boolean(trackedOrder?.id);
 
@@ -37,11 +40,20 @@ const QuantityStepper = ({
 
   const quantity = cartItem?.quantity ?? 0;
 
+  // Shared cooldown so rapid +/- taps are throttled (~150ms).
+  const isStepThrottled = () => {
+    const now = Date.now();
+    if (now - lastStepAtRef.current < 150) return true;
+    lastStepAtRef.current = now;
+    return false;
+  };
+
   const handleIncrease = () => {
     if (hasActiveTrackedOrder) {
       dispatch(setShowTrackedOrderLockPopup(true));
       return;
     }
+    if (isStepThrottled()) return;
     dispatch(
       quantityHandle({
         id: item.id,
@@ -56,6 +68,7 @@ const QuantityStepper = ({
       dispatch(setShowTrackedOrderLockPopup(true));
       return;
     }
+    if (isStepThrottled()) return;
     dispatch(
       quantityHandle({
         id: item.id,

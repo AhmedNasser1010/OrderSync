@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
+import { useRef } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
@@ -42,6 +43,10 @@ type Totals = {
 const usePlace = () => {
   const dispatch = useAppDispatch();
   const t = useTranslations();
+  // In-flight guard: prevents a second order from being submitted while a
+  // previous submission is still running. Survives re-renders, so even a
+  // rapidly re-rendered button cannot double-fire.
+  const placeInFlightRef = useRef(false);
 
   const user = useAppSelector((state) => state.user);
   const cart = useAppSelector((state) => state.cart);
@@ -379,6 +384,18 @@ const usePlace = () => {
 
   const placeOrder = (comment?: string) => {
     return new Promise((resolve, reject) => {
+      // Drop duplicate submissions (double-click / rapid re-render) while a
+      // previous placement is still running.
+      if (placeInFlightRef.current) {
+        resolve(false);
+        return;
+      }
+      placeInFlightRef.current = true;
+
+      const release = () => {
+        placeInFlightRef.current = false;
+      };
+
       if (
         checkIfUserIsLoggedIn() &&
         checkIfUserIsActive() &&
@@ -393,18 +410,22 @@ const usePlace = () => {
             placeOrderMutation(validatedData)
               .then(() => {
                 handleOrderPlacementSuccess();
+                release();
                 resolve(true);
               })
               .catch((err) => {
                 handleOrderPlacementError(err);
+                release();
                 reject(err);
               });
           })
           .catch((err) => {
             handleOrderPlacementError(err);
+            release();
             reject(err);
           });
       } else {
+        release();
         resolve(false);
       }
     });
