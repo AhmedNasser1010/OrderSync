@@ -1,0 +1,13 @@
+{
+  "name": "ordersync",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "customer_app",
+    "driver_app",
+    "manager_app",
+    "onboarding_app",
+    "orders_app",
+    "packages/*"
+  ]
+}
