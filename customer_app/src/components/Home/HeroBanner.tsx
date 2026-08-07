@@ -65,7 +65,7 @@ function BannerCard({ banner }: { banner: HeroBannerType }) {
   );
 
   const baseClass =
-    "relative h-55 w-full overflow-hidden rounded-3xl bg-secondary sm:h-52 outline-none";
+    "relative h-48 w-full overflow-hidden rounded-3xl bg-secondary sm:h-52 outline-none";
 
   if (!href) {
     return <div className={baseClass}>{content}</div>;
@@ -132,8 +132,8 @@ function HeroBanner() {
   const settings = {
     dots: true,
     infinite: true,
-    speed: 500,
-    slidesToShow: 1.15,
+    speed: 600,
+    slidesToShow: 1.05,
     slidesToScroll: 1,
     autoplay: banners.length > 1,
     autoplaySpeed: AUTO_SCROLL_INTERVAL,

@@ -326,6 +326,20 @@
   padding: 0 8px;
 }
 
+.hero-banner-slider .slick-track {
+  display: flex;
+  flex-wrap: nowrap;
+  margin-left: 4.762%;
+}
+
+.hero-banner-slider .slick-slide {
+  flex-shrink: 0;
+}
+
+[dir="rtl"] .hero-banner-slider .slick-track {
+  margin-left: 9.524%;
+}
+
 .slick-dots {
   position: absolute;
   bottom: 12px;

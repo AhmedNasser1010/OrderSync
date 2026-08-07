@@ -151,7 +151,9 @@ function RestaurantCard({ info }: { info: RestaurantCardInfo }) {
           {cuisines && cuisines.length > 0 && (
             <>
               <span className="size-1 shrink-0 rounded-full bg-color-8" />
-              <span className="truncate">{cuisines.join(", ")}</span>
+              <span className="min-w-0 truncate">
+                {cuisines.map((cuisine) => t(cuisine)).join(", ")}
+              </span>
             </>
           )}
         </div>

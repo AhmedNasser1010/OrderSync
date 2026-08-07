@@ -97,7 +97,7 @@ const RestaurantHero = ({
               </div>
               {cuisines?.length ? (
                 <p className="mt-1.5 font-ProximaNovaMed text-sm text-white/80">
-                  {cuisines.join(", ")}
+                  {cuisines.map((cuisine) => t(cuisine)).join(", ")}
                 </p>
               ) : null}
               <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-white/90">

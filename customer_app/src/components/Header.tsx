@@ -474,23 +474,23 @@ function Header() {
               </li>
             )}
 
-            <li>
-              <Link
-                href="/cart"
-                aria-label={t("Cart")}
-                className="flex items-center gap-1.5 rounded-full px-2 py-2 text-sm font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none"
-              >
-                <span className="relative">
-                  <ShoppingCartIcon className="size-5" />
-                  {mounted && cartItems.length > 0 && (
+            {mounted && cartItems.length > 0 && (
+              <li>
+                <Link
+                  href="/cart"
+                  aria-label={t("Cart")}
+                  className="flex items-center gap-1.5 rounded-full px-2 py-2 text-sm font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none"
+                >
+                  <span className="relative">
+                    <ShoppingCartIcon className="size-5" />
                     <span className="absolute -top-2 -end-2 grid min-w-4.5 min-h-4.5 place-items-center rounded-full bg-color-2 px-1 text-[10px] font-ProximaNovaBold text-white">
                       {cartItems.length}
                     </span>
-                  )}
-                </span>
-                <span className="hidden sm:inline">{t("Cart")}</span>
-              </Link>
-            </li>
+                  </span>
+                  <span className="hidden sm:inline">{t("Cart")}</span>
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       </header>
@@ -587,14 +587,16 @@ function Header() {
           </div>
 
           <div className="space-y-3">
-            <Link
-              href="/cart"
-              onClick={() => setMenuOpen(false)}
-              className="flex w-full items-center justify-center gap-2 rounded-full border border-color-7 py-2 font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40"
-            >
-              <ShoppingCartIcon className="size-4" />
-              {t("Cart")}
-            </Link>
+            {mounted && cartItems.length > 0 && (
+              <Link
+                href="/cart"
+                onClick={() => setMenuOpen(false)}
+                className="flex w-full items-center justify-center gap-2 rounded-full border border-color-7 py-2 font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40"
+              >
+                <ShoppingCartIcon className="size-4" />
+                {t("Cart")}
+              </Link>
+            )}
             <div className="flex items-center gap-3">
               <ThemeToggle onNavigate={() => setMenuOpen(false)} fullWidth />
               <LanguageSwitcher onNavigate={() => setMenuOpen(false)} fullWidth />
