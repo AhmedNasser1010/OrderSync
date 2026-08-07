@@ -31,9 +31,9 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
 
-  --font-sans: var(--font-proxima);
-  --font-heading: var(--font-grot);
-  --font-display: var(--font-beiruti);
+  --font-sans: var(--font-cairo);
+  --font-heading: var(--font-alexandria);
+  --font-display: var(--font-alexandria);
 
   --color-color-1: var(--color-1);
   --color-color-2: var(--color-2);
@@ -139,40 +139,50 @@
 }
 
 /* ============================================================
-   Custom font utilities (legacy Swiggy-like family classes)
+   Brand font utilities (Cairo body/UI, Alexandria display)
    ============================================================ */
 @utility font-GrotThin {
-  font-family: var(--font-grot-thin);
+  font-family: var(--font-cairo);
+  font-weight: 300;
 }
 @utility font-GrotReg {
-  font-family: var(--font-grot-reg);
+  font-family: var(--font-cairo);
+  font-weight: 400;
 }
 @utility font-GrotMed {
-  font-family: var(--font-grot-med);
+  font-family: var(--font-cairo);
+  font-weight: 500;
 }
 @utility font-GrotBold {
-  font-family: var(--font-grot-bold);
+  font-family: var(--font-cairo);
+  font-weight: 700;
 }
 @utility font-GrotBlack {
-  font-family: var(--font-grot-black);
+  font-family: var(--font-cairo);
+  font-weight: 900;
 }
 @utility font-ProximaNovaThin {
-  font-family: var(--font-proxima-thin);
+  font-family: var(--font-cairo);
+  font-weight: 300;
 }
 @utility font-ProximaNovaMed {
-  font-family: var(--font-proxima-med);
+  font-family: var(--font-cairo);
+  font-weight: 500;
 }
 @utility font-ProximaNovaSemiBold {
-  font-family: var(--font-proxima-semibold);
+  font-family: var(--font-cairo);
+  font-weight: 600;
 }
 @utility font-ProximaNovaBold {
-  font-family: var(--font-proxima-bold);
+  font-family: var(--font-cairo);
+  font-weight: 700;
 }
 @utility font-ProximaNovaBlack {
-  font-family: var(--font-proxima-black);
+  font-family: var(--font-cairo);
+  font-weight: 900;
 }
 @utility font-Beiruti {
-  font-family: var(--font-beiruti);
+  font-family: var(--font-alexandria);
 }
 
 /* ============================================================
