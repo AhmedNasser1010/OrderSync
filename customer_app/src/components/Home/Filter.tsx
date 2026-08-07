@@ -29,12 +29,12 @@ function Filter({
     <button
       className={cn(
         "filter-btn font-GrotMed text-color-3 text-sm tracking-tight",
-        isActive && "active"
+        isActive && "active bg-primary/10 border-primary/25"
       )}
       onClick={handleActive}
     >
       {children}
-      <span className="text-lg ml-1 mb-[2px] hidden">
+      <span className={cn("text-lg ml-1 mb-[2px]", isActive ? "block" : "hidden")}>
         <XIcon className="size-4" />
       </span>
     </button>

@@ -18,7 +18,11 @@ function Restaurants() {
   const filteredRestaurants = useMemo(() => {
     if (filter.length && restaurants.length) {
       return restaurants.filter((res: RestaurantDocument) =>
-        filter.some((tag) => res?.profile?.cuisines?.includes(tag))
+        filter.some((tag) =>
+          tag === "offers"
+            ? res?.hasOffers
+            : res?.profile?.cuisines?.includes(tag)
+        )
       );
     }
     return restaurants;

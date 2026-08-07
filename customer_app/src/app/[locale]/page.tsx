@@ -41,7 +41,7 @@ export default function HomePage() {
       <PopularDishes restaurants={restaurants} />
       <div className="divider"></div>
       <Restaurants />
-      <Reviews restaurants={restaurants} />
+      {/*<Reviews restaurants={restaurants} />*/}
       <CtaStrip />
     </div>
   );

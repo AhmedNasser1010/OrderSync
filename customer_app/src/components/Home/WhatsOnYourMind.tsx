@@ -9,10 +9,11 @@ import SectionHeader from "@/components/Home/SectionHeader";
 import type { RestaurantDocument } from "@/types/restaurant";
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  "italian-pizza": "https://i.imgur.com/avMww3r.jpg",
-  sandwiches: "https://i.imgur.com/jh2GEIS.jpg",
-  pasta: "https://i.imgur.com/y44eLlr.jpg",
-  crepes: "https://i.imgur.com/y44eLlr.jpg",
+  crepes: "/images/dishes/crepes.webp",
+  "eastern-pie": "/images/dishes/eastern-pie.webp",
+  negresco: "/images/dishes/negresco.webp",
+  pizza: "/images/dishes/pizza.webp",
+  sandwich: "/images/dishes/sandwich.webp"
 };
 
 function WhatsOnYourMind() {
@@ -42,7 +43,9 @@ function WhatsOnYourMind() {
   const handleTriggerFilter = (tag: string) => {
     dispatch(clearAll());
     dispatch(addFilter(tag));
-    document.getElementById("restaurants")?.scrollIntoView({ behavior: "smooth" });
+    document
+      .getElementById("restaurants")
+      ?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (

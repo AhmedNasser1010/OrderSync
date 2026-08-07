@@ -8,10 +8,11 @@ function RestaurantsFilter() {
   return (
     <div className="filter-btns flex gap-3 2xl:justify-start justify-center md:flex-nowrap flex-wrap">
       <Filter filterId="offers">{t("Offers")}</Filter>
-      <Filter filterId="sandwiches">{t("Sandwiches")}</Filter>
-      <Filter filterId="crepes">{t("Crepes")}</Filter>
-      <Filter filterId="italian-pizza">{t("Italian Pizza")}</Filter>
-      <Filter filterId="pasta">{t("Pasta")}</Filter>
+      <Filter filterId="crepes">{t("crepes")}</Filter>
+      <Filter filterId="eastern-pie">{t("eastern-pie")}</Filter>
+      <Filter filterId="negresco">{t("negresco")}</Filter>
+      <Filter filterId="pizza">{t("pizza")}</Filter>
+      <Filter filterId="sandwich">{t("sandwich")}</Filter>
     </div>
   );
 }
