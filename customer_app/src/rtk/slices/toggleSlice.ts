@@ -11,6 +11,7 @@ export interface ToggleState {
   showResPausedPopup: boolean;
   showRestaurantUnavailablePopup: boolean;
   showOrderPlacementErrorDialog: boolean;
+  showOrderPlacementSuccess: boolean;
   rateIsOpen: boolean;
   cancellationNoticeIsOpen: boolean;
   rateDismissedOrderId: string | null;
@@ -29,6 +30,7 @@ const initialState: ToggleState = {
   showResPausedPopup: false,
   showRestaurantUnavailablePopup: false,
   showOrderPlacementErrorDialog: false,
+  showOrderPlacementSuccess: false,
   rateIsOpen: false,
   cancellationNoticeIsOpen: false,
   rateDismissedOrderId: null,
@@ -46,6 +48,10 @@ const toggleSlice = createSlice({
     },
     toggleOrderSidebar: (state) => {
       state.isOrderSidebarOpen = !state.isOrderSidebarOpen;
+    },
+    setOrderSidebarIsOpen: (state, { payload }) => {
+      state.isOrderSidebarOpen =
+        payload === undefined ? !state.isOrderSidebarOpen : payload;
     },
     toggleLng: (state, { payload }: PayloadAction<string>) => {
       state.lng = payload;
@@ -76,6 +82,10 @@ const toggleSlice = createSlice({
           ? !state.showOrderPlacementErrorDialog
           : payload;
     },
+    setShowOrderPlacementSuccess: (state, { payload }) => {
+      state.showOrderPlacementSuccess =
+        payload === undefined ? !state.showOrderPlacementSuccess : payload;
+    },
     resetPopupStates: (state) => {
       state.showItemsAlreadyInCartPopup = false;
       state.showTrackedOrderLockPopup = false;
@@ -83,6 +93,7 @@ const toggleSlice = createSlice({
       state.showResPausedPopup = false;
       state.showRestaurantUnavailablePopup = false;
       state.showOrderPlacementErrorDialog = false;
+      state.showOrderPlacementSuccess = false;
     },
     setRateIsOpen: (state, { payload }) => {
       state.rateIsOpen = payload === undefined ? !state.rateIsOpen : payload;
@@ -132,6 +143,7 @@ const toggleSlice = createSlice({
 export const {
   toggleLoginSidebar,
   toggleOrderSidebar,
+  setOrderSidebarIsOpen,
   toggleLng,
   setShowItemsAlreadyInCartPopup,
   setShowTrackedOrderLockPopup,
@@ -139,6 +151,7 @@ export const {
   setShowResPausedPopup,
   setShowRestaurantUnavailablePopup,
   setShowOrderPlacementErrorDialog,
+  setShowOrderPlacementSuccess,
   resetPopupStates,
   setRateIsOpen,
   setHasOrder,

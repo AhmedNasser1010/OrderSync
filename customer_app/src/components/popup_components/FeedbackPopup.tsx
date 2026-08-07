@@ -17,12 +17,19 @@ import {
   useClearTrackedOrderMutation,
   useFetchOrderTrackingDataQuery,
 } from "@/rtk/api/firestoreApi";
-import { setRateIsOpen, setRateDismissedOrderId } from "@/rtk/slices/toggleSlice";
+import {
+  setRateIsOpen,
+  setRateDismissedOrderId,
+  setOrderSidebarIsOpen,
+} from "@/rtk/slices/toggleSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "@/i18n/routing";
+import { CheckCircleIcon } from "lucide-react";
 
 function FeedbackPopup() {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const isOpen = useAppSelector((state) => state.toggle.rateIsOpen);
   const user = useAppSelector((state) => state.user);
   const { currentData: trackedOrderData } = useFetchOrderTrackingDataQuery(
@@ -37,6 +44,7 @@ function FeedbackPopup() {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [setOrderFeedbackMutation] = useSetOrderFeedbackMutation();
   const [clearTrackedOrder] = useClearTrackedOrderMutation();
   const t = useTranslations();
@@ -48,34 +56,32 @@ function FeedbackPopup() {
     setComment("");
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (submitInFlightRef.current) return;
     submitInFlightRef.current = true;
     setSubmitting(true);
 
-    if ((rating <= 5 && rating >= 0) || comment) {
-      const uid = user?.uid;
-      const resId = user?.trackedOrder?.restaurant;
-      setOrderFeedbackMutation({
+    try {
+      await setOrderFeedbackMutation({
         orderId: trackedOrderData?.id,
-        uid,
+        uid: user?.uid,
         feedback: { rating, comment },
-        resId,
-      })
-        .finally(() => {
-          submitInFlightRef.current = false;
-          setSubmitting(false);
-        });
-    }
-    const orderId = trackedOrderData?.id;
-    if (orderId) {
-      dispatch(setRateDismissedOrderId(orderId));
-      if (user?.uid) {
-        clearTrackedOrder({ uid: user.uid, orderId });
+        resId: user?.trackedOrder?.restaurant,
+      }).unwrap();
+      const orderId = trackedOrderData?.id;
+      if (orderId) {
+        dispatch(setRateDismissedOrderId(orderId));
+        if (user?.uid) {
+          clearTrackedOrder({ uid: user.uid, orderId });
+        }
       }
+      setSubmitted(true);
+    } catch (error) {
+      console.error("Error submitting order feedback:", error);
+    } finally {
+      submitInFlightRef.current = false;
+      setSubmitting(false);
     }
-    dispatch(setRateIsOpen(false));
-    resetFeedbackForm();
   };
 
   const handleClose = () => {
@@ -88,34 +94,68 @@ function FeedbackPopup() {
     }
     dispatch(setRateIsOpen(false));
     resetFeedbackForm();
+    setSubmitted(false);
+  };
+
+  const handleGoHome = () => {
+    dispatch(setOrderSidebarIsOpen(false));
+    handleClose();
+    router.push("/");
   };
 
   return (
     <Popup open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <PopupContent>
         <PopupHeader closePopupCallback={handleClose}>
-          <PopupTitle>{t("Rate this Restaurant!")}</PopupTitle>
-          <PopupDescription>
-            {t("feedbackThanksMessage")}
-          </PopupDescription>
+          {submitted ? (
+            <>
+              <div className="mx-auto mb-1 grid size-14 shrink-0 place-items-center rounded-full bg-color-11/10">
+                <CheckCircleIcon className="size-7 text-color-11" />
+              </div>
+              <PopupTitle>{t("Thank You!")}</PopupTitle>
+              <PopupDescription>
+                {t("Thank you for your feedback")}
+              </PopupDescription>
+            </>
+          ) : (
+            <>
+              <PopupTitle>{t("Rate this Restaurant!")}</PopupTitle>
+              <PopupDescription>
+                {t("feedbackThanksMessage")}
+              </PopupDescription>
+            </>
+          )}
         </PopupHeader>
 
-        <RatingWithComment
-          rating={rating}
-          setRating={setRating}
-          comment={comment}
-          setComment={setComment}
-        />
+        {submitted ? (
+          <PopupFooter>
+            <Button
+              className="bg-color-2 hover:bg-color-2/90 text-white h-10 px-6"
+              onClick={handleGoHome}
+            >
+              {t("Go to Home Screen")}
+            </Button>
+          </PopupFooter>
+        ) : (
+          <>
+            <RatingWithComment
+              rating={rating}
+              setRating={setRating}
+              comment={comment}
+              setComment={setComment}
+            />
 
-        <PopupFooter>
-          <Button
-            className="bg-color-2 hover:bg-color-2/90 text-white h-10 px-6"
-            onClick={handleSubmit}
-            disabled={submitting}
-          >
-            {t("Submit Feedback")}
-          </Button>
-        </PopupFooter>
+            <PopupFooter>
+              <Button
+                className="bg-color-2 hover:bg-color-2/90 text-white h-10 px-6"
+                onClick={handleSubmit}
+                disabled={submitting}
+              >
+                {t("Submit Feedback")}
+              </Button>
+            </PopupFooter>
+          </>
+        )}
       </PopupContent>
     </Popup>
   );

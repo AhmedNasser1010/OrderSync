@@ -4,6 +4,7 @@ import FeedbackPopup from "@/components/popup_components/FeedbackPopup";
 import OrderCancellationNotice from "@/components/popup_components/OrderCancellationNotice";
 import RestaurantUnavailablePopup from "@/components/popup_components/RestaurantUnavailablePopup";
 import OrderPlacementErrorDialog from "@/components/popup_components/OrderPlacementErrorDialog";
+import OrderSuccessCelebration from "@/components/popup_components/OrderSuccessCelebration";
 
 function PopupProvider({ children }: { children: React.ReactNode }) {
   return (
@@ -12,6 +13,7 @@ function PopupProvider({ children }: { children: React.ReactNode }) {
       <OrderCancellationNotice />
       <RestaurantUnavailablePopup />
       <OrderPlacementErrorDialog />
+      <OrderSuccessCelebration />
       {children}
     </>
   );

@@ -41,6 +41,7 @@
   "Confirmed": "Confirmed",
   "Contact": "Contact",
   "Contact Information": "Contact Information",
+  "Continue Browsing": "Continue Browsing",
   "Continue Shopping": "Continue Shopping",
   "Continue with Google to start ordering": "Continue with Google to start ordering",
   "crepes": "Crepes",
@@ -91,7 +92,7 @@
   "Large": "Large",
   "Leave a comment": "Leave a comment",
   "Live": "Live",
-  "Live tracking available soon": "Live tracking available soon",
+  "Available in the delivery phase": "Available in the delivery phase",
   "Location": "Location",
   "Location Address": "Location Address",
   "Location information is required": "Location information is required",
@@ -123,6 +124,8 @@
   "Order summary": "Order summary",
   "Order Track": "Order Track",
   "Order Tracking": "Order Tracking",
+  "Thank You!": "Thank You!",
+  "Track Order": "Track Order",
   "orderCancellationNotice": "Sorry, your order was canceled due to an issue in the kitchen. We apologize for the inconvenience.",
   "Pasta": "Pasta",
   "pasta": "Pasta",
@@ -194,7 +197,7 @@
   "You already have an order in progress": "You already have an order in progress",
   "You can go to home page to view more restaurants": "You can go to home page to view more restaurants",
   "cannotClearDeliveredOrderItems": "You cannot clear these items because your order from this restaurant is already placed and being delivered to you.",
-  "You'll see your driver in real time": "You'll see your driver in real time",
+  "You'll see the driver in real time": "You'll see the driver in real time",
   "Your account": "Your account",
   "Your driver": "Your driver",
   "Call your driver": "Call your driver",
@@ -268,5 +271,7 @@
   "Bill Details": "Bill Details",
   "Item Total": "Item Total",
   "You saved": "You saved",
-  "Items to be delivered": "Items to be delivered"
+  "Items to be delivered": "Items to be delivered",
+  "Go to Home Screen": "Go to Home Screen",
+  "Thank you for your feedback": "Thank you for your feedback! We appreciate your time."
 }

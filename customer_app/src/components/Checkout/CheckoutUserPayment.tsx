@@ -2,11 +2,10 @@
 
 import { useMemo, useState, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
 import { CircleAlertIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
-import { addCheckout, clearCheckout } from "@/rtk/slices/checkoutSlice";
-import { clearCart, applyOrderDiscount, removeOrderDiscount } from "@/rtk/slices/cartSlice";
+import { addCheckout } from "@/rtk/slices/checkoutSlice";
+import { applyOrderDiscount, removeOrderDiscount } from "@/rtk/slices/cartSlice";
 import { priceAfterDiscount, resolveItemDiscount } from "@ordersync/order-utils";
 import usePlace from "@/hooks/usePlace";
 import { useClickGuard } from "@/hooks/useClickGuard";
@@ -14,7 +13,6 @@ import Divider from "@/components/Checkout/Divider";
 import Tip from "@/components/Checkout/Tip";
 import CheckoutMainButton from "@/components/Checkout/CheckoutMainButton";
 import CheckoutPageTitle from "@/components/Checkout/CheckoutPageTitle";
-import PopupWindow from "@/components/Checkout/PopupWindow";
 import type { DiscountObject } from "@ordersync/types";
 import type { RestaurantDocument } from "@/types/restaurant";
 
@@ -46,7 +44,6 @@ const CheckoutUserPayment = ({
   deliveryFees: number;
 }) => {
   const t = useTranslations();
-  const router = useRouter();
   const dispatch = useAppDispatch();
   const { placeOrder } = usePlace();
 
@@ -65,7 +62,6 @@ const CheckoutUserPayment = ({
 
   const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [buttonIsDisable, setButtonIsDisable] = useState(false);
-  const [windowIsOpen, setWindowIsOpen] = useState(false);
   const [promoCodeInput, setPromoCodeInput] = useState("");
   const [promoError, setPromoError] = useState("");
   const [promoSuccess, setPromoSuccess] = useState("");
@@ -132,23 +128,11 @@ const CheckoutUserPayment = ({
           setButtonIsDisable(false);
           return;
         }
-        setWindowIsOpen(true);
-        setTimeout(() => {
-          dispatch(clearCheckout());
-          dispatch(clearCart());
-          router.replace("/");
-        }, 3500);
       })
       .catch(() => {
         placeOrderPendingRef.current = false;
         setButtonIsDisable(false);
       });
-  };
-
-  const handleOnWindowClose = () => {
-    dispatch(clearCheckout());
-    dispatch(clearCart());
-    router.replace("/");
   };
 
   const handleApplyPromoCode = () => {
@@ -335,35 +319,6 @@ const CheckoutUserPayment = ({
         nextEventCallback={handlePlaceOrder}
         backEventCallback={() => handleCurrentState("ON_USER_ADDRESS")}
       />
-      {windowIsOpen && (
-        <PopupWindow isOpen={windowIsOpen} onWindowClose={handleOnWindowClose}>
-          <div className="flex flex-col items-center justify-between gap-6 max-w-[400px]">
-            <svg
-              version="1.1"
-              id="Capa_1"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 50 50"
-              className="w-[200px]"
-            >
-              <circle style={{ fill: "#25AE88" }} cx="25" cy="25" r="25" />
-              <polyline
-                style={{
-                  fill: "none",
-                  stroke: "#FFFFFF",
-                  strokeWidth: "4.2",
-                  strokeLinecap: "round",
-                  strokeLinejoin: "round",
-                  strokeMiterlimit: "10",
-                }}
-                points="38,15 22,33 12,25"
-              />
-            </svg>
-            <p className="text-center text-[17px] leading-6 max-w-[70%] font-bold">
-              {t("orderReceivedSuccessfully")}
-            </p>
-          </div>
-        </PopupWindow>
-      )}
     </div>
   );
 };

@@ -9,6 +9,7 @@ import {
   toggleOrderSidebar,
   setShowRestaurantUnavailablePopup,
   setShowOrderPlacementErrorDialog,
+  setShowOrderPlacementSuccess,
 } from "@/rtk/slices/toggleSlice";
 import filterObject from "@/utils/filterObject";
 import getUserSource from "@/utils/getUserSource";
@@ -343,6 +344,7 @@ const usePlace = () => {
       position: "top-center",
       duration: 4000,
     });
+    dispatch(setShowOrderPlacementSuccess(true));
   };
 
   const handleOrderPlacementError = (err: unknown) => {
