@@ -16,7 +16,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "firebase": "^12.16.0",
-    "firebase-admin": "^14.2.0",
+    "firebase-admin": "^13.10.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.24.0",
     "next": "16.2.10",

@@ -31,7 +31,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "firebase": "^12.14.0",
-    "firebase-admin": "^14.2.0",
+    "firebase-admin": "^13.10.0",
     "framer-motion": "^11.5.4",
     "lucide-react": "^0.439.0",
     "next": "^16.2.7",
