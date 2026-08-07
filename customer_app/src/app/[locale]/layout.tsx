@@ -8,6 +8,7 @@ import LoginSidebar from "@/components/Sidebar/LoginSidebar";
 import OrderSidebar from "@/components/Sidebar/OrderSidebar";
 import PopupProvider from "@/components/PopupProvider";
 import { PwaInstallButton } from "@/components/pwa-install-button";
+import LoadingScreen from "@/components/LoadingScreen";
 
 type Props = {
   children: React.ReactNode;
@@ -25,6 +26,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
+      <LoadingScreen />
       <HtmlAttributes locale={locale} />
       <PopupProvider>
         <Header />
