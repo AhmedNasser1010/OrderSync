@@ -14,24 +14,13 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["food", "shopping"],
     icons: [
       {
-        src: "/icons/icon-192.png",
-        sizes: "192x192",
+        src: "/logo.png",
+        sizes: "2000x2000",
         type: "image/png",
       },
       {
-        src: "/icons/icon-512.png",
-        sizes: "512x512",
-        type: "image/png",
-      },
-      {
-        src: "/icons/icon-maskable-192.png",
-        sizes: "192x192",
-        type: "image/png",
-        purpose: "maskable",
-      },
-      {
-        src: "/icons/icon-maskable-512.png",
-        sizes: "512x512",
+        src: "/logo.png",
+        sizes: "2000x2000",
         type: "image/png",
         purpose: "maskable",
       },
@@ -42,13 +31,13 @@ export default function manifest(): MetadataRoute.Manifest {
         name: "المطاعم",
         short_name: "Restaurants",
         url: "/",
-        icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }],
+        icons: [{ src: "/logo.png", sizes: "2000x2000" }],
       },
       {
         name: "سلة المشتريات",
         short_name: "Cart",
         url: "/cart",
-        icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }],
+        icons: [{ src: "/logo.png", sizes: "2000x2000" }],
       },
     ],
   };
