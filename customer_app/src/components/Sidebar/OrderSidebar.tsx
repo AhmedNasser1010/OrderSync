@@ -180,13 +180,17 @@ function StepIndicator({
 function ErrorBanner({
   status,
   reason,
+  cancelledByCustomer,
 }: {
   status: string | undefined;
   reason?: string;
+  cancelledByCustomer?: boolean;
 }) {
   const t = useTranslations();
   const labels: Record<string, string> = {
-    CANCELED: "Your Order Has Been Canceled!",
+    CANCELED: cancelledByCustomer
+      ? "You Cancelled Your Order"
+      : "Your Order Has Been Canceled!",
     REJECTED: "Your Order Has Been Rejected!",
     VOIDED: "Your Order Has Been Voided!",
   };
@@ -273,6 +277,10 @@ const OrderSidebar = () => {
   ];
 
   const currentStatus = trackedOrderData?.status?.current;
+  const cancelEntry = [...(trackedOrderData?.status?.history ?? [])]
+    .reverse()
+    .find((h) => h.status === currentStatus);
+  const cancelledByCustomer = cancelEntry?.by === "customer";
 
   const currentStepIndex = useMemo(() => {
     if (!currentStatus) return 0;
@@ -407,6 +415,7 @@ const OrderSidebar = () => {
           <ErrorBanner
             status={currentStatus}
             reason={trackedOrderData?.status?.cancellationReason}
+            cancelledByCustomer={cancelledByCustomer}
           />
         )}
 

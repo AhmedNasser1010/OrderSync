@@ -11,9 +11,15 @@ export interface ToggleState {
   showResPausedPopup: boolean;
   showRestaurantUnavailablePopup: boolean;
   showOrderPlacementErrorDialog: boolean;
+  showOrderPlacementLoading: boolean;
   showOrderPlacementSuccess: boolean;
   rateIsOpen: boolean;
   cancellationNoticeIsOpen: boolean;
+  cancellationNoticeData: {
+    status?: string;
+    cancellationReason?: string;
+    cancelledByCustomer?: boolean;
+  } | null;
   rateDismissedOrderId: string | null;
   cancellationDismissedOrderId: string | null;
   hasOrder: boolean;
@@ -30,9 +36,11 @@ const initialState: ToggleState = {
   showResPausedPopup: false,
   showRestaurantUnavailablePopup: false,
   showOrderPlacementErrorDialog: false,
+  showOrderPlacementLoading: false,
   showOrderPlacementSuccess: false,
   rateIsOpen: false,
   cancellationNoticeIsOpen: false,
+  cancellationNoticeData: null,
   rateDismissedOrderId: null,
   cancellationDismissedOrderId: null,
   hasOrder: true,
@@ -82,6 +90,10 @@ const toggleSlice = createSlice({
           ? !state.showOrderPlacementErrorDialog
           : payload;
     },
+    setShowOrderPlacementLoading: (state, { payload }) => {
+      state.showOrderPlacementLoading =
+        payload === undefined ? !state.showOrderPlacementLoading : payload;
+    },
     setShowOrderPlacementSuccess: (state, { payload }) => {
       state.showOrderPlacementSuccess =
         payload === undefined ? !state.showOrderPlacementSuccess : payload;
@@ -93,6 +105,7 @@ const toggleSlice = createSlice({
       state.showResPausedPopup = false;
       state.showRestaurantUnavailablePopup = false;
       state.showOrderPlacementErrorDialog = false;
+      state.showOrderPlacementLoading = false;
       state.showOrderPlacementSuccess = false;
     },
     setRateIsOpen: (state, { payload }) => {
@@ -104,6 +117,9 @@ const toggleSlice = createSlice({
     setCancellationNoticeIsOpen: (state, { payload }) => {
       state.cancellationNoticeIsOpen =
         payload === undefined ? !state.cancellationNoticeIsOpen : payload;
+    },
+    setCancellationNoticeData: (state, { payload }) => {
+      state.cancellationNoticeData = payload;
     },
     setRateDismissedOrderId: (
       state,
@@ -151,11 +167,13 @@ export const {
   setShowResPausedPopup,
   setShowRestaurantUnavailablePopup,
   setShowOrderPlacementErrorDialog,
+  setShowOrderPlacementLoading,
   setShowOrderPlacementSuccess,
   resetPopupStates,
   setRateIsOpen,
   setHasOrder,
   setCancellationNoticeIsOpen,
+  setCancellationNoticeData,
   setRateDismissedOrderId,
   setCancellationDismissedOrderId,
   initTheme,

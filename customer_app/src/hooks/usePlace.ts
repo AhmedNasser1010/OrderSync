@@ -9,6 +9,7 @@ import {
   toggleOrderSidebar,
   setShowRestaurantUnavailablePopup,
   setShowOrderPlacementErrorDialog,
+  setShowOrderPlacementLoading,
   setShowOrderPlacementSuccess,
 } from "@/rtk/slices/toggleSlice";
 import filterObject from "@/utils/filterObject";
@@ -340,14 +341,12 @@ const usePlace = () => {
   };
 
   const handleOrderPlacementSuccess = () => {
-    toast.success(t("Order placed successfully"), {
-      position: "top-center",
-      duration: 4000,
-    });
+    dispatch(setShowOrderPlacementLoading(false));
     dispatch(setShowOrderPlacementSuccess(true));
   };
 
   const handleOrderPlacementError = (err: unknown) => {
+    dispatch(setShowOrderPlacementLoading(false));
     const error = err as { code?: string; data?: { code?: string } };
     if (
       error?.code === "RESTAURANT_NOT_ACCEPTING_ORDERS" ||
@@ -407,6 +406,7 @@ const usePlace = () => {
         checkIfUserHasCart() &&
         checkIfUserHasNoOrder()
       ) {
+        dispatch(setShowOrderPlacementLoading(true));
         validateOrderData(comment)
           .then((validatedData) => {
             placeOrderMutation(validatedData)

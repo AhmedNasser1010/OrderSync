@@ -12,6 +12,7 @@ import {
 import {
   setRateIsOpen,
   setCancellationNoticeIsOpen,
+  setCancellationNoticeData,
 } from "@/rtk/slices/toggleSlice";
 import { clearCart } from "@/rtk/slices/cartSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
@@ -82,6 +83,19 @@ const useOrder = () => {
       dispatch(clearCart());
 
       if (cancellationDismissedOrderId !== orderId) {
+        const currentStatus = trackedOrderData?.status?.current;
+        const cancelEntry = [
+          ...(trackedOrderData?.status?.history ?? []),
+        ]
+          .reverse()
+          .find((h) => h.status === currentStatus);
+        dispatch(
+          setCancellationNoticeData({
+            status: currentStatus,
+            cancellationReason: trackedOrderData?.status?.cancellationReason,
+            cancelledByCustomer: cancelEntry?.by === "customer",
+          })
+        );
         dispatch(setCancellationNoticeIsOpen(true));
       }
 

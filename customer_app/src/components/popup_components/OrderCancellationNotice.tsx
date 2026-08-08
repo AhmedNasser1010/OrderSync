@@ -13,6 +13,7 @@ import {
 import {
   setCancellationNoticeIsOpen,
   setCancellationDismissedOrderId,
+  setOrderSidebarIsOpen,
 } from "@/rtk/slices/toggleSlice";
 import useOrder from "@/hooks/useOrder";
 import { useRouter } from "@/i18n/routing";
@@ -27,10 +28,17 @@ function OrderCancellationNotice() {
   );
   const { trackedOrderData } = useOrder();
   const t = useTranslations();
-  const status = trackedOrderData?.status?.current;
-  const cancellationReason = trackedOrderData?.status?.cancellationReason || "";
+  const cancellationNoticeData = useAppSelector(
+    (state) => state.toggle.cancellationNoticeData
+  );
+  const status = cancellationNoticeData?.status;
+  const cancellationReason = cancellationNoticeData?.cancellationReason || "";
+  const cancelledByCustomer =
+    cancellationNoticeData?.cancelledByCustomer ?? false;
   const noticeTitles: Record<string, string> = {
-    CANCELED: "Your Order Has Been Canceled!",
+    CANCELED: cancelledByCustomer
+      ? "You Cancelled Your Order"
+      : "Your Order Has Been Canceled!",
     REJECTED: "Your Order Has Been Rejected!",
     VOIDED: "Your Order Has Been Voided!",
   };
@@ -41,6 +49,8 @@ function OrderCancellationNotice() {
       dispatch(setCancellationDismissedOrderId(orderId));
     }
     dispatch(setCancellationNoticeIsOpen(false));
+    dispatch(setOrderSidebarIsOpen(false));
+    document.body.classList.remove("overflow-hidden");
     router.push("/");
   };
 
@@ -63,6 +73,8 @@ function OrderCancellationNotice() {
                 {cancellationReason}
               </p>
             </div>
+          ) : cancelledByCustomer ? (
+            <PopupDescription>{t("selfCancellationNotice")}</PopupDescription>
           ) : (
             <PopupDescription>{t("orderCancellationNotice")}</PopupDescription>
           )}

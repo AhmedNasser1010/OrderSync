@@ -3,7 +3,7 @@
 import { useMemo, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/routing";
-import { BikeIcon } from "lucide-react";
+import { BikeIcon, Loader2Icon } from "lucide-react";
 import {
   Popup,
   PopupContent,
@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import {
+  setShowOrderPlacementLoading,
   setShowOrderPlacementSuccess,
   toggleOrderSidebar,
 } from "@/rtk/slices/toggleSlice";
@@ -32,7 +33,12 @@ function OrderSuccessCelebration() {  const t = useTranslations();
   const dispatch = useAppDispatch();
   const router = useRouter();
   const isOpen = useAppSelector(
-    (state) => state.toggle.showOrderPlacementSuccess
+    (state) =>
+      state.toggle.showOrderPlacementSuccess ||
+      state.toggle.showOrderPlacementLoading
+  );
+  const isLoading = useAppSelector(
+    (state) => state.toggle.showOrderPlacementLoading
   );
 
   const confetti = useMemo(
@@ -51,6 +57,7 @@ function OrderSuccessCelebration() {  const t = useTranslations();
   );
 
   const closeAndGoHome = () => {
+    dispatch(setShowOrderPlacementLoading(false));
     dispatch(setShowOrderPlacementSuccess(false));
     dispatch(clearCheckout());
     dispatch(clearCart());
@@ -58,6 +65,7 @@ function OrderSuccessCelebration() {  const t = useTranslations();
   };
 
   const handleTrackOrder = () => {
+    dispatch(setShowOrderPlacementLoading(false));
     dispatch(setShowOrderPlacementSuccess(false));
     dispatch(toggleOrderSidebar());
     document.body.classList.add("overflow-hidden");
@@ -66,81 +74,96 @@ function OrderSuccessCelebration() {  const t = useTranslations();
     router.replace("/");
   };
 
+  const handleOpenChange = (open: boolean) => {
+    if (open) return;
+    if (isLoading) return;
+    closeAndGoHome();
+  };
+
   return (
-    <Popup
-      open={isOpen}
-      onOpenChange={(open) => !open && closeAndGoHome()}
-    >
+    <Popup open={isOpen} onOpenChange={handleOpenChange}>
       <PopupContent className="overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-32"
-        >
-          {confetti.map((piece) => (
-            <span
-              key={piece.id}
-              className="confetti-piece"
-              style={
-                {
-                  left: piece.left,
-                  width: piece.size,
-                  height: piece.size,
-                  backgroundColor: piece.color,
-                  borderRadius: piece.round ? "9999px" : "2px",
-                  animationDelay: piece.delay,
-                  animationDuration: piece.duration,
-                  "--confetti-drift": piece.drift,
-                } as CSSProperties
-              }
-            />
-          ))}
-        </div>
-
-        <div className="relative flex flex-col items-center gap-4 pt-8 text-center">
-          <div className="relative">
-            <span className="success-ring" />
-            <span className="success-ring" style={{ animationDelay: "0.7s" }} />
-            <svg
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 50 50"
-              className="success-pop relative w-20"
-            >
-              <circle style={{ fill: "#25AE88" }} cx="25" cy="25" r="25" />
-              <polyline
-                style={{
-                  fill: "none",
-                  stroke: "#FFFFFF",
-                  strokeWidth: "4.2",
-                  strokeLinecap: "round",
-                  strokeLinejoin: "round",
-                  strokeMiterlimit: "10",
-                }}
-                points="38,15 22,33 12,25"
-              />
-            </svg>
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center gap-6 py-16 text-center">
+            <Loader2Icon className="size-14 animate-spin text-color-11" />
+            <PopupTitle className="text-2xl">{t("placingYourOrder")}</PopupTitle>
+            <PopupDescription>
+              {t("orderReceivedSuccessfully")}
+            </PopupDescription>
           </div>
-
-          <PopupTitle className="text-2xl">{t("Thank You!")}</PopupTitle>
-          <PopupDescription>{t("orderReceivedSuccessfully")}</PopupDescription>
-
-          <div className="mt-2 flex w-full flex-col gap-2">
-            <Button
-              className="h-11 w-full rounded-full bg-color-11 text-base text-white hover:bg-color-11/90"
-              onClick={handleTrackOrder}
+        ) : (
+          <>
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-x-0 top-0 h-32"
             >
-              <BikeIcon />
-              {t("Track Order")}
-            </Button>
-            <Button
-              variant="ghost"
-              className="h-11 w-full rounded-full text-sm text-color-6 hover:bg-muted"
-              onClick={closeAndGoHome}
-            >
-              {t("Continue Browsing")}
-            </Button>
-          </div>
-        </div>
+              {confetti.map((piece) => (
+                <span
+                  key={piece.id}
+                  className="confetti-piece"
+                  style={
+                    {
+                      left: piece.left,
+                      width: piece.size,
+                      height: piece.size,
+                      backgroundColor: piece.color,
+                      borderRadius: piece.round ? "9999px" : "2px",
+                      animationDelay: piece.delay,
+                      animationDuration: piece.duration,
+                      "--confetti-drift": piece.drift,
+                    } as CSSProperties
+                  }
+                />
+              ))}
+            </div>
+
+            <div className="relative flex flex-col items-center gap-4 pt-8 text-center">
+              <div className="relative">
+                <span className="success-ring" />
+                <span className="success-ring" style={{ animationDelay: "0.7s" }} />
+                <svg
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 50 50"
+                  className="success-pop relative w-20"
+                >
+                  <circle style={{ fill: "#25AE88" }} cx="25" cy="25" r="25" />
+                  <polyline
+                    style={{
+                      fill: "none",
+                      stroke: "#FFFFFF",
+                      strokeWidth: "4.2",
+                      strokeLinecap: "round",
+                      strokeLinejoin: "round",
+                      strokeMiterlimit: "10",
+                    }}
+                    points="38,15 22,33 12,25"
+                  />
+                </svg>
+              </div>
+
+              <PopupTitle className="text-2xl">{t("Thank You!")}</PopupTitle>
+              <PopupDescription>{t("orderReceivedSuccessfully")}</PopupDescription>
+
+              <div className="mt-2 flex w-full flex-col gap-2">
+                <Button
+                  className="h-11 w-full rounded-full bg-color-11 text-base text-white hover:bg-color-11/90"
+                  onClick={handleTrackOrder}
+                >
+                  <BikeIcon />
+                  {t("Track Order")}
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="h-11 w-full rounded-full text-sm text-color-6 hover:bg-muted"
+                  onClick={closeAndGoHome}
+                >
+                  {t("Continue Browsing")}
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
       </PopupContent>
     </Popup>
   );

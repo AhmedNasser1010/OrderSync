@@ -85,10 +85,6 @@ const useAddToCart = (resID: string, status: string) => {
     }
 
     if (isSameRes) {
-      toast.success(t("Added to the Cart"), {
-        position: "top-center",
-        duration: 1500,
-      });
       dispatch(
         addToCart({
           id: menuItem.id,
