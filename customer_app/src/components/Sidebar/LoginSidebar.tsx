@@ -14,11 +14,13 @@ import {
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { toggleLoginSidebar, toggleLng } from "@/rtk/slices/toggleSlice";
 import { useAuth } from "@/contexts/AuthContext";
+import { useClickGuard } from "@/hooks/useClickGuard";
 import { useRouter } from "@/i18n/routing";
 import { LOGO_URL } from "@/utils/constants";
 import UserForm from "@/components/Sidebar/UserForm";
 import ProfileAvatar from "@/components/Sidebar/ProfileAvatar";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 function GoogleLogo({ className }: { className?: string }) {
   return (
@@ -111,6 +113,19 @@ const LoginSidebar = () => {
     handleCloseSidebar();
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+    } catch {
+      toast.error(t("Google sign in failed"), { position: "top-center" });
+    }
+  };
+
+  const { run: runGoogleSignIn, busy: isGoogleSigningIn } = useClickGuard(
+    handleGoogleSignIn,
+    { cooldown: 1500 }
+  );
+
   const checks = [
     { label: t("Name"), done: !!user?.userInfo?.name },
     { label: t("Phone Number"), done: !!user?.userInfo?.phone },
@@ -187,11 +202,13 @@ const LoginSidebar = () => {
 
             {/* Google sign-in */}
             <button
-              onClick={signInWithGoogle}
-              className="group w-full flex items-center justify-center gap-3 rounded-2xl border border-color-7 bg-card py-4 px-4 text-base font-ProximaNovaSemiBold text-color-1 shadow-sm transition-all duration-200 hover:border-color-2/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer"
+              type="button"
+              onClick={(e) => void runGoogleSignIn(e as never)}
+              disabled={isGoogleSigningIn}
+              className="group w-full flex items-center justify-center gap-3 rounded-2xl border border-color-7 bg-card py-4 px-4 text-base font-ProximaNovaSemiBold text-color-1 shadow-sm transition-all duration-200 hover:border-color-2/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer disabled:cursor-wait disabled:opacity-70"
             >
               <GoogleLogo className="size-5 shrink-0" />
-              {t("Login With Google")}
+              {isGoogleSigningIn ? t("Signing in...") : t("Login With Google")}
             </button>
 
             <p className="mt-4 text-center text-xs font-ProximaNovaThin text-color-5">

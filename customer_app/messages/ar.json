@@ -100,6 +100,8 @@
   "locationNotAvailable": "الموقع مش متاح لسه.",
   "Login": "تسجيل الدخول",
   "Login With Google": "تسجيل الدخول باستخدام جوجل",
+  "Google sign in failed": "فشل تسجيل الدخول باستخدام جوجل. حاول مرة أخرى.",
+  "Signing in...": "جارٍ تسجيل الدخول...",
   "Logout": "تسجيل الخروج",
   "Medium": "وسط",
   "Merro": "ميرو",

@@ -100,6 +100,8 @@
   "locationNotAvailable": "Location not available yet.",
   "Login": "Login",
   "Login With Google": "Login With Google",
+  "Google sign in failed": "Google sign in failed. Please try again.",
+  "Signing in...": "Signing in...",
   "Logout": "Logout",
   "Medium": "Medium",
   "Merro": "Merro",
