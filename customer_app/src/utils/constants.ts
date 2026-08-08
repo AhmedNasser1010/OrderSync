@@ -13,7 +13,7 @@ export const RES_IMG =
 export const RES_IMG_GRAY =
   "https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_660,e_grayscale/";
 
-export const LOGO_URL = "/logo.png";
+export const LOGO_URL = "/logo-v2.png";
 
 export const RES_MENU_IMG =
   "https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_208,h_208,c_fit/";

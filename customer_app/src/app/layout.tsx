@@ -25,6 +25,10 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "زاجل",
   },
+  icons: {
+    icon: "/icons/icon-192-v2.png",
+    apple: "/icons/apple-touch-icon-v2.png",
+  },
   formatDetection: {
     telephone: false,
   },
