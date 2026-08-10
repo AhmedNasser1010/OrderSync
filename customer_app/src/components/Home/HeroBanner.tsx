@@ -55,7 +55,7 @@ function BannerCard({ banner }: { banner: HeroBannerType }) {
         <Image
           src={banner.imageUrl}
           alt=""
-          loading="lazy"
+          loading="eager"
           fill
           sizes="100vw"
           className="object-cover"

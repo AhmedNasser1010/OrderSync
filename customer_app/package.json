@@ -6,7 +6,12 @@
     "dev": "PORT=3004 next dev",
     "build": "next build",
     "start": "PORT=3004 next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run && npm run test:e2e",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@ordersync/order-utils": "file:../packages/order-utils",
@@ -34,18 +39,26 @@
   },
   "devDependencies": {
     "@ordersync/types": "file:../packages/types",
+    "@playwright/test": "^1.62.1",
     "@serwist/turbopack": "^9.5.12",
     "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.3",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-slick": "^0.23.13",
+    "@vitejs/plugin-react": "^6.0.5",
+    "@vitest/coverage-v8": "^4.1.10",
     "esbuild": "^0.28.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "jsdom": "^30.0.1",
     "serwist": "^9.5.12",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

@@ -10,7 +10,9 @@ function getUserSource() {
   const isPC = !isMobile && !isPWA;
 
   const browserType = (function () {
-    if (/chrome|crios|crmo/i.test(userAgent)) {
+    if (/edg|edge/i.test(userAgent)) {
+      return "edge";
+    } else if (/chrome|crios|crmo/i.test(userAgent)) {
       return "chrome";
     } else if (/firefox|fxios/i.test(userAgent)) {
       return "firefox";
@@ -18,8 +20,6 @@ function getUserSource() {
       return "safari";
     } else if (/msie|trident/i.test(userAgent)) {
       return "ie";
-    } else if (/edge/i.test(userAgent)) {
-      return "edge";
     } else {
       return "unknown-browser";
     }

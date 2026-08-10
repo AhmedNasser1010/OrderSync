@@ -2,6 +2,9 @@
   "name": "ordersync",
   "version": "1.0.0",
   "private": true,
+  "scripts": {
+    "test": "npm run test --workspace customer_app"
+  },
   "workspaces": [
     "customer_app",
     "driver_app",
@@ -9,5 +12,8 @@
     "onboarding_app",
     "orders_app",
     "packages/*"
-  ]
+  ],
+  "devDependencies": {
+    "firebase-tools": "^14.27.0"
+  }
 }

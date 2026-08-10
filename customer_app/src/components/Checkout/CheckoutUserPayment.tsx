@@ -19,16 +19,22 @@ import type { RestaurantDocument } from "@/types/restaurant";
 const RadioInputWrapper = ({
   htmlFor,
   selected,
+  disabled,
   children,
 }: {
   htmlFor: string;
   selected: boolean;
+  disabled?: boolean;
   children: React.ReactNode;
 }) => (
   <label
     htmlFor={htmlFor}
     className="flex flex-col items-center gap-4 border border-input rounded-[6px] py-8 w-[calc(100%/2-10px)] cursor-pointer transition-colors"
-    style={{ borderColor: selected ? "blue" : undefined }}
+    style={{
+      borderColor: selected ? "blue" : undefined,
+      opacity: disabled ? 0.55 : undefined,
+      cursor: disabled ? "not-allowed" : "pointer",
+    }}
   >
     {children}
   </label>
@@ -237,18 +243,23 @@ const CheckoutUserPayment = ({
             {t("payToDeliveryCaptain")}
           </p>
         </RadioInputWrapper>
-        <RadioInputWrapper htmlFor="visa" selected={paymentMethod === "ONLINE"}>
+        <RadioInputWrapper
+          htmlFor="visa"
+          selected={paymentMethod === "ONLINE"}
+          disabled
+        >
           <input
             id="visa"
             type="radio"
             name="visa"
             value="ONLINE"
+            disabled
             checked={paymentMethod === "ONLINE"}
             onChange={handleOnRadioChange}
           />
           <span className="text-[22px] font-light">{t("Online Payment")}</span>
           <p className="text-[13px] w-4/5 text-center text-color-8">
-            {t("payOnlineMethods")}
+            {t("Online Payment Coming Soon")}
           </p>
         </RadioInputWrapper>
       </div>
