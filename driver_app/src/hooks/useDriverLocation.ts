@@ -49,10 +49,20 @@ export function useDriverLocation(online: { byManager: boolean; byUser: boolean 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isBackgroundRef = useRef(false);
 
+  const onlineRef = useRef(online);
+  const myOrdersRef = useRef(myOrders);
+
+  useEffect(() => {
+    onlineRef.current = online;
+    myOrdersRef.current = myOrders;
+  }, [online, myOrders]);
+
+  const isOnlineNow = isOnline(online);
+
   const writeLocation = useCallback(
     async (position: GeolocationPosition) => {
       if (!driverUid) return;
-      if (!isOnline(online)) return;
+      if (!isOnline(onlineRef.current)) return;
 
       const { latitude, longitude, heading, speed, accuracy } = position.coords;
       const now = Date.now();
@@ -83,7 +93,7 @@ export function useDriverLocation(online: { byManager: boolean; byUser: boolean 
         console.error("Failed to write driver location:", err);
       }
     },
-    [driverUid, online],
+    [driverUid],
   );
 
   useEffect(() => {
@@ -91,7 +101,7 @@ export function useDriverLocation(online: { byManager: boolean; byUser: boolean 
       if (!navigator.geolocation) setPermissionState("unsupported");
       return;
     }
-    if (!isOnline(online)) return;
+    if (!isOnlineNow) return;
 
     let watchId: number;
     let lastWriteTime = 0;
@@ -103,11 +113,9 @@ export function useDriverLocation(online: { byManager: boolean; byUser: boolean 
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     const startTracking = () => {
-      const driverState = getDriverState(myOrders ?? []);
-
       const getInterval = () => {
         if (isBackgroundRef.current) return BACKGROUND_INTERVAL;
-        return INTERVALS[driverState];
+        return INTERVALS[getDriverState(myOrdersRef.current ?? [])];
       };
 
       const onPosition = (position: GeolocationPosition) => {
@@ -176,7 +184,7 @@ export function useDriverLocation(online: { byManager: boolean; byUser: boolean 
       if (timerRef.current) clearTimeout(timerRef.current);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [driverUid, online, myOrders, writeLocation]);
+  }, [driverUid, isOnlineNow, writeLocation]);
 
   return { permissionState, position };
 }
