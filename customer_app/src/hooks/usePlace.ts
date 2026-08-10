@@ -19,6 +19,7 @@ import {
   priceAfterDiscount,
   resolveItemDiscount,
   applyOrderDiscounts,
+  calculateOrderFinance,
 } from "@ordersync/order-utils";
 import getDeliveryFees from "@/utils/getDeliveryFees";
 import getDistanceFromLatlngInKm from "@/utils/getDistanceFromLatlngInKm";
@@ -287,13 +288,13 @@ const usePlace = () => {
         method: "CASH",
         status: "COMPLETED",
       },
-      finance: {
-        commissionPercent: 0,
-        commissionAmount: 0,
-        restaurantShare: 0,
-        companyShare: 0,
-        cashCollected: 0,
-      },
+      finance: calculateOrderFinance({
+        subtotal,
+        discount,
+        deliveryFees,
+        total: cartTotalPrice.discount,
+        commissionPercent: services.commissionPercent,
+      }),
       reconciliation: {
         settlementId: null,
         restaurantPaid: false,

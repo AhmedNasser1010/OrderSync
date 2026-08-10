@@ -32,7 +32,7 @@ export const firestoreApi = createApi({
       >,
       { uid: string }
     >({
-      queryFn: () => ({ data: { userInfo: {} as Driver["userInfo"], online: { byManager: false, byUser: false }, finance: { currentCash: 0, warningLimit: 0, blockLimit: 0 } } }),
+      queryFn: () => ({ data: { userInfo: {} as Driver["userInfo"], online: { byManager: false, byUser: false }, finance: { currentCash: 0, warningLimit: 0, blockLimit: 0, earnings: 0 } } }),
       async onCacheEntryAdded(
         user,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
@@ -479,6 +479,9 @@ export const firestoreApi = createApi({
             const driverUpdate: Record<string, unknown> = {
               accessToken: deleteField(),
               "finance.currentCash": increment(order.pricing?.total ?? 0),
+              "finance.earnings": increment(
+                order.finance?.driverEarnings ?? order.pricing?.deliveryFees ?? 0
+              ),
             };
             if (customerUid) {
               driverUpdate.trackingCustomerIds = arrayRemove(customerUid);

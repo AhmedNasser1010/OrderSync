@@ -20,6 +20,7 @@ import type { BusinessDocument, OrderType } from "@ordersync/types";
 import {
   getActiveSessionBounds,
   getBusinessDayOfTimestamp,
+  getOrderRestaurantNet,
   localDateKey,
 } from "@ordersync/order-utils";
 import type { TodayData } from "@/lib/types/types";
@@ -126,7 +127,7 @@ const useTodayOrders = () => {
     }
 
     const totalRevenue = orders.reduce(
-      (sum, o) => sum + o.pricing.total,
+      (sum, o) => sum + getOrderRestaurantNet(o),
       0,
     );
     const totalOrders = orders.length;
@@ -178,7 +179,7 @@ const useTodayOrders = () => {
           quantity: (existing?.quantity ?? 0) + item.quantity,
           revenue:
             (existing?.revenue ?? 0) +
-            item.quantity * (o.pricing.total / o.cart.length),
+            item.quantity * (getOrderRestaurantNet(o) / o.cart.length),
         });
       });
     });

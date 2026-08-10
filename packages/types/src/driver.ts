@@ -35,6 +35,7 @@ export type Driver = {
     currentCash: number;
     warningLimit: number;
     blockLimit: number;
+    earnings: number;
   };
   fcmTokens?: string[];
   notifyPush?: boolean;

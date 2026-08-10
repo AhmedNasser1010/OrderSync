@@ -119,6 +119,8 @@ export type OrderType = {
     companyShare: number;
 
     cashCollected: number;
+
+    driverEarnings: number;
   };
 
   reconciliation: {

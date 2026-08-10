@@ -71,6 +71,7 @@ const orderYupSchema = yup.object().shape({
       restaurantShare: yup.number().required(),
       companyShare: yup.number().required(),
       cashCollected: yup.number().required(),
+      driverEarnings: yup.number().required(),
     })
     .required(),
 

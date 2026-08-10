@@ -6,6 +6,7 @@ import type {
 } from "@ordersync/types";
 import {
   getBusinessDayOfTimestamp,
+  getOrderRestaurantNet,
   localDateKey,
 } from "@ordersync/order-utils";
 import type { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
@@ -109,10 +110,10 @@ const buildAnalyticsFromOrders = (
 
     for (const order of dayOrders) {
       totalOrders++;
-      totalRevenue += order.pricing.total;
+      totalRevenue += getOrderRestaurantNet(order);
       totalDiscounts += order.pricing.discount;
       totalDeliveryFees += order.pricing.deliveryFees;
-      totalOrderValue += order.pricing.total;
+      totalOrderValue += getOrderRestaurantNet(order);
       if (order.createdAt < createdAt) createdAt = order.createdAt;
 
       if (order.timeline.preparingAt && order.timeline.placedAt) {

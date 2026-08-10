@@ -225,6 +225,7 @@ function Header() {
         initServices({
           deliveryFees: servicesConfig.deliveryFees,
           minDeliveryFees: servicesConfig.minDeliveryFees,
+          commissionPercent: servicesConfig.commissionPercent,
         })
       );
     }

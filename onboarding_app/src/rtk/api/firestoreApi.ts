@@ -141,7 +141,10 @@ export const firestoreApi = createApi({
       invalidatesTags: ["Banners"],
     }),
     fetchServices: builder.query<
-      Pick<ServicesDocument, "deliveryFeesPerKm" | "minDeliveryFees">,
+      Pick<
+        ServicesDocument,
+        "deliveryFeesPerKm" | "minDeliveryFees" | "commissionPercent"
+      >,
       void
     >({
       async queryFn() {
@@ -156,6 +159,7 @@ export const firestoreApi = createApi({
             data: {
               deliveryFeesPerKm: data.deliveryFeesPerKm ?? 3.5,
               minDeliveryFees: data.minDeliveryFees ?? 5,
+              commissionPercent: data.commissionPercent ?? 10,
             },
           };
         } catch (error: unknown) {
@@ -172,6 +176,7 @@ export const firestoreApi = createApi({
         updates: {
           deliveryFeesPerKm?: number;
           minDeliveryFees?: number;
+          commissionPercent?: number;
           updatedBy?: string;
         };
       }
@@ -756,7 +761,7 @@ export const firestoreApi = createApi({
               queue: data.queue ?? [],
               userInfo: data.userInfo ?? {},
               licensePlate: data.licensePlate,
-              finance: data.finance ?? { currentCash: 0, warningLimit: 0, blockLimit: 0 },
+              finance: data.finance ?? { currentCash: 0, warningLimit: 0, blockLimit: 0, earnings: 0 },
             } as Driver;
           });
           console.log("Read Operation [fetchDriverUsers]");
@@ -1131,6 +1136,7 @@ export const firestoreApi = createApi({
               currentCash: 0,
               warningLimit: 350,
               blockLimit: 500,
+              earnings: 0,
             },
           };
           if (licensePlate) driverData.licensePlate = licensePlate;

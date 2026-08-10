@@ -28,6 +28,10 @@ const orderColumns: ExportColumn[] = [
   { header: "Subtotal", accessor: "pricing.subtotal" },
   { header: "Delivery Fees", accessor: "pricing.deliveryFees" },
   { header: "Total", accessor: "pricing.total" },
+  { header: "Commission", accessor: "finance.commissionAmount" },
+  { header: "Restaurant Net", accessor: "finance.restaurantShare" },
+  { header: "Driver Earnings", accessor: "finance.driverEarnings" },
+  { header: "Cash Collected", accessor: "finance.cashCollected" },
   { header: "Created At", accessor: "createdAt" },
 ];
 
@@ -146,6 +150,10 @@ export default function ReceivedOrdersPage() {
       "pricing.subtotal": order.pricing?.subtotal ?? 0,
       "pricing.deliveryFees": order.pricing?.deliveryFees ?? 0,
       "pricing.total": order.pricing?.total ?? 0,
+      "finance.commissionAmount": order.finance?.commissionAmount ?? 0,
+      "finance.restaurantShare": order.finance?.restaurantShare ?? 0,
+      "finance.driverEarnings": order.finance?.driverEarnings ?? 0,
+      "finance.cashCollected": order.finance?.cashCollected ?? 0,
     }));
   }, [filteredOrders, restaurantNameMap]);
 

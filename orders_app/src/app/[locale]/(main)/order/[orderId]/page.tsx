@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { Link } from "@/i18n/routing";
 import type { OrderType, OrderStatusType } from "@ordersync/types";
 import type { ItemType, BusinessDocument } from "@ordersync/types";
+import { getOrderRestaurantNet } from "@ordersync/order-utils";
 import type { CartItemType } from "@/types/orders";
 import useOrders from "@/hooks/useOrders";
 import Image from "next/image";
@@ -405,23 +406,13 @@ export default function OrderDetails({
                 </span>
               </div>
             )}
-            {order.pricing.deliveryFees > 0 && (
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">{t("deliveryFees")}</span>
-                <span className="text-foreground">
-                  {locale === "ar"
-                    ? `${order.pricing.deliveryFees.toFixed(2)} ${currency}`
-                    : `${currency}${order.pricing.deliveryFees.toFixed(2)}`}
-                </span>
-              </div>
-            )}
             <Separator className="bg-border/50" />
             <div className="flex items-center justify-between">
-              <span className="text-base font-bold text-foreground">{t("total")}</span>
+              <span className="text-base font-bold text-foreground">{t("netTotal")}</span>
               <span className="text-lg font-bold text-foreground">
                 {locale === "ar"
-                  ? `${order.pricing.total.toFixed(2)} ${currency}`
-                  : `${currency}${order.pricing.total.toFixed(2)}`}
+                  ? `${getOrderRestaurantNet(order).toFixed(2)} ${currency}`
+                  : `${currency}${getOrderRestaurantNet(order).toFixed(2)}`}
               </span>
             </div>
           </div>

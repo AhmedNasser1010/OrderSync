@@ -84,7 +84,7 @@
       "settings": "Settings"
     },
     "kpis": {
-      "revenue": "Revenue",
+      "revenue": "Net Revenue",
       "orders": "Orders",
       "avgOrderValue": "Avg Order Value",
       "cancellationRate": "Cancellation Rate"
@@ -97,7 +97,7 @@
     },
     "salesTrends": {
       "title": "Sales Trends",
-      "revenue": "Revenue",
+      "revenue": "Net Revenue",
       "orders": "Orders"
     },
     "topItems": {
@@ -239,7 +239,7 @@
     "today": {
       "title": "Today's Overview",
       "welcome": "Real-time overview of today's activity",
-      "revenue": "Today's Revenue",
+      "revenue": "Today's Net Revenue",
       "orders": "Today's Orders",
       "avgOrderValue": "Avg Order Value",
       "cancellationRate": "Cancellation Rate",

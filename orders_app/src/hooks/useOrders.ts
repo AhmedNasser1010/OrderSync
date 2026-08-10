@@ -3,6 +3,7 @@ import type { OrderType, BusinessDocument } from "@ordersync/types";
 import type { ItemType } from "@ordersync/types";
 import {
   getBusinessDayOfTimestamp,
+  getOrderRestaurantNet,
   localDateKey,
   wasReturnedByDriver,
 } from "@ordersync/order-utils";
@@ -168,7 +169,7 @@ const useOrders = (): UseOrders => {
         id: order.id,
         orderNumber: order.orderNumber,
         customer: order.customer.name,
-        total: order.pricing.total.toFixed(2),
+        total: getOrderRestaurantNet(order).toFixed(2),
         status: order.status.current,
         items: getOrderMenu(order.cart)
           .map((item) => `${item?.quantity}x ${item?.title}`)

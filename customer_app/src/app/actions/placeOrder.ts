@@ -3,7 +3,11 @@
 import { initAdmin } from "@/lib/firebase-admin";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
-import { TERMINAL_STATUSES } from "@ordersync/order-utils";
+import {
+  TERMINAL_STATUSES,
+  calculateOrderFinance,
+  DEFAULT_COMMISSION_PERCENT,
+} from "@ordersync/order-utils";
 import type {
   MainMenuType,
   OrderStatusType,
@@ -287,6 +291,9 @@ export async function placeOrderServer(args: {
             }
           : DEFAULT_DELIVERY_FEES;
 
+        const commissionPercent =
+          servicesSnap.data()?.commissionPercent ?? DEFAULT_COMMISSION_PERCENT;
+
         let serverPricing;
         let serverLines;
         try {
@@ -317,10 +324,16 @@ export async function placeOrderServer(args: {
 
         const orderNumber = randomOrderNumber();
 
+        const serverFinance = calculateOrderFinance({
+          ...serverPricing,
+          commissionPercent,
+        });
+
         const newOrder = {
           ...orderData,
           cart: serverLines,
           pricing: serverPricing,
+          finance: serverFinance,
           id: orderRef.id,
           orderNumber,
           businessId: orderData.business.id,

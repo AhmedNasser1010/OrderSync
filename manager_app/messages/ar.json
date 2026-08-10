@@ -84,7 +84,7 @@
       "settings": "الإعدادات"
     },
     "kpis": {
-      "revenue": "الإيرادات",
+      "revenue": "صافي الإيرادات",
       "orders": "الطلبات",
       "avgOrderValue": "متوسط قيمة الطلب",
       "cancellationRate": "معدل الإلغاء"
@@ -97,7 +97,7 @@
     },
     "salesTrends": {
       "title": "اتجاهات المبيعات",
-      "revenue": "الإيرادات",
+      "revenue": "صافي الإيرادات",
       "orders": "الطلبات"
     },
     "topItems": {
@@ -239,7 +239,7 @@
     "today": {
       "title": "نظرة عامة على اليوم",
       "welcome": "نظرة عامة في الوقت الفعلي على نشاط اليوم",
-      "revenue": "إيرادات اليوم",
+      "revenue": "صافي إيرادات اليوم",
       "orders": "طلبات اليوم",
       "avgOrderValue": "متوسط قيمة الطلب",
       "cancellationRate": "معدل الإلغاء",

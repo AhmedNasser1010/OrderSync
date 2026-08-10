@@ -51,6 +51,23 @@ function CartSummary({ cart }: { cart: OrderType["cart"] }) {
   );
 }
 
+function FinanceCell({
+  label,
+  amount,
+}: {
+  label: string;
+  amount: number;
+}) {
+  return (
+    <div className="flex flex-col">
+      <span className="text-[11px] text-muted-foreground">{label}</span>
+      <span className="text-sm font-medium text-foreground">
+        {formatCurrency(amount)}
+      </span>
+    </div>
+  );
+}
+
 export function ReceivedOrdersTable({
   orders,
   restaurantNameMap,
@@ -105,6 +122,15 @@ export function ReceivedOrdersTable({
             </TableHead>
             <TableHead className="text-foreground font-semibold">
               Total
+            </TableHead>
+            <TableHead className="text-foreground font-semibold">
+              Commission
+            </TableHead>
+            <TableHead className="text-foreground font-semibold">
+              Restaurant Net
+            </TableHead>
+            <TableHead className="text-foreground font-semibold">
+              Driver Earnings
             </TableHead>
             <TableHead className="text-foreground font-semibold">
               Since
@@ -168,6 +194,24 @@ export function ReceivedOrdersTable({
                 </TableCell>
                 <TableCell className="py-4 text-sm font-medium text-foreground">
                   {formatCurrency(order.pricing?.total ?? 0)}
+                </TableCell>
+                <TableCell className="py-4">
+                  <FinanceCell
+                    label={`${order.finance?.commissionPercent ?? 0}%`}
+                    amount={order.finance?.commissionAmount ?? 0}
+                  />
+                </TableCell>
+                <TableCell className="py-4">
+                  <FinanceCell
+                    label="Net"
+                    amount={order.finance?.restaurantShare ?? 0}
+                  />
+                </TableCell>
+                <TableCell className="py-4">
+                  <FinanceCell
+                    label="Fee"
+                    amount={order.finance?.driverEarnings ?? 0}
+                  />
                 </TableCell>
                 <TableCell className="py-4 text-sm font-medium text-muted-foreground">
                   {order.createdAt ? timeSince(order.createdAt) : "—"}

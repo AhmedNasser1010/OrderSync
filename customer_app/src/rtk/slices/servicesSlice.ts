@@ -3,6 +3,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 export interface ServicesState {
   deliveryFees?: number;
   minDeliveryFees?: number;
+  commissionPercent?: number;
   [key: string]: unknown;
 }
 
