@@ -1,4 +1,4 @@
-import { seedEmulator } from "./seed-emulator.ts";
+import { seedEmulator } from "./seed-emulator";
 
 seedEmulator()
   .then(() => {

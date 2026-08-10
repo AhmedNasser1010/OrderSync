@@ -24,7 +24,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `bash -c 'pkill -f "cloud-firestore-emulat[o]r" 2>/dev/null; pkill -f "firebase-auth-emulat[o]r" 2>/dev/null; sleep 1; npx firebase-tools emulators:exec --only auth,firestore --project pos-system-0 "node --experimental-strip-types e2e/seed-emulator-cli.ts && PORT=3006 next dev"'`,
+    command: `bash -c 'pkill -f "cloud-firestore-emulat[o]r" 2>/dev/null; pkill -f "firebase-auth-emulat[o]r" 2>/dev/null; sleep 1; npx firebase-tools emulators:exec --only auth,firestore --project pos-system-0 "npx esbuild e2e/seed-emulator-cli.ts --bundle --platform=node --format=cjs --packages=external --outfile=node_modules/.cache/e2e-seed.cjs && node node_modules/.cache/e2e-seed.cjs && PORT=3006 next dev"'`,
     url: "http://localhost:3006",
     reuseExistingServer: false,
     timeout: 180_000,
