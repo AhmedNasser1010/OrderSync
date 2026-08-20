@@ -61,7 +61,7 @@ export function ImageCarousel({
         width={first.width}
         height={first.height}
         className={`w-full h-auto ${className}`}
-        sizes={`${first.width}px`}
+        sizes="(max-width: 640px) 240px, (max-width: 1024px) 260px, 280px"
         draggable={false}
       />
     );
@@ -90,7 +90,8 @@ export function ImageCarousel({
               width={img.width}
               height={img.height}
               className="w-full h-full object-cover"
-              sizes={`${img.width}px`}
+              sizes="(max-width: 640px) 240px, (max-width: 1024px) 260px, 280px"
+              priority={i === 0}
               draggable={false}
             />
           </motion.div>

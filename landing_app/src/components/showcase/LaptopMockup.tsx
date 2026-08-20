@@ -30,7 +30,7 @@ export function LaptopMockup({
         {/* Inner bezel */}
         <div className="relative w-full bg-gray-900 rounded-t-[9px] sm:rounded-t-[11px] p-[8px] sm:p-[10px]">
           {/* Screen */}
-          <div className="relative w-full bg-black rounded-[4px] sm:rounded-[6px] overflow-hidden">
+          <div className="relative w-full bg-black rounded-[4px] sm:rounded-[6px] overflow-hidden" style={{ imageRendering: "auto", contain: "layout paint" }}>
             {/* Camera */}
             <div className="absolute top-1.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-gray-800 rounded-full z-10" />
 

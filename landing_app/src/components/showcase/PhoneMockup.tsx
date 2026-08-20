@@ -30,7 +30,7 @@ export function PhoneMockup({
         {/* Inner bezel */}
         <div className="relative w-full bg-gray-900 rounded-[33px] sm:rounded-[39px] p-[10px]">
           {/* Screen */}
-          <div className="relative w-full bg-black rounded-[24px] sm:rounded-[28px] overflow-hidden">
+          <div className="relative w-full bg-black rounded-[24px] sm:rounded-[28px] overflow-hidden" style={{ imageRendering: "auto", contain: "layout paint" }}>
             {/* Camera */}
             <div className="absolute top-2 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rounded-full z-10" />
 
