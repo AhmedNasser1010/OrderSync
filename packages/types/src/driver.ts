@@ -33,8 +33,8 @@ export type Driver = {
   };
   finance: {
     currentCash: number;
-    warningLimit: number;
-    blockLimit: number;
+    dailyAdvance: number;
+    dailyAdvanceDate: number;
     earnings: number;
   };
   fcmTokens?: string[];

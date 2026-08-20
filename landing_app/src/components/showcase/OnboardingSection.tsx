@@ -152,6 +152,7 @@ export function OnboardingSection() {
               images={[
                 { src: "/images/onboarding-screen-1.png", alt: "Onboarding App - Partner Admin", width: 1366, height: 768 },
                 { src: "/images/onboarding-screen-2.png", alt: "Onboarding App - Partner Admin", width: 1366, height: 768 },
+                { src: "/images/onboarding-screen-3.png", alt: "Onboarding App - Partner Admin", width: 1366, height: 768 },
               ]}
             />
           </motion.div>

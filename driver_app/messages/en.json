@@ -111,8 +111,7 @@
     "close": "Close"
   },
   "finance": {
-    "blocked": "Your cash balance (${amount}) has reached the limit (${limit}). You cannot claim new orders.",
-    "warning": "Your cash balance (${amount}) has reached the warning limit (${limit})."
+    "remainingAdvance": "Remaining advance: ${amount}"
   },
   "userMenu": {
     "settings": "Settings"
@@ -190,9 +189,7 @@
     "noMatchingOrders": "No matching orders",
     "noMatchingOrdersDesc": "Try a different order number, customer name, item, or status",
     "noOrdersAvailable": "No orders available",
-    "noOrdersAvailableDesc": "New orders will appear here",
-    "limitReached": "$ Limit Reached",
-    "limitReachedDesc": "Your cash balance (${amount}) has reached the limit (${limit}). Contact your manager to continue."
+    "noOrdersAvailableDesc": "New orders will appear here"
   },
   "settings": {
     "theme": "Theme",

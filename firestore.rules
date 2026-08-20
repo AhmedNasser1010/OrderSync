@@ -288,7 +288,7 @@ service cloud.firestore {
         && (incomingData().status.current != 'READY'
           || incomingData().status.returnedByDriverUid == request.auth.uid)
         && incomingData().diff(resourceData()).affectedKeys()
-            .hasOnly(['status', 'timeline', 'assignment', 'updatedAt']);
+            .hasOnly(['status', 'timeline', 'assignment', 'reconciliation', 'updatedAt']);
 
       // Customers can submit feedback on delivered orders.
       allow update: if isCustomer()

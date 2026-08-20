@@ -59,7 +59,7 @@ export function MapMarkers({
                       : undefined
                   }
                   lastSeen={loc.updatedAt}
-                  cash={driver?.finance?.currentCash ?? 0}
+                  cash={(driver?.finance?.dailyAdvance ?? 0) + (driver?.finance?.earnings ?? 0)}
                 />
               </Popup>
             </Marker>

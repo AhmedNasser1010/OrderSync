@@ -40,7 +40,7 @@ export function DriverPopup({
       <p className="text-xs text-muted-foreground">
         Last seen: {formatTimestamp(lastSeen)}
       </p>
-      <p className="text-xs text-muted-foreground">Cash: EGP {cash}</p>
+      <p className="text-xs text-muted-foreground">Remaining Advance: EGP {cash}</p>
     </div>
   );
 }

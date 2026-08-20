@@ -111,8 +111,7 @@
     "close": "إغلاق"
   },
   "finance": {
-    "blocked": "رصيدك النقدي (${amount}) بلغ الحد الأقصى (${limit}). لا يمكنك استلام طلبات جديدة.",
-    "warning": "رصيدك النقدي (${amount}) بلغ حد التحذير (${limit})."
+    "remainingAdvance": "المبلغ المتبقي: ${amount}"
   },
   "userMenu": {
     "settings": "الإعدادات"

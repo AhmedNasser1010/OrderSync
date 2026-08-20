@@ -125,6 +125,7 @@ export function CustomerSection() {
               images={[
                 { src: "/images/customer-screen-1.jpg", alt: "Customer App - OrderSync", width: 1078, height: 2239 },
                 { src: "/images/customer-screen-2.jpg", alt: "Customer App - OrderSync", width: 1078, height: 2247 },
+                { src: "/images/customer-screen-3.jpg", alt: "Customer App - OrderSync", width: 1080, height: 2251 },
               ]}
             />
           </motion.div>

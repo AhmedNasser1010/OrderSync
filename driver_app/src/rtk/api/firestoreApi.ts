@@ -32,7 +32,7 @@ export const firestoreApi = createApi({
       >,
       { uid: string }
     >({
-      queryFn: () => ({ data: { userInfo: {} as Driver["userInfo"], online: { byManager: false, byUser: false }, finance: { currentCash: 0, warningLimit: 0, blockLimit: 0, earnings: 0 } } }),
+      queryFn: () => ({ data: { userInfo: {} as Driver["userInfo"], online: { byManager: false, byUser: false }, finance: { currentCash: 0, dailyAdvance: 0, dailyAdvanceDate: 0, earnings: 0 } } }),
       async onCacheEntryAdded(
         user,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
@@ -208,6 +208,7 @@ export const firestoreApi = createApi({
 
             const now = Date.now();
             const customerUid = order.customer?.uid;
+            const restaurantShare = order.finance?.restaurantShare ?? 0;
 
             transaction.update(orderRef, {
               "assignment.driverUid": driverUid,
@@ -227,6 +228,9 @@ export const firestoreApi = createApi({
             }
             if (customerUid) {
               driverUpdate.trackingCustomerIds = arrayUnion(customerUid);
+            }
+            if (restaurantShare > 0) {
+              driverUpdate["finance.currentCash"] = increment(-restaurantShare);
             }
             if (Object.keys(driverUpdate).length > 0) {
               transaction.update(driverRef, driverUpdate);
@@ -282,6 +286,7 @@ export const firestoreApi = createApi({
             const now = Date.now();
             const customerUids: string[] = [];
             let businessId = "";
+            let totalRestaurantShare = 0;
 
             for (let i = 0; i < orderSnaps.length; i++) {
               const order = orderSnaps[i].data() as OrderType;
@@ -305,6 +310,7 @@ export const firestoreApi = createApi({
               if (order.customer?.uid) {
                 customerUids.push(order.customer.uid);
               }
+              totalRestaurantShare += order.finance?.restaurantShare ?? 0;
             }
 
             const driverUpdate: Record<string, unknown> = {};
@@ -314,6 +320,9 @@ export const firestoreApi = createApi({
             if (customerUids.length > 0) {
               driverUpdate.trackingCustomerIds =
                 arrayUnion(...customerUids);
+            }
+            if (totalRestaurantShare > 0) {
+              driverUpdate["finance.currentCash"] = increment(-totalRestaurantShare);
             }
             if (Object.keys(driverUpdate).length > 0) {
               transaction.update(driverRef, driverUpdate);
@@ -365,6 +374,7 @@ export const firestoreApi = createApi({
                 ),
                 "timeline.pickedUpAt": now,
                 "timeline.onRouteAt": now,
+                "reconciliation.restaurantPaid": true,
                 updatedAt: now,
               });
             } else {
@@ -376,6 +386,7 @@ export const firestoreApi = createApi({
                   by: `driver:${driverUid}`,
                 }),
                 "timeline.pickedUpAt": now,
+                "reconciliation.restaurantPaid": true,
                 updatedAt: now,
               });
             }
@@ -480,7 +491,8 @@ export const firestoreApi = createApi({
               accessToken: deleteField(),
               "finance.currentCash": increment(order.pricing?.total ?? 0),
               "finance.earnings": increment(
-                order.finance?.driverEarnings ?? order.pricing?.deliveryFees ?? 0
+                (order.finance?.driverEarnings ?? order.pricing?.deliveryFees ?? 0)
+                + (order.finance?.commissionAmount ?? 0)
               ),
             };
             if (customerUid) {
@@ -524,6 +536,7 @@ export const firestoreApi = createApi({
 
             const now = Date.now();
             const customerUid = order.customer?.uid;
+            const restaurantShare = order.finance?.restaurantShare ?? 0;
 
             transaction.update(orderRef, {
               "status.current": "READY",
@@ -543,6 +556,9 @@ export const firestoreApi = createApi({
             };
             if (customerUid) {
               driverUpdate.trackingCustomerIds = arrayRemove(customerUid);
+            }
+            if (restaurantShare > 0) {
+              driverUpdate["finance.currentCash"] = increment(restaurantShare);
             }
             transaction.update(driverRef, driverUpdate);
           });

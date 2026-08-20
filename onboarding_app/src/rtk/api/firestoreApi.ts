@@ -761,7 +761,7 @@ export const firestoreApi = createApi({
               queue: data.queue ?? [],
               userInfo: data.userInfo ?? {},
               licensePlate: data.licensePlate,
-              finance: data.finance ?? { currentCash: 0, warningLimit: 0, blockLimit: 0, earnings: 0 },
+              finance: data.finance ?? { currentCash: 0, dailyAdvance: 0, dailyAdvanceDate: 0, earnings: 0 },
             } as Driver;
           });
           console.log("Read Operation [fetchDriverUsers]");
@@ -1134,8 +1134,8 @@ export const firestoreApi = createApi({
             userInfo,
             finance: {
               currentCash: 0,
-              warningLimit: 350,
-              blockLimit: 500,
+              dailyAdvance: 0,
+              dailyAdvanceDate: 0,
               earnings: 0,
             },
           };
@@ -1205,6 +1205,70 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ["Drivers"],
     }),
+    initializeDailyAdvance: builder.mutation<
+      null,
+      { uid: string; amount: number }
+    >({
+      async queryFn({ uid, amount }) {
+        try {
+          if (!uid) throw new Error("Driver UID is required.");
+          if (amount <= 0) throw new Error("Advance amount must be positive.");
+
+          const now = Date.now();
+          const driverRef = doc(db, "drivers", uid);
+          await updateDoc(driverRef, {
+            "finance.currentCash": amount,
+            "finance.dailyAdvance": amount,
+            "finance.dailyAdvanceDate": now,
+            updatedAt: now,
+          });
+
+          console.log("Write Operation [initializeDailyAdvance]");
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error initializing daily advance:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Drivers"],
+    }),
+    settleDriverAccount: builder.mutation<
+      { settlementAmount: number },
+      { uid: string }
+    >({
+      async queryFn({ uid }) {
+        try {
+          if (!uid) throw new Error("Driver UID is required.");
+
+          const driverRef = doc(db, "drivers", uid);
+          const driverSnap = await getDoc(driverRef);
+          if (!driverSnap.exists()) throw new Error("Driver not found.");
+
+          const finance = driverSnap.data()?.finance;
+          const dailyAdvance = finance?.dailyAdvance ?? 0;
+          const earnings = finance?.earnings ?? 0;
+          const settlementAmount = dailyAdvance + earnings;
+
+          const now = Date.now();
+          await updateDoc(driverRef, {
+            "finance.currentCash": 0,
+            "finance.dailyAdvance": 0,
+            "finance.dailyAdvanceDate": 0,
+            "finance.earnings": 0,
+            updatedAt: now,
+          });
+
+          console.log("Write Operation [settleDriverAccount]");
+          return { data: { settlementAmount } };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error settling driver account:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Drivers"],
+    }),
   }),
 });
 
@@ -1238,6 +1302,8 @@ export const {
   useCreateDriverDocumentMutation,
   useUpdateDriverDocumentMutation,
   useDeleteDriverDocumentMutation,
+  useInitializeDailyAdvanceMutation,
+  useSettleDriverAccountMutation,
   useUpdateCustomerDocumentMutation,
   useSetReviewVisibilityMutation,
 } = firestoreApi;

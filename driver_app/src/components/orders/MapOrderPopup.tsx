@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "@/i18n/routing";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrderActions } from "@/hooks/useOrderActions";
-import useDriverFinance from "@/hooks/useDriverFinance";
 import { STATUS_CONFIG, STATUS_TRANSLATION_KEY } from "./OrderCard";
 import { cn, formatPrice, formatRelativeTime } from "@/lib/utils";
 import { useTranslations } from "next-intl";
@@ -44,7 +43,6 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
   const { user } = useAuth();
   const driverUid = user?.uid ?? "";
   const { claim, start, startRoute, complete, isLoading, isLocked } = useOrderActions();
-  const { isBlocked } = useDriverFinance();
   const t = useTranslations("orderCard");
   const p = useTranslations("mapOrderPopup");
 
@@ -108,7 +106,7 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
             : null;
 
   const isActionDisabled =
-    isLoading || isLocked(order.id) || (status === "READY" && isBlocked);
+    isLoading || isLocked(order.id);
 
   const deliveryLatLng = order.delivery?.latlng;
   const hasLocation =
@@ -208,8 +206,6 @@ export function MapOrderPopup({ order, onClose, onNavigate }: MapOrderPopupProps
                 <Loader2 className="h-4 w-4 animate-spin" />
                 {p("processing")}
               </>
-            ) : status === "READY" && isBlocked ? (
-              p("limitReached")
             ) : (
               t(actionLabelKey)
             )}

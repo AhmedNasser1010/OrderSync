@@ -32,8 +32,7 @@ export function EditDriverDialog({
   const [secondPhone, setSecondPhone] = useState("");
   const [licensePlateLetters, setLicensePlateLetters] = useState("");
   const [licensePlateNumbers, setLicensePlateNumbers] = useState("");
-  const [warningLimit, setWarningLimit] = useState("");
-  const [blockLimit, setBlockLimit] = useState("");
+  const [dailyAdvance, setDailyAdvance] = useState("");
   const [onlineByManager, setOnlineByManager] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,14 +51,9 @@ export function EditDriverDialog({
           ? String(driver.licensePlate.numbers)
           : "",
       );
-      setWarningLimit(
-        driver.finance?.warningLimit != null
-          ? String(driver.finance.warningLimit)
-          : "",
-      );
-      setBlockLimit(
-        driver.finance?.blockLimit != null
-          ? String(driver.finance.blockLimit)
+      setDailyAdvance(
+        driver.finance?.dailyAdvance != null
+          ? String(driver.finance.dailyAdvance)
           : "",
       );
       setOnlineByManager(driver.online?.byManager ?? false);
@@ -100,13 +94,9 @@ export function EditDriverDialog({
         };
       }
 
-      const newWarningLimit = warningLimit ? parseInt(warningLimit) : undefined;
-      const newBlockLimit = blockLimit ? parseInt(blockLimit) : undefined;
-      if (newWarningLimit != null) {
-        updates["finance.warningLimit"] = newWarningLimit;
-      }
-      if (newBlockLimit != null) {
-        updates["finance.blockLimit"] = newBlockLimit;
+      const newDailyAdvance = dailyAdvance ? parseInt(dailyAdvance) : undefined;
+      if (newDailyAdvance != null) {
+        updates["finance.dailyAdvance"] = newDailyAdvance;
       }
 
       await updateDriverDocument({
@@ -202,29 +192,16 @@ export function EditDriverDialog({
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="edit-warning-limit">Warning Limit</Label>
-              <Input
-                id="edit-warning-limit"
-                type="number"
-                value={warningLimit}
-                onChange={(e) => setWarningLimit(e.target.value)}
-                placeholder="e.g. 350"
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="edit-block-limit">Block Limit</Label>
-              <Input
-                id="edit-block-limit"
-                type="number"
-                value={blockLimit}
-                onChange={(e) => setBlockLimit(e.target.value)}
-                placeholder="e.g. 500"
-                className="mt-1.5"
-              />
-            </div>
+          <div>
+            <Label htmlFor="edit-daily-advance">Daily Advance</Label>
+            <Input
+              id="edit-daily-advance"
+              type="number"
+              value={dailyAdvance}
+              onChange={(e) => setDailyAdvance(e.target.value)}
+              placeholder="e.g. 500"
+              className="mt-1.5"
+            />
           </div>
           <div className="flex items-center justify-between rounded-lg border border-border p-3">
             <div className="space-y-0.5">

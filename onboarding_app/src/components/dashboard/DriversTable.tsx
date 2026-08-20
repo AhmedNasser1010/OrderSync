@@ -19,13 +19,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Pencil, Trash2, AlertTriangle, Loader2 } from "lucide-react";
+import { Pencil, Trash2, AlertTriangle, Loader2, Wallet, Receipt, MoreHorizontal } from "lucide-react";
 import { format } from "date-fns";
 import type { Driver } from "@ordersync/types";
 import { EditDriverDialog } from "./EditDriverDialog";
+import { SetAdvanceDialog } from "./SetAdvanceDialog";
+import { SettleAccountDialog } from "./SettleAccountDialog";
 import { useUpdateDriverDocumentMutation } from "@/rtk/api/firestoreApi";
 import { Badge } from "@/components/ui/badge";
 import { ButtonGuard } from "@/components/ui/button-guard";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 interface DriversTableProps {
@@ -36,6 +45,10 @@ interface DriversTableProps {
 export function DriversTable({ drivers, onDelete }: DriversTableProps) {
   const [editDriver, setEditDriver] = useState<Driver | null>(null);
   const [editOpen, setEditOpen] = useState(false);
+  const [setAdvanceDriver, setSetAdvanceDriver] = useState<Driver | null>(null);
+  const [setAdvanceOpen, setSetAdvanceOpen] = useState(false);
+  const [settleDriver, setSettleDriver] = useState<Driver | null>(null);
+  const [settleOpen, setSettleOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     driver: Driver | null;
@@ -87,7 +100,7 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
 
   return (
     <>
-      <Card className="overflow-hidden bg-card border-border">
+      <Card className="bg-card border-border">
         <Table>
           <TableHeader className="bg-secondary/50 border-b border-border">
             <TableRow className="hover:bg-transparent">
@@ -101,7 +114,10 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
                 Status
               </TableHead>
               <TableHead className="text-foreground font-semibold">
-                Cash
+                Daily Advance
+              </TableHead>
+              <TableHead className="text-foreground font-semibold">
+                Available
               </TableHead>
               <TableHead className="text-foreground font-semibold">
                 Created
@@ -181,7 +197,10 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
                     )}
                   </TableCell>
                   <TableCell className="py-4 text-sm text-muted-foreground">
-                    {driver.finance?.currentCash?.toLocaleString() ?? "0"}
+                    {driver.finance?.dailyAdvance?.toLocaleString() ?? "0"}
+                  </TableCell>
+                  <TableCell className="py-4 text-sm text-muted-foreground">
+                    {((driver.finance?.dailyAdvance ?? 0) + (driver.finance?.earnings ?? 0)).toLocaleString()}
                   </TableCell>
                   <TableCell className="py-4 text-sm text-muted-foreground">
                     {driver.createdAt
@@ -189,28 +208,52 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
                       : "—"}
                   </TableCell>
                   <TableCell className="py-4 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:bg-secondary/80"
-                        onClick={() => handleEdit(driver)}
-                        title="Edit driver"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive hover:bg-destructive/10"
-                        onClick={() =>
-                          setDeleteDialog({ open: true, driver })
-                        }
-                        title="Delete driver"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setSetAdvanceDriver(driver);
+                            setSetAdvanceOpen(true);
+                          }}
+                        >
+                          <Wallet className="mr-2 h-4 w-4" />
+                          <span>Set Advance</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => {
+                            setSettleDriver(driver);
+                            setSettleOpen(true);
+                          }}
+                        >
+                          <Receipt className="mr-2 h-4 w-4" />
+                          <span>Settle Account</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => handleEdit(driver)}
+                        >
+                          <Pencil className="mr-2 h-4 w-4" />
+                          <span>Edit Driver</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-destructive cursor-pointer"
+                          onClick={() =>
+                            setDeleteDialog({ open: true, driver })
+                          }
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          <span>Delete Driver</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               );
@@ -223,6 +266,18 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
         driver={editDriver}
         open={editOpen}
         onOpenChange={setEditOpen}
+      />
+
+      <SetAdvanceDialog
+        driver={setAdvanceDriver}
+        open={setAdvanceOpen}
+        onOpenChange={setSetAdvanceOpen}
+      />
+
+      <SettleAccountDialog
+        driver={settleDriver}
+        open={settleOpen}
+        onOpenChange={setSettleOpen}
       />
 
       <Dialog
