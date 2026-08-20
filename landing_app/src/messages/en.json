@@ -1,0 +1,161 @@
+{
+  "nav": {
+    "apps": "Apps",
+    "features": "Features",
+    "ecosystem": "Ecosystem",
+    "contact": "Contact",
+    "docs": "Docs",
+    "getStarted": "Get Started"
+  },
+  "hero": {
+    "badge": "Complete Food Delivery Platform",
+    "title": "Connect Restaurants, Drivers & Customers in One Platform",
+    "subtitle": "OrderSync brings together five purpose-built apps sharing one real-time Firebase backend — from ordering to delivery to analytics.",
+    "cta_primary": "Explore Apps",
+    "cta_secondary": "View GitHub",
+    "stat_apps": "5 Apps",
+    "stat_realtime": "Real-time",
+    "stat_i18n": "Multi-language",
+    "stat_offline": "Offline Ready"
+  },
+  "showcase": {
+    "section_title": "Five Apps, One Platform",
+    "section_subtitle": "Each app is purpose-built for its role, yet they all share one seamless real-time backend.",
+    "customer": {
+      "badge": "Customer App",
+      "title": "Order Delicious Food",
+      "subtitle": "Browse menus, track orders in real-time, and pay securely — all from your phone.",
+      "cta": "Try OrderSync",
+      "feature_1": "Real-time order tracking",
+      "feature_2": "Full restaurant menus",
+      "feature_3": "Secure checkout with map",
+      "feature_4": "PWA installable"
+    },
+    "onboarding": {
+      "badge": "Onboarding App",
+      "title": "Manage Your Restaurant",
+      "subtitle": "Build menus, create discounts, and manage your entire team from one dashboard.",
+      "cta": "Explore Platform",
+      "feature_1": "Menu builder with sizes",
+      "feature_2": "Advanced discount engine",
+      "feature_3": "User & driver management",
+      "feature_4": "Live fleet monitoring"
+    },
+    "orders": {
+      "badge": "Kitchen App",
+      "title": "Real-Time Order Board",
+      "subtitle": "Track orders from received to delivery with live alerts and batch processing.",
+      "cta": "See It Live",
+      "feature_1": "Tabbed order pipeline",
+      "feature_2": "Urgent order alerting",
+      "feature_3": "Batch accept & prepare",
+      "feature_4": "Printable invoices"
+    },
+    "driver": {
+      "badge": "Driver App",
+      "title": "Deliver with Ease",
+      "subtitle": "Optimized routes, live GPS tracking, and an order marketplace — built for the road.",
+      "cta": "Start Driving",
+      "feature_1": "Route optimization",
+      "feature_2": "Order marketplace",
+      "feature_3": "Live GPS streaming",
+      "feature_4": "Push notifications"
+    },
+    "manager": {
+      "badge": "Manager App",
+      "title": "Insights at Your Fingertips",
+      "subtitle": "Real-time KPIs, sales trends, and a business health score — all in one view.",
+      "cta": "View Analytics",
+      "feature_1": "Real-time KPI dashboard",
+      "feature_2": "Sales trend charts",
+      "feature_3": "Business health score",
+      "feature_4": "AI-powered insights"
+    }
+  },
+  "ecosystem": {
+    "section_title": "How It Works",
+    "section_subtitle": "All five apps are connected through a single real-time Firebase backend.",
+    "step_1_title": "Customer Orders",
+    "step_1_desc": "A customer browses restaurants and places an order through the OrderSync app.",
+    "step_2_title": "Kitchen Receives",
+    "step_2_desc": "The order appears instantly on the restaurant's kitchen board.",
+    "step_3_title": "Driver Delivers",
+    "step_3_desc": "A nearby driver claims the order and follows optimized routes.",
+    "step_4_title": "Manager Monitors",
+    "step_4_desc": "Real-time analytics and KPIs keep managers informed."
+  },
+  "features": {
+    "section_title": "Built for Scale",
+    "section_subtitle": "Every feature is designed for reliability, performance, and growth.",
+    "realtime": {
+      "title": "Real-time Updates",
+      "desc": "Firebase-powered instant sync across all apps simultaneously."
+    },
+    "i18n": {
+      "title": "Multi-language",
+      "desc": "Full English & Arabic support with bidirectional text."
+    },
+    "offline": {
+      "title": "Offline Ready",
+      "desc": "PWA with service workers for seamless offline access."
+    },
+    "routing": {
+      "title": "Route Optimization",
+      "desc": "Smart delivery routing that saves time and fuel."
+    },
+    "analytics": {
+      "title": "Analytics Dashboard",
+      "desc": "Real-time KPIs, charts, and business health scores."
+    },
+    "discounts": {
+      "title": "Discount Engine",
+      "desc": "Item & order-level discounts with complex conditions."
+    },
+    "notifications": {
+      "title": "Push Notifications",
+      "desc": "Real-time alerts for orders, deliveries, and updates."
+    },
+    "maps": {
+      "title": "Live Map Tracking",
+      "desc": "Real-time GPS tracking for drivers and order locations."
+    },
+    "roles": {
+      "title": "Role-based Access",
+      "desc": "Secure permissions for every user type in the platform."
+    }
+  },
+  "docs": {
+    "title": "Documentation",
+    "subtitle": "Technical documentation for the OrderSync platform."
+  },
+  "footer": {
+    "tagline": "The complete food delivery platform connecting restaurants, drivers, and customers.",
+    "apps_title": "Apps",
+    "platform_title": "Platform",
+    "company_title": "Company",
+    "features": "Features",
+    "ecosystem_link": "Ecosystem",
+    "pricing": "Pricing",
+    "security": "Security",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "copyright": "© 2026 OrderSync. All rights reserved.",
+    "built_with": "Built with Next.js, Firebase & Tailwind",
+    "app_customer": "Customer App (OrderSync)",
+    "app_onboarding": "Onboarding App",
+    "app_kitchen": "Kitchen App",
+    "app_driver": "Driver App",
+    "app_manager": "Manager App",
+    "social_website": "Website",
+    "social_chat": "Chat",
+    "social_share": "Share",
+    "social_email": "Email",
+    "alt_customer": "Customer App - OrderSync",
+    "alt_onboarding": "Onboarding App - Partner Admin",
+    "alt_orders": "Orders App - Kitchen Board",
+    "alt_driver": "Driver App",
+    "alt_manager": "Manager App - Analytics Dashboard"
+  }
+}
