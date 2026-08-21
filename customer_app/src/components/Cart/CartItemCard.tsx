@@ -43,6 +43,7 @@ const CartItemCard = ({
     discountIncluded && price > 0 && finalPrice < price
       ? Math.round((1 - finalPrice / price) * 100)
       : 0;
+  const hasDiscountMsg = Boolean(discountIncluded && discountMsg);
 
   return (
     <div className="flex items-start justify-between gap-4 py-6">
@@ -59,6 +60,7 @@ const CartItemCard = ({
           price={price}
           finalPrice={finalPrice}
           discountIncluded={discountIncluded}
+          hidePercentOff={hasDiscountMsg}
         />
         <ItemDescription description={item?.description} />
         <ItemSizesBar item={item} selectedSize={item?.selectedSize} />
@@ -116,7 +118,7 @@ const CartItemCard = ({
             sizes="(min-width: 640px) 128px, 112px"
             className="rounded-2xl object-cover transition-transform duration-300 group-hover:scale-110"
           />
-          {percentOff > 0 && (
+          {percentOff > 0 && !hasDiscountMsg && (
             <span className="absolute top-2 start-2 z-10 rounded-full bg-gradient-to-r from-color-2 to-[#ffab4a] px-3 py-1 font-ProximaNovaBold text-xs uppercase tracking-wide text-white shadow-lg shadow-color-2/30">
               {percentOff}% {t("OFF")}
             </span>

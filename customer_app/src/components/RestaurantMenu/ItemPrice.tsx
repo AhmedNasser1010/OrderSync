@@ -6,10 +6,12 @@ const ItemPrice = ({
   price,
   finalPrice,
   discountIncluded,
+  hidePercentOff,
 }: {
   price?: number;
   finalPrice?: number;
   discountIncluded?: boolean;
+  hidePercentOff?: boolean;
 }) => {
   const t = useTranslations();
 
@@ -27,7 +29,7 @@ const ItemPrice = ({
         <span className="egp text-base font-ProximaNovaBold text-color-11">
           {finalPrice}
         </span>
-        {percentOff > 0 && (
+        {percentOff > 0 && !hidePercentOff && (
           <span className="rounded-full bg-color-11/10 px-2 py-0.5 font-ProximaNovaBold text-xs text-color-11">
             {percentOff}% {t("OFF")}
           </span>

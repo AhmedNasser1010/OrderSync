@@ -22,6 +22,20 @@ describe("ItemPrice", () => {
     expect(screen.queryByText(/OFF/)).not.toBeInTheDocument();
   });
 
+  it("hides the percent badge when hidePercentOff is set (discount message shown instead)", () => {
+    render(
+      <ItemPrice
+        price={100}
+        finalPrice={95}
+        discountIncluded={true}
+        hidePercentOff={true}
+      />
+    );
+    expect(screen.getByText("100")).toBeInTheDocument();
+    expect(screen.getByText("95")).toBeInTheDocument();
+    expect(screen.queryByText(/OFF/)).not.toBeInTheDocument();
+  });
+
   it("renders an empty price cell when the price is undefined", () => {
     const { container } = render(
       <ItemPrice price={undefined} finalPrice={undefined} discountIncluded={false} />
