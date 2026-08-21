@@ -5,6 +5,7 @@ import { evaluateConditions } from "./evaluateConditions";
 import { isWithinTimeRules } from "./evaluateTimeRules";
 import { applyStackingRules } from "./applyStackingRules";
 import { evaluateSegments } from "./evaluateSegments";
+import { calculateDiscountAmount } from "./discountAmount";
 
 interface CartItem {
   price: number;
@@ -41,12 +42,5 @@ export const calculateOrderDiscount = (
   cartTotal: number,
   discount: DiscountObject
 ): number => {
-  switch (discount.type) {
-    case "FIXED":
-      return Math.max(0, cartTotal - discount.value);
-    case "P":
-      return cartTotal * (1 - discount.value / 100);
-    default:
-      return cartTotal;
-  }
+  return cartTotal - calculateDiscountAmount(cartTotal, discount);
 };

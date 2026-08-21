@@ -50,6 +50,7 @@ export interface DiscountObject {
   level: DiscountLevel;
   type: DiscountType;
   value: number;
+  maxDiscountValue?: number;
   itemId?: string;
   categoryId?: string;
   minOrderTotal?: number;
@@ -73,6 +74,7 @@ export interface PromoCode {
   code: string;
   type: DiscountType;
   value: number;
+  maxDiscountValue?: number;
   message: string;
   level: DiscountLevel;
   minOrderTotal?: number;

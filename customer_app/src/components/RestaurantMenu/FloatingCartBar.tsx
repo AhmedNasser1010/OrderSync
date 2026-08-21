@@ -5,7 +5,7 @@ import { ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { useAppSelector } from "@/rtk/hooks";
-import { applyOrderDiscounts, priceAfterDiscount, resolveItemDiscount } from "@ordersync/order-utils";
+import { applyOrderDiscounts, calculateDiscountAmount, priceAfterDiscount, resolveItemDiscount } from "@ordersync/order-utils";
 
 const FloatingCartBar = ({ resID }: { resID: string }) => {
   const t = useTranslations();
@@ -62,10 +62,10 @@ const FloatingCartBar = ({ resID }: { resID: string }) => {
       );
       const autoOrderDiscount = eligible[0] || null;
       if (autoOrderDiscount && result.total > 0) {
-        const orderDiscountAmount =
-          autoOrderDiscount.type === "P"
-            ? result.discount * (autoOrderDiscount.value / 100)
-            : Math.min(autoOrderDiscount.value, result.discount);
+        const orderDiscountAmount = calculateDiscountAmount(
+          result.discount,
+          autoOrderDiscount
+        );
         result.discount = Math.max(0, result.discount - orderDiscountAmount);
       }
     }

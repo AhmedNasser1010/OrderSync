@@ -25,7 +25,7 @@ import {
 } from "@/rtk/slices/cartSlice";
 import { addCheckout } from "@/rtk/slices/checkoutSlice";
 import { toggleOrderSidebar } from "@/rtk/slices/toggleSlice";
-import { priceAfterDiscount, resolveItemDiscount, applyOrderDiscounts } from "@ordersync/order-utils";
+import { priceAfterDiscount, resolveItemDiscount, applyOrderDiscounts, calculateDiscountAmount } from "@ordersync/order-utils";
 import getDistanceFromLatlngInKm from "@/utils/getDistanceFromLatlngInKm";
 import getDeliveryFees from "@/utils/getDeliveryFees";
 import isRestaurantAvailable from "@/utils/isRestaurantAvailable";
@@ -177,10 +177,10 @@ export default function CartPage() {
 
     if (autoOrderDiscount && result) {
       const itemSubtotal = result.discount - deliveryFees;
-      const orderDiscountAmount =
-        autoOrderDiscount.type === "P"
-          ? itemSubtotal * (autoOrderDiscount.value / 100)
-          : Math.min(autoOrderDiscount.value, itemSubtotal);
+      const orderDiscountAmount = calculateDiscountAmount(
+        itemSubtotal,
+        autoOrderDiscount
+      );
       result.autoOrderAmount = orderDiscountAmount;
       result.discount = Math.max(0, result.discount - orderDiscountAmount);
     }

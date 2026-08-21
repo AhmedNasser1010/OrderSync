@@ -50,6 +50,7 @@ export {
 
 export {
   isDiscountActive,
+  calculateDiscountAmount,
   evaluateConditions,
   isWithinTimeRules,
   generateDiscountObj,

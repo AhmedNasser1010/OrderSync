@@ -2,6 +2,7 @@ import {
   priceAfterDiscount,
   resolveItemDiscount,
   applyOrderDiscounts,
+  calculateDiscountAmount,
 } from "@ordersync/order-utils";
 import type {
   MainMenuType,
@@ -193,16 +194,10 @@ export function computeServerPricing(
   let promoDiscount: number | undefined;
 
   if (autoDiscount) {
-    orderDiscountAmount =
-      autoDiscount.type === "P"
-        ? finalSubtotal * (autoDiscount.value / 100)
-        : Math.min(autoDiscount.value, finalSubtotal);
+    orderDiscountAmount = calculateDiscountAmount(finalSubtotal, autoDiscount);
 
     promoCode = autoDiscount.code;
-    promoDiscount =
-      autoDiscount.type === "P"
-        ? unitSubtotal * (autoDiscount.value / 100)
-        : Math.min(autoDiscount.value, unitSubtotal);
+    promoDiscount = calculateDiscountAmount(unitSubtotal, autoDiscount);
   }
 
   const afterOrderDiscount = Math.max(

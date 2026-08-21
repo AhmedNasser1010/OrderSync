@@ -35,6 +35,11 @@ const HELP_CONTENT: Record<string, { title: string; description: string }> = {
     description:
       "The discount amount. For Percentage type, this is the percent off (e.g. 20 = 20% off). For Fixed type, this is the exact amount to subtract (e.g. 10 = $10 off).",
   },
+  discountMaxValueHelp: {
+    title: "Max Discount (EGP)",
+    description:
+      "An optional cap for percentage discounts. For example, '10% off' with a max of 50 EGP will never deduct more than 50 EGP, no matter how large the cart is. Leave empty for no limit.",
+  },
   discountDateHelp: {
     title: "Dates",
     description:

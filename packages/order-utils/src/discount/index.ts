@@ -1,4 +1,5 @@
 export { isDiscountActive } from "./isDiscountActive";
+export { calculateDiscountAmount } from "./discountAmount";
 export { evaluateConditions } from "./evaluateConditions";
 export { isWithinTimeRules } from "./evaluateTimeRules";
 export { generateDiscountObj } from "./generateDiscountObj";

@@ -4,6 +4,7 @@ import { evaluateConditions } from "./evaluateConditions";
 import { isWithinTimeRules } from "./evaluateTimeRules";
 import { isDiscountActive } from "./isDiscountActive";
 import { evaluateSegments } from "./evaluateSegments";
+import { calculateDiscountAmount } from "./discountAmount";
 
 export const priceAfterDiscount = (
   price: number,
@@ -21,19 +22,7 @@ export const priceAfterDiscount = (
     return { finalPrice: price, isAvailableForUser: false };
   }
 
-  let finalPrice = price;
-
-  switch (discount.type) {
-    case "FIXED":
-      finalPrice = Math.max(0, price - discount.value);
-      break;
-    case "P":
-      finalPrice = price * (1 - discount.value / 100);
-      break;
-    default:
-      finalPrice = price;
-      break;
-  }
+  const finalPrice = price - calculateDiscountAmount(price, discount);
 
   let isAvailableForUser = false;
 

@@ -19,6 +19,7 @@ import {
   priceAfterDiscount,
   resolveItemDiscount,
   applyOrderDiscounts,
+  calculateDiscountAmount,
   calculateOrderFinance,
 } from "@ordersync/order-utils";
 import getDeliveryFees from "@/utils/getDeliveryFees";
@@ -213,10 +214,10 @@ const usePlace = () => {
 
       if (autoDiscount) {
         const itemSubtotal = result.discount - deliveryFees;
-        const orderDiscountAmount =
-          autoDiscount.type === "P"
-            ? itemSubtotal * (autoDiscount.value / 100)
-            : Math.min(autoDiscount.value, itemSubtotal);
+        const orderDiscountAmount = calculateDiscountAmount(
+          itemSubtotal,
+          autoDiscount
+        );
         result.discount = Math.max(0, result.discount - orderDiscountAmount);
       }
 
@@ -278,10 +279,7 @@ const usePlace = () => {
         total: cartTotalPrice.discount,
         ...(autoDiscount && {
           promoCode: autoDiscount.code,
-          promoDiscount:
-            autoDiscount.type === "P"
-              ? subtotal * (autoDiscount.value / 100)
-              : Math.min(autoDiscount.value, subtotal),
+          promoDiscount: calculateDiscountAmount(subtotal, autoDiscount),
         }),
       },
       payment: {

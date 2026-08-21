@@ -6,7 +6,7 @@ import { CircleAlertIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { addCheckout } from "@/rtk/slices/checkoutSlice";
 import { applyOrderDiscount, removeOrderDiscount } from "@/rtk/slices/cartSlice";
-import { priceAfterDiscount, resolveItemDiscount } from "@ordersync/order-utils";
+import { calculateDiscountAmount, priceAfterDiscount, resolveItemDiscount } from "@ordersync/order-utils";
 import usePlace from "@/hooks/usePlace";
 import { useClickGuard } from "@/hooks/useClickGuard";
 import Divider from "@/components/Checkout/Divider";
@@ -99,10 +99,10 @@ const CheckoutUserPayment = ({
 
     let finalTotal = totalWithDiscount + deliveryFees;
     if (appliedOrderDiscount) {
-      const orderDiscountAmount =
-        appliedOrderDiscount.type === "P"
-          ? totalWithDiscount * (appliedOrderDiscount.value / 100)
-          : Math.min(appliedOrderDiscount.value, totalWithDiscount);
+      const orderDiscountAmount = calculateDiscountAmount(
+        totalWithDiscount,
+        appliedOrderDiscount
+      );
       finalTotal =
         Math.max(0, totalWithDiscount - orderDiscountAmount) + deliveryFees;
     }

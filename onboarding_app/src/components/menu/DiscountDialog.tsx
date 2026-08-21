@@ -74,6 +74,9 @@ export function DiscountDialog({
     initialData?.type ?? "P",
   );
   const [value, setValue] = useState<number>(initialData?.value ?? 0);
+  const [maxDiscountValue, setMaxDiscountValue] = useState<number>(
+    initialData?.maxDiscountValue ?? 0,
+  );
   const [minOrderTotal, setMinOrderTotal] = useState<number>(
     initialData?.minOrderTotal ?? 0,
   );
@@ -120,6 +123,7 @@ export function DiscountDialog({
     setMessage("");
     setDiscountType("P");
     setValue(0);
+    setMaxDiscountValue(0);
     setMinOrderTotal(0);
     setMinCartItems(0);
     setConditions(DEFAULT_CONDITIONS);
@@ -137,7 +141,12 @@ export function DiscountDialog({
 
   const generateAutoMessage = () => {
     const parts: string[] = [];
-    const valueFormatted = discountType === "P" ? `${value}%` : `${value} EGP`;
+    const valueFormatted =
+      discountType === "P"
+        ? maxDiscountValue > 0
+          ? `${value}% up to ${maxDiscountValue} EGP`
+          : `${value}%`
+        : `${value} EGP`;
     parts.push(`${valueFormatted} off`);
 
     if (level === "order") {
@@ -180,6 +189,10 @@ export function DiscountDialog({
       level,
       type: discountType,
       value,
+      maxDiscountValue:
+        discountType === "P" && maxDiscountValue > 0
+          ? maxDiscountValue
+          : undefined,
       itemId: initialData?.itemId,
       categoryId: initialData?.categoryId,
       minOrderTotal: level === "order" && minOrderTotal > 0 ? minOrderTotal : undefined,
@@ -293,6 +306,28 @@ export function DiscountDialog({
               />
             </div>
           </div>
+
+          {discountType === "P" && (
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-1.5">
+                Max Discount (EGP)
+                <WidgetHelp widgetKey="discountMaxValueHelp" />
+              </label>
+              <Input
+                type="number"
+                value={maxDiscountValue || ""}
+                onChange={(e) =>
+                  setMaxDiscountValue(parseFloat(e.target.value) || 0)
+                }
+                min="0"
+                step="0.01"
+                placeholder="No limit"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Optional cap on the discount amount, e.g. 10% off up to 50 EGP
+              </p>
+            </div>
+          )}
 
           {level === "order" && (
             <div className="grid grid-cols-2 gap-3">

@@ -1,17 +1,11 @@
 import type { DiscountObject, StackingMode } from "./types";
+import { calculateDiscountAmount } from "./discountAmount";
 
 const calculateSavings = (
   discount: DiscountObject,
   cartTotal: number
 ): number => {
-  switch (discount.type) {
-    case "FIXED":
-      return Math.min(discount.value, cartTotal);
-    case "P":
-      return cartTotal * (discount.value / 100);
-    default:
-      return 0;
-  }
+  return calculateDiscountAmount(cartTotal, discount);
 };
 
 const sortByPriority = (discounts: DiscountObject[]): DiscountObject[] => {
@@ -84,14 +78,9 @@ export const applyStackedDiscounts = (
   price: number,
   discounts: DiscountObject[]
 ): number => {
-  return discounts.reduce((currentPrice, discount) => {
-    switch (discount.type) {
-      case "P":
-        return currentPrice * (1 - discount.value / 100);
-      case "FIXED":
-        return Math.max(0, currentPrice - discount.value);
-      default:
-        return currentPrice;
-    }
-  }, price);
+  return discounts.reduce(
+    (currentPrice, discount) =>
+      currentPrice - calculateDiscountAmount(currentPrice, discount),
+    price
+  );
 };
