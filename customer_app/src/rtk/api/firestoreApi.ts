@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  limit,
   onSnapshot,
   orderBy,
   query,
@@ -70,6 +71,7 @@ export const firestoreApi = createApi({
     "Menu",
     "Banners",
     "Services",
+    "LastOrder",
   ],
   endpoints: (builder) => ({
     // =====================================================================
@@ -235,6 +237,35 @@ export const firestoreApi = createApi({
         unsubscribe();
       },
       keepUnusedDataFor: 0,
+    }),
+
+    fetchLastOrder: builder.query<Partial<OrderType> | null, string>({
+      async queryFn(uid) {
+        try {
+          const ordersRef = collection(db, "orders");
+          // Must filter on customer.uid (not top-level customerUid):
+          // security rules permit listing only queries constrained by
+          // resourceData().customer.uid == request.auth.uid.
+          const q = query(
+            ordersRef,
+            where("customer.uid", "==", uid),
+            orderBy("createdAt", "desc"),
+            limit(1)
+          );
+          const snapshot = await getDocs(q);
+          if (snapshot.empty) return { data: null };
+          const orderDoc = snapshot.docs[0];
+          return {
+            data: { id: orderDoc.id, ...orderDoc.data() } as Partial<OrderType>,
+          };
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error("Error fetching last order:", message);
+          return { error: message };
+        }
+      },
+      providesTags: ["LastOrder"],
     }),
 
     // =====================================================================
@@ -528,6 +559,7 @@ export const {
   useFetchMenuDataQuery,
   useFetchServicesQuery,
   useFetchOrderTrackingDataQuery,
+  useFetchLastOrderQuery,
   useCancelOrderMutation,
   useSetOrderFeedbackMutation,
   useClearTrackedOrderMutation,

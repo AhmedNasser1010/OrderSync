@@ -36,6 +36,14 @@
       "collectionGroup": "orders",
       "queryScope": "COLLECTION",
       "fields": [
+        { "fieldPath": "customer.uid", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
         { "fieldPath": "businessId", "order": "ASCENDING" },
         { "fieldPath": "timeline.deliveredAt", "order": "ASCENDING" }
       ]

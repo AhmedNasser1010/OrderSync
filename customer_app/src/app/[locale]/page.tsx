@@ -6,6 +6,7 @@ import useRestaurants from "@/hooks/useRestaurants";
 import ShimmerHome from "@/components/Shimmer/ShimmerHome";
 import LocationBar from "@/components/Home/LocationBar";
 import HeroBanner from "@/components/Home/HeroBanner";
+import ReorderSection from "@/components/Home/ReorderSection";
 // import Offers from "@/components/Home/Offers";
 import WhatsOnYourMind from "@/components/Home/WhatsOnYourMind";
 import TopRestaurant from "@/components/Home/TopRestaurant";
@@ -35,6 +36,7 @@ export default function HomePage() {
     <div className="container mx-auto mb-10 px-2 sm:px-10 overflow-x-hidden">
       <LocationBar />
       <HeroBanner />
+      <ReorderSection />
       {/* <Offers restaurants={sections.offers} /> */}
       <WhatsOnYourMind />
       <TopRestaurant restaurants={sections.topChains} />
