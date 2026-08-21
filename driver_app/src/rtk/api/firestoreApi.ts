@@ -23,7 +23,7 @@ import { canTransition } from "@ordersync/order-utils";
 export const firestoreApi = createApi({
   reducerPath: "firestoreApi",
   baseQuery: fakeBaseQuery(),
-  tagTypes: ["UserData", "DriverProfile", "MarketplaceOrders", "MyOrders", "BusinessNames"],
+  tagTypes: ["UserData", "DriverProfile", "MarketplaceOrders", "MyOrders", "PreparingOrders", "BusinessNames"],
   endpoints: (builder) => ({
     fetchUserData: builder.query<
       Pick<
@@ -135,6 +135,45 @@ export const firestoreApi = createApi({
         unsubscribe();
       },
       providesTags: ["MarketplaceOrders"],
+    }),
+
+    // Preparing orders: shown as "almost ready" preview when marketplace is empty
+    fetchPreparingOrders: builder.query<OrderType[], void>({
+      queryFn: () => ({ data: [] }),
+      async onCacheEntryAdded(
+        _arg,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved },
+      ) {
+        const ordersRef = collection(db, "orders");
+        const q = query(
+          ordersRef,
+          where("status.current", "==", "PREPARING"),
+          orderBy("createdAt", "desc"),
+        );
+
+        await cacheDataLoaded;
+
+        const unsubscribe = onSnapshot(
+          q,
+          (snapshot) => {
+            updateCachedData((draft: OrderType[]) => {
+              draft.length = 0;
+              snapshot.docs.forEach((doc) =>
+                draft.push(doc.data() as OrderType),
+              );
+            });
+          },
+          (error) => {
+            if (auth.currentUser) {
+              console.error("Error in preparing orders listener:", error?.message);
+            }
+          },
+        );
+
+        await cacheEntryRemoved;
+        unsubscribe();
+      },
+      providesTags: ["PreparingOrders"],
     }),
 
     // My active orders: orders assigned to this driver (not yet delivered/canceled)
@@ -572,7 +611,7 @@ export const firestoreApi = createApi({
     }),
 
     fetchBusinessNames: builder.query<
-      Record<string, { nameInAr: string }>,
+      Record<string, { nameInAr: string; cookTime?: [number, number] }>,
       string[]
     >({
       async queryFn(businessIds) {
@@ -584,14 +623,15 @@ export const firestoreApi = createApi({
           const snapshots = await Promise.all(
             refs.map((ref) => getDoc(ref)),
           );
-          const result: Record<string, { nameInAr: string }> = {};
+          const result: Record<string, { nameInAr: string; cookTime?: [number, number] }> = {};
           for (let i = 0; i < uniqueIds.length; i++) {
             const snap = snapshots[i];
             if (snap.exists()) {
               const data = snap.data();
               const nameInAr = data?.profile?.nameInAr;
-              if (nameInAr) {
-                result[uniqueIds[i]] = { nameInAr };
+              const cookTime = data?.operations?.cookTime;
+              if (nameInAr || cookTime) {
+                result[uniqueIds[i]] = { nameInAr, cookTime };
               }
             }
           }
@@ -636,6 +676,7 @@ export const {
   useFetchUserDataQuery,
   useFetchMarketplaceOrdersQuery,
   useFetchMyOrdersQuery,
+  useFetchPreparingOrdersQuery,
   useClaimOrderMutation,
   useClaimOrdersBatchMutation,
   useStartDeliveryMutation,

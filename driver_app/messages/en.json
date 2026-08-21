@@ -72,7 +72,9 @@
     "completeDelivery": "Complete Delivery",
     "cancel": "Cancel",
     "call": "Call",
-    "claimOrder": "Claim Order"
+    "claimOrder": "Claim Order",
+    "readyIn": "Ready in ~{minutes}m",
+    "readySoon": "Ready soon"
   },
   "noOrders": {
     "clearSearch": "Clear search"
@@ -189,7 +191,9 @@
     "noMatchingOrders": "No matching orders",
     "noMatchingOrdersDesc": "Try a different order number, customer name, item, or status",
     "noOrdersAvailable": "No orders available",
-    "noOrdersAvailableDesc": "New orders will appear here"
+    "noOrdersAvailableDesc": "New orders will appear here",
+    "almostReadyTitle": "Almost ready",
+    "almostReadyDesc": "These orders are being prepared and will be available here soon"
   },
   "settings": {
     "theme": "Theme",

@@ -239,6 +239,12 @@ service cloud.firestore {
           && resourceData().status.current == 'READY'
           && resourceData().status.returnedByDriverUid == null);
 
+      // Drivers can read PREPARING orders ("almost ready" preview when the
+      // marketplace is empty). View-only: claiming still requires READY.
+      allow read: if resource == null
+        || (isRider()
+          && resourceData().status.current == 'PREPARING');
+
       // Drivers can read orders assigned to them.
       allow read: if resource == null
         || (isRider()
@@ -297,6 +303,7 @@ service cloud.firestore {
         && incomingData().status.current == 'GIVEN_FEEDBACK'
         && incomingData().diff(resourceData()).affectedKeys()
             .hasOnly(['status', 'timeline', 'customerFeedback', 'updatedAt']);
+    }
 
     // =====================================================================
     // Helper: returns list of business IDs owned by the authenticated partner

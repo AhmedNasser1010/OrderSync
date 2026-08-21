@@ -7,6 +7,7 @@ import { OrderCard } from "@/components/orders/OrderCard";
 import { RecommendedOrders } from "@/components/orders/RecommendedOrders";
 import { OrderSearchBar } from "@/components/orders/OrderSearchBar";
 import { NoOrders } from "@/components/orders/NoOrders";
+import { PreparingOrders } from "@/components/orders/PreparingOrders";
 import { useBusinessNamesMap } from "@/contexts/BusinessNamesContext";
 import { useTranslations } from "next-intl";
 
@@ -107,10 +108,7 @@ export default function MarketplacePage() {
           onClearSearch={() => setSearchQuery("")}
         />
       ) : orders.length === 0 ? (
-        <NoOrders
-          title={t("noOrdersAvailable")}
-          description={t("noOrdersAvailableDesc")}
-        />
+        <PreparingOrders />
       ) : (
         <div className="flex flex-col gap-3">
           <RecommendedOrders />

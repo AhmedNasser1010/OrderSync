@@ -72,7 +72,9 @@
     "completeDelivery": "إكمال التوصيل",
     "cancel": "إلغاء",
     "call": "اتصال",
-    "claimOrder": "استلام الطلب"
+    "claimOrder": "استلام الطلب",
+    "readyIn": "جاهز خلال ~{minutes} د",
+    "readySoon": "جاهز تقريبًا"
   },
   "noOrders": {
     "clearSearch": "مسح البحث"
@@ -190,6 +192,8 @@
     "noMatchingOrdersDesc": "جرب رقم طلب أو اسم عميل أو صنف أو حالة مختلف",
     "noOrdersAvailable": "لا توجد طلبات متاحة",
     "noOrdersAvailableDesc": "ستظهر الطلبات الجديدة هنا",
+    "almostReadyTitle": "على وشك الجاهزية",
+    "almostReadyDesc": "هذه الطلبات قيد التحضير وستكون متاحة هنا قريبًا",
     "limitReached": "تم الوصول للحد المالي",
     "limitReachedDesc": "رصيدك النقدي (${amount}) بلغ الحد الأقصى (${limit}). تواصل مع مديرك للمتابعة."
   },
