@@ -1,15 +1,14 @@
 "use client";
 
-import { use, useState, useEffect, useCallback } from "react";
+import { use, useState, useCallback } from "react";
 import { useRouter } from "@/i18n/routing";
-import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import {
   useFetchMyOrdersQuery,
   useFetchMarketplaceOrdersQuery,
 } from "@/rtk/api/firestoreApi";
 import { useOrderActions } from "@/hooks/useOrderActions";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDriverPosition } from "@/components/LocationProvider";
 import { OrderMap } from "@/components/orders/OrderMap";
 import { cn, formatPrice, formatRelativeTime } from "@/lib/utils";
 import { useTranslations } from "next-intl";
@@ -36,7 +35,7 @@ import {
   Undo2,
   ExternalLink,
 } from "lucide-react";
-import type { LiveLocation, OrderStatusType } from "@ordersync/types";
+import type { OrderStatusType } from "@ordersync/types";
 
 export default function OrderDetailPage({
   params,
@@ -66,9 +65,7 @@ export default function OrderDetailPage({
   const { claim, start, startRoute, complete, release, isLoading, isLocked } =
     useOrderActions();
 
-  const [driverLocation, setDriverLocation] = useState<LiveLocation | null>(
-    null,
-  );
+  const driverPosition = useDriverPosition();
   const [notesExpanded, setNotesExpanded] = useState(false);
   const [confirmReturnOpen, setConfirmReturnOpen] = useState(false);
 
@@ -130,22 +127,6 @@ export default function OrderDetailPage({
     }
   }, [order?.delivery?.latlng]);
 
-  useEffect(() => {
-    if (!driverUid) return;
-
-    const driverRef = doc(db, "drivers", driverUid);
-    const unsubscribe = onSnapshot(driverRef, (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.data();
-        if (data.liveLocation) {
-          setDriverLocation(data.liveLocation as LiveLocation);
-        }
-      }
-    });
-
-    return () => unsubscribe();
-  }, [driverUid]);
-
   if (!order) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3">
@@ -160,8 +141,7 @@ export default function OrderDetailPage({
   const orderLocation = order.delivery?.latlng;
   const hasOrderLocation =
     orderLocation && orderLocation[0] && orderLocation[1];
-  const hasDriverLocation =
-    driverLocation && driverLocation.lat && driverLocation.lng;
+  const hasDriverLocation = !!driverPosition;
 
   const currentStatus = order.status?.current as OrderStatusType;
 
@@ -175,7 +155,15 @@ export default function OrderDetailPage({
             <div className="relative w-full shadow-lg">
               <OrderMap
                 orderLocation={orderLocation}
-                driverLocation={hasDriverLocation ? driverLocation : undefined}
+                driverLocation={
+                  hasDriverLocation
+                    ? {
+                        lat: driverPosition.lat,
+                        lng: driverPosition.lng,
+                        heading: driverPosition.heading,
+                      }
+                    : undefined
+                }
                 restaurantLocation={order.business?.latlng}
               />
               <button

@@ -1,14 +1,20 @@
 "use client";
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useMemo } from "react";
 import { FitMapToMarkers } from "./FitMapToMarkers";
-import { driverIcon, orderIcon, restaurantIcon } from "./mapCustomMarker";
-import type { LiveLocation } from "@ordersync/types";
+import {
+  driverIcon,
+  createDriverHeadingIcon,
+  orderIcon,
+  restaurantIcon,
+} from "./mapCustomMarker";
+import { SmoothDriverMarker } from "./SmoothDriverMarker";
 import "leaflet/dist/leaflet.css";
 
 interface OrderMapProps {
   orderLocation: [number, number];
-  driverLocation?: LiveLocation | null;
+  driverLocation?: { lat: number; lng: number; heading?: number } | null;
   restaurantLocation?: [number, number];
 }
 
@@ -16,6 +22,15 @@ export function OrderMap({ orderLocation, driverLocation, restaurantLocation }: 
   const driverLatLng: [number, number] | null = driverLocation
     ? [driverLocation.lat, driverLocation.lng]
     : null;
+
+  const roundedHeading =
+    driverLocation?.heading != null
+      ? Math.round(driverLocation.heading / 5) * 5
+      : null;
+  const driverMarkerIcon = useMemo(
+    () => (roundedHeading != null ? createDriverHeadingIcon(roundedHeading) : driverIcon),
+    [roundedHeading],
+  );
 
   const points: [number, number][] = [orderLocation];
   if (driverLatLng) points.push(driverLatLng);
@@ -39,9 +54,9 @@ export function OrderMap({ orderLocation, driverLocation, restaurantLocation }: 
           <Popup>Delivery Location</Popup>
         </Marker>
         {driverLatLng && (
-          <Marker position={driverLatLng} icon={driverIcon}>
+          <SmoothDriverMarker position={driverLatLng} icon={driverMarkerIcon}>
             <Popup>Your Location</Popup>
-          </Marker>
+          </SmoothDriverMarker>
         )}
         {restaurantLocation && (
           <Marker position={restaurantLocation} icon={restaurantIcon}>

@@ -20,10 +20,24 @@ function createRadarIcon(svg: string, bgColor: string): L.DivIcon {
   });
 }
 
-export const driverIcon = createSvgIcon(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3.5-3.5 2-3 2 3h3"/></svg>`,
-  "#3b82f6"
-);
+const DRIVER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3.5-3.5 2-3 2 3h3"/></svg>`;
+
+export const driverIcon = createSvgIcon(DRIVER_SVG, "#3b82f6");
+
+export function createDriverHeadingIcon(heading: number): L.DivIcon {
+  return L.divIcon({
+    className: "",
+    html: `<div style="position:relative;width:36px;height:36px;">
+      <div style="position:absolute;left:50%;top:50%;width:0;height:0;transform:rotate(${heading}deg);">
+        <div style="position:absolute;left:-7px;top:-27px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:12px solid #3b82f6;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4));"></div>
+      </div>
+      <div style="position:relative;width:36px;height:36px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.3);border:2px solid white;">${DRIVER_SVG}</div>
+    </div>`,
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -20],
+  });
+}
 
 export const orderIcon = createSvgIcon(
   `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,

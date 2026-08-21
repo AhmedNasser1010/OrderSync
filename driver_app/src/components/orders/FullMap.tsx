@@ -6,6 +6,7 @@ import { FitMapToMarkers } from "./FitMapToMarkers";
 import { RouteControl } from "./RouteControl";
 import {
   driverIcon,
+  createDriverHeadingIcon,
   createOrderStatusIcon,
   restaurantIcon,
 } from "./mapCustomMarker";
@@ -13,6 +14,7 @@ import { MapFilterPanel } from "./MapFilterPanel";
 import { MapOrderPopup } from "./MapOrderPopup";
 import { MapRestaurantPopup } from "./MapRestaurantPopup";
 import { MapSearch } from "./MapSearch";
+import { SmoothDriverMarker } from "./SmoothDriverMarker";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useBusinessDisplayName } from "@/contexts/BusinessNamesContext";
@@ -115,6 +117,15 @@ export function FullMap({
         ? [driverPosition.lat, driverPosition.lng]
         : null,
     [filters.driverLocation, driverPosition],
+  );
+
+  const roundedHeading =
+    driverPosition?.heading != null
+      ? Math.round(driverPosition.heading / 5) * 5
+      : null;
+  const driverMarkerIcon = useMemo(
+    () => (roundedHeading != null ? createDriverHeadingIcon(roundedHeading) : driverIcon),
+    [roundedHeading],
   );
 
   const fitPoints = useMemo(() => {
@@ -221,7 +232,7 @@ export function FullMap({
         )}
 
         {driverPoint && (
-          <Marker position={driverPoint} icon={driverIcon} />
+          <SmoothDriverMarker position={driverPoint} icon={driverMarkerIcon} />
         )}
 
         {visibleOrders.map((order) => {

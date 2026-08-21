@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useMap } from "react-leaflet";
 import { latLngBounds } from "leaflet";
 
 export function FitMapToMarkers({ points }: { points: [number, number][] }) {
   const map = useMap();
+  const hasFittedRef = useRef(false);
 
   useEffect(() => {
+    if (hasFittedRef.current) return;
+
     const validPoints = points.filter(
       (p) =>
         Array.isArray(p) &&
@@ -18,6 +21,8 @@ export function FitMapToMarkers({ points }: { points: [number, number][] }) {
     );
 
     if (!validPoints.length) return;
+
+    hasFittedRef.current = true;
 
     if (validPoints.length === 1) {
       map.setView(validPoints[0], 15, { animate: true });
