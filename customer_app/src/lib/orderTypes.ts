@@ -31,7 +31,6 @@ export interface PlaceOrderInput {
   };
   payment: { method: string; status: string };
   finance?: Record<string, number>;
-  reconciliation?: Record<string, unknown>;
   notes?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
   customer: {

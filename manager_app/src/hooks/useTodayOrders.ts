@@ -112,7 +112,6 @@ const useTodayOrders = () => {
         totalOrders: 0,
         avgOrderValue: 0,
         cancellationRate: 0,
-        balance: { paid: 0, unpaid: 0, paidCount: 0, unpaidCount: 0 },
         activeOrders: 0,
         statusBreakdown: {},
         paymentMethods: {},
@@ -140,20 +139,6 @@ const useTodayOrders = () => {
       totalOrders > 0
         ? Number(((cancelledCount / totalOrders) * 100).toFixed(1))
         : 0;
-
-    let paid = 0;
-    let unpaid = 0;
-    let paidCount = 0;
-    let unpaidCount = 0;
-    orders.forEach((o) => {
-      if (o.reconciliation.restaurantPaid) {
-        paid += o.finance.restaurantShare;
-        paidCount++;
-      } else {
-        unpaid += o.finance.restaurantShare;
-        unpaidCount++;
-      }
-    });
 
     const activeOrders = orders.filter((o) =>
       ACTIVE_STATUSES.has(o.status.current),
@@ -233,7 +218,6 @@ const useTodayOrders = () => {
       totalOrders,
       avgOrderValue: Number(avgOrderValue.toFixed(2)),
       cancellationRate,
-      balance: { paid, unpaid, paidCount, unpaidCount },
       activeOrders,
       statusBreakdown,
       paymentMethods,

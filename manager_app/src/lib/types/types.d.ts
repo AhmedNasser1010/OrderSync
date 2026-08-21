@@ -116,20 +116,12 @@ export interface DashboardData {
   businessHealth: BusinessHealthData;
 }
 
-export interface BalanceSummary {
-  paid: number;
-  unpaid: number;
-  paidCount: number;
-  unpaidCount: number;
-}
-
 export interface TodayData {
   date: string;
   totalRevenue: number;
   totalOrders: number;
   avgOrderValue: number;
   cancellationRate: number;
-  balance: BalanceSummary;
   activeOrders: number;
   statusBreakdown: Record<string, number>;
   paymentMethods: Record<string, number>;

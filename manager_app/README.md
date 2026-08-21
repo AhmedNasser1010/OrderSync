@@ -27,7 +27,6 @@ All metrics are derived **client-side** from order documents by [`utilities/anal
 
 ### Today View (Real-Time)
 - **Today's KPIs** — revenue, orders, average order value, cancellation rate.
-- **Balance card** — split between paid and unpaid orders.
 - **Active orders** — live list of orders currently in the pipeline.
 - **Status breakdown** — how today's orders are distributed across statuses.
 - **Top items** — best sellers so far today.
@@ -117,7 +116,7 @@ src/
 │   ├── dashboard/                # kpi-cards, sales-trends, top-items, category-perf,
 │   │                             # customer-analytics, delivery-areas, operations-perf,
 │   │                             # payment-methods, business-score, insights-card, no-data
-│   ├── today/                    # today-kpi-cards, today-balance-card, today-active-orders,
+│   ├── today/                    # today-kpi-cards, today-active-orders,
 │   │                             # today-status-breakdown, today-top-items, today-customer-insights
 │   └── ui/                       # charts, calendar, select, tabs, actions-menu, widget-help
 ├── hooks/                        # useAnalytics, useTodayOrders, useUser

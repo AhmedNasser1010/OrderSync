@@ -123,14 +123,6 @@ export type OrderType = {
     driverEarnings: number;
   };
 
-  reconciliation: {
-    settlementId: string | null;
-
-    restaurantPaid: boolean;
-
-    restaurantPaidAt?: number;
-  };
-
   customerFeedback?: {
     rating: number;
     comment: string;

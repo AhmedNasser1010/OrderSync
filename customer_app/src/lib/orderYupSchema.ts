@@ -75,14 +75,6 @@ const orderYupSchema = yup.object().shape({
     })
     .required(),
 
-  reconciliation: yup
-    .object()
-    .shape({
-      settlementId: yup.string().nullable(),
-      restaurantPaid: yup.boolean().required(),
-    })
-    .required(),
-
   notes: yup
     .object()
     .shape({

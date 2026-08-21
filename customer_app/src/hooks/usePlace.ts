@@ -295,10 +295,6 @@ const usePlace = () => {
         total: cartTotalPrice.discount,
         commissionPercent: services.commissionPercent,
       }),
-      reconciliation: {
-        settlementId: null,
-        restaurantPaid: false,
-      },
       notes: { order: comment || undefined },
       metadata: {
         orderSource,

@@ -107,11 +107,15 @@ export async function placeOrderServer(args: {
   orderData: PlaceOrderInput;
 }): Promise<PlaceOrderServerResult> {
   try {
-    const { idToken, orderData } = args;
+    const { idToken, orderData: rawOrderData } = args;
 
-    if (!idToken || !orderData) {
+    if (!idToken || !rawOrderData) {
       return { success: false, code: "INVALID_ORDER_PAYLOAD" };
     }
+
+    // Strip legacy field still sent by older deployed client versions.
+    const { reconciliation: _ignored, ...orderData } =
+      rawOrderData as PlaceOrderInput & { reconciliation?: unknown };
 
     const app = await initAdmin();
     const auth = getAuth(app);

@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import { Calendar } from "lucide-react";
 import { AppHeader } from "@/components/dashboard/app-header";
 import { TodayKPICards } from "@/components/today/today-kpi-cards";
-import { TodayBalanceCard } from "@/components/today/today-balance-card";
 import { TodayActiveOrders } from "@/components/today/today-active-orders";
 import { TodayStatusBreakdown } from "@/components/today/today-status-breakdown";
 // import { TodayPaymentMethods } from "@/components/today/today-payment-methods";
@@ -34,7 +33,6 @@ export default function TodayPage() {
         ) : (
           <>
             <TodayKPICards data={todayData} />
-            <TodayBalanceCard balance={todayData.balance} />
             <TodayActiveOrders activeOrders={todayData.activeOrders} />
             <TodayStatusBreakdown
               statusBreakdown={todayData.statusBreakdown}

@@ -207,7 +207,7 @@ service cloud.firestore {
     // Every order document contains:
     //   - accessToken, customer.uid, assignment.driverUid
     //   - status.current, status.history[]
-    //   - timeline, pricing, finance, reconciliation
+    //   - timeline, pricing, finance
     // =====================================================================
     match /orders/{orderId} {
 
@@ -288,7 +288,7 @@ service cloud.firestore {
         && (incomingData().status.current != 'READY'
           || incomingData().status.returnedByDriverUid == request.auth.uid)
         && incomingData().diff(resourceData()).affectedKeys()
-            .hasOnly(['status', 'timeline', 'assignment', 'reconciliation', 'updatedAt']);
+            .hasOnly(['status', 'timeline', 'assignment', 'updatedAt']);
 
       // Customers can submit feedback on delivered orders.
       allow update: if isCustomer()
@@ -298,16 +298,9 @@ service cloud.firestore {
         && incomingData().diff(resourceData()).affectedKeys()
             .hasOnly(['status', 'timeline', 'customerFeedback', 'updatedAt']);
 
-      // Partners can update reconciliation fields.
-      allow update: if isPartner()
-        && resourceData().businessId in partnerBusinessIds()
-        && incomingData().diff(resourceData()).affectedKeys()
-            .hasOnly(['reconciliation', 'updatedAt']);
-    }
-
     // =====================================================================
     // Helper: returns list of business IDs owned by the authenticated partner
-    // Used in /orders/{orderId} rules for partner read and reconciliation access.
+    // Used in /orders/{orderId} rules for partner read access.
     // =====================================================================
     function partnerBusinessIds() {
       return hasUsersDoc() ? getUsersDoc().data.businesses : [];

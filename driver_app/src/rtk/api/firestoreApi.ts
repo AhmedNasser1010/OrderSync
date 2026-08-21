@@ -374,7 +374,6 @@ export const firestoreApi = createApi({
                 ),
                 "timeline.pickedUpAt": now,
                 "timeline.onRouteAt": now,
-                "reconciliation.restaurantPaid": true,
                 updatedAt: now,
               });
             } else {
@@ -386,7 +385,6 @@ export const firestoreApi = createApi({
                   by: `driver:${driverUid}`,
                 }),
                 "timeline.pickedUpAt": now,
-                "reconciliation.restaurantPaid": true,
                 updatedAt: now,
               });
             }

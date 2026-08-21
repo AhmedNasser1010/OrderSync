@@ -243,12 +243,6 @@
       "orders": "Today's Orders",
       "avgOrderValue": "Avg Order Value",
       "cancellationRate": "Cancellation Rate",
-      "balance": {
-        "title": "Balance",
-        "paid": "Paid",
-        "unpaid": "Unpaid",
-        "orders": "orders"
-      },
       "activeOrders": "Active Orders",
       "statusBreakdown": "Order Status Breakdown",
       "noData": {

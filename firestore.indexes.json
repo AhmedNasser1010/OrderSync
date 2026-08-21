@@ -37,23 +37,6 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "businessId", "order": "ASCENDING" },
-        { "fieldPath": "reconciliation.restaurantPaid", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "orders",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "assignment.driverUid", "order": "ASCENDING" },
-        { "fieldPath": "reconciliation.settlementId", "order": "ASCENDING" },
-        { "fieldPath": "status.current", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "orders",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "businessId", "order": "ASCENDING" },
         { "fieldPath": "timeline.deliveredAt", "order": "ASCENDING" }
       ]
     },

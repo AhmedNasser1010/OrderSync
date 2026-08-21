@@ -19,34 +19,6 @@ export function TodaySkeleton() {
         ))}
       </div>
 
-      {/* Balance Card Skeleton */}
-      <div className="bg-card border border-border rounded-2xl p-4 mx-4 my-3">
-        <div className="flex items-center gap-2 mb-4">
-          <Skeleton className="w-4 h-4 rounded" />
-          <Skeleton className="w-20 h-4 rounded" />
-        </div>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Skeleton className="w-10 h-10 rounded-xl" />
-            <div className="space-y-1">
-              <Skeleton className="w-12 h-2 rounded" />
-              <Skeleton className="w-16 h-4 rounded" />
-              <Skeleton className="w-14 h-2 rounded" />
-            </div>
-          </div>
-          <Skeleton className="h-8 w-px" />
-          <div className="flex items-center gap-3">
-            <Skeleton className="w-10 h-10 rounded-xl" />
-            <div className="space-y-1">
-              <Skeleton className="w-12 h-2 rounded" />
-              <Skeleton className="w-16 h-4 rounded" />
-              <Skeleton className="w-14 h-2 rounded" />
-            </div>
-          </div>
-        </div>
-        <Skeleton className="w-full h-2 rounded-full" />
-      </div>
-
       {/* Active Orders Skeleton */}
       <div className="bg-card border border-border rounded-2xl p-4 mx-4 my-3">
         <div className="flex items-center justify-between">

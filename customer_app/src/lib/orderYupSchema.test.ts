@@ -24,7 +24,6 @@ const validOrder = {
     cashCollected: 205,
     driverEarnings: 5,
   },
-  reconciliation: { settlementId: null, restaurantPaid: false },
   notes: { order: null },
   metadata: { orderSource: "pc_chrome", cancelAutoAssign: false },
   customer: {

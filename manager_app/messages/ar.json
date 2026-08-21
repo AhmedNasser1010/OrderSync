@@ -243,12 +243,6 @@
       "orders": "طلبات اليوم",
       "avgOrderValue": "متوسط قيمة الطلب",
       "cancellationRate": "معدل الإلغاء",
-      "balance": {
-        "title": "الرصيد",
-        "paid": "مدفوع",
-        "unpaid": "غير مدفوع",
-        "orders": "طلب"
-      },
       "activeOrders": "الطلبات النشطة",
       "statusBreakdown": "توزيع حالات الطلبات",
       "noData": {
