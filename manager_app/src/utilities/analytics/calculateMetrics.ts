@@ -10,7 +10,12 @@ export const calculateMetrics = (data: AnalyticsEntry[]) => {
     0,
   );
 
-  const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  const billableOrders = data.reduce(
+    (sum, day) => sum + (day.billableOrders ?? day.totalOrders),
+    0,
+  );
+
+  const avgOrderValue = billableOrders > 0 ? totalRevenue / billableOrders : 0;
 
   const cancellationRate =
     totalOrders > 0 ? (totalCancelled / totalOrders) * 100 : 0;

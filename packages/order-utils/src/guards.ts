@@ -2,6 +2,7 @@ import type { OrderStatusType, OrderType } from "@ordersync/types";
 import { ALLOWED_TRANSITIONS, REVERSE_TRANSITIONS } from "./transitions";
 import {
   TERMINAL_STATUSES,
+  ALTERNATIVE_ENDINGS,
   MARKETPLACE_STATUSES,
   DRIVER_OWNED_STATUSES,
   RESTAURANT_ACTIVE_STATUSES,
@@ -19,6 +20,12 @@ export function canTransition(
 
 export function isFinalStatus(status: OrderStatusType): boolean {
   return TERMINAL_STATUSES.includes(status);
+}
+
+export function countsTowardsRevenue(
+  order: Pick<OrderType, "status">,
+): boolean {
+  return !ALTERNATIVE_ENDINGS.includes(order.status.current);
 }
 
 export function isMarketplaceVisible(order: OrderType): boolean {

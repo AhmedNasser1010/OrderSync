@@ -21,6 +21,7 @@ import {
   getActiveSessionBounds,
   getBusinessDayOfTimestamp,
   getOrderRestaurantNet,
+  countsTowardsRevenue,
   localDateKey,
 } from "@ordersync/order-utils";
 import type { TodayData } from "@/lib/types/types";
@@ -125,15 +126,18 @@ const useTodayOrders = () => {
       };
     }
 
-    const totalRevenue = orders.reduce(
+    const revenueOrders = orders.filter(countsTowardsRevenue);
+    const totalRevenue = revenueOrders.reduce(
       (sum, o) => sum + getOrderRestaurantNet(o),
       0,
     );
     const totalOrders = orders.length;
-    const avgOrderValue = totalRevenue / totalOrders;
+    const avgOrderValue =
+      revenueOrders.length > 0 ? totalRevenue / revenueOrders.length : 0;
 
     const cancelledCount = orders.filter(
-      (o) => o.status.current === "CANCELED",
+      (o) =>
+        o.status.current === "CANCELED" || o.status.current === "REJECTED",
     ).length;
     const cancellationRate =
       totalOrders > 0
@@ -157,7 +161,7 @@ const useTodayOrders = () => {
     });
 
     const itemsMap = new Map<string, { quantity: number; revenue: number }>();
-    orders.forEach((o) => {
+    revenueOrders.forEach((o) => {
       o.cart.forEach((item) => {
         const existing = itemsMap.get(item.name);
         itemsMap.set(item.name, {

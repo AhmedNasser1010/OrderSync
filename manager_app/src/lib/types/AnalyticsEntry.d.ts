@@ -63,6 +63,7 @@ export type AnalyticsEntry = {
   totalDiscounts: number;
   totalRevenue: number;
   totalOrders: number;
+  billableOrders?: number;
   orderSources: Record<string, number>;
   paymentMethods: Record<string, number>;
   revenuePerCustomer?: RevenuePerCustomer;

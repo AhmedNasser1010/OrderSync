@@ -7,6 +7,7 @@ import type {
 import {
   getBusinessDayOfTimestamp,
   getOrderRestaurantNet,
+  countsTowardsRevenue,
   localDateKey,
 } from "@ordersync/order-utils";
 import type { AnalyticsEntry } from "@/lib/types/AnalyticsEntry";
@@ -76,6 +77,7 @@ const buildAnalyticsFromOrders = (
 
   for (const [businessDate, dayOrders] of grouped) {
     let totalOrders = 0;
+    let billableOrders = 0;
     let totalRevenue = 0;
     let totalDiscounts = 0;
     let totalDeliveryFees = 0;
@@ -110,11 +112,24 @@ const buildAnalyticsFromOrders = (
 
     for (const order of dayOrders) {
       totalOrders++;
-      totalRevenue += getOrderRestaurantNet(order);
-      totalDiscounts += order.pricing.discount;
-      totalDeliveryFees += order.pricing.deliveryFees;
-      totalOrderValue += getOrderRestaurantNet(order);
       if (order.createdAt < createdAt) createdAt = order.createdAt;
+
+      const billable = countsTowardsRevenue(order);
+
+      if (
+        order.status.current === "CANCELED" ||
+        order.status.current === "REJECTED"
+      ) {
+        totalCancelled++;
+      }
+
+      if (billable) {
+        billableOrders++;
+        totalRevenue += getOrderRestaurantNet(order);
+        totalDiscounts += order.pricing.discount;
+        totalDeliveryFees += order.pricing.deliveryFees;
+        totalOrderValue += getOrderRestaurantNet(order);
+      }
 
       if (order.timeline.preparingAt && order.timeline.placedAt) {
         preparationTimes.push(order.timeline.preparingAt - order.timeline.placedAt);
@@ -153,8 +168,6 @@ const buildAnalyticsFromOrders = (
       }
       locationCounts[locationKey].ordersCount++;
 
-      if (order.status.current === "CANCELED") totalCancelled++;
-
       if (order.customer.totalOrdersValue > highestValueCustomer.totalOrdersValue) {
         highestValueCustomer = {
           name: order.customer.name,
@@ -162,6 +175,8 @@ const buildAnalyticsFromOrders = (
           totalOrderCount: order.customer.totalOrders,
         };
       }
+
+      if (!billable) continue;
 
       const totalDiscountsSave =
         (order.pricing?.total || 0) - (order.pricing?.discount || 0);
@@ -233,7 +248,9 @@ const buildAnalyticsFromOrders = (
     );
 
     const averageOrderValue =
-      totalOrders > 0 ? Number((totalOrderValue / totalOrders).toFixed(2)) : 0;
+      billableOrders > 0
+        ? Number((totalOrderValue / billableOrders).toFixed(2))
+        : 0;
 
     const cancellationRate =
       totalOrders > 0 ? (totalCancelled / totalOrders) * 100 : 0;
@@ -243,6 +260,7 @@ const buildAnalyticsFromOrders = (
       businessDate,
       createdAt: createdAt === Infinity ? 0 : createdAt,
       totalOrders,
+      billableOrders,
       totalRevenue,
       totalDiscounts,
       totalDeliveryFees,

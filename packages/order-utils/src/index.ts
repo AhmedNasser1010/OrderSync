@@ -15,6 +15,7 @@ export { ALLOWED_TRANSITIONS, REVERSE_TRANSITIONS, TIMELINE_FIELD_MAP } from "./
 export {
   canTransition,
   isFinalStatus,
+  countsTowardsRevenue,
   isMarketplaceVisible,
   isDriverOwned,
   isClaimedByDriver,
