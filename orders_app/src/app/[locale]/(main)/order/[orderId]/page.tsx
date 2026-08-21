@@ -29,11 +29,15 @@ import type { CartItemType } from "@/types/orders";
 import useOrders from "@/hooks/useOrders";
 import Image from "next/image";
 import { useAppSelector } from "@/rtk/hooks";
-import { accessToken } from "@/rtk/slices/constantsSlice";
-import { useFetchRestaurantDataQuery } from "@/rtk/api/firestoreApi";
+import { userUid } from "@/rtk/slices/constantsSlice";
+import {
+  useFetchRestaurantDataQuery,
+  useFetchUserDataQuery,
+} from "@/rtk/api/firestoreApi";
 import Invoice from "@/components/print-invoice-dialog/Invoice";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useReactToPrint } from "react-to-print";
+import { skipToken } from "@reduxjs/toolkit/query";
 
 const STATUS_CONFIG: Record<OrderStatusType, { color: string; bg: string; dot: string }> = {
   RECEIVED: {
@@ -119,10 +123,14 @@ export default function OrderDetails({
   const locale = useLocale();
   const { orderId } = use(params);
   const { getOrder, getOrderMenu, isLoading } = useOrders();
-  const resAccessToken = useAppSelector(accessToken);
-  const { data: restaurant } = useFetchRestaurantDataQuery(resAccessToken ?? "", {
-    skip: !resAccessToken,
-  });
+  const uid = useAppSelector(userUid);
+  const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
+  const { data: restaurant } = useFetchRestaurantDataQuery(
+    userData?.accessToken ?? skipToken,
+    {
+      skip: !userData?.accessToken,
+    }
+  );
   const [order, setOrder] = useState<OrderType | null>(null);
   const [orderCart, setOrderCart] = useState<(ItemType & CartItemType)[] | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);

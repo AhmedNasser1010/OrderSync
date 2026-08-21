@@ -5,8 +5,8 @@ import type { OrderStatusType, BusinessDocument } from "@ordersync/types";
 import type { MainTabTypes } from "@/types/orders";
 import { CardFooter } from "@/components/ui/card";
 import { ButtonGuard } from "@/components/ui/button-guard";
-import { useFetchRestaurantDataQuery } from "@/rtk/api/firestoreApi";
-import { accessToken } from "@/rtk/slices/constantsSlice";
+import { useFetchRestaurantDataQuery, useFetchUserDataQuery } from "@/rtk/api/firestoreApi";
+import { userUid } from "@/rtk/slices/constantsSlice";
 import { useAppSelector } from "@/rtk/hooks";
 import { skipToken } from "@reduxjs/toolkit/query";
 import ControlMenu from "./ControlMenu";
@@ -69,8 +69,11 @@ type Props = {
 export default function OrderFooter({ id, activeTabValue, status, returnedByDriver }: Props) {
   const ft = useTranslations("Orders.footer");
   const st = useTranslations("Orders.statuses");
-  const resAccessToken = useAppSelector(accessToken);
-  const { data: restaurant } = useFetchRestaurantDataQuery(resAccessToken ?? skipToken, { skip: !resAccessToken });
+  const uid = useAppSelector(userUid);
+  const { data: userData } = useFetchUserDataQuery(uid ? uid : skipToken);
+  const { data: restaurant } = useFetchRestaurantDataQuery(userData?.accessToken ?? skipToken, {
+    skip: !userData?.accessToken,
+  });
   const printInvoice = restaurant?.settings?.printInvoice ?? false;
   const { handleChangeStatus, isUpdating, getPossibleNextStatuses, getPossiblePreviousStatuses } = useOrderHandler();
 
