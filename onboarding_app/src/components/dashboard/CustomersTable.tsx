@@ -15,6 +15,7 @@ import { Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useUpdateCustomerDocumentMutation } from "@/rtk/api/firestoreApi";
+import { SuspendDialog } from "@/components/dashboard/SuspendDialog";
 import type { CustomerType } from "@ordersync/types";
 
 interface CustomersTableProps {
@@ -36,13 +37,59 @@ export function CustomersTable({
   const [updateCustomer, { isLoading: isUpdating }] =
     useUpdateCustomerDocumentMutation();
   const [togglingCustomer, setTogglingCustomer] = useState<string | null>(null);
+  const [suspendTarget, setSuspendTarget] = useState<CustomerType | null>(
+    null,
+  );
 
-  const handleToggleActive = async (customer: CustomerType) => {
-    setTogglingCustomer(customer.uid);
+  const handleToggleActive = (customer: CustomerType) => {
+    setSuspendTarget(customer);
+  };
+
+  const handleBan = async (reason: string) => {
+    if (!suspendTarget) return;
+    const target = suspendTarget;
+    setSuspendTarget(null);
+    setTogglingCustomer(target.uid);
     try {
       await updateCustomer({
-        uid: customer.uid,
-        updates: { isActive: !(customer.isActive ?? true) },
+        uid: target.uid,
+        updates: {
+          isActive: false,
+          suspension: { reason, at: Date.now() },
+        },
+      }).unwrap();
+    } finally {
+      setTogglingCustomer(null);
+    }
+  };
+
+  const handleUnban = async () => {
+    if (!suspendTarget) return;
+    const target = suspendTarget;
+    setSuspendTarget(null);
+    setTogglingCustomer(target.uid);
+    try {
+      await updateCustomer({
+        uid: target.uid,
+        updates: { isActive: true, suspension: null },
+      }).unwrap();
+    } finally {
+      setTogglingCustomer(null);
+    }
+  };
+
+  const handleSaveNote = async (reason: string) => {
+    if (!suspendTarget) return;
+    const target = suspendTarget;
+    setSuspendTarget(null);
+    setTogglingCustomer(target.uid);
+    try {
+      await updateCustomer({
+        uid: target.uid,
+        updates: {
+          isActive: false,
+          suspension: { reason, at: target.suspension?.at ?? Date.now() },
+        },
       }).unwrap();
     } finally {
       setTogglingCustomer(null);
@@ -205,6 +252,22 @@ export function CustomersTable({
           })}
         </TableBody>
       </Table>
+      <SuspendDialog
+        open={suspendTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setSuspendTarget(null);
+        }}
+        mode={(suspendTarget?.isActive ?? true) ? "ban" : "unban"}
+        customerName={
+          suspendTarget?.userInfo?.name ||
+          suspendTarget?.userInfo?.email?.split("@")[0] ||
+          undefined
+        }
+        initialReason={suspendTarget?.suspension?.reason}
+        onBan={handleBan}
+        onUnban={handleUnban}
+        onSaveNote={handleSaveNote}
+      />
     </Card>
   );
 }
