@@ -136,6 +136,7 @@ export function LiveMap() {
       <MapContainer
         center={DEFAULT_CENTER}
         zoom={DEFAULT_ZOOM}
+        zoomControl={false}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%" }}
         className="z-0"

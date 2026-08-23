@@ -16,7 +16,7 @@ import { toggleTheme } from "@/rtk/slices/uiSlice";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHydrationSafeTheme } from "@/hooks/useHydrationSafeTheme";
 
-export function Header({ sidebarOpen }: { sidebarOpen: boolean }) {
+export function Header() {
   const dispatch = useAppDispatch();
   const isDarkRedux = useAppSelector((state) => state.ui.isDark);
   const { user, logout } = useAuth();
@@ -32,11 +32,7 @@ export function Header({ sidebarOpen }: { sidebarOpen: boolean }) {
   }, [isDarkRedux]);
 
   return (
-    <header
-      className={`fixed top-0 right-0 h-16 bg-card border-b border-border px-6 flex items-center justify-between z-40 transition-all duration-300 ${
-        sidebarOpen ? "md:left-64" : "md:left-20"
-      }`}
-    >
+    <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-card px-4 sm:px-6">
       {/* Right Actions */}
       <div className="flex items-center gap-2 ml-auto">
         {/* Theme Toggle */}

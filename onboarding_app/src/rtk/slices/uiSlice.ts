@@ -17,7 +17,6 @@ export interface OrderLookupState {
 }
 
 interface UiState {
-  sidebarOpen: boolean;
   searchTerm: string;
   isDark: boolean;
   orderLookup: OrderLookupState;
@@ -33,7 +32,6 @@ function loadInitialTheme(): boolean {
 }
 
 const initialState: UiState = {
-  sidebarOpen: true,
   searchTerm: "",
   isDark: loadInitialTheme(),
   orderLookup: {
@@ -49,12 +47,6 @@ export const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    toggleSidebar: (state) => {
-      state.sidebarOpen = !state.sidebarOpen;
-    },
-    setSidebarOpen: (state, action) => {
-      state.sidebarOpen = action.payload;
-    },
     setSearchTerm: (state, action) => {
       state.searchTerm = action.payload;
     },
@@ -76,5 +68,5 @@ export const uiSlice = createSlice({
   },
 });
 
-export const { toggleSidebar, setSidebarOpen, setSearchTerm, toggleTheme, setTheme, patchOrderLookup } = uiSlice.actions;
+export const { setSearchTerm, toggleTheme, setTheme, patchOrderLookup } = uiSlice.actions;
 export default uiSlice.reducer;
