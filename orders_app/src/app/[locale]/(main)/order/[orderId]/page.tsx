@@ -428,7 +428,7 @@ export default function OrderDetails({
       </div>
 
       {/* ── Hidden Print Content ── */}
-      <div className="absolute left-[-9999px] top-0 opacity-0 pointer-events-none">
+      <div className="fixed top-0 left-0 h-0 w-0 overflow-hidden opacity-0 pointer-events-none">
         {order && orderCart && restaurant && (
           <ScrollArea className="h-[500px] rounded-md border border-border">
             <Invoice
