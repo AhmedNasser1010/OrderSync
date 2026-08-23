@@ -1,9 +1,26 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { OrderLookupField } from '../api/firestoreApi';
+
+export interface OrderLookupCandidate {
+  uid: string;
+  name: string;
+  phone?: string;
+  targetField: OrderLookupField;
+}
+
+export interface OrderLookupState {
+  field: OrderLookupField | 'driverName' | 'customerName';
+  inputValue: string;
+  search: { field: OrderLookupField; value: string; businessIds: string[] } | null;
+  candidates: OrderLookupCandidate[];
+  notice: string | null;
+}
 
 interface UiState {
   sidebarOpen: boolean;
   searchTerm: string;
   isDark: boolean;
+  orderLookup: OrderLookupState;
 }
 
 function loadInitialTheme(): boolean {
@@ -19,6 +36,13 @@ const initialState: UiState = {
   sidebarOpen: true,
   searchTerm: "",
   isDark: loadInitialTheme(),
+  orderLookup: {
+    field: "orderId",
+    inputValue: "",
+    search: null,
+    candidates: [],
+    notice: null,
+  },
 };
 
 export const uiSlice = createSlice({
@@ -46,8 +70,11 @@ export const uiSlice = createSlice({
         localStorage.setItem('theme', state.isDark ? 'dark' : 'light');
       }
     },
+    patchOrderLookup: (state, action: PayloadAction<Partial<OrderLookupState>>) => {
+      state.orderLookup = { ...state.orderLookup, ...action.payload };
+    },
   },
 });
 
-export const { toggleSidebar, setSidebarOpen, setSearchTerm, toggleTheme, setTheme } = uiSlice.actions;
+export const { toggleSidebar, setSidebarOpen, setSearchTerm, toggleTheme, setTheme, patchOrderLookup } = uiSlice.actions;
 export default uiSlice.reducer;

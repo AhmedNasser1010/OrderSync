@@ -13,10 +13,6 @@ export type CustomerType = {
   createdAt: number;
   updatedAt: number;
   isActive: boolean;
-  suspension?: {
-    reason: string;
-    at: number;
-  } | null;
   locations: {
     city: string;
     selected: string;

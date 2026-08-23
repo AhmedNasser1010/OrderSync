@@ -45,6 +45,20 @@ export interface DeleteBusinessInput {
   userUid: string;
 }
 
+export type OrderLookupField =
+  | "orderId"
+  | "orderNumber"
+  | "customerUid"
+  | "driverUid"
+  | "businessId"
+  | "customerPhone";
+
+export interface SearchOrdersInput {
+  field: OrderLookupField;
+  value: string;
+  businessIds: string[];
+}
+
 function getErrorMessage(error: unknown): string {
   if (error instanceof FirestoreError) return error.message;
   if (error instanceof Error) return error.message;
@@ -914,6 +928,106 @@ export const firestoreApi = createApi({
       },
       providesTags: ["Orders"],
     }),
+    searchOrders: builder.query<OrderType[], SearchOrdersInput>({
+      keepUnusedDataFor: 900,
+      async queryFn({ field, value, businessIds }) {
+        try {
+          const trimmed = value.trim();
+          if (!trimmed || !businessIds.length) {
+            return { data: [] };
+          }
+
+          if (field === "orderId") {
+            const snapshot = await getDoc(doc(db, "orders", trimmed));
+            if (!snapshot.exists()) {
+              return { data: [] };
+            }
+            console.log("Read Operation [searchOrders] (orderId)");
+            return {
+              data: [
+                { id: snapshot.id, ...snapshot.data() } as OrderType,
+              ],
+            };
+          }
+
+          if (field === "businessId") {
+            if (!businessIds.includes(trimmed)) {
+              return { data: [] };
+            }
+            const ref = collection(db, "orders");
+            const q = query(
+              ref,
+              where("businessId", "==", trimmed),
+              limit(100),
+            );
+            const snapshot = await getDocs(q);
+            const orders = snapshot.docs.map(
+              (docSnap) =>
+                ({
+                  id: docSnap.id,
+                  ...docSnap.data(),
+                }) as OrderType,
+            );
+            orders.sort((a, b) => b.createdAt - a.createdAt);
+            console.log("Read Operation [searchOrders] (businessId)");
+            return { data: orders };
+          }
+
+          let equalityValue: string | number = trimmed;
+          if (field === "orderNumber") {
+            equalityValue = Number(trimmed);
+            if (!Number.isInteger(equalityValue)) {
+              throw new Error("Order number must be a whole number.");
+            }
+          }
+
+          const fieldPath =
+            field === "driverUid"
+              ? "assignment.driverUid"
+              : field === "customerPhone"
+                ? "customer.phone"
+                : field;
+
+          const chunks: string[][] = [];
+          for (let i = 0; i < businessIds.length; i += 10) {
+            chunks.push(businessIds.slice(i, i + 10));
+          }
+
+          const snapshots = await Promise.all(
+            chunks.map(async (chunk) => {
+              const ref = collection(db, "orders");
+              const q = query(
+                ref,
+                where("businessId", "in", chunk),
+                where(fieldPath, "==", equalityValue),
+                limit(100),
+              );
+              return getDocs(q);
+            }),
+          );
+
+          const orders = snapshots
+            .flatMap((snap) =>
+              snap.docs.map(
+                (docSnap) =>
+                  ({
+                    id: docSnap.id,
+                    ...docSnap.data(),
+                  }) as OrderType,
+              ),
+            )
+            .sort((a, b) => b.createdAt - a.createdAt);
+
+          console.log(`Read Operation [searchOrders] (${field})`);
+          return { data: orders };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
+        }
+      },
+      providesTags: ["Orders"],
+    }),
     fetchReviews: builder.query<
       CustomerFeedbackType[],
       { partnerUid: string; fetchLimit?: number }
@@ -1279,9 +1393,12 @@ export const {
   useFetchBusinessesQuery,
   useFetchManagersQuery,
   useFetchDriverUsersQuery,
+  useLazyFetchDriverUsersQuery,
   useFetchCustomersQuery,
+  useLazyFetchCustomersQuery,
   useFetchActiveOrdersQuery,
   useFetchReceivedOrdersQuery,
+  useSearchOrdersQuery,
   useFetchReviewsQuery,
 
   useFetchBannersQuery,
