@@ -14,12 +14,18 @@ interface DeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+  title?: string;
+  description?: string;
+  confirmLabel?: string;
 }
 
 export function DeleteDialog({
   open,
   onOpenChange,
   onConfirm,
+  title = "Delete Restaurant?",
+  description = "This action cannot be undone. The restaurant and all its data will be permanently deleted.",
+  confirmLabel = "Delete",
 }: DeleteDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -30,10 +36,9 @@ export function DeleteDialog({
               <AlertTriangle className="h-5 w-5 text-destructive" />
             </div>
             <div>
-              <DialogTitle>Delete Restaurant?</DialogTitle>
+              <DialogTitle>{title}</DialogTitle>
               <DialogDescription className="mt-1">
-                This action cannot be undone. The restaurant and all its data
-                will be permanently deleted.
+                {description}
               </DialogDescription>
             </div>
           </div>
@@ -43,7 +48,7 @@ export function DeleteDialog({
             Cancel
           </Button>
           <ButtonGuard variant="destructive" onClick={onConfirm}>
-            Delete
+            {confirmLabel}
           </ButtonGuard>
         </DialogFooter>
       </DialogContent>

@@ -1028,6 +1028,53 @@ export const firestoreApi = createApi({
       },
       providesTags: ["Orders"],
     }),
+    deleteOrder: builder.mutation<
+      null,
+      { orderId: string; businessIds: string[] }
+    >({
+      async queryFn({ orderId, businessIds }) {
+        try {
+          if (!orderId) throw new Error("Order id is required.");
+          if (!businessIds.length)
+            throw new Error("No businesses are linked to your account yet.");
+
+          const orderRef = doc(db, "orders", orderId);
+          const snapshot = await getDoc(orderRef);
+          if (!snapshot.exists()) {
+            throw new Error("Order not found. It may have already been deleted.");
+          }
+
+          const orderData = snapshot.data() as OrderType;
+          if (!businessIds.includes(orderData.businessId)) {
+            throw new Error(
+              "You can only delete orders belonging to your restaurants.",
+            );
+          }
+
+          const terminalStatuses = new Set([
+            "DELIVERED",
+            "GIVEN_FEEDBACK",
+            "CANCELED",
+            "REJECTED",
+            "VOIDED",
+          ]);
+          if (!terminalStatuses.has(orderData.status?.current)) {
+            throw new Error(
+              "Only completed or canceled orders can be permanently deleted.",
+            );
+          }
+
+          await deleteDoc(orderRef);
+          console.log(`Write Operation [deleteOrder] (${orderId})`);
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error deleting order:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Orders"],
+    }),
     fetchReviews: builder.query<
       CustomerFeedbackType[],
       { partnerUid: string; fetchLimit?: number }
@@ -1399,6 +1446,7 @@ export const {
   useFetchActiveOrdersQuery,
   useFetchReceivedOrdersQuery,
   useSearchOrdersQuery,
+  useDeleteOrderMutation,
   useFetchReviewsQuery,
 
   useFetchBannersQuery,

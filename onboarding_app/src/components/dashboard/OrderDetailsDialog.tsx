@@ -4,10 +4,12 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -17,6 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { ReactNode } from "react";
+import { Trash2 } from "lucide-react";
 import type { OrderType } from "@ordersync/types";
 import {
   formatCurrency,
@@ -75,12 +78,14 @@ interface OrderDetailsDialogProps {
   order: OrderType | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onDeleteRequest?: () => void;
 }
 
 export function OrderDetailsDialog({
   order,
   open,
   onOpenChange,
+  onDeleteRequest,
 }: OrderDetailsDialogProps) {
   if (!order) return null;
 
@@ -326,6 +331,19 @@ export function OrderDetailsDialog({
             <InfoRow label="Updated At" value={formatOrderDate(order.updatedAt)} />
           </Section>
         </div>
+
+        {onDeleteRequest && (
+          <DialogFooter className="mt-6 border-t border-border pt-4">
+            <Button
+              variant="outline"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/40"
+              onClick={onDeleteRequest}
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Order
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

@@ -7,6 +7,7 @@ import {
 } from "@/components/dashboard/OrderLookupFilters";
 import { OrderLookupTable } from "@/components/dashboard/OrderLookupTable";
 import { OrderDetailsDialog } from "@/components/dashboard/OrderDetailsDialog";
+import { DeleteDialog } from "@/components/dashboard/DeleteDialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SearchX, Inbox } from "lucide-react";
@@ -22,6 +23,7 @@ import {
   useLazyFetchDriverUsersQuery,
   useLazyFetchCustomersQuery,
   useSearchOrdersQuery,
+  useDeleteOrderMutation,
   type OrderLookupField,
   type SearchOrdersInput,
 } from "@/rtk/api/firestoreApi";
@@ -56,7 +58,10 @@ export default function OrderLookupPage() {
   const { field, inputValue, search, candidates, notice } = lookup;
 
   const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<OrderType | null>(null);
   const [page, setPage] = useState(1);
+
+  const [deleteOrder] = useDeleteOrderMutation();
 
   const patch = useCallback(
     (partial: Partial<OrderLookupState>) => dispatch(patchOrderLookup(partial)),
@@ -209,6 +214,27 @@ export default function OrderLookupPage() {
     [patch],
   );
 
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteOrder({
+        orderId: deleteTarget.id,
+        businessIds,
+      }).unwrap();
+      setSelectedOrder(null);
+    } catch (error: unknown) {
+      const message =
+        typeof error === "string"
+          ? error
+          : error instanceof Error
+            ? error.message
+            : "Failed to delete the order. Please try again.";
+      patch({ notice: message });
+    } finally {
+      setDeleteTarget(null);
+    }
+  }, [deleteTarget, deleteOrder, businessIds, patch]);
+
   const totalPages = Math.ceil(results.length / PAGE_SIZE);
   const safePage = Math.min(page, totalPages || 1);
   const paginatedResults = results.slice(
@@ -339,6 +365,20 @@ export default function OrderLookupPage() {
         onOpenChange={(open) => {
           if (!open) setSelectedOrder(null);
         }}
+        onDeleteRequest={() => setDeleteTarget(selectedOrder)}
+      />
+
+      <DeleteDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Permanently Delete Order?"
+        description={`This action cannot be undone. Order #${
+          deleteTarget?.orderNumber ?? ""
+        } and all of its data will be permanently deleted from Firestore.`}
+        confirmLabel="Delete Permanently"
       />
     </div>
   );

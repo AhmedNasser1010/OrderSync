@@ -303,6 +303,16 @@ service cloud.firestore {
         && incomingData().status.current == 'GIVEN_FEEDBACK'
         && incomingData().diff(resourceData()).affectedKeys()
             .hasOnly(['status', 'timeline', 'customerFeedback', 'updatedAt']);
+
+      // --- DELETE permissions ---
+
+      // Partners can permanently delete orders belonging to their
+      // businesses, but only once they are in a terminal state.
+      // Active orders can never be deleted, so live customer/driver
+      // flows cannot be disrupted.
+      allow delete: if isPartner()
+        && resourceData().businessId in partnerBusinessIds()
+        && resourceData().status.current in ['DELIVERED', 'GIVEN_FEEDBACK', 'CANCELED', 'REJECTED', 'VOIDED'];
     }
 
     // =====================================================================
