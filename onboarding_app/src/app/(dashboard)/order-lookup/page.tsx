@@ -8,11 +8,16 @@ import {
 import { OrderLookupTable } from "@/components/dashboard/OrderLookupTable";
 import { OrderDetailsDialog } from "@/components/dashboard/OrderDetailsDialog";
 import { DeleteDialog } from "@/components/dashboard/DeleteDialog";
+import { ExportButton } from "@/components/dashboard/ExportButton";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SearchX, Inbox } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
+import {
+  flattenOrderForExport,
+  ORDER_EXPORT_COLUMNS,
+} from "@/lib/order-export";
 import {
   patchOrderLookup,
   type OrderLookupCandidate,
@@ -242,6 +247,11 @@ export default function OrderLookupPage() {
     safePage * PAGE_SIZE,
   );
 
+  const exportData = useMemo(
+    () => results.map(flattenOrderForExport),
+    [results],
+  );
+
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <div>
@@ -317,9 +327,20 @@ export default function OrderLookupPage() {
 
       {search && (
         <>
-          <div className="text-sm text-muted-foreground">
-            Found {results.length} order{results.length === 1 ? "" : "s"}
-            {isFetching ? " · searching..." : ""}
+          <div className="flex items-center justify-between gap-4">
+            <div className="text-sm text-muted-foreground">
+              Found {results.length} order{results.length === 1 ? "" : "s"}
+              {isFetching ? " · searching..." : ""}
+            </div>
+            {results.length > 0 && (
+              <ExportButton
+                data={exportData}
+                columns={ORDER_EXPORT_COLUMNS}
+                filename="order-lookup"
+                sheetName="Order Lookup"
+                title="Order Lookup Results"
+              />
+            )}
           </div>
 
           <OrderLookupTable

@@ -18,6 +18,8 @@
     "firebase": "^12.15.0",
     "firebase-admin": "^13.10.0",
     "framer-motion": "^12.41.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.21.0",
     "next": "16.2.9",

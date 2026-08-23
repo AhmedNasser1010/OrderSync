@@ -1,5 +1,7 @@
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export interface ExportColumn {
   header: string;
@@ -97,9 +99,53 @@ export function exportToJSON<T extends Record<string, unknown>>(
   data: T[],
   columns: ExportColumn[],
   filename: string,
+  raw?: unknown,
 ): void {
-  const rows = data.map((item) => buildRow(item, columns));
-  const json = JSON.stringify(rows, null, 2);
+  const json =
+    raw !== undefined
+      ? JSON.stringify(raw, null, 2)
+      : JSON.stringify(
+          data.map((item) => buildRow(item, columns)),
+          null,
+          2,
+        );
   const blob = new Blob([json], { type: "application/json;charset=utf-8;" });
   saveAs(blob, `${generateFilename(filename)}.json`);
+}
+
+export function exportToPDF<T extends Record<string, unknown>>(
+  data: T[],
+  columns: ExportColumn[],
+  filename: string,
+  title?: string,
+): void {
+  const rows = data.map((item) => buildRow(item, columns));
+  const doc = new jsPDF({
+    orientation: columns.length > 6 ? "landscape" : "portrait",
+    unit: "pt",
+    format: "a4",
+  });
+
+  const heading = title ?? filename;
+  doc.setFontSize(14);
+  doc.text(heading, 40, 40);
+  doc.setFontSize(9);
+  doc.setTextColor(110);
+  doc.text(
+    `${rows.length} record${rows.length === 1 ? "" : "s"} · exported ${new Date().toLocaleString()}`,
+    40,
+    56,
+  );
+
+  autoTable(doc, {
+    head: [columns.map((col) => col.header)],
+    body: rows.map((row) => columns.map((col) => row[col.header])),
+    startY: 68,
+    margin: { left: 40, right: 40 },
+    styles: { fontSize: 8, cellPadding: 4, overflow: "linebreak" },
+    headStyles: { fillColor: [55, 65, 81], textColor: 255 },
+    alternateRowStyles: { fillColor: [245, 246, 248] },
+  });
+
+  doc.save(`${generateFilename(filename)}.pdf`);
 }

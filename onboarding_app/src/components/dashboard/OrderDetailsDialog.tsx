@@ -20,6 +20,11 @@ import {
 } from "@/components/ui/table";
 import type { ReactNode } from "react";
 import { Trash2 } from "lucide-react";
+import { ExportButton } from "@/components/dashboard/ExportButton";
+import {
+  buildOrderDetailRows,
+  ORDER_DETAIL_COLUMNS,
+} from "@/lib/order-export";
 import type { OrderType } from "@ordersync/types";
 import {
   formatCurrency,
@@ -332,8 +337,16 @@ export function OrderDetailsDialog({
           </Section>
         </div>
 
-        {onDeleteRequest && (
-          <DialogFooter className="mt-6 border-t border-border pt-4">
+        <DialogFooter className="mt-6 border-t border-border pt-4 sm:justify-between">
+          <ExportButton
+            data={buildOrderDetailRows(order)}
+            columns={ORDER_DETAIL_COLUMNS}
+            rawJSON={order}
+            filename={`order-${order.orderNumber}`}
+            sheetName="Order Details"
+            title={`Order #${order.orderNumber} — Details`}
+          />
+          {onDeleteRequest && (
             <Button
               variant="outline"
               className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/40"
@@ -342,8 +355,8 @@ export function OrderDetailsDialog({
               <Trash2 className="h-4 w-4" />
               Delete Order
             </Button>
-          </DialogFooter>
-        )}
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

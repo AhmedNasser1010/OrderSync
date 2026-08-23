@@ -7,15 +7,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Download, FileSpreadsheet, FileJson, FileText, Loader2 } from "lucide-react";
+import { Download, FileSpreadsheet, FileJson, FileText, FileDown, Loader2 } from "lucide-react";
 import type { ExportColumn } from "@/lib/export-utils";
-import { exportToExcel, exportToCSV, exportToJSON } from "@/lib/export-utils";
+import { exportToExcel, exportToCSV, exportToJSON, exportToPDF } from "@/lib/export-utils";
 
 interface ExportButtonProps {
   data: Record<string, unknown>[];
   columns: ExportColumn[];
   filename: string;
   sheetName?: string;
+  title?: string;
+  rawJSON?: unknown;
 }
 
 export function ExportButton({
@@ -23,11 +25,13 @@ export function ExportButton({
   columns,
   filename,
   sheetName,
+  title,
+  rawJSON,
 }: ExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
 
   const handleExport = async (
-    format: "excel" | "csv" | "json",
+    format: "excel" | "csv" | "json" | "pdf",
   ) => {
     if (data.length === 0) return;
     setIsExporting(true);
@@ -41,7 +45,10 @@ export function ExportButton({
           exportToCSV(data, columns, filename);
           break;
         case "json":
-          exportToJSON(data, columns, filename);
+          exportToJSON(data, columns, filename, rawJSON);
+          break;
+        case "pdf":
+          exportToPDF(data, columns, filename, title);
           break;
       }
     } finally {
@@ -71,6 +78,13 @@ export function ExportButton({
         >
           <FileSpreadsheet className="mr-2 h-4 w-4" />
           Export as Excel
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => handleExport("pdf")}
+          className="cursor-pointer"
+        >
+          <FileDown className="mr-2 h-4 w-4" />
+          Export as PDF
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => handleExport("csv")}
