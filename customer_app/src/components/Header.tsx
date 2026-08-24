@@ -225,6 +225,7 @@ function Header() {
         initServices({
           deliveryFees: servicesConfig.deliveryFees,
           minDeliveryFees: servicesConfig.minDeliveryFees,
+          maxWorkDistanceKm: servicesConfig.maxWorkDistanceKm,
         })
       );
     }

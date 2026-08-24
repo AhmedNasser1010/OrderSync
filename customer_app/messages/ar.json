@@ -116,6 +116,8 @@
   "No phone number added": "لم تتم إضافة رقم هاتف",
   "No Restaurants found, try another filter": "مفيش مطاعم، جرب فلتر تاني",
   "Not Available": "غير متاح",
+  "outsideDeliveryRangeTitle": "خارج نطاق التوصيل",
+  "outsideDeliveryRangeMessage": "العنوان اللي اخترته بعيد عن أقصى مسافة توصيل للمطعم ده. من فضلك اختار عنوان أقرب أو اطلب من مطعم تاني.",
   "Offers": "عروض",
   "On its way to you": "في الطريق ليك",
   "On the Way": "في الطريق",

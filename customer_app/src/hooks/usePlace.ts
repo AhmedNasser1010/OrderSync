@@ -8,6 +8,7 @@ import {
   toggleLoginSidebar,
   toggleOrderSidebar,
   setShowRestaurantUnavailablePopup,
+  setShowOutOfRangePopup,
   setShowOrderPlacementErrorDialog,
   setShowOrderPlacementLoading,
   setShowOrderPlacementSuccess,
@@ -385,6 +386,14 @@ const usePlace = () => {
         position: "top-center",
         duration: 4000,
       });
+      return;
+    }
+
+    if (
+      error?.code === "OUT_OF_DELIVERY_RANGE" ||
+      error?.data?.code === "OUT_OF_DELIVERY_RANGE"
+    ) {
+      dispatch(setShowOutOfRangePopup(true));
       return;
     }
 

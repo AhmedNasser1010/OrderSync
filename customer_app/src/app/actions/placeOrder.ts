@@ -19,10 +19,12 @@ import {
 import type { PlaceOrderInput } from "@/lib/orderTypes";
 import workingDaysChecker from "@/utils/workingDaysChecker";
 import randomOrderNumber from "@/utils/randomOrderId";
+import getDistanceFromLatlngInKm from "@/utils/getDistanceFromLatlngInKm";
 
 const PRICING_EPSILON = 0.01;
 const LOCATION_EPSILON = 0.0001;
 const DEFAULT_DELIVERY_FEES: DeliveryFeesConfig = { perKm: 3.5, min: 5 };
+const DEFAULT_MAX_WORK_DISTANCE_KM = 15;
 
 export type PlaceOrderServerResult =
   | { success: true; orderId: string; orderNumber: number }
@@ -302,8 +304,26 @@ export async function placeOrderServer(args: {
               min:
                 servicesSnap.data()?.minDeliveryFees ??
                 DEFAULT_DELIVERY_FEES.min,
+              maxWorkDistanceKm:
+                servicesSnap.data()?.maxWorkDistanceKm ??
+                DEFAULT_MAX_WORK_DISTANCE_KM,
             }
-          : DEFAULT_DELIVERY_FEES;
+          : {
+              ...DEFAULT_DELIVERY_FEES,
+              maxWorkDistanceKm: DEFAULT_MAX_WORK_DISTANCE_KM,
+            };
+
+        const distanceKm = getDistanceFromLatlngInKm(
+          [deliveryLatLng[0], deliveryLatLng[1]],
+          [restaurantLatLng[0], restaurantLatLng[1]]
+        );
+        if (
+          !Number.isFinite(servicesConfig.maxWorkDistanceKm) ||
+          servicesConfig.maxWorkDistanceKm <= 0 ||
+          distanceKm > servicesConfig.maxWorkDistanceKm
+        ) {
+          return { error: { code: "OUT_OF_DELIVERY_RANGE" } };
+        }
 
         let serverPricing;
         let serverLines;

@@ -116,6 +116,8 @@
   "No phone number added": "No phone number added",
   "No Restaurants found, try another filter": "No Restaurants found, try another filter",
   "Not Available": "Not Available",
+  "outsideDeliveryRangeTitle": "Outside Delivery Range",
+  "outsideDeliveryRangeMessage": "Your selected address is beyond this restaurant's max delivery distance. Please choose a closer address or order from another restaurant.",
   "Offers": "Offers",
   "On its way to you": "On its way to you",
   "On the Way": "On the Way",

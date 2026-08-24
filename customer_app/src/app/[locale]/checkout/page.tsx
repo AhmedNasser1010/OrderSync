@@ -48,23 +48,33 @@ export default function CheckoutPage() {
     [res]
   );
 
-  const deliveryFees = useMemo(() => {
-    if (!res || !user?.locations?.selected) return 0;
+  const distanceKm = useMemo(() => {
+    if (!res || !user?.locations?.selected) return null;
     const selectedLocation = (
       user.locations as unknown as Record<string, { latlng?: number[] }>
     )[user.locations.selected];
     if (!selectedLocation?.latlng?.[0] && !selectedLocation?.latlng?.[1]) {
-      return 0;
+      return null;
     }
-    const distance = getDistanceFromLatlngInKm(
+    return getDistanceFromLatlngInKm(
       selectedLocation.latlng as [number, number],
       res.profile.latlng
     );
-    return getDeliveryFees(distance, {
+  }, [res, user]);
+
+  const isOutOfRange =
+    distanceKm !== null &&
+    typeof services.maxWorkDistanceKm === "number" &&
+    services.maxWorkDistanceKm > 0 &&
+    distanceKm > services.maxWorkDistanceKm;
+
+  const deliveryFees = useMemo(() => {
+    if (distanceKm === null) return 0;
+    return getDeliveryFees(distanceKm, {
       perKm: services.deliveryFees,
       min: services.minDeliveryFees,
     });
-  }, [res, user, services.deliveryFees, services.minDeliveryFees]);
+  }, [distanceKm, services.deliveryFees, services.minDeliveryFees]);
 
   const handleCurrentState = (status: string) => {
     setCurrentState(status);
@@ -99,6 +109,18 @@ export default function CheckoutPage() {
             res?.branding?.closeMsg ||
             t("notAvailableRightNow")
           }
+          button={<Link href="/">{t("Back To Home")}</Link>}
+        />
+      </section>
+    );
+  }
+
+  if (isOutOfRange) {
+    return (
+      <section className="my-[100px] mx-6 md:mx-[150px]">
+        <PopupMsg
+          title={t("outsideDeliveryRangeTitle")}
+          subject={t("outsideDeliveryRangeMessage")}
           button={<Link href="/">{t("Back To Home")}</Link>}
         />
       </section>

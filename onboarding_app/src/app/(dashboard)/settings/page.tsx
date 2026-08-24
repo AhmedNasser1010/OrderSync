@@ -13,12 +13,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   AlertCircle,
   Loader2,
+  MapPinned,
   Save,
   Truck,
 } from "lucide-react";
 
 const DEFAULT_DELIVERY_FEES_PER_KM = 3.5;
 const DEFAULT_MIN_DELIVERY_FEES = 5;
+const DEFAULT_MAX_WORK_DISTANCE_KM = 15;
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -29,6 +31,9 @@ export default function SettingsPage() {
     null
   );
   const [minDeliveryFees, setMinDeliveryFees] = useState<number | null>(null);
+  const [maxWorkDistanceKm, setMaxWorkDistanceKm] = useState<number | null>(
+    null
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -39,18 +44,27 @@ export default function SettingsPage() {
     DEFAULT_DELIVERY_FEES_PER_KM;
   const minFees =
     minDeliveryFees ?? data?.minDeliveryFees ?? DEFAULT_MIN_DELIVERY_FEES;
+  const maxDistanceKm =
+    maxWorkDistanceKm ??
+    data?.maxWorkDistanceKm ??
+    DEFAULT_MAX_WORK_DISTANCE_KM;
 
   const handleSave = async () => {
     if (isSaving) return;
 
-    const perKm = Number(deliveryFeesPerKm);
-    const min = Number(minDeliveryFees);
+    const perKm = Number(feesPerKm);
+    const min = Number(minFees);
+    const maxKm = Number(maxDistanceKm);
     if (Number.isNaN(perKm) || perKm < 0) {
       setSaveError("Delivery fee per km must be a positive number.");
       return;
     }
     if (Number.isNaN(min) || min < 0) {
       setSaveError("Minimum delivery fee must be a positive number.");
+      return;
+    }
+    if (Number.isNaN(maxKm) || maxKm <= 0) {
+      setSaveError("Max work distance must be greater than zero.");
       return;
     }
 
@@ -63,6 +77,7 @@ export default function SettingsPage() {
         updates: {
           deliveryFeesPerKm: perKm,
           minDeliveryFees: min,
+          maxWorkDistanceKm: maxKm,
           updatedBy: user?.uid,
         },
       }).unwrap();
@@ -83,9 +98,10 @@ export default function SettingsPage() {
           Platform Settings
         </h1>
         <p className="text-muted-foreground mt-1">
-          Configure global delivery pricing used by the customer app and
-          validated on every order. Restaurant commission is set per
-          restaurant on each restaurant&apos;s edit page.
+          Configure global delivery pricing and the maximum delivery range
+          used by the customer app and validated on every order. Restaurant
+          commission is set per restaurant on each restaurant&apos;s edit
+          page.
         </p>
       </div>
 
@@ -144,6 +160,42 @@ export default function SettingsPage() {
                 value={minFees}
                 onChange={(e) =>
                   setMinDeliveryFees(
+                    e.target.value === "" ? 0 : Number(e.target.value)
+                  )
+                }
+                className="mt-1.5"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4 border-t pt-6">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <MapPinned className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">
+                  Max Work Distance
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Orders delivered farther than this straight-line distance
+                  from the restaurant are rejected at checkout.
+                </p>
+              </div>
+            </div>
+
+            <div className="max-w-xs">
+              <Label htmlFor="max-work-distance-km">
+                Max work distance (km)
+              </Label>
+              <Input
+                id="max-work-distance-km"
+                type="number"
+                step="1"
+                min="1"
+                value={maxDistanceKm}
+                onChange={(e) =>
+                  setMaxWorkDistanceKm(
                     e.target.value === "" ? 0 : Number(e.target.value)
                   )
                 }
