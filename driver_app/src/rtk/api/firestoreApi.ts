@@ -28,7 +28,7 @@ export const firestoreApi = createApi({
     fetchUserData: builder.query<
       Pick<
         Driver,
-        "userInfo" | "online" | "finance" | "theme" | "locale" | "notifyPush" | "skipStartRoute"
+        "userInfo" | "online" | "finance" | "theme" | "locale" | "notifyPush" | "skipStartRoute" | "visibleBusinessIds"
       >,
       { uid: string }
     >({
@@ -56,6 +56,7 @@ export const firestoreApi = createApi({
                 locale: data.locale,
                 notifyPush: data.notifyPush,
                 skipStartRoute: data.skipStartRoute,
+                visibleBusinessIds: data.visibleBusinessIds ?? [],
               }));
             }
           },

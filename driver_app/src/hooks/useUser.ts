@@ -7,7 +7,7 @@ import type { Driver } from "@ordersync/types";
 type UseUserResult = {
   name: string;
   userData:
-    | Pick<Driver, "userInfo" | "online" | "finance" | "theme" | "locale" | "notifyPush" | "skipStartRoute">
+    | Pick<Driver, "userInfo" | "online" | "finance" | "theme" | "locale" | "notifyPush" | "skipStartRoute" | "visibleBusinessIds">
     | undefined;
   isLoading: boolean;
   isError: boolean;

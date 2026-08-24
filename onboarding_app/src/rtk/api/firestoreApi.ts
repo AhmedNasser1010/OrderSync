@@ -776,6 +776,7 @@ export const firestoreApi = createApi({
               userInfo: data.userInfo ?? {},
               licensePlate: data.licensePlate,
               finance: data.finance ?? { currentCash: 0, dailyAdvance: 0, dailyAdvanceDate: 0, earnings: 0 },
+              visibleBusinessIds: data.visibleBusinessIds ?? [],
             } as Driver;
           });
           console.log("Read Operation [fetchDriverUsers]");

@@ -42,4 +42,9 @@ export type Driver = {
   theme?: "light" | "dark";
   locale?: "en" | "ar";
   skipStartRoute?: boolean;
+  /**
+   * Allowlist of business IDs whose READY orders this driver sees in the
+   * marketplace. Empty/undefined means all restaurants are visible.
+   */
+  visibleBusinessIds?: string[];
 };

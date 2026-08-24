@@ -19,10 +19,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Pencil, Trash2, AlertTriangle, Loader2, Wallet, Receipt, MoreHorizontal } from "lucide-react";
+import { Pencil, Trash2, AlertTriangle, Loader2, Wallet, Receipt, MoreHorizontal, Eye } from "lucide-react";
 import { format } from "date-fns";
 import type { Driver } from "@ordersync/types";
 import { EditDriverDialog } from "./EditDriverDialog";
+import { DriverVisibilityDialog } from "./DriverVisibilityDialog";
 import { SetAdvanceDialog } from "./SetAdvanceDialog";
 import { SettleAccountDialog } from "./SettleAccountDialog";
 import { useUpdateDriverDocumentMutation } from "@/rtk/api/firestoreApi";
@@ -43,25 +44,25 @@ interface DriversTableProps {
 }
 
 export function DriversTable({ drivers, onDelete }: DriversTableProps) {
-  const [editDriver, setEditDriver] = useState<Driver | null>(null);
-  const [editOpen, setEditOpen] = useState(false);
-  const [setAdvanceDriver, setSetAdvanceDriver] = useState<Driver | null>(null);
-  const [setAdvanceOpen, setSetAdvanceOpen] = useState(false);
-  const [settleDriver, setSettleDriver] = useState<Driver | null>(null);
-  const [settleOpen, setSettleOpen] = useState(false);
+  const [editUid, setEditUid] = useState<string | null>(null);
+  const [visibilityUid, setVisibilityUid] = useState<string | null>(null);
+  const [setAdvanceUid, setSetAdvanceUid] = useState<string | null>(null);
+  const [settleUid, setSettleUid] = useState<string | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     driver: Driver | null;
   }>({ open: false, driver: null });
 
+  const findDriver = (uid: string | null) =>
+    uid ? drivers.find((d) => d.uid === uid) ?? null : null;
+  const editDriver = findDriver(editUid);
+  const visibilityDriver = findDriver(visibilityUid);
+  const setAdvanceDriver = findDriver(setAdvanceUid);
+  const settleDriver = findDriver(settleUid);
+
   const [updateDriver, { isLoading: isUpdating }] =
     useUpdateDriverDocumentMutation();
   const [togglingDriver, setTogglingDriver] = useState<string | null>(null);
-
-  const handleEdit = (driver: Driver) => {
-    setEditDriver(driver);
-    setEditOpen(true);
-  };
 
   const handleToggleByManager = async (driver: Driver) => {
     setTogglingDriver(driver.uid);
@@ -218,8 +219,7 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
                         <DropdownMenuItem
                           className="cursor-pointer"
                           onClick={() => {
-                            setSetAdvanceDriver(driver);
-                            setSetAdvanceOpen(true);
+                            setSetAdvanceUid(driver.uid);
                           }}
                         >
                           <Wallet className="mr-2 h-4 w-4" />
@@ -228,8 +228,7 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
                         <DropdownMenuItem
                           className="cursor-pointer"
                           onClick={() => {
-                            setSettleDriver(driver);
-                            setSettleOpen(true);
+                            setSettleUid(driver.uid);
                           }}
                         >
                           <Receipt className="mr-2 h-4 w-4" />
@@ -237,7 +236,16 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="cursor-pointer"
-                          onClick={() => handleEdit(driver)}
+                          onClick={() => {
+                            setVisibilityUid(driver.uid);
+                          }}
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          <span>Order Visibility</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="cursor-pointer"
+                          onClick={() => setEditUid(driver.uid)}
                         >
                           <Pencil className="mr-2 h-4 w-4" />
                           <span>Edit Driver</span>
@@ -264,20 +272,34 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
 
       <EditDriverDialog
         driver={editDriver}
-        open={editOpen}
-        onOpenChange={setEditOpen}
+        open={editUid !== null}
+        onOpenChange={(open) => {
+          if (!open) setEditUid(null);
+        }}
+      />
+
+      <DriverVisibilityDialog
+        driver={visibilityDriver}
+        open={visibilityUid !== null}
+        onOpenChange={(open) => {
+          if (!open) setVisibilityUid(null);
+        }}
       />
 
       <SetAdvanceDialog
         driver={setAdvanceDriver}
-        open={setAdvanceOpen}
-        onOpenChange={setSetAdvanceOpen}
+        open={setAdvanceUid !== null}
+        onOpenChange={(open) => {
+          if (!open) setSetAdvanceUid(null);
+        }}
       />
 
       <SettleAccountDialog
         driver={settleDriver}
-        open={settleOpen}
-        onOpenChange={setSettleOpen}
+        open={settleUid !== null}
+        onOpenChange={(open) => {
+          if (!open) setSettleUid(null);
+        }}
       />
 
       <Dialog
