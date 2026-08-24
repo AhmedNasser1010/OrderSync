@@ -3,12 +3,16 @@
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 interface SettingsPanelProps {
   settings: {
     printInvoice: boolean;
   };
   topChains: boolean;
+  commissionPercent: number | "";
+  commissionError?: string;
+  onCommissionPercentChange: (value: number | "") => void;
   onChange: (settings: {
     printInvoice: boolean;
   }) => void;
@@ -18,6 +22,9 @@ interface SettingsPanelProps {
 export function SettingsPanel({
   settings,
   topChains,
+  commissionPercent,
+  commissionError,
+  onCommissionPercentChange,
   onChange,
   onTopChainsChange,
 }: SettingsPanelProps) {
@@ -49,10 +56,44 @@ export function SettingsPanel({
     }
   };
 
+  const handleCommissionChange = (raw: string) => {
+    if (raw === "") {
+      onCommissionPercentChange("");
+      return;
+    }
+    const num = parseFloat(raw);
+    onCommissionPercentChange(isNaN(num) ? "" : num);
+  };
+
   return (
     <Card className="p-6 bg-card border-border sticky top-32">
       <h2 className="text-lg font-semibold text-foreground mb-4">Settings</h2>
       <div className="space-y-4">
+        <div>
+          <Label htmlFor="commission-percent" className="text-foreground font-medium text-sm">
+            Commission (%)
+          </Label>
+          <Input
+            id="commission-percent"
+            type="number"
+            min={0}
+            max={100}
+            step="0.5"
+            value={commissionPercent}
+            onChange={(e) => handleCommissionChange(e.target.value)}
+            placeholder="10"
+            className="mt-1.5"
+          />
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Platform commission taken from this restaurant&apos;s orders (0–100).
+            Required before it can receive orders.
+          </p>
+          {commissionError && (
+            <p className="flex items-center gap-1 text-sm text-destructive mt-1">
+              {commissionError}
+            </p>
+          )}
+        </div>
         {settingsList.map((setting) => (
           <div key={setting.id} className="flex items-start justify-between">
             <div>

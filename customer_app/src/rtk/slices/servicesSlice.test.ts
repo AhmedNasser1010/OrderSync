@@ -10,7 +10,6 @@ describe("servicesSlice", () => {
     const services = {
       deliveryFees: 10,
       minDeliveryFees: 5,
-      commissionPercent: 15,
       minOrder: 50,
     };
     expect(reducer(undefined, initServices(services))).toEqual(services);

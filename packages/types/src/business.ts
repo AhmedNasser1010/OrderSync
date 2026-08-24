@@ -3,6 +3,8 @@ export type RestaurantStatusTypes = "active" | "inactive" | "busy" | "pause" | "
 export type BusinessDocument = {
   accessToken: string;
   partnerUid: string;
+  /** Platform commission rate (%) applied to this restaurant's orders. Required for ordering. */
+  commissionPercent?: number;
   branding: {
     closeMsg: string;
     promotionalSubtitle: string;

@@ -81,6 +81,19 @@ export function useRestaurantForm(initialData?: BusinessDocument) {
           "Maximum time must be greater than minimum";
       }
 
+      if (
+        typeof data.commissionPercent !== "number" ||
+        !Number.isFinite(data.commissionPercent)
+      ) {
+        newErrors["commissionPercent"] = "Commission percent is required";
+      } else if (
+        data.commissionPercent < 0 ||
+        data.commissionPercent > 100
+      ) {
+        newErrors["commissionPercent"] =
+          "Commission must be between 0 and 100";
+      }
+
       if (phones.length === 0 || !phones[0].trim()) {
         newErrors["phoneNumbers"] =
           "At least one phone number is required";

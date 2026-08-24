@@ -17,7 +17,6 @@ import { db } from "@/lib/firebase";
 import {
   canTransition,
   getTimelineField,
-  DEFAULT_COMMISSION_PERCENT,
 } from "@ordersync/order-utils";
 import type { HeroBanner, OrderType, ServicesDocument } from "@ordersync/types";
 import { setHasOrder } from "@/rtk/slices/toggleSlice";
@@ -141,7 +140,6 @@ export const firestoreApi = createApi({
       {
         deliveryFees: ServicesDocument["deliveryFeesPerKm"];
         minDeliveryFees: ServicesDocument["minDeliveryFees"];
-        commissionPercent: ServicesDocument["commissionPercent"];
       },
       void
     >({
@@ -149,7 +147,6 @@ export const firestoreApi = createApi({
         data: {
           deliveryFees: 3.5,
           minDeliveryFees: 5,
-          commissionPercent: 10,
         },
       }),
       async onCacheEntryAdded(
@@ -168,12 +165,9 @@ export const firestoreApi = createApi({
                 const data = docSnapshot.data() as Partial<ServicesDocument>;
                 draft.deliveryFees = data.deliveryFeesPerKm ?? 3.5;
                 draft.minDeliveryFees = data.minDeliveryFees ?? 5;
-                draft.commissionPercent =
-                  data.commissionPercent ?? DEFAULT_COMMISSION_PERCENT;
               } else {
                 draft.deliveryFees = 3.5;
                 draft.minDeliveryFees = 5;
-                draft.commissionPercent = DEFAULT_COMMISSION_PERCENT;
               }
             });
           },

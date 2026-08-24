@@ -36,6 +36,7 @@ export function RestaurantForm({
     updateFormData,
     setPhoneNumbers,
     handleSubmit,
+    getError,
   } = useRestaurantForm(initialData);
 
   const handleSave = async () => {
@@ -186,6 +187,13 @@ export function RestaurantForm({
                 printInvoice: formData.settings.printInvoice,
               }}
               topChains={formData.topChains}
+              commissionPercent={formData.commissionPercent ?? ""}
+              commissionError={getError("commissionPercent")}
+              onCommissionPercentChange={(value) =>
+                updateFormData({
+                  commissionPercent: value === "" ? undefined : value,
+                })
+              }
               onChange={(settings) =>
                 updateFormData({
                   settings,

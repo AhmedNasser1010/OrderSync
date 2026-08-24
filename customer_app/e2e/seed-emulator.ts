@@ -46,6 +46,7 @@ export async function seedEmulator() {
   await db.collection("businesses").doc(E2E_RESTAURANT_ID).set({
     accessToken: E2E_RESTAURANT_ID,
     partnerUid: "e2e-partner",
+    commissionPercent: 10,
     branding: {
       closeMsg: "",
       promotionalSubtitle: "",
@@ -128,7 +129,6 @@ export async function seedEmulator() {
   await db.collection("services").doc("platform").set({
     deliveryFeesPerKm: 3.5,
     minDeliveryFees: 5,
-    commissionPercent: 10,
     updatedAt: now,
     updatedBy: "e2e-seed",
   });

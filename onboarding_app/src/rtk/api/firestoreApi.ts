@@ -155,10 +155,7 @@ export const firestoreApi = createApi({
       invalidatesTags: ["Banners"],
     }),
     fetchServices: builder.query<
-      Pick<
-        ServicesDocument,
-        "deliveryFeesPerKm" | "minDeliveryFees" | "commissionPercent"
-      >,
+      Pick<ServicesDocument, "deliveryFeesPerKm" | "minDeliveryFees">,
       void
     >({
       async queryFn() {
@@ -173,7 +170,6 @@ export const firestoreApi = createApi({
             data: {
               deliveryFeesPerKm: data.deliveryFeesPerKm ?? 3.5,
               minDeliveryFees: data.minDeliveryFees ?? 5,
-              commissionPercent: data.commissionPercent ?? 10,
             },
           };
         } catch (error: unknown) {
@@ -190,7 +186,6 @@ export const firestoreApi = createApi({
         updates: {
           deliveryFeesPerKm?: number;
           minDeliveryFees?: number;
-          commissionPercent?: number;
           updatedBy?: string;
         };
       }

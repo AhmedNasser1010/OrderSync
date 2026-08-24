@@ -219,6 +219,7 @@
   "Your driver": "Your driver",
   "Call your driver": "Call your driver",
   "accountSuspendedMessage": "Your account has been suspended. Please contact support for assistance.",
+  "restaurantCannotReceiveOrders": "This restaurant can't receive orders at the moment.",
   "resetCartConfirmation": "Your cart contains items from other restaurant. Would you like to reset your cart for adding items from this restaurant?",
   "Your cart is empty": "Your cart is empty",
   "Your cart is empty continue shopping and come back again": "Your cart is empty continue shopping and come back again",

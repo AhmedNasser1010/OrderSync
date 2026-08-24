@@ -21,6 +21,7 @@ import {
   applyOrderDiscounts,
   calculateDiscountAmount,
   calculateOrderFinance,
+  DEFAULT_COMMISSION_PERCENT,
 } from "@ordersync/order-utils";
 import getDeliveryFees from "@/utils/getDeliveryFees";
 import getDistanceFromLatlngInKm from "@/utils/getDistanceFromLatlngInKm";
@@ -37,6 +38,12 @@ import type {
 } from "@ordersync/types";
 
 type FilteredCartItem = CartItem & { discount?: { code?: string } };
+
+const isValidCommissionPercent = (value: unknown): value is number =>
+  typeof value === "number" &&
+  Number.isFinite(value) &&
+  value >= 0 &&
+  value <= 100;
 
 type Totals = {
   total: number;
@@ -150,6 +157,12 @@ const usePlace = () => {
       return false;
     }
     return true;
+  };
+
+  const checkIfRestaurantHasCommission = () => {
+    if (isValidCommissionPercent(currentRes?.commissionPercent)) return true;
+    showError("restaurantCannotReceiveOrders", "order");
+    return false;
   };
 
   const getCartFromMenu = () => {
@@ -291,7 +304,8 @@ const usePlace = () => {
         discount,
         deliveryFees,
         total: cartTotalPrice.discount,
-        commissionPercent: services.commissionPercent,
+        commissionPercent:
+          currentRes?.commissionPercent ?? DEFAULT_COMMISSION_PERCENT,
       }),
       notes: { order: comment || undefined },
       metadata: {
@@ -364,6 +378,17 @@ const usePlace = () => {
     }
 
     if (
+      error?.code === "RESTAURANT_COMMISSION_NOT_SET" ||
+      error?.data?.code === "RESTAURANT_COMMISSION_NOT_SET"
+    ) {
+      toast.error(t("restaurantCannotReceiveOrders"), {
+        position: "top-center",
+        duration: 4000,
+      });
+      return;
+    }
+
+    if (
       error?.code === "PRICE_MISMATCH" ||
       error?.data?.code === "PRICE_MISMATCH"
     ) {
@@ -396,6 +421,7 @@ const usePlace = () => {
         checkIfUserIsLoggedIn() &&
         checkIfUserIsActive() &&
         checkIfRestaurantIsOpen() &&
+        checkIfRestaurantHasCommission() &&
         checkUserInformation() &&
         checkIfUserHasLocation() &&
         checkIfUserHasCart() &&

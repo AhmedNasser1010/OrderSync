@@ -6,7 +6,6 @@ import { getFirestore } from "firebase-admin/firestore";
 import {
   TERMINAL_STATUSES,
   calculateOrderFinance,
-  DEFAULT_COMMISSION_PERCENT,
 } from "@ordersync/order-utils";
 import type {
   MainMenuType,
@@ -46,6 +45,12 @@ interface ActiveOrderShape {
 
 const isNonTerminal = (status: string | undefined): boolean =>
   !!status && !TERMINAL_STATUSES.includes(status as OrderStatusType);
+
+const isValidCommissionPercent = (value: unknown): value is number =>
+  typeof value === "number" &&
+  Number.isFinite(value) &&
+  value >= 0 &&
+  value <= 100;
 
 const cleanUndefined = (value: unknown): unknown => {
   if (Array.isArray(value)) return value.map(cleanUndefined);
@@ -212,6 +217,11 @@ export async function placeOrderServer(args: {
           return { error: { code: "RESTAURANT_NOT_ACCEPTING_ORDERS" } };
         }
 
+        if (!isValidCommissionPercent(restaurantData.commissionPercent)) {
+          return { error: { code: "RESTAURANT_COMMISSION_NOT_SET" } };
+        }
+        const commissionPercent = restaurantData.commissionPercent;
+
         const deliveryLatLng = orderData.delivery?.latlng;
         if (
           !Array.isArray(deliveryLatLng) ||
@@ -294,9 +304,6 @@ export async function placeOrderServer(args: {
                 DEFAULT_DELIVERY_FEES.min,
             }
           : DEFAULT_DELIVERY_FEES;
-
-        const commissionPercent =
-          servicesSnap.data()?.commissionPercent ?? DEFAULT_COMMISSION_PERCENT;
 
         let serverPricing;
         let serverLines;
