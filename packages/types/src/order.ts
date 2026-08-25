@@ -22,6 +22,10 @@ export type OrderType = {
   businessId: string;
   customerUid: string;
 
+  /** Denormalized from business settings (hideFromMarketplace || allowMarkComplete).
+   *  Lets driver_app filter these orders at the Firestore query level. */
+  marketplaceHidden?: boolean;
+
   status: {
     current: OrderStatusType;
     cancellationReason?: string;

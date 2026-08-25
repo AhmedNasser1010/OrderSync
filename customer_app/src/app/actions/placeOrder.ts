@@ -360,6 +360,9 @@ export async function placeOrderServer(args: {
           commissionPercent,
         });
 
+        const businessSettings = restaurantData.settings ?? {};
+        const marketplaceHidden = businessSettings.hideFromMarketplace === true;
+
         const newOrder = {
           ...orderData,
           cart: serverLines,
@@ -368,6 +371,7 @@ export async function placeOrderServer(args: {
           id: orderRef.id,
           orderNumber,
           businessId: orderData.business.id,
+          marketplaceHidden,
           status: {
             current: "RECEIVED" as OrderStatusType,
             history: [

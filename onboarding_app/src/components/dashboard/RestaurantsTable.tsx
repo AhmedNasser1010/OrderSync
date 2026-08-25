@@ -19,13 +19,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal, Edit, Trash2, Loader2, Eye, EyeOff, UtensilsCrossed } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Loader2, Eye, EyeOff, UtensilsCrossed, Globe, GlobeOff } from "lucide-react";
 import Link from "next/link";
 import type { BusinessDocument, RestaurantStatusTypes } from "@ordersync/types";
-import { useSetRestaurantStatusMutation } from "@/rtk/api/firestoreApi";
+import { useSetRestaurantStatusMutation, useSetMarketplaceVisibilityMutation } from "@/rtk/api/firestoreApi";
 import { cn } from "@/lib/utils";
 import { DeleteDialog } from "./DeleteDialog";
 import { HideDialog } from "./HideDialog";
+import { MarketplaceVisibilityDialog } from "./MarketplaceVisibilityDialog";
 import { useClickGuard } from "@/hooks/useClickGuard";
 import { format } from "date-fns";
 
@@ -72,8 +73,20 @@ export function RestaurantsTable({
     name: "",
     nextStatus: "hidden",
   });
+  const [marketplaceVisibilityDialog, setMarketplaceVisibilityDialog] = useState<{
+    open: boolean;
+    accessToken: string | null;
+    name: string;
+    hiding: boolean;
+  }>({
+    open: false,
+    accessToken: null,
+    name: "",
+    hiding: true,
+  });
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const [setRestaurantStatus] = useSetRestaurantStatusMutation();
+  const [setMarketplaceVisibility] = useSetMarketplaceVisibilityMutation();
 
   // Guard against rapid status switching (double-click on a menu item or the
   // hide confirm) so the restaurant doesn't bounce between states.
@@ -124,6 +137,36 @@ export function RestaurantsTable({
       name: restaurant.profile.name,
       nextStatus: isHidden ? "active" : "hidden",
     });
+  };
+
+  const handleToggleMarketplaceVisibility = (restaurant: BusinessDocument) => {
+    const isHiddenFromMarketplace = restaurant.settings?.hideFromMarketplace ?? false;
+    setMarketplaceVisibilityDialog({
+      open: true,
+      accessToken: restaurant.accessToken,
+      name: restaurant.profile.name,
+      hiding: !isHiddenFromMarketplace,
+    });
+  };
+
+  const handleMarketplaceVisibilityConfirm = async () => {
+    if (marketplaceVisibilityDialog.accessToken) {
+      setUpdatingStatus(marketplaceVisibilityDialog.accessToken);
+      try {
+        await setMarketplaceVisibility({
+          resId: marketplaceVisibilityDialog.accessToken,
+          hideFromMarketplace: marketplaceVisibilityDialog.hiding,
+        }).unwrap();
+      } finally {
+        setUpdatingStatus(null);
+        setMarketplaceVisibilityDialog({
+          open: false,
+          accessToken: null,
+          name: "",
+          hiding: true,
+        });
+      }
+    }
   };
 
   const handleHideConfirm = async () => {
@@ -364,6 +407,22 @@ export function RestaurantsTable({
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => handleToggleMarketplaceVisibility(restaurant)}
+                      >
+                        {(restaurant.settings?.hideFromMarketplace ?? false) ? (
+                          <Globe className="mr-2 h-4 w-4" />
+                        ) : (
+                          <GlobeOff className="mr-2 h-4 w-4" />
+                        )}
+                        <span>
+                          {(restaurant.settings?.hideFromMarketplace ?? false)
+                            ? "Show in Marketplace"
+                            : "Hide from Marketplace"}
+                        </span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
                         className="text-destructive cursor-pointer"
                         onClick={() =>
                           setDeleteDialog({
@@ -407,6 +466,22 @@ export function RestaurantsTable({
         onConfirm={handleHideConfirm}
         restaurantName={hideDialog.name}
         hiding={hideDialog.nextStatus === "hidden"}
+      />
+
+      {/* Marketplace Visibility Dialog */}
+      <MarketplaceVisibilityDialog
+        open={marketplaceVisibilityDialog.open}
+        onOpenChange={(open) =>
+          setMarketplaceVisibilityDialog({
+            open,
+            accessToken: marketplaceVisibilityDialog.accessToken,
+            name: marketplaceVisibilityDialog.name,
+            hiding: marketplaceVisibilityDialog.hiding,
+          })
+        }
+        onConfirm={handleMarketplaceVisibilityConfirm}
+        restaurantName={marketplaceVisibilityDialog.name}
+        hiding={marketplaceVisibilityDialog.hiding}
       />
     </>
   );

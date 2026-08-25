@@ -46,6 +46,8 @@ export type BusinessDocument = {
   settings: {
     printInvoice: boolean;
     skipAccepted?: boolean;
+    allowMarkComplete?: boolean;
+    hideFromMarketplace?: boolean;
   };
   status: RestaurantStatusTypes;
   hasOffers?: boolean;

@@ -75,6 +75,7 @@ export default function OrderFooter({ id, activeTabValue, status, returnedByDriv
     skip: !userData?.accessToken,
   });
   const printInvoice = restaurant?.settings?.printInvoice ?? false;
+  const allowMarkComplete = restaurant?.settings?.allowMarkComplete ?? false;
   const { handleChangeStatus, isUpdating, getPossibleNextStatuses, getPossiblePreviousStatuses } = useOrderHandler();
 
   const possibleStatuses = getPossibleNextStatuses(id);
@@ -125,6 +126,23 @@ export default function OrderFooter({ id, activeTabValue, status, returnedByDriv
                 <span className="text-sm font-medium">{ft("ready")}</span>
                 <span className="text-xs text-muted-foreground">{ft("waitingForDriver")}</span>
               </>
+            )}
+            {allowMarkComplete && (
+              <ButtonGuard
+                size="default"
+                variant="success"
+                className="h-9 ml-2"
+                disabled={isUpdating}
+                busyLabel=""
+                cooldown={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleChangeStatus(id, "DELIVERED");
+                }}
+              >
+                <CheckCircle className="mr-1.5 h-4 w-4" />
+                {ft("delivered")}
+              </ButtonGuard>
             )}
           </div>
         ) : isReceived ? (

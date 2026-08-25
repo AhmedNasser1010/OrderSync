@@ -185,6 +185,7 @@ export function RestaurantForm({
             <SettingsPanel
               settings={{
                 printInvoice: formData.settings.printInvoice,
+                allowMarkComplete: formData.settings.allowMarkComplete,
               }}
               topChains={formData.topChains}
               commissionPercent={formData.commissionPercent ?? ""}

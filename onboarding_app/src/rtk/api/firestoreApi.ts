@@ -702,6 +702,35 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ["Businesses"],
     }),
+    setMarketplaceVisibility: builder.mutation<
+      null,
+      {
+        resId: string;
+        hideFromMarketplace: boolean;
+      }
+    >({
+      async queryFn({ resId, hideFromMarketplace }) {
+        try {
+          if (!resId) {
+            throw new Error("Restaurant ID is required.");
+          }
+
+          const docRef = doc(db, "businesses", resId);
+
+          await updateDoc(docRef, {
+            ["settings.hideFromMarketplace"]: hideFromMarketplace,
+          });
+
+          console.log("Write Operation [setMarketplaceVisibility]");
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error updating marketplace visibility:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Businesses"],
+    }),
     fetchManagers: builder.query<ManagerUser[], string>({
       async queryFn(partnerUid: string) {
         try {
@@ -1465,6 +1494,7 @@ export const {
   useSyncMenuDataMutation,
   useDeleteManagerMutation,
   useSetRestaurantStatusMutation,
+  useSetMarketplaceVisibilityMutation,
   useCreateDriverDocumentMutation,
   useUpdateDriverDocumentMutation,
   useDeleteDriverDocumentMutation,

@@ -35,6 +35,14 @@ function filterVisibleBusinesses(
   );
 }
 
+function collectBusinessIds(orders: OrderType[]): string[] {
+  const ids = new Set<string>();
+  for (const order of orders) {
+    if (order.business?.id) ids.add(order.business.id);
+  }
+  return [...ids];
+}
+
 export function useMarketplaceOrders() {
   const { user } = useAuth();
   const driverUid = user?.uid ?? "";
@@ -45,6 +53,8 @@ export function useMarketplaceOrders() {
     { skip: !driverUid },
   );
 
+  // Orders hidden from the marketplace (marketplaceHidden == true) are
+  // excluded by the Firestore query itself, not filtered here.
   const filteredOrders = useMemo(
     () =>
       enabledByManager
@@ -78,6 +88,7 @@ export function usePreparingOrders() {
   const driverUid = user?.uid ?? "";
   const { visibleBusinessIds, enabledByManager } = useDriverVisibility();
 
+  // Hidden orders are excluded by the Firestore query itself.
   const { data: orders, isLoading } = useFetchPreparingOrdersQuery(undefined, {
     skip: !driverUid,
   });
@@ -90,14 +101,10 @@ export function usePreparingOrders() {
     [orders, visibleBusinessIds, enabledByManager],
   );
 
-  const businessIds = useMemo(() => {
-    if (!filteredOrders.length) return [];
-    const ids = new Set<string>();
-    for (const order of filteredOrders) {
-      if (order.business?.id) ids.add(order.business.id);
-    }
-    return [...ids];
-  }, [filteredOrders]);
+  const businessIds = useMemo(
+    () => collectBusinessIds(filteredOrders),
+    [filteredOrders],
+  );
 
   const { data: businessInfo } = useFetchBusinessNamesQuery(businessIds, {
     skip: businessIds.length === 0,

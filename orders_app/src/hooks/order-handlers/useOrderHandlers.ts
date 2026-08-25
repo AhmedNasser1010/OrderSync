@@ -59,6 +59,7 @@ const useOrderHandler = (): OrderHandler => {
     useSetCancelOrderMutation();
 
   const skipAccepted = restaurant?.settings?.skipAccepted ?? false;
+  const allowMarkComplete = restaurant?.settings?.allowMarkComplete ?? false;
 
   const canReverse = (current: OrderStatusType, next: OrderStatusType): boolean =>
     canReverseTransition(current, next) ||
@@ -96,8 +97,10 @@ const useOrderHandler = (): OrderHandler => {
 
     const isValidForward = canTransition(currentStatus, nextStatus);
     const isValidReverse = canReverse(currentStatus, nextStatus);
+    const isAllowMarkComplete =
+      allowMarkComplete && currentStatus === "READY" && nextStatus === "DELIVERED";
 
-    if (!isValidForward && !isValidReverse) {
+    if (!isValidForward && !isValidReverse && !isAllowMarkComplete) {
       console.error(`Invalid transition: ${currentStatus} -> ${nextStatus}`);
       return;
     }
@@ -136,6 +139,9 @@ const useOrderHandler = (): OrderHandler => {
       (next) => {
         if (skipAccepted && order.status.current === "RECEIVED" && next === "ACCEPTED") {
           return false;
+        }
+        if (order.status.current === "READY" && next === "DELIVERED" && allowMarkComplete) {
+          return true;
         }
         if (
           order.status.current === "READY" &&

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 interface SettingsPanelProps {
   settings: {
     printInvoice: boolean;
+    allowMarkComplete?: boolean;
   };
   topChains: boolean;
   commissionPercent: number | "";
@@ -15,6 +16,7 @@ interface SettingsPanelProps {
   onCommissionPercentChange: (value: number | "") => void;
   onChange: (settings: {
     printInvoice: boolean;
+    allowMarkComplete?: boolean;
   }) => void;
   onTopChainsChange: (value: boolean) => void;
 }
@@ -39,6 +41,11 @@ export function SettingsPanel({
       description: "Print invoices for each order",
     },
     {
+      id: "allowMarkComplete",
+      label: "Mark Order As Complete",
+      description: "Complete orders without delivery drivers (starter plan)",
+    },
+    {
       id: "topChains",
       label: "Top Chains",
       description: "Feature this restaurant in top chains",
@@ -49,6 +56,8 @@ export function SettingsPanel({
     switch (id) {
       case "printInvoice":
         return settings.printInvoice;
+      case "allowMarkComplete":
+        return settings.allowMarkComplete ?? false;
       case "topChains":
         return topChains;
       default:

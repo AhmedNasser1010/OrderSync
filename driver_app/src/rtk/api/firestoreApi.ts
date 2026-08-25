@@ -110,6 +110,7 @@ export const firestoreApi = createApi({
           ordersRef,
           where("status.current", "==", "READY"),
           where("status.returnedByDriverUid", "==", null),
+          where("marketplaceHidden", "in", [false, null]),
           orderBy("createdAt", "desc"),
         );
 
@@ -149,6 +150,7 @@ export const firestoreApi = createApi({
         const q = query(
           ordersRef,
           where("status.current", "==", "PREPARING"),
+          where("marketplaceHidden", "in", [false, null]),
           orderBy("createdAt", "desc"),
         );
 

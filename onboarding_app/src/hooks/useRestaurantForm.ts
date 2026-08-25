@@ -263,6 +263,8 @@ function createEmptyBusinessDocument(): BusinessDocument {
     },
     settings: {
       printInvoice: true,
+      allowMarkComplete: false,
+      hideFromMarketplace: false,
     },
     status: "active",
     updatedAt: Date.now(),

@@ -13,7 +13,8 @@
     "clone": "npm run export && npm run import",
     "clone:auth": "tsx clone.ts --auth",
     "backfill:nameInAr": "tsx backfillBusinessNameInAr.ts",
-    "backfill:hasOffers": "tsx backfillBusinessHasOffers.ts"
+    "backfill:hasOffers": "tsx backfillBusinessHasOffers.ts",
+    "backfill:marketplaceHidden": "tsx backfillOrdersMarketplaceHidden.ts"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

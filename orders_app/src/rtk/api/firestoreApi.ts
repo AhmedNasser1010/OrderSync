@@ -167,17 +167,23 @@ export const firestoreApi = createApi({
 
             const businessRef = doc(db, "businesses", order.businessId);
             const businessSnap = await transaction.get(businessRef);
-            const skipAccepted =
-              businessSnap.exists() &&
-              (businessSnap.data() as BusinessDocument).settings?.skipAccepted === true;
+            const businessData = businessSnap.exists()
+              ? (businessSnap.data() as BusinessDocument)
+              : null;
+            const skipAccepted = businessData?.settings?.skipAccepted === true;
+            const allowMarkComplete = businessData?.settings?.allowMarkComplete === true;
 
             const isSkipAcceptedReverse =
               skipAccepted && currentStatus === "PREPARING" && updatedStatus === "RECEIVED";
 
+            const isAllowMarkCompleteTransition =
+              allowMarkComplete && currentStatus === "READY" && updatedStatus === "DELIVERED";
+
             if (
               !canTransition(currentStatus, updatedStatus) &&
               !canReverseTransition(currentStatus, updatedStatus) &&
-              !isSkipAcceptedReverse
+              !isSkipAcceptedReverse &&
+              !isAllowMarkCompleteTransition
             ) {
               throw new Error(
                 `Invalid transition: ${currentStatus} -> ${updatedStatus}`,
