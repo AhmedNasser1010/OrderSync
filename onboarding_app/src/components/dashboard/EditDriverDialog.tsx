@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,39 +27,32 @@ export function EditDriverDialog({
   open,
   onOpenChange,
 }: EditDriverDialogProps) {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [secondPhone, setSecondPhone] = useState("");
-  const [licensePlateLetters, setLicensePlateLetters] = useState("");
-  const [licensePlateNumbers, setLicensePlateNumbers] = useState("");
-  const [dailyAdvance, setDailyAdvance] = useState("");
-  const [onlineByManager, setOnlineByManager] = useState(false);
+  const [name, setName] = useState(driver?.userInfo?.name ?? "");
+  const [phone, setPhone] = useState(driver?.userInfo?.phone ?? "");
+  const [secondPhone, setSecondPhone] = useState(
+    driver?.userInfo?.secondPhone ?? "",
+  );
+  const [licensePlateLetters, setLicensePlateLetters] = useState(
+    driver?.licensePlate?.letters ?? "",
+  );
+  const [licensePlateNumbers, setLicensePlateNumbers] = useState(
+    driver?.licensePlate?.numbers != null
+      ? String(driver.licensePlate.numbers)
+      : "",
+  );
+  const [dailyAdvance, setDailyAdvance] = useState(
+    driver?.finance?.dailyAdvance != null
+      ? String(driver.finance.dailyAdvance)
+      : "",
+  );
+  const [onlineByManager, setOnlineByManager] = useState(
+    driver?.online?.byManager ?? false,
+  );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const [updateDriverDocument] = useUpdateDriverDocumentMutation();
-
-  useEffect(() => {
-    if (open && driver) {
-      setName(driver.userInfo?.name ?? "");
-      setPhone(driver.userInfo?.phone ?? "");
-      setSecondPhone(driver.userInfo?.secondPhone ?? "");
-      setLicensePlateLetters(driver.licensePlate?.letters ?? "");
-      setLicensePlateNumbers(
-        driver.licensePlate?.numbers != null
-          ? String(driver.licensePlate.numbers)
-          : "",
-      );
-      setDailyAdvance(
-        driver.finance?.dailyAdvance != null
-          ? String(driver.finance.dailyAdvance)
-          : "",
-      );
-      setOnlineByManager(driver.online?.byManager ?? false);
-      setSubmitError(null);
-    }
-  }, [open, driver]);
 
   const handleSubmit = async () => {
     if (!driver?.uid) return;
@@ -105,8 +98,14 @@ export function EditDriverDialog({
       }).unwrap();
 
       onOpenChange(false);
-    } catch (error: any) {
-      setSubmitError(error?.data || error?.message || "Failed to update driver");
+    } catch (error: unknown) {
+      const message =
+        error && typeof error === "object" && "data" in error
+          ? String((error as { data: unknown }).data)
+          : error && typeof error === "object" && "message" in error
+            ? String((error as { message: unknown }).message)
+            : "Failed to update driver";
+      setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }

@@ -37,8 +37,14 @@ export function SettleAccountDialog({
     try {
       const res = await settleAccount({ uid: driver.uid }).unwrap();
       setResult(res.settlementAmount);
-    } catch (err: any) {
-      setError(err?.data || err?.message || "Failed to settle account.");
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === "object" && "data" in err
+          ? String((err as { data: unknown }).data)
+          : err && typeof err === "object" && "message" in err
+            ? String((err as { message: unknown }).message)
+            : "Failed to settle account.";
+      setError(message);
     }
   };
 

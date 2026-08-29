@@ -2,7 +2,6 @@
 
 import type { BusinessDocument } from "@ordersync/types";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { OwnerSection } from "./OwnerSection";
 import { RestaurantInfoSection } from "./RestaurantInfoSection";
 import { OpeningHoursSection } from "./OpeningHoursSection";

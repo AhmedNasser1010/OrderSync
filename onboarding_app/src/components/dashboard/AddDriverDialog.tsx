@@ -92,8 +92,14 @@ export function AddDriverDialog() {
 
       setOpen(false);
       resetForm();
-    } catch (error: any) {
-      setSubmitError(error?.data || error?.message || "Failed to create driver");
+    } catch (error: unknown) {
+      const message =
+        error && typeof error === "object" && "data" in error
+          ? String((error as { data: unknown }).data)
+          : error && typeof error === "object" && "message" in error
+            ? String((error as { message: unknown }).message)
+            : "Failed to create driver";
+      setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -208,7 +214,7 @@ export function AddDriverDialog() {
               className="mt-1.5"
             />
             <p className="text-sm text-muted-foreground mt-1.5">
-              The User ID is the driver's Firebase Authentication uid
+              The User ID is the driver&apos;s Firebase Authentication uid
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4">

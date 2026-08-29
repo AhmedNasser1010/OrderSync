@@ -153,7 +153,7 @@ export function OwnerSection({ data, onChange }: OwnerSectionProps) {
             className="mt-1.5"
           />
           <p className="text-sm text-muted-foreground mt-1.5">
-            The User ID is the manager's Firebase Authentication uid
+            The User ID is the manager&apos;s Firebase Authentication uid
           </p>
         </div>
       </div>

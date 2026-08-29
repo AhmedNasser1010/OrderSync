@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export interface BannerPreviewDraft {
@@ -27,10 +28,13 @@ export function BannerPreview({
     >
       <div className="relative h-55 w-full overflow-hidden rounded-3xl bg-secondary sm:h-52">
         {data.imageUrl ? (
-          <img
+          <Image
             src={data.imageUrl}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
+            unoptimized
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-muted-foreground text-sm">

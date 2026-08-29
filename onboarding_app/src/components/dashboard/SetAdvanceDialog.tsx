@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,22 +27,15 @@ export function SetAdvanceDialog({
   open,
   onOpenChange,
 }: SetAdvanceDialogProps) {
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(
+    driver?.finance?.dailyAdvance != null
+      ? String(driver.finance.dailyAdvance)
+      : "",
+  );
   const [error, setError] = useState<string | null>(null);
 
   const [initializeAdvance, { isLoading }] =
     useInitializeDailyAdvanceMutation();
-
-  useEffect(() => {
-    if (open && driver) {
-      setAmount(
-        driver.finance?.dailyAdvance != null
-          ? String(driver.finance.dailyAdvance)
-          : "",
-      );
-      setError(null);
-    }
-  }, [open, driver]);
 
   const handleSubmit = async () => {
     if (!driver?.uid) return;
@@ -57,8 +50,14 @@ export function SetAdvanceDialog({
     try {
       await initializeAdvance({ uid: driver.uid, amount: parsed }).unwrap();
       onOpenChange(false);
-    } catch (err: any) {
-      setError(err?.data || err?.message || "Failed to set advance.");
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === "object" && "data" in err
+          ? String((err as { data: unknown }).data)
+          : err && typeof err === "object" && "message" in err
+            ? String((err as { message: unknown }).message)
+            : "Failed to set advance.";
+      setError(message);
     }
   };
 

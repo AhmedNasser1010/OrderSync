@@ -271,6 +271,7 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
       </Card>
 
       <EditDriverDialog
+        key={editDriver?.uid ?? "none"}
         driver={editDriver}
         open={editUid !== null}
         onOpenChange={(open) => {
@@ -287,6 +288,7 @@ export function DriversTable({ drivers, onDelete }: DriversTableProps) {
       />
 
       <SetAdvanceDialog
+        key={setAdvanceDriver?.uid ?? "none"}
         driver={setAdvanceDriver}
         open={setAdvanceUid !== null}
         onOpenChange={(open) => {
