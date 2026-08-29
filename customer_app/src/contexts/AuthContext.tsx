@@ -58,11 +58,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [signInError, setSignInError] = useState<Error | null>(null);
   const redirectHandledRef = useRef(false);
 
-  const isDevLocalhost =
-    typeof window !== "undefined" &&
-    (window.location.hostname === "localhost" ||
-      window.location.hostname === "127.0.0.1");
-
   const ensureCustomerDocument = useCallback(
     async (data?: { name?: string; phone?: string; provider?: string }) => {
       const current = auth.currentUser;
@@ -132,25 +127,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = useCallback(async (): Promise<void> => {
     const provider = new GoogleAuthProvider();
     try {
-      if (isDevLocalhost) {
-        try {
-          const result = await signInWithPopup(auth, provider);
-          await ensureCustomerDocument({ provider: "Google" });
-          setSignInError(null);
-          setUser(result.user);
-          return;
-        } catch (err: unknown) {
-          const code = getAuthErrorCode(err);
-          if (code === "auth/popup-blocked") {
-            await signInWithRedirect(auth, provider);
-            return;
-          }
-          throw err;
-        }
-      }
-      await signInWithRedirect(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      await ensureCustomerDocument({ provider: "Google" });
+      setSignInError(null);
+      setUser(result.user);
     } catch (err: unknown) {
       const code = getAuthErrorCode(err);
+      if (code === "auth/popup-blocked") {
+        await signInWithRedirect(auth, provider);
+        return;
+      }
       if (
         code === "auth/popup-closed-by-user" ||
         code === "auth/cancelled-popup-request"
@@ -159,7 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       throw err;
     }
-  }, [ensureCustomerDocument, isDevLocalhost]);
+  }, [ensureCustomerDocument]);
 
   const logout = useCallback(async (): Promise<void> => {
     try {
