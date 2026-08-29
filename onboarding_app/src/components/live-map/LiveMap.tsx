@@ -38,19 +38,22 @@ export function LiveMap() {
 
   const businessTokens = userData?.data?.businesses ?? [];
 
-  const { data: businesses = [], refetch: refetchBusinesses } =
+  const { data: businesses = [], refetch: refetchBusinesses, isFetching: businessesFetching } =
     useFetchBusinessesQuery(businessTokens, { skip: !businessTokens.length });
 
-  const { data: drivers = [], refetch: refetchDrivers } =
+  const { data: drivers = [], refetch: refetchDrivers, isFetching: driversFetching } =
     useFetchDriverUsersQuery(partnerUid, { skip: !partnerUid });
 
-  const { data: customers = [], refetch: refetchCustomers } =
+  const { data: customers = [], refetch: refetchCustomers, isFetching: customersFetching } =
     useFetchCustomersQuery(partnerUid, { skip: !partnerUid });
 
-  const { data: orders = [], refetch: refetchOrders } =
+  const { data: orders = [], refetch: refetchOrders, isFetching: ordersFetching } =
     useFetchActiveOrdersQuery(businessTokens, { skip: !businessTokens.length });
 
   const driverLocations = useLiveDriverLocations(partnerUid);
+
+  const isRefreshing =
+    businessesFetching || driversFetching || customersFetching || ordersFetching;
 
   const counts = useMemo(
     () => ({
@@ -161,6 +164,7 @@ export function LiveMap() {
         onlineDrivers={onlineDrivers}
         activeOrders={orders.length}
         onRefresh={handleRefresh}
+        refreshing={isRefreshing}
       />
 
       <MapLegend />

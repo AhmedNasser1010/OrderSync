@@ -66,6 +66,7 @@ interface FilterPanelProps {
   onlineDrivers?: number;
   activeOrders?: number;
   onRefresh: () => void;
+  refreshing?: boolean;
 }
 
 export function FilterPanel({
@@ -76,6 +77,7 @@ export function FilterPanel({
   onlineDrivers,
   activeOrders,
   onRefresh,
+  refreshing = false,
 }: FilterPanelProps) {
   const currentPreset = PRESETS.find(
     (p) =>
@@ -94,9 +96,10 @@ export function FilterPanel({
           size="icon"
           className="h-7 w-7"
           onClick={onRefresh}
+          disabled={refreshing}
           title="Refresh data"
         >
-          <RefreshCw className="h-3.5 w-3.5" />
+          <RefreshCw className={cn("h-3.5 w-3.5", refreshing && "animate-spin")} />
         </Button>
       </div>
 
