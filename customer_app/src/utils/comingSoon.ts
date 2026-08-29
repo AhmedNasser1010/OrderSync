@@ -1,0 +1,1 @@
+export const IS_COMING_SOON = process.env.NEXT_PUBLIC_COMING_SOON === "true";
