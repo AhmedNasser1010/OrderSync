@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "source": "@waybarrios/opencode-power-pack",
+  "enforcementLevel": "advisory",
+  "warning": "This capability policy is advisory until an enforcement backend and host adapter are active.",
+  "skill": "frontend-design",
+  "profile": {
+    "name": "develop",
+    "description": "Modify the workspace and temporary files without network access or external side effects.",
+    "riskLevel": 1,
+    "capabilities": {
+      "workspace": "write",
+      "temporaryFiles": "write",
+      "network": "deny",
+      "credentials": "deny",
+      "externalSideEffects": "deny"
+    },
+    "enforcementLevel": "advisory"
+  },
+  "allowedEscalations": [
+    {
+      "name": "network-read",
+      "description": "Use explicitly approved network destinations and credentials for retrieval without external mutations.",
+      "riskLevel": 2,
+      "capabilities": {
+        "workspace": "write",
+        "temporaryFiles": "write",
+        "network": "explicit",
+        "credentials": "explicit",
+        "externalSideEffects": "deny"
+      },
+      "enforcementLevel": "advisory"
+    }
+  ]
+}

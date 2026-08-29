@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "source": "@waybarrios/opencode-power-pack",
+  "enforcementLevel": "advisory",
+  "warning": "This capability policy is advisory until an enforcement backend and host adapter are active.",
+  "skill": "ai-slop",
+  "profile": {
+    "name": "observe",
+    "description": "Inspect and analyze the workspace without modifying it or using the network.",
+    "riskLevel": 0,
+    "capabilities": {
+      "workspace": "read",
+      "temporaryFiles": "write",
+      "network": "deny",
+      "credentials": "deny",
+      "externalSideEffects": "deny"
+    },
+    "enforcementLevel": "advisory"
+  },
+  "allowedEscalations": []
+}

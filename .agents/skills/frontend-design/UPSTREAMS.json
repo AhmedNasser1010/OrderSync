@@ -1,0 +1,722 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "name": "opencode-plugin-pattern",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/obra/superpowers",
+        "commit": "6efe32c9e2dd002d0c394e861e0529675d1ab32e",
+        "committedAt": "2026-04-24T02:02:37Z",
+        "path": ".opencode/plugins/superpowers.js",
+        "blob": "48a2b72ddc5ac05718d23647a11b6b169a9a6363"
+      }
+    }
+  ],
+  "skills": [
+    {
+      "name": "agentic-actions-auditor",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/agentic-actions-auditor/SKILL.md",
+        "blob": "50f44c1eb1768470895a2600097245ca5bc4b5ae"
+      }
+    },
+    {
+      "name": "agents-md-improver",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "commit": "bdca23e8e46f8832d0030c05804ae207786ae37f",
+        "committedAt": "2026-04-24T19:52:02Z",
+        "path": "plugins/claude-md-management/skills/claude-md-improver/SKILL.md",
+        "blob": "744444e4df385e9b9160e23fba02321062dfba9a"
+      }
+    },
+    {
+      "name": "agents-md-revise",
+      "license": "Apache-2.0",
+      "adaptation": "translated",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "commit": "bdca23e8e46f8832d0030c05804ae207786ae37f",
+        "committedAt": "2026-04-24T19:52:02Z",
+        "path": "plugins/claude-md-management/commands/revise-claude-md.md",
+        "blob": "b7f201db19ec485271945e350914e6ac5a8957bd"
+      }
+    },
+    {
+      "name": "ai-slop",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/LePro10/omp-designer",
+        "commit": "fc8abdc0d2046b64c2d442a361948b5c53f2e16f",
+        "committedAt": "2026-07-02T18:33:40+02:00",
+        "path": "skills/ai-slop.md",
+        "blob": "bf81402b348bdd158ae3aa9f1c29d07939db2fd3"
+      }
+    },
+    {
+      "name": "code-architect",
+      "license": "Apache-2.0",
+      "adaptation": "ported",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "commit": "bdca23e8e46f8832d0030c05804ae207786ae37f",
+        "committedAt": "2026-04-24T19:52:02Z",
+        "path": "plugins/feature-dev/agents/code-architect.md",
+        "blob": "fcb78bfd11004048fa287ac52c55eb5c17855549"
+      }
+    },
+    {
+      "name": "code-explorer",
+      "license": "Apache-2.0",
+      "adaptation": "ported",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "commit": "bdca23e8e46f8832d0030c05804ae207786ae37f",
+        "committedAt": "2026-04-24T19:52:02Z",
+        "path": "plugins/feature-dev/agents/code-explorer.md",
+        "blob": "e0f667ef65f7204399110214defd46ce062a1a51"
+      }
+    },
+    {
+      "name": "code-quality",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/Firstp1ck/pi-coding-agent-forge",
+        "commit": "bd36f19036e9948c8d63e1a85a32e7ace9db06e9",
+        "committedAt": "2026-06-18T12:19:40+02:00",
+        "path": "pi-skill-code-quality/skills/code-quality/SKILL.md",
+        "blob": "a65c247e1a2e452f0ef3a2b9bd63aa7d9ca6c3e3"
+      }
+    },
+    {
+      "name": "code-review",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "commit": "bdca23e8e46f8832d0030c05804ae207786ae37f",
+        "committedAt": "2026-04-24T19:52:02Z",
+        "path": "plugins/code-review/commands/code-review.md",
+        "blob": "c46e327f19b6bb59dbf9060e8c9961e701908350"
+      }
+    },
+    {
+      "name": "code-reviewer",
+      "license": "Apache-2.0",
+      "adaptation": "ported",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "commit": "bdca23e8e46f8832d0030c05804ae207786ae37f",
+        "committedAt": "2026-04-24T19:52:02Z",
+        "path": "plugins/feature-dev/agents/code-reviewer.md",
+        "blob": "7fb589cbd7140152fae41720e391290ba202e57e"
+      }
+    },
+    {
+      "name": "codeql",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/codeql/SKILL.md",
+        "blob": "a59322096c1d82a687ac253a5eed8443473d8b4c"
+      }
+    },
+    {
+      "name": "design-patterns",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/Firstp1ck/pi-coding-agent-forge",
+        "commit": "bd36f19036e9948c8d63e1a85a32e7ace9db06e9",
+        "committedAt": "2026-06-18T12:19:40+02:00",
+        "path": "pi-skill-design-patterns/skills/design-patterns/SKILL.md",
+        "blob": "287ce08720be901678934552a711627d40dbf78b"
+      }
+    },
+    {
+      "name": "differential-review",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/differential-review/SKILL.md",
+        "blob": "b14a515767b0073631db74bdc41583205ec423dc"
+      }
+    },
+    {
+      "name": "feature-dev",
+      "license": "Apache-2.0",
+      "adaptation": "ported",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "commit": "bdca23e8e46f8832d0030c05804ae207786ae37f",
+        "committedAt": "2026-04-24T19:52:02Z",
+        "path": "plugins/feature-dev/commands/feature-dev.md",
+        "blob": "8bdeda3430e43afddbee79830db0f6ea9dfbf36a"
+      }
+    },
+    {
+      "name": "fp-check",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/fp-check/SKILL.md",
+        "blob": "992d901780562a5f73ec3270953f4c79ef0bb498"
+      }
+    },
+    {
+      "name": "frontend-design",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/anthropics/claude-plugins-official",
+        "commit": "bdca23e8e46f8832d0030c05804ae207786ae37f",
+        "committedAt": "2026-04-24T19:52:02Z",
+        "path": "plugins/frontend-design/skills/frontend-design/SKILL.md",
+        "blob": "600b6db41fac7e2081c7528ec6982960892c819d"
+      }
+    },
+    {
+      "name": "hf-cli",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "7039bdcf4510c30ec932637e8b2c1646aee7f185",
+        "committedAt": "2026-07-09T17:06:41+02:00",
+        "path": "skills/hf-cli/SKILL.md",
+        "blob": "4fd111f9df28b11d71c6a4f012a2b898f91c195a"
+      }
+    },
+    {
+      "name": "hf-cloud-aws-context-discovery",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "89d91fd4d0e6d4330471ba35f1c388489e94b496",
+        "committedAt": "2026-07-07T16:32:21+02:00",
+        "path": "skills/hf-cloud-aws-context-discovery/SKILL.md",
+        "blob": "fbf62203595b187ea833904f67ca0ae2fdaf39a6"
+      }
+    },
+    {
+      "name": "hf-cloud-python-env-setup",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "89d91fd4d0e6d4330471ba35f1c388489e94b496",
+        "committedAt": "2026-07-07T16:32:21+02:00",
+        "path": "skills/hf-cloud-python-env-setup/SKILL.md",
+        "blob": "462a6b99e7767576e1ba6c39c1456873d020de92"
+      }
+    },
+    {
+      "name": "hf-cloud-sagemaker-deployment-planner",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "89d91fd4d0e6d4330471ba35f1c388489e94b496",
+        "committedAt": "2026-07-07T16:32:21+02:00",
+        "path": "skills/hf-cloud-sagemaker-deployment-planner/SKILL.md",
+        "blob": "567bcd7be7529892217d7e9b07518b61ec78df65"
+      }
+    },
+    {
+      "name": "hf-cloud-sagemaker-iam-preflight",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "89d91fd4d0e6d4330471ba35f1c388489e94b496",
+        "committedAt": "2026-07-07T16:32:21+02:00",
+        "path": "skills/hf-cloud-sagemaker-iam-preflight/SKILL.md",
+        "blob": "8f15164327ff28e8086ae275a54b068ff32025e8"
+      }
+    },
+    {
+      "name": "hf-cloud-sagemaker-production-defaults",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "89d91fd4d0e6d4330471ba35f1c388489e94b496",
+        "committedAt": "2026-07-07T16:32:21+02:00",
+        "path": "skills/hf-cloud-sagemaker-production-defaults/SKILL.md",
+        "blob": "8e4f7f30f816f40b3eb364485de0b3c886f108f6"
+      }
+    },
+    {
+      "name": "hf-cloud-serving-image-selection",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "89d91fd4d0e6d4330471ba35f1c388489e94b496",
+        "committedAt": "2026-07-07T16:32:21+02:00",
+        "path": "skills/hf-cloud-serving-image-selection/SKILL.md",
+        "blob": "05f70d82c00da9160a086f477f31ff77e9bddea5"
+      }
+    },
+    {
+      "name": "hf-mem",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "c68f1b08d9eb3af22cdc1d3fb60e9cdb78522556",
+        "committedAt": "2026-06-12T11:25:39+02:00",
+        "path": "skills/hf-mem/SKILL.md",
+        "blob": "fadc48b0e2a510e21345e3860c69ac799255d9c0"
+      }
+    },
+    {
+      "name": "huggingface-best",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "be02c15f4b81c901b6d71a8896e56f93837d8050",
+        "committedAt": "2026-04-22T15:19:36+02:00",
+        "path": "skills/huggingface-best/SKILL.md",
+        "blob": "6073590ebf8b136bb405a567fed9d47840164713"
+      }
+    },
+    {
+      "name": "huggingface-community-evals",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "386571e3e65ef0c129af2747ff36d1fa6fc5b8a4",
+        "committedAt": "2026-03-23T15:24:34+00:00",
+        "path": "skills/huggingface-community-evals/SKILL.md",
+        "blob": "a68b2e79958930b3913cb8e7667e07000031e40b"
+      }
+    },
+    {
+      "name": "huggingface-datasets",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "b3df145a3a5a3e64ac075d781c625896d9d2bfcd",
+        "committedAt": "2026-04-30T09:17:59-04:00",
+        "path": "skills/huggingface-datasets/SKILL.md",
+        "blob": "abafddcbe62bd6e549c095ee9ce23b921081fe22"
+      }
+    },
+    {
+      "name": "huggingface-gradio",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "ff28908172004ae4def67d7fe8b31b77482aa594",
+        "committedAt": "2026-03-24T19:17:07+00:00",
+        "path": "skills/huggingface-gradio/SKILL.md",
+        "blob": "81dfb05834ab34a13cb0171a2fb03e4557b1e148"
+      }
+    },
+    {
+      "name": "huggingface-llm-trainer",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "d0d3f4301358fc1351d408a58596d5644b5a8114",
+        "committedAt": "2026-04-09T11:58:58+01:00",
+        "path": "skills/huggingface-llm-trainer/SKILL.md",
+        "blob": "74ad29af05eee633fb4c04376118f751c24cdd5e"
+      }
+    },
+    {
+      "name": "huggingface-local-models",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "f4ddab46b9847c7005d7979fdfec36da1aec4e26",
+        "committedAt": "2026-04-22T08:42:11+02:00",
+        "path": "skills/huggingface-local-models/SKILL.md",
+        "blob": "ece849559de75eaa8e9709a51e0e957e6ae630d3"
+      }
+    },
+    {
+      "name": "huggingface-lora-space-builder",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "86cdeee824b73e504198b6005bb113552cdfa7ba",
+        "committedAt": "2026-07-16T09:07:15+01:00",
+        "path": "skills/huggingface-lora-space-builder/SKILL.md",
+        "blob": "c1d0cbbfa60999ced1f97e136af5010ab86c814c"
+      }
+    },
+    {
+      "name": "huggingface-paper-publisher",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "386571e3e65ef0c129af2747ff36d1fa6fc5b8a4",
+        "committedAt": "2026-03-23T15:24:34+00:00",
+        "path": "skills/huggingface-paper-publisher/SKILL.md",
+        "blob": "01b7db0cb9e30912eda8aa2b73a744c17ab1e176"
+      }
+    },
+    {
+      "name": "huggingface-papers",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "386571e3e65ef0c129af2747ff36d1fa6fc5b8a4",
+        "committedAt": "2026-03-23T15:24:34+00:00",
+        "path": "skills/huggingface-papers/SKILL.md",
+        "blob": "e65fc90acabc30208883238ec89a27c4cdc1b57e"
+      }
+    },
+    {
+      "name": "huggingface-spaces",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "87f9ee5b670a630b022809a8742606c6da21812c",
+        "committedAt": "2026-07-25T06:31:31+02:00",
+        "path": "skills/huggingface-spaces/SKILL.md",
+        "blob": "9c054c071bc4d2bc2ba1d67b96b0d93825a559ce"
+      }
+    },
+    {
+      "name": "huggingface-tool-builder",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "95640aa22f447f49ff1321dfa221873644415171",
+        "committedAt": "2026-04-01T15:07:10-04:00",
+        "path": "skills/huggingface-tool-builder/SKILL.md",
+        "blob": "0634af706451240f82faf0871a15b0faac5f39a2"
+      }
+    },
+    {
+      "name": "huggingface-trackio",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "88e864e27586c1b43eb43610fd3d14252522400f",
+        "committedAt": "2026-07-06T19:39:01+02:00",
+        "path": "skills/huggingface-trackio/SKILL.md",
+        "blob": "df231aa06d661bf031aaad00dfa286ca83df4940"
+      }
+    },
+    {
+      "name": "huggingface-vision-trainer",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "386571e3e65ef0c129af2747ff36d1fa6fc5b8a4",
+        "committedAt": "2026-03-23T15:24:34+00:00",
+        "path": "skills/huggingface-vision-trainer/SKILL.md",
+        "blob": "5a2c554b04218a9c411c184fd749ffb6eb0daabe"
+      }
+    },
+    {
+      "name": "huggingface-zerogpu",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "5e3b4d2226d1beaa6a8a4df3739b6f68bd36521b",
+        "committedAt": "2026-05-20T16:18:47+01:00",
+        "path": "skills/huggingface-zerogpu/SKILL.md",
+        "blob": "7171d2b71c94eab597cbd8a4b38ba5ca489276af"
+      }
+    },
+    {
+      "name": "insecure-defaults",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/insecure-defaults/SKILL.md",
+        "blob": "d1b29cd32f38fb5e62823628c8a8d4afeb0215a6"
+      }
+    },
+    {
+      "name": "mcp-builder",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/anthropics/skills",
+        "commit": "5128e1865d670f5d6c9cef000e6dfc4e951fb5b9",
+        "committedAt": "2026-04-23T17:07:18Z",
+        "path": "skills/mcp-builder/SKILL.md",
+        "blob": "8a1a77a47d141967b246adb4da4f91037578ff7d"
+      }
+    },
+    {
+      "name": "paper-summarizer",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/Firstp1ck/pi-coding-agent-forge",
+        "commit": "bd36f19036e9948c8d63e1a85a32e7ace9db06e9",
+        "committedAt": "2026-06-18T12:19:40+02:00",
+        "path": "pi-skill-paper-summarizer/skills/paper-summarizer/SKILL.md",
+        "blob": "c2ab246c8061db51d34861020edb452b7ac2f791"
+      }
+    },
+    {
+      "name": "sarif-parsing",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/sarif-parsing/SKILL.md",
+        "blob": "47e8464215d08c02208ca05d462bab57b6d29047"
+      }
+    },
+    {
+      "name": "security-review",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/anthropics/claude-code-security-review",
+        "commit": "0c6a49f1fa56a1d472575da86a94dbc1edb78eda",
+        "committedAt": "2026-02-11T18:01:23Z",
+        "path": ".claude/commands/security-review.md",
+        "blob": "93651ea8b92194a1f739eaf5115ea493746df300"
+      }
+    },
+    {
+      "name": "security-threat-model",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/security-threat-model/SKILL.md",
+        "blob": "abd3c1c95d49c4e0e0664f198f4bf168c6291aec"
+      }
+    },
+    {
+      "name": "semgrep",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/semgrep/SKILL.md",
+        "blob": "b00c781a64e2a5b9dc955894902cdfc2a22b355c"
+      }
+    },
+    {
+      "name": "semgrep-rule-creator",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/semgrep-rule-creator/SKILL.md",
+        "blob": "5c336b557400dbc5eb1eaf08ea14018e21afb3c1"
+      }
+    },
+    {
+      "name": "semgrep-rule-variant-creator",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/semgrep-rule-variant-creator/SKILL.md",
+        "blob": "0be73121ddc713b7a48d3e07f5d695da0417c188"
+      }
+    },
+    {
+      "name": "sharp-edges",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/sharp-edges/SKILL.md",
+        "blob": "b5f86df960e094c851998752b7b7310555395d6d"
+      }
+    },
+    {
+      "name": "skill-creator",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-07-27",
+      "source": {
+        "repository": "https://github.com/anthropics/skills",
+        "commit": "5128e1865d670f5d6c9cef000e6dfc4e951fb5b9",
+        "committedAt": "2026-04-23T17:07:18Z",
+        "path": "skills/skill-creator/SKILL.md",
+        "blob": "65b3a402dbd09b8e83f9d637c6b553875189085c"
+      }
+    },
+    {
+      "name": "supply-chain-risk-auditor",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/supply-chain-risk-auditor/SKILL.md",
+        "blob": "1389de7b1c43aa6a9273478ea37dfc585e5ea6ca"
+      }
+    },
+    {
+      "name": "train-sentence-transformers",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "3ac5910959e2b9fae3aea94badcc3b280781c9c2",
+        "committedAt": "2026-05-07T14:50:17+02:00",
+        "path": "skills/train-sentence-transformers/SKILL.md",
+        "blob": "6af33bdea3fd59e540cc852b65d515f282cd4a21"
+      }
+    },
+    {
+      "name": "transformers-js",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "4db6015affd7779ca959b7c7c53cdcd3c8f4737b",
+        "committedAt": "2026-04-10T17:57:42+02:00",
+        "path": "skills/transformers-js/SKILL.md",
+        "blob": "bc62aa1a63bc31ea9aea9456fed65b334e5010bd"
+      }
+    },
+    {
+      "name": "trl-training",
+      "license": "Apache-2.0",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/huggingface/skills",
+        "commit": "df04e76a36a84c20fb08267b0378465d64835f82",
+        "committedAt": "2026-06-08T08:34:04+02:00",
+        "path": "skills/trl-training/SKILL.md",
+        "blob": "1941385812d82abbbe1f466aa1204e0f8d775ea9"
+      }
+    },
+    {
+      "name": "variant-analysis",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/variant-analysis/SKILL.md",
+        "blob": "cf70af1df5f9263f9f11504b19aac7293f599505"
+      }
+    },
+    {
+      "name": "vuln-report",
+      "license": "MIT",
+      "adaptation": "adapted",
+      "reviewedAt": "2026-08-02",
+      "source": {
+        "repository": "https://github.com/vigolium/piolium",
+        "commit": "890888a20d52a9378d20bbbc7b8850483d97362a",
+        "committedAt": "2026-05-23T20:30:16+08:00",
+        "path": "skills/vuln-report/SKILL.md",
+        "blob": "bce9e57c7d3fccf8183a96d641a35f47ace4cdeb"
+      }
+    }
+  ]
+}
