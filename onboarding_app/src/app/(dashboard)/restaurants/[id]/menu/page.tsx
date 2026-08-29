@@ -441,7 +441,7 @@ export default function MenuManagementPage() {
             <p className="text-muted-foreground mb-4">No categories yet</p>
             <Button
               onClick={() => setShowCategoryForm(true)}
-              className="bg-accent hover:bg-accent/90"
+              className=""
             >
               Create First Category
             </Button>

@@ -36,6 +36,12 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'www.allrecipes.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'pub-fd5c9e71bf0d4aa6bf3ebbfefbed5c55.r2.dev',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

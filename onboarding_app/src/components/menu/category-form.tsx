@@ -78,7 +78,7 @@ export function CategoryForm({
             <div className="flex gap-2">
               <Button
                 type="submit"
-                className="flex-1 bg-accent hover:bg-accent/90"
+                className="flex-1"
               >
                 {isEditing ? "Save Changes" : "Create Category"}
               </Button>

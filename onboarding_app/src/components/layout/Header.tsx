@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { Moon, Sun, LogOut } from "lucide-react";
+import { Images, Moon, Sun, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ImageGallery } from "@/components/gallery/ImageGallery";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { toggleTheme } from "@/rtk/slices/uiSlice";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,6 +22,7 @@ export function Header() {
   const isDarkRedux = useAppSelector((state) => state.ui.isDark);
   const { user, logout } = useAuth();
   const isDark = useHydrationSafeTheme();
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
   // Apply theme on load and whenever it changes
   useEffect(() => {
@@ -35,6 +37,17 @@ export function Header() {
     <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-card px-4 sm:px-6">
       {/* Right Actions */}
       <div className="flex items-center gap-2 ml-auto">
+        {/* Image Gallery */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9"
+          title="Open image gallery"
+          onClick={() => setGalleryOpen(true)}
+        >
+          <Images className="h-4 w-4" />
+        </Button>
+
         {/* Theme Toggle */}
           <Button
             variant="ghost"
@@ -91,6 +104,13 @@ export function Header() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
+      <ImageGallery
+        key={String(galleryOpen)}
+        open={galleryOpen}
+        onOpenChange={setGalleryOpen}
+        onSelect={() => {}}
+      />
     </header>
   );
 }

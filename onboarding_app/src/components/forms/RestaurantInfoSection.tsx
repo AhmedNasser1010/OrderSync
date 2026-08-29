@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ImagePickerField } from "@/components/gallery/ImagePickerField";
 
 interface RestaurantInfoSectionProps {
   data: {
@@ -86,27 +87,25 @@ export function RestaurantInfoSection({
           </Select>
         </div>
         <div>
-          <Label htmlFor="rest-icon" className="text-foreground">
-            Icon URL
-          </Label>
-          <Input
+          <ImagePickerField
             id="rest-icon"
+            label="Restaurant Icon"
             value={data.icon}
-            onChange={(e) => handleChange("icon", e.target.value)}
-            placeholder="https://example.com/icon.png"
-            className="mt-1.5"
+            onChange={(value) => handleChange("icon", value)}
+            placeholder="https://.../icon.png"
+            folder="restaurants"
+            hint="Square logo shown on cards and the restaurant header."
           />
         </div>
         <div>
-          <Label htmlFor="rest-cover" className="text-foreground">
-            Cover Image URL
-          </Label>
-          <Input
+          <ImagePickerField
             id="rest-cover"
+            label="Restaurant Cover Image"
             value={data.cover}
-            onChange={(e) => handleChange("cover", e.target.value)}
-            placeholder="https://example.com/cover.png"
-            className="mt-1.5"
+            onChange={(value) => handleChange("cover", value)}
+            placeholder="https://.../cover.png"
+            folder="restaurants"
+            hint="Wide banner shown behind the restaurant header."
           />
         </div>
       </div>

@@ -157,6 +157,22 @@ service cloud.firestore {
     }
 
     // =====================================================================
+    // /r2Images/{imageId}
+    //
+    // Gallery index of objects stored in the Cloudflare R2 bucket "zajil".
+    // Each doc mirrors an uploaded object (key + public URL). The onboarding
+    // app gallery lists these to let users pick an existing image instead of
+    // pasting a URL. URLs themselves are public via the R2 public bucket;
+    // only partners and business managers can mutate the index.
+    // =====================================================================
+    match /r2Images/{imageId} {
+      allow read: if isSignedIn();
+      allow create: if (isPartner() || isManager()) && isOwner(incomingData().createdBy);
+      allow delete: if isPartner() || isManager();
+      allow update: if false;
+    }
+
+    // =====================================================================
     // /services/{serviceId}
     //
     // Global platform config (e.g. delivery fee rates). Publicly readable

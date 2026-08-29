@@ -13,6 +13,11 @@ export type CustomerType = {
   createdAt: number;
   updatedAt: number;
   isActive: boolean;
+  /** Suspension details when a partner has temporarily banned this customer. */
+  suspension?: {
+    reason: string;
+    at: number;
+  } | null;
   locations: {
     city: string;
     selected: string;

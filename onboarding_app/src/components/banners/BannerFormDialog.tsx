@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { ImagePickerField } from "@/components/gallery/ImagePickerField";
 import {
   useCreateBannerMutation,
   useUpdateBannerMutation,
@@ -111,22 +112,17 @@ function BannerFormContent({
         <div className="space-y-6">
           <div className="space-y-3 rounded-xl border border-border p-4">
             <h3 className="font-semibold text-foreground">Banner Image</h3>
-            <div>
-              <Label htmlFor="banner-image-url">Image URL</Label>
-              <Input
-                id="banner-image-url"
-                value={draft.imageUrl}
-                onChange={(e) =>
-                  setDraft((prev) => ({ ...prev, imageUrl: e.target.value }))
-                }
-                placeholder="https://example.com/banner.png"
-                className="mt-1.5"
-              />
-              <p className="text-sm text-muted-foreground mt-1.5">
-                Paste the URL of your banner image (designed in Canva or other
-                tool). The whole card acts as the button.
-              </p>
-            </div>
+            <ImagePickerField
+              id="banner-image-url"
+              label="Image"
+              value={draft.imageUrl}
+              onChange={(value) =>
+                setDraft((prev) => ({ ...prev, imageUrl: value }))
+              }
+              placeholder="https://example.com/banner.png"
+              folder="banners"
+              hint="The whole card acts as the button."
+            />
           </div>
 
           <div className="space-y-3 rounded-xl border border-border p-4">
