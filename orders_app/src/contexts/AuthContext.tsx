@@ -155,7 +155,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mountedRef.current = false;
       unsubscribe();
     };
-  }, [router, dispatch]);
+  }, [router, dispatch, isAuthPage]);
 
   const login = async (email: string, password: string): Promise<void> => {
     clearAuthError();

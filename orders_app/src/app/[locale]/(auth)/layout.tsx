@@ -1,10 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
-export async function generateMetadata({
-  params: _params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<{ title: string }> {
+export async function generateMetadata(): Promise<{ title: string }> {
   return { title: "Auth" };
 }
 

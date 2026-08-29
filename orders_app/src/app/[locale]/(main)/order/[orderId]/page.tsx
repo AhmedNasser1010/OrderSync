@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useRef, useState } from "react";
+import { use, useMemo, useRef } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import {
   ArrowLeft,
@@ -131,21 +131,17 @@ export default function OrderDetails({
       skip: !userData?.accessToken,
     }
   );
-  const [order, setOrder] = useState<OrderType | null>(null);
-  const [orderCart, setOrderCart] = useState<(ItemType & CartItemType)[] | null>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const printInvoice = useReactToPrint({ contentRef });
 
-  useEffect(() => {
-    if (isLoading === false) {
-      setOrder(getOrder(orderId) || null);
-    }
+  const order = useMemo<OrderType | null>(() => {
+    if (isLoading) return null;
+    return getOrder(orderId) ?? null;
   }, [isLoading, getOrder, orderId]);
 
-  useEffect(() => {
-    if (order && isLoading === false) {
-      setOrderCart(getOrderMenu(order.cart));
-    }
+  const orderCart = useMemo<(ItemType & CartItemType)[] | null>(() => {
+    if (!order || isLoading) return null;
+    return getOrderMenu(order.cart);
   }, [order, isLoading, getOrderMenu]);
 
   const openMap = () => {

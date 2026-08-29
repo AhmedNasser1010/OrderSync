@@ -221,7 +221,6 @@ export default function OrderFooter({ id, activeTabValue, status, returnedByDriv
       {!isTerminal && (
         <ControlMenu
           orderId={id}
-          activeTabValue={activeTabValue}
           overflowStatuses={overflowForward}
           previousStatuses={previousStatuses}
           destructiveStatuses={destructive}

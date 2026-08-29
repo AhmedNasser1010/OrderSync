@@ -1,4 +1,3 @@
-import type { ItemType } from "@ordersync/types";
 import type { OrderStatusType } from "@ordersync/types";
 
 export type MainTabTypes = "RECEIVED" | "PREPARING" | "DELIVERY" | "COMPLETED" | "VOIDED";

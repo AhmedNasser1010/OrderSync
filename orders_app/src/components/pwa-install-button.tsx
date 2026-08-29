@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useSyncExternalStore } from "react";
 import { Download, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -12,11 +12,12 @@ interface BeforeInstallPromptEvent extends Event {
 const DISMISS_KEY = "pwa-install-dismissed";
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
+const emptySubscribe = () => () => {};
+
 export function PwaInstallButton() {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [showSheet, setShowSheet] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
 
   const checkIfInstalled = useCallback(() => {
     if (typeof window === "undefined") return false;
@@ -25,6 +26,16 @@ export function PwaInstallButton() {
       (window.navigator as any).standalone === true
     );
   }, []);
+
+  const [isInstalled, setIsInstalled] = useState(() =>
+    typeof window !== "undefined" ? checkIfInstalled() : false
+  );
+
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const isDismissed = useCallback(() => {
     if (typeof window === "undefined") return false;
@@ -35,11 +46,6 @@ export function PwaInstallButton() {
   }, []);
 
   useEffect(() => {
-    if (checkIfInstalled()) {
-      setIsInstalled(true);
-      return;
-    }
-
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -60,7 +66,7 @@ export function PwaInstallButton() {
       );
       window.removeEventListener("appinstalled", handleAppInstalled);
     };
-  }, [checkIfInstalled]);
+  }, []);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
@@ -81,7 +87,7 @@ export function PwaInstallButton() {
     setDeferredPrompt(null);
   };
 
-  if (isInstalled || !deferredPrompt || isDismissed()) {
+  if (!mounted || isInstalled || !deferredPrompt || isDismissed()) {
     return null;
   }
 

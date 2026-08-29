@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { getAgeUrgency, getPreparingAgeUrgency, type AgeUrgency } from "@/lib/orderAge";
 
 function playUrgencySound() {
@@ -32,7 +32,10 @@ function playUrgencySound() {
 const TICK_INTERVAL_MS = 10_000;
 
 export default function useOrderUrgency(placedAt: number, preparingAt?: number): AgeUrgency {
-  const getUrgency = () => preparingAt ? getPreparingAgeUrgency(preparingAt) : getAgeUrgency(placedAt);
+  const getUrgency = useCallback(
+    () => (preparingAt ? getPreparingAgeUrgency(preparingAt) : getAgeUrgency(placedAt)),
+    [placedAt, preparingAt]
+  );
 
   const [urgency, setUrgency] = useState<AgeUrgency>(() => getUrgency());
   const prevUrgencyRef = useRef<AgeUrgency>(urgency);
@@ -42,7 +45,7 @@ export default function useOrderUrgency(placedAt: number, preparingAt?: number):
       setUrgency(getUrgency());
     }, TICK_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [placedAt, preparingAt]);
+  }, [getUrgency]);
 
   useEffect(() => {
     if (urgency !== prevUrgencyRef.current) {

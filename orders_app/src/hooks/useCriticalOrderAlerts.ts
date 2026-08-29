@@ -32,7 +32,6 @@ function playCriticalAlertSound() {
 }
 
 const CRITICAL_REPEAT_MS = 30_000;
-const CHECK_INTERVAL_MS = 10_000;
 
 export default function useCriticalOrderAlerts(receivedOrders: OrderType[], preparingOrders: OrderType[]) {
   const timersRef = useRef<Map<string, ReturnType<typeof setInterval>>>(new Map());
@@ -105,12 +104,15 @@ export default function useCriticalOrderAlerts(receivedOrders: OrderType[], prep
   }, [receivedOrders, preparingOrders]);
 
   useEffect(() => {
+    const timers = timersRef.current;
+    const firstAlert = firstAlertRef.current;
+
     return () => {
-      for (const timer of timersRef.current.values()) {
+      for (const timer of timers.values()) {
         clearInterval(timer);
       }
-      timersRef.current.clear();
-      firstAlertRef.current.clear();
+      timers.clear();
+      firstAlert.clear();
     };
   }, []);
 }

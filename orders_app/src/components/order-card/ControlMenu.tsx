@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import type { OrderStatusType, BusinessDocument } from "@ordersync/types";
-import type { MainTabTypes } from "@/types/orders";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ButtonGuard } from "@/components/ui/button-guard";
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useAppDispatch } from "@/rtk/hooks";
 import { setReasonDialog } from "@/rtk/slices/toggleSlice";
 import {
@@ -34,11 +33,9 @@ import Invoice from "../print-invoice-dialog/Invoice";
 import useOrders from "@/hooks/useOrders";
 import { useReactToPrint } from "react-to-print";
 import type { OrderType, ItemType } from "@ordersync/types";
-import { useEffect, useRef } from "react";
 
 type Props = {
   orderId: string;
-  activeTabValue: MainTabTypes;
   overflowStatuses: OrderStatusType[];
   previousStatuses: OrderStatusType[];
   destructiveStatuses: OrderStatusType[];
@@ -50,7 +47,6 @@ type Props = {
 
 export default function ControlMenu({
   orderId,
-  activeTabValue,
   overflowStatuses,
   previousStatuses,
   destructiveStatuses,
@@ -64,27 +60,20 @@ export default function ControlMenu({
   const st = useTranslations("Orders.statuses");
   const dispatch = useAppDispatch();
   const [printOpen, setPrintOpen] = useState(false);
-  const [order, setOrder] = useState<OrderType | undefined>(undefined);
-  const [orderMenu, setOrderMenu] = useState<
-    (ItemType & { quantity: number; selectedSize: string; discountCode?: string })[] | undefined
-  >(undefined);
   const { getOrder, getOrderMenu, isLoading } = useOrders();
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  useEffect(() => {
-    if (isLoading === false) {
-      setOrder(getOrder(orderId));
-    }
+  const order = useMemo<OrderType | undefined>(() => {
+    if (isLoading) return undefined;
+    return getOrder(orderId);
   }, [isLoading, getOrder, orderId]);
 
-  useEffect(() => {
-    if (isLoading === false && order) {
-      const orderMenuData = getOrderMenu(order.cart);
-      if (orderMenuData) {
-        setOrderMenu(orderMenuData);
-      }
-    }
+  const orderMenu = useMemo<
+    (ItemType & { quantity: number; selectedSize: string; discountCode?: string })[] | undefined
+  >(() => {
+    if (isLoading || !order) return undefined;
+    return getOrderMenu(order.cart);
   }, [isLoading, order, getOrderMenu]);
 
   const hasItems =

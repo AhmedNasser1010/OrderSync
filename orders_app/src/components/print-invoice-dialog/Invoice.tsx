@@ -74,8 +74,8 @@ export default function Invoice({
   order: OrderType | undefined;
   orderMenu: (ItemType & { quantity: number; selectedSize: string; discountCode?: string; })[] | undefined;
 }) {
-  if (!restaurant || !order) return null;
   const { SVG } = useQRCode();
+  if (!restaurant || !order) return null;
   return (
     <InvoiceWrapper ref={contentRef}>
       <IconContainer>

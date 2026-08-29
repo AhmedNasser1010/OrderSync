@@ -100,7 +100,6 @@ export default function OrderHeader({
   }, [placedAt, t]);
 
   useEffect(() => {
-    updateTimeAgo();
     const intervalMs = status === "RECEIVED" ? 10_000 : 60_000;
     const interval = setInterval(updateTimeAgo, intervalMs);
     return () => clearInterval(interval);

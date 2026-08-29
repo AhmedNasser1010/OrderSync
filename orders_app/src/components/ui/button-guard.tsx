@@ -33,7 +33,7 @@ function ButtonGuard({
   ...props
 }: ButtonGuardProps) {
   const { run, busy } = useClickGuard(
-    onClick ?? ((_event: React.MouseEvent<HTMLButtonElement>) => undefined),
+    onClick ?? (() => undefined),
     { cooldown, resetOnError: true }
   );
 

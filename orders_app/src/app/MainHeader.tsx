@@ -34,7 +34,6 @@ const tabCountsLabel: Record<MainTabTypes, string> = {
 };
 
 export default function MainHeader() {
-  const t = useTranslations("Orders.header");
   const st = useTranslations("Settings.header");
   const pathname = usePathname();
   const isSettings = pathname === "/settings";

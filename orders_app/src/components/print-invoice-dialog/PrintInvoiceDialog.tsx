@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import InvoiceDialogTrigger from "./InvoiceDialogTrigger";
 import type { MainTabTypes } from "@/types/orders";
 import { ButtonGuard } from "@/components/ui/button-guard";
@@ -29,26 +29,21 @@ export default function PrintInvoiceDialog({
 }) {
   const ct = useTranslations("Common");
   const [open, setOpen] = useState(false);
-  const [order, setOrder] = useState<OrderType | undefined>(undefined);
-  const [orderMenu, setOrderMenu] = useState<(ItemType & { quantity: number; selectedSize: string; discountCode?: string; })[] | undefined>(undefined);
   const { getOrder, getOrderMenu, isLoading } = useOrders();
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
-  useEffect(() => {
-    if (isLoading === false && order) {
-      const orderMenuData = getOrderMenu(order.cart);
-      if (orderMenuData) {
-        setOrderMenu(orderMenuData);
-      }
-    }
-  }, [isLoading, order, getOrderMenu]);
-
-  useEffect(() => {
-    if (isLoading === false) {
-      setOrder(getOrder(orderId));
-    }
+  const order = useMemo<OrderType | undefined>(() => {
+    if (isLoading) return undefined;
+    return getOrder(orderId);
   }, [isLoading, getOrder, orderId]);
+
+  const orderMenu = useMemo<
+    (ItemType & { quantity: number; selectedSize: string; discountCode?: string })[] | undefined
+  >(() => {
+    if (isLoading || !order) return undefined;
+    return getOrderMenu(order.cart);
+  }, [isLoading, order, getOrderMenu]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

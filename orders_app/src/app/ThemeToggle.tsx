@@ -1,20 +1,22 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState, useEffect } from 'react'
+import { useSyncExternalStore } from 'react'
 import { useTheme } from "next-themes"
 import { Sun, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import React from 'react'
 
+const emptySubscribe = () => () => {};
+
 export default function ThemeToggle() {
   const t = useTranslations("Common");
   const { setTheme, theme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  )
 
   if (!mounted) {
     return null

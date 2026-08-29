@@ -45,7 +45,6 @@ const useCloseDay = (): UseCloseDay => {
         setCloseDayPopup({
           isLoading: false,
           errors: {
-            ...closeDayPopupValues.errors,
             noQueue: {
               isPassed: !hasActiveOrders,
               text: "",

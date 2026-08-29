@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button"
 import { ButtonGuard } from "@/components/ui/button-guard"
@@ -25,17 +25,7 @@ export default function CloseDayPopup() {
   const { closeDay, isPassed, isLoading } = useCloseDay()
   const ordersIsPassed = isPassed()
 
-  useEffect(() => {
-    if (closeDayPopupValues.result.type === "success") {
-      const timer = setTimeout(() => {
-        handleClose();
-      }, 5000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [closeDayPopupValues.result.type]);
-
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     dispatch(setCloseDayPopup({
       isOpen: false,
       isLoading: true,
@@ -54,7 +44,17 @@ export default function CloseDayPopup() {
         }
       }
      }))
-  }
+  }, [dispatch])
+
+  useEffect(() => {
+    if (closeDayPopupValues.result.type === "success") {
+      const timer = setTimeout(() => {
+        handleClose();
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [closeDayPopupValues.result.type, handleClose]);
 
   return (
     <Dialog open={closeDayPopupValues.isOpen} onOpenChange={handleClose}>
