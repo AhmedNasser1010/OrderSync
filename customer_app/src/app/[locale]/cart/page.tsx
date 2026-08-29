@@ -337,24 +337,22 @@ export default function CartPage() {
         <div className="space-y-6">
           {resInfo && (
             <div className="flex items-center gap-4 rounded-2xl border border-color-7 bg-card p-4">
-              {resInfo?.branding?.cover && (
-                <Image
-                  src={resInfo.branding.cover}
-                  alt={resName || "restaurant"}
-                  width={56}
-                  height={56}
-                  className="size-14 shrink-0 rounded-xl object-cover"
-                  style={{
-                    filter: isRestaurantAvailable({
-                      status: resInfo?.status,
-                      openingHours: resInfo?.operations?.openingHours,
-                      openNowUntil: resInfo?.operations?.openNowUntil,
-                    })
-                      ? "grayscale(0)"
-                      : "grayscale(1)",
-                  }}
-                />
-              )}
+              <Image
+                src={resInfo?.branding?.cover || "/assets/restaurant-default-cover.jpg"}
+                alt={resName || "restaurant"}
+                width={56}
+                height={56}
+                className="size-14 shrink-0 rounded-xl object-cover"
+                style={{
+                  filter: isRestaurantAvailable({
+                    status: resInfo?.status,
+                    openingHours: resInfo?.operations?.openingHours,
+                    openNowUntil: resInfo?.operations?.openNowUntil,
+                  })
+                    ? "grayscale(0)"
+                    : "grayscale(1)",
+                }}
+              />
               <div className="min-w-0 flex-1">
                 <h2 className="flex items-center gap-1.5 truncate font-ProximaNovaBold text-lg text-color-1">
                   <Store className="size-4 shrink-0 text-color-2" />

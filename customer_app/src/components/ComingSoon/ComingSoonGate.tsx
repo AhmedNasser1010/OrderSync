@@ -33,6 +33,7 @@ function ComingSoonGate() {
 
   useEffect(() => {
     if (isLoginSidebarOpen) return;
+    if (!IS_COMING_SOON) return;
     const className = "overflow-hidden";
     const hadClass = document.body.classList.contains(className);
     document.body.classList.add(className);
