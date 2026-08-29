@@ -33,7 +33,7 @@ interface AuthContextValue {
   signup: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
-  authError: any;
+  authError: unknown;
   authErrorMsg: string | null;
 }
 
@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
-  const [authError, setAuthError] = useState<any>(null);
+  const [authError, setAuthError] = useState<unknown>(null);
   const [authErrorMsg, setAuthErrorMsg] = useState<string | null>(null);
 
   const mountedRef = useRef(true);
@@ -59,13 +59,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const onFailedLogin = useCallback(
-    (error: any) => {
+    (error: unknown) => {
       setIsAuthLoading(false);
       setAuthError(error);
 
       let msg: string | null = null;
-      if (error?.code) {
-        switch (error.code) {
+      const code =
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        typeof (error as { code?: unknown }).code === "string"
+          ? ((error as { code: string }).code as string)
+          : undefined;
+
+      if (code) {
+        switch (code) {
           case "auth/invalid-credential":
           case "auth/user-not-found":
           case "auth/wrong-password":
@@ -176,14 +184,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           "Access denied. Only business managers can access this app.",
         );
       }
-    } catch (err: any) {
-      if (err?.message?.includes("Access denied")) {
+    } catch (err) {
+      const authErr = err instanceof Error ? err : new Error(String(err));
+      if (authErr.message.includes("Access denied")) {
         setIsAuthLoading(false);
-        setAuthError(err);
-        setAuthErrorMsg(err.message);
+        setAuthError(authErr);
+        setAuthErrorMsg(authErr.message);
         throw err;
       }
-      onFailedLogin(err);
+      onFailedLogin(authErr);
       throw err;
     }
   };
@@ -225,14 +234,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsAuthLoading(false);
       initialCheckDone.current = true;
       router.push("/");
-    } catch (err: any) {
-      if (err?.message?.includes("Access denied")) {
+    } catch (err) {
+      const authErr = err instanceof Error ? err : new Error(String(err));
+      if (authErr.message.includes("Access denied")) {
         setIsAuthLoading(false);
-        setAuthError(err);
-        setAuthErrorMsg(err.message);
+        setAuthError(authErr);
+        setAuthErrorMsg(authErr.message);
         throw err;
       }
-      onFailedLogin(err);
+      onFailedLogin(authErr);
       throw err;
     } finally {
       isSigningUp.current = false;
@@ -285,11 +295,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           );
         }
       }
-    } catch (err: any) {
-      if (err?.message?.includes("Access denied")) {
+    } catch (err) {
+      const authErr = err instanceof Error ? err : new Error(String(err));
+      if (authErr.message.includes("Access denied")) {
         setIsAuthLoading(false);
-        setAuthError(err);
-        setAuthErrorMsg(err.message);
+        setAuthError(authErr);
+        setAuthErrorMsg(authErr.message);
         throw err;
       }
 

@@ -6,6 +6,7 @@ import {
   ShoppingCart,
   DollarSign,
   AlertCircle,
+  type LucideIcon,
 } from "lucide-react";
 import { WidgetHelp } from "@/components/ui/widget-help";
 
@@ -13,7 +14,7 @@ interface KPICardsProps {
   kpis: KPIData[];
 }
 
-const iconMap: Record<string, React.ComponentType<any>> = {
+const iconMap: Record<string, LucideIcon> = {
   TrendingUp,
   ShoppingCart,
   DollarSign,

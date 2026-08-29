@@ -24,7 +24,9 @@ export function WidgetHelp({ widgetKey }: WidgetHelpProps) {
       <button
         type="button"
         onClick={() => {
-          document.activeElement instanceof HTMLElement && document.activeElement.blur();
+          if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+          }
           setOpen(true);
         }}
         className="text-muted-foreground hover:text-foreground transition-colors shrink-0"

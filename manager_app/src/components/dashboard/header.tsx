@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/select";
 import { useAppDispatch, useAppSelector } from "@/lib/rtk/hooks";
 import {
-  initTimeRange,
   setTimeRange,
   timeRange,
 } from "@/lib/rtk/slices/toggleSlice";

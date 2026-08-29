@@ -9,7 +9,8 @@ interface InsightsCardProps {
   insights: AIInsight[];
 }
 
-function InsightText({ insight, t }: { insight: AIInsight; t: (key: string, values?: Record<string, any>) => string }) {
+function InsightText({ insight }: { insight: AIInsight }) {
+  const t = useTranslations("Dashboard.insights");
   switch (insight.type) {
     case "bestSeller":
       return <>{t("bestSeller", { item: insight.itemName })}</>;
@@ -38,7 +39,7 @@ export function InsightsCard({ insights }: InsightsCardProps) {
                 key={idx}
                 className="text-xs text-blue-800 dark:text-blue-300 leading-relaxed"
               >
-                <InsightText insight={insight} t={t} />
+                <InsightText insight={insight} />
               </p>
             ))}
           </div>

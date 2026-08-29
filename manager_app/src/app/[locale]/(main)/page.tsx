@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 import { BarChart3, Calendar, ChevronDown } from "lucide-react";
@@ -53,15 +53,6 @@ export default function Component() {
     to: savedCustomRange.end ? new Date(savedCustomRange.end) : undefined,
   }));
   const [calendarOpen, setCalendarOpen] = useState(false);
-
-  useEffect(() => {
-    if (savedCustomRange.start && savedCustomRange.end) {
-      setDateRange({
-        from: new Date(savedCustomRange.start),
-        to: new Date(savedCustomRange.end),
-      });
-    }
-  }, [savedCustomRange]);
 
   const timeRangeOptions = useMemo(
     () => [

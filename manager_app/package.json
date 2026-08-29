@@ -6,7 +6,7 @@
     "dev": "PORT=3001 next dev",
     "build": "next build",
     "start": "PORT=3001 next start",
-    "lint": "next lint"
+    "lint": "eslint"
   },
   "dependencies": {
     "@ordersync/order-utils": "file:../packages/order-utils",

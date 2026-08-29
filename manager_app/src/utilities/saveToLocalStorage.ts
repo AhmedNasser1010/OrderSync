@@ -1,4 +1,4 @@
-const saveToLocalStorage = (key: string, data: any) => {
+const saveToLocalStorage = (key: string, data: unknown) => {
   if (typeof window !== "undefined") {
     localStorage.setItem(key, JSON.stringify(data));
   }

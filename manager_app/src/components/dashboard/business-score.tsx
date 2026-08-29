@@ -14,7 +14,8 @@ interface BusinessScoreProps {
   data: BusinessHealthData;
 }
 
-function StrengthText({ strength, t }: { strength: StrengthItem; t: (key: string, values?: Record<string, any>) => string }) {
+function StrengthText({ strength }: { strength: StrengthItem }) {
+  const t = useTranslations("Dashboard.businessScore");
   switch (strength.type) {
     case "strongRetention":
       return <>{t("strongRetention", { percentage: strength.percentage })}</>;
@@ -27,7 +28,8 @@ function StrengthText({ strength, t }: { strength: StrengthItem; t: (key: string
   }
 }
 
-function AlertText({ alert, t }: { alert: AlertItem; t: (key: string, values?: Record<string, any>) => string }) {
+function AlertText({ alert }: { alert: AlertItem }) {
+  const t = useTranslations("Dashboard.businessScore");
   switch (alert.type) {
     case "lowRetention":
       return <>{t("lowRetention")}</>;
@@ -107,7 +109,7 @@ export function BusinessScore({ data }: BusinessScoreProps) {
                 key={idx}
                 className="text-xs text-card-foreground leading-relaxed"
               >
-                • <StrengthText strength={strength} t={t} />
+                • <StrengthText strength={strength} />
               </li>
             ))}
           </ul>
@@ -126,7 +128,7 @@ export function BusinessScore({ data }: BusinessScoreProps) {
                 key={idx}
                 className="text-xs text-card-foreground leading-relaxed"
               >
-                • <AlertText alert={alert} t={t} />
+                • <AlertText alert={alert} />
               </li>
             ))}
           </ul>

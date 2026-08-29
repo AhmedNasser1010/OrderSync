@@ -1,4 +1,4 @@
-const calculateGrowth = (current: number, previous: number) => {
+export const calculateGrowth = (current: number, previous: number) => {
   if (previous === 0) {
     return current > 0 ? 100 : 0;
   }

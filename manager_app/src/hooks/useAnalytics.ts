@@ -138,7 +138,7 @@ const useAnalytics = () => {
       previousPeriodData,
       kpis,
     });
-  }, [currentPeriodData, previousPeriodData]);
+  }, [currentPeriodData, previousPeriodData, t]);
 
   const loading =
     !resId ||

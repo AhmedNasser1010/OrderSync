@@ -65,15 +65,18 @@ const useTodayOrders = () => {
   const openingHours = restaurantData?.operations?.openingHours;
 
   const [orders, setOrders] = useState<OrderType[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [prevResId, setPrevResId] = useState(resId);
+
+  if (prevResId !== resId) {
+    setPrevResId(resId);
+    setOrders([]);
+    setHasLoaded(!resId);
+  }
 
   useEffect(() => {
-    if (!resId) {
-      setLoading(false);
-      return;
-    }
+    if (!resId) return;
 
-    setLoading(true);
     const { startMs, endMs } = getTodayBounds(openingHours);
 
     const ordersRef = collection(db, "orders");
@@ -92,11 +95,11 @@ const useTodayOrders = () => {
           (doc) => doc.data() as OrderType,
         );
         setOrders(todayOrders);
-        setLoading(false);
+        setHasLoaded(true);
       },
       (error) => {
         console.error("Error fetching today's orders:", error);
-        setLoading(false);
+        setHasLoaded(true);
       },
     );
 
@@ -234,6 +237,8 @@ const useTodayOrders = () => {
       operations: { avgPrepTime, avgDeliveryTime },
     };
   }, [orders, openingHours]);
+
+  const loading = resId ? !hasLoaded : false;
 
   return { todayData, loading, hasData: orders.length > 0 };
 };

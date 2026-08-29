@@ -13,18 +13,19 @@ const DISMISS_KEY = "pwa-install-dismissed";
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 export function PwaInstallButton() {
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
-  const [showSheet, setShowSheet] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
-
   const checkIfInstalled = useCallback(() => {
     if (typeof window === "undefined") return false;
     return (
       window.matchMedia("(display-mode: standalone)").matches ||
-      (window.navigator as any).standalone === true
+      (window.navigator as Navigator & { standalone?: boolean }).standalone ===
+        true
     );
   }, []);
+
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
+  const [showSheet, setShowSheet] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(() => checkIfInstalled());
 
   const isDismissed = useCallback(() => {
     if (typeof window === "undefined") return false;
@@ -35,10 +36,7 @@ export function PwaInstallButton() {
   }, []);
 
   useEffect(() => {
-    if (checkIfInstalled()) {
-      setIsInstalled(true);
-      return;
-    }
+    if (isInstalled) return;
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
@@ -60,7 +58,7 @@ export function PwaInstallButton() {
       );
       window.removeEventListener("appinstalled", handleAppInstalled);
     };
-  }, [checkIfInstalled]);
+  }, [isInstalled]);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
