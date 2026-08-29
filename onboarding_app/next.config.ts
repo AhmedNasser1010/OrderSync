@@ -4,6 +4,11 @@ import path from "path";
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['*.ngrok-free.app'],
   transpilePackages: ["@ordersync/types"],
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "16mb",
+    },
+  },
   turbopack: {
     root: path.join(__dirname, ".."),
   },

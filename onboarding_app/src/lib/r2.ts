@@ -10,6 +10,10 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
+import {
+  uploadImageToR2Action,
+  deleteImageFromR2Action,
+} from "@/lib/r2-actions";
 
 export interface R2Image {
   id: string;
@@ -23,75 +27,29 @@ export interface R2Image {
   createdAt: number;
 }
 
-const WORKER_URL =
-  process.env.NEXT_PUBLIC_R2_WORKER_URL ??
-  "https://ordersync-r2.ahmedn-coder.workers.dev";
-
-const UPLOAD_SECRET = process.env.NEXT_PUBLIC_R2_UPLOAD_SECRET ?? "";
-
-const MAX_SIZE = 15 * 1024 * 1024;
+async function getAuthToken(): Promise<string> {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to upload images.");
+  return user.getIdToken();
+}
 
 /**
- * Uploads a file to the R2 bucket through the Cloudflare Worker.
- * Returns the public URL and object key. Does NOT persist a Firestore record.
+ * Uploads a file to the R2 bucket through a server action (keeps the
+ * upload secret server-side). Returns the public URL and object key.
+ * Does NOT persist a Firestore record.
  */
 export async function uploadImageToR2(
   file: File,
   folder: string
 ): Promise<{ key: string; url: string; size: number }> {
-  if (!UPLOAD_SECRET) {
-    throw new Error("R2 upload secret is not configured.");
-  }
-  if (file.size > MAX_SIZE) {
-    throw new Error("File exceeds the 15MB limit.");
-  }
-
-  const res = await fetch(`${WORKER_URL}/upload`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${UPLOAD_SECRET}`,
-      "Content-Type": file.type || "application/octet-stream",
-      "X-Filename": file.name,
-      "X-Folder": folder,
-    },
-    body: file,
-  });
-
-  const data = (await res.json().catch(() => ({}))) as {
-    error?: string;
-    key?: string;
-    url?: string;
-    size?: number;
-  };
-
-  if (!res.ok || !data.url || !data.key) {
-    throw new Error(data.error || "Upload failed.");
-  }
-
-  return {
-    key: data.key,
-    url: data.url,
-    size: data.size ?? file.size,
-  };
+  return uploadImageToR2Action(file, folder, await getAuthToken());
 }
 
 /**
- * Deletes an object from R2 by key, ignoring trailing extra keys.
+ * Deletes an object from R2 by key through a server action.
  */
 export async function deleteImageFromR2(key: string): Promise<void> {
-  if (!UPLOAD_SECRET) {
-    throw new Error("R2 upload secret is not configured.");
-  }
-  const res = await fetch(`${WORKER_URL}/delete?key=${encodeURIComponent(key)}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${UPLOAD_SECRET}`,
-    },
-  });
-  if (!res.ok) {
-    const data = (await res.json().catch(() => ({}))) as { error?: string };
-    throw new Error(data.error || "Delete failed.");
-  }
+  await deleteImageFromR2Action(key, await getAuthToken());
 }
 
 // ---------------------------------------------------------------------------

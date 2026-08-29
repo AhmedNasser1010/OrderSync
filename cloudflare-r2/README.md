@@ -46,16 +46,21 @@ npm run deploy      # wrangler deploy
 ```
 
 The client apps reference the Worker URL via
-`NEXT_PUBLIC_R2_WORKER_URL` (onboarding_app/.env.local) and the upload
-secret via `NEXT_PUBLIC_R2_UPLOAD_SECRET`.
+`NEXT_PUBLIC_R2_WORKER_URL` (onboarding_app/.env.local). The onboarding app
+keeps the upload secret behind the server: `R2_UPLOAD_SECRET` is read only by
+the `uploadImageToR2Action`/`deleteImageFromR2Action` server actions in
+`onboarding_app/src/lib/r2-actions.ts` and is never embedded in the client
+bundle.
 
 ## Security notes
 
 - The upload/delete endpoints require the `UPLOAD_SECRET` bearer token.
-- ⚠️ The onboarding app sends it as `NEXT_PUBLIC_R2_UPLOAD_SECRET`, which is
-  embedded in the client JS bundle. Anyone with the onboarding app's source
-  can extract it and upload to the `zajil` bucket (bounded to images ≤15MB).
-  For maximum security beyond an internal admin tool, harden the Worker to
-  validate a Firebase ID token from the signed-in partner/manager instead.
+- ✅ The onboarding app never ships the secret to the browser. The
+  `"use server"` actions in `src/lib/r2-actions.ts` verify the caller's
+  Firebase ID token (via `firebase-admin`) and use the server-side
+  `R2_UPLOAD_SECRET` when proxying upload/delete calls to the Worker, so a
+  signed-in partner/manager session is required. Uploads are still bounded to
+  images ≤15MB and the server action body size limit is raised to 16MB in
+  `next.config.ts`.
 - The R2 bucket is public-read by design so images render without per-image
   signatures. Do not upload non-public content.
