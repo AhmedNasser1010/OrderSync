@@ -149,7 +149,6 @@ export default function CheckoutPage() {
       {currentState === "ON_PAYMENT" && (
         <CheckoutUserPayment
           handleCurrentState={handleCurrentState}
-          res={res}
           deliveryFees={deliveryFees}
         />
       )}

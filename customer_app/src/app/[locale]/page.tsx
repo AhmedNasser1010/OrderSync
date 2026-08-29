@@ -12,7 +12,6 @@ import WhatsOnYourMind from "@/components/Home/WhatsOnYourMind";
 import TopRestaurant from "@/components/Home/TopRestaurant";
 import PopularDishes from "@/components/Home/PopularDishes";
 import Restaurants from "@/components/Home/Restaurants";
-import Reviews from "@/components/Home/Reviews";
 import CtaStrip from "@/components/Home/CtaStrip";
 
 export default function HomePage() {

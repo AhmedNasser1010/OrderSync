@@ -36,7 +36,7 @@ export async function seedEmulator() {
       displayName: E2E_USER_NAME,
     });
     uid = user.uid;
-  } catch (error) {
+  } catch {
     const existing = await auth.getUserByEmail(E2E_USER_EMAIL);
     uid = existing.uid;
   }
@@ -173,9 +173,16 @@ export async function seedEmulator() {
   return { uid };
 }
 
-export async function getCustomerOrders(): Promise<
-  Array<Record<string, any>>
-> {
+interface CustomerOrder {
+  businessId: string;
+  customer: { name: string };
+  status: { current: string };
+  pricing: { total: number; subtotal: number; deliveryFees: number };
+  finance: Record<string, number>;
+  [key: string]: unknown;
+}
+
+export async function getCustomerOrders(): Promise<CustomerOrder[]> {
   const app = adminApp();
   const db = getFirestore(app);
   const auth = getAuth(app);
@@ -184,7 +191,9 @@ export async function getCustomerOrders(): Promise<
     .collection("orders")
     .where("customer.uid", "==", user.uid)
     .get();
-  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return snap.docs.map(
+    (doc) => ({ id: doc.id, ...doc.data() }) as unknown as CustomerOrder
+  );
 }
 
 export function authStorageKey() {

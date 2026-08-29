@@ -14,7 +14,6 @@ import Tip from "@/components/Checkout/Tip";
 import CheckoutMainButton from "@/components/Checkout/CheckoutMainButton";
 import CheckoutPageTitle from "@/components/Checkout/CheckoutPageTitle";
 import type { DiscountObject } from "@ordersync/types";
-import type { RestaurantDocument } from "@/types/restaurant";
 
 const RadioInputWrapper = ({
   htmlFor,
@@ -42,11 +41,9 @@ const RadioInputWrapper = ({
 
 const CheckoutUserPayment = ({
   handleCurrentState,
-  res,
   deliveryFees,
 }: {
   handleCurrentState: (status: string) => void;
-  res: RestaurantDocument | undefined;
   deliveryFees: number;
 }) => {
   const t = useTranslations();

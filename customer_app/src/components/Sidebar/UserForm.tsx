@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { UserIcon, PhoneIcon, MapPinIcon } from "lucide-react";
@@ -26,33 +26,32 @@ const UserForm = () => {
   const user = useAppSelector((state) => state.user);
   const { saveName, savePhone, saveSecondPhone, saveAddress, saveLocation } =
     useUserForm();
+
+  const getFormValues = (u: typeof user) => ({
+    name: u?.userInfo?.name || "",
+    phone: u?.userInfo?.phone || "",
+    secondPhone: u?.userInfo?.secondPhone || "",
+    address: u?.locations?.home?.address || "",
+    location: u?.locations?.home?.latlng?.[0]
+      ? (u.locations.home.latlng as [number, number])
+      : null,
+  });
+
   const [formValues, setFormValues] = useState<{
     name: string;
     phone: string;
     secondPhone: string;
     address: string;
     location: [number, number] | null;
-  }>({
-    name: "",
-    phone: "",
-    secondPhone: "",
-    address: "",
-    location: null,
-  });
+  }>(() => getFormValues(user));
+  const [prevUser, setPrevUser] = useState(user);
 
-  useEffect(() => {
+  if (user !== prevUser) {
+    setPrevUser(user);
     if (user?.userInfo) {
-      setFormValues({
-        name: user?.userInfo?.name || "",
-        phone: user?.userInfo?.phone || "",
-        secondPhone: user?.userInfo?.secondPhone || "",
-        address: user?.locations?.home?.address || "",
-        location: user?.locations?.home?.latlng?.[0]
-          ? (user.locations.home.latlng as [number, number])
-          : null,
-      });
+      setFormValues(getFormValues(user));
     }
-  }, [user]);
+  }
 
   const inputProps = (
     name: "name" | "phone" | "secondPhone" | "address",

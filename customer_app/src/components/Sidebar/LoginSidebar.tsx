@@ -59,26 +59,23 @@ const LoginSidebar = () => {
 
   const [expandUserInfo, setExpandUserInfo] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
+  const [prevSidebarOpen, setPrevSidebarOpen] = useState(isLoginSidebarOpen);
+
+  if (isLoginSidebarOpen && prevSidebarOpen !== isLoginSidebarOpen) {
+    setPrevSidebarOpen(isLoginSidebarOpen);
+    if (
+      user?.userInfo &&
+      (!user.userInfo?.name ||
+        !user.userInfo?.phone ||
+        !user.locations?.home?.address ||
+        !user.locations?.home?.latlng?.[0])
+    ) {
+      setExpandUserInfo(true);
+    }
+  }
 
   const isRTL = locale === "ar";
   const isLoggedIn = !!authUser;
-
-  useEffect(() => {
-    if (
-      user?.userInfo &&
-      expandUserInfo === false &&
-      isLoginSidebarOpen === true
-    ) {
-      if (
-        !user.userInfo?.name ||
-        !user.userInfo?.phone ||
-        !user.locations?.home?.address ||
-        !user.locations?.home?.latlng?.[0]
-      ) {
-        setExpandUserInfo(true);
-      }
-    }
-  }, [user, isLoginSidebarOpen, expandUserInfo]);
 
   useEffect(() => {
     if (!confirmLogout) return;

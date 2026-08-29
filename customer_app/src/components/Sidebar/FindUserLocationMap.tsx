@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -9,14 +9,11 @@ import {
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import type { Map as LeafletMap } from "leaflet";
 import { cn } from "@/lib/utils";
 
 import { markerMapIcon } from "@/components/Sidebar/mapCustomMarker";
 import LocationButton from "@/components/Sidebar/LocationButton";
 import AddMarker from "@/components/Sidebar/AddMarker";
-
-const DEFAULT_LOCATION: [number, number] = [29.620106778124843, 31.255811811669496];
 
 function CenterController({
   center,
@@ -48,7 +45,23 @@ function FindUserLocationMap({
   const [centerLocation, setCenterLocation] = useState<[number, number]>(
     userLocation || defaultLocation
   );
-  const [markers, setMarkers] = useState<MarkerItem[]>([]);
+  const [markers, setMarkers] = useState<MarkerItem[]>(
+    userLocation
+      ? [{ latlng: userLocation, popup: "Home location", byUser: true }]
+      : []
+  );
+  const [prevUserLocation, setPrevUserLocation] =
+    useState<[number, number] | null>(userLocation);
+
+  if (userLocation !== prevUserLocation) {
+    setPrevUserLocation(userLocation);
+    if (userLocation) {
+      setCenterLocation(userLocation);
+      setMarkers([
+        { latlng: userLocation, popup: "Home location", byUser: true },
+      ]);
+    }
+  }
 
   const addMarker = (mark: [number, number]) => {
     setMarkers((current) =>
@@ -61,14 +74,6 @@ function FindUserLocationMap({
       onChange(mark);
     }
   };
-
-  useEffect(() => {
-    if (userLocation) {
-      setCenterLocation(userLocation);
-      addMarker(userLocation);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userLocation]);
 
   return (
     <MapContainer
