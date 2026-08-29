@@ -13,11 +13,10 @@ const SERVICE_URL = "https://router.project-osrm.org/route/v1";
 interface RouteControlProps {
   driverPosition: [number, number];
   destination: [number, number];
-  label: string;
   onError?: () => void;
 }
 
-export function RouteControl({ driverPosition, destination, label, onError }: RouteControlProps) {
+export function RouteControl({ driverPosition, destination, onError }: RouteControlProps) {
   const map = useMap();
   const polylineRef = useRef<L.Polyline | null>(null);
 
@@ -66,7 +65,7 @@ export function RouteControl({ driverPosition, destination, label, onError }: Ro
         polylineRef.current = null;
       }
     };
-  }, [map, driverPosition, destination]);
+  }, [map, driverPosition, destination, onError]);
 
   return null;
 }

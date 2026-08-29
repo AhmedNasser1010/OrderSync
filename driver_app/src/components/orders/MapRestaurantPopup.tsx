@@ -173,15 +173,19 @@ function RestaurantOrderRow({
   const [staleLevel, setStaleLevel] = useState<StaleLevel>(
     isAvailable ? getStaleLevel(readyAt) : "none",
   );
+  const [prevConfig, setPrevConfig] = useState({ isAvailable, readyAt });
+  if (
+    prevConfig.isAvailable !== isAvailable ||
+    prevConfig.readyAt !== readyAt
+  ) {
+    setPrevConfig({ isAvailable, readyAt });
+    setStaleLevel(isAvailable ? getStaleLevel(readyAt) : "none");
+  }
   const isWarning = staleLevel === "warning";
   const isCritical = staleLevel === "critical";
 
   useEffect(() => {
-    if (!isAvailable) {
-      setStaleLevel("none");
-      return;
-    }
-    setStaleLevel(getStaleLevel(readyAt));
+    if (!isAvailable) return;
     const interval = setInterval(
       () => setStaleLevel(getStaleLevel(readyAt)),
       30_000,

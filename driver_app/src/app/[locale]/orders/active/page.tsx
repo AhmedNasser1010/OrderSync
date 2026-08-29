@@ -5,7 +5,6 @@ import { useOrderActions } from "@/hooks/useOrderActions";
 import useNewOrderAlert from "@/hooks/useNewOrderAlert";
 import { useAuth } from "@/contexts/AuthContext";
 import { useBusinessNamesMap } from "@/contexts/BusinessNamesContext";
-import type { OrderType } from "@ordersync/types";
 import { useMemo, useState } from "react";
 import { OrderSearchBar } from "@/components/orders/OrderSearchBar";
 import { NoOrders } from "@/components/orders/NoOrders";
@@ -33,8 +32,12 @@ export default function ActiveOrdersPage() {
   const hasNoActiveOrders = orders.length === 0;
   useNewOrderAlert(marketplaceOrders.length, hasNoActiveOrders);
 
-  const normalizedSearch = searchQuery.trim();
-  const qTokens = normalizedSearch ? normalize(normalizedSearch).split(/\s+/).filter(Boolean) : [];
+  const qTokens = useMemo(() => {
+    const normalizedSearch = searchQuery.trim();
+    return normalizedSearch
+      ? normalize(normalizedSearch).split(/\s+/).filter(Boolean)
+      : [];
+  }, [searchQuery]);
   const isSearching = qTokens.length > 0;
 
   const visibleOrders = useMemo(() => {

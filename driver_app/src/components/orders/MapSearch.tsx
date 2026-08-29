@@ -149,7 +149,7 @@ export function MapSearch({
     }
 
     return [...matchedRestaurants, ...matchedOrders].slice(0, 10);
-  }, [query, allOrders]);
+  }, [query, allOrders, businessNamesMap]);
 
   const handleSelect = useCallback(
     (result: SearchResult) => {

@@ -6,6 +6,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
   useRef,
   type ReactNode,
 } from "react";
@@ -45,10 +46,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const locale = pathname.split("/")[1] || "ar";
-  const localeRouter = {
-    push: (path: string) => router.push(`/${locale}${path}`),
-    replace: (path: string) => router.replace(`/${locale}${path}`),
-  };
+  const localeRouter = useMemo(() => {
+    return {
+      push: (path: string) => router.push(`/${locale}${path}`),
+      replace: (path: string) => router.replace(`/${locale}${path}`),
+    };
+  }, [router, locale]);
   const dispatch = useAppDispatch();
 
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -187,7 +190,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mountedRef.current = false;
       unsubscribe();
     };
-  }, [router]);
+  }, [localeRouter]);
 
   const signIn = async (email: string, password: string): Promise<void> => {
     clearAuthError();

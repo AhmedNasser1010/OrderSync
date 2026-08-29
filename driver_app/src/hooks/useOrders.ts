@@ -5,7 +5,6 @@ import { skipToken } from "@reduxjs/toolkit/query";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   useFetchUserDataQuery,
-  useFetchDriverProfileQuery,
   useFetchMarketplaceOrdersQuery,
   useFetchMyOrdersQuery,
   useFetchPreparingOrdersQuery,

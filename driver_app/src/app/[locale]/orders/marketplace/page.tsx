@@ -26,8 +26,12 @@ export default function MarketplacePage() {
   const businessNamesMap = useBusinessNamesMap();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const normalizedSearch = searchQuery.trim();
-  const qTokens = normalizedSearch ? normalize(normalizedSearch).split(/\s+/).filter(Boolean) : [];
+  const qTokens = useMemo(() => {
+    const normalizedSearch = searchQuery.trim();
+    return normalizedSearch
+      ? normalize(normalizedSearch).split(/\s+/).filter(Boolean)
+      : [];
+  }, [searchQuery]);
   const isSearching = qTokens.length > 0;
 
   const sortedOrders = useMemo(
@@ -45,10 +49,10 @@ export default function MarketplacePage() {
   const visibleOrders = useMemo(() => {
     if (!isSearching) return sortedOrders;
     return sortedOrders.filter((order) => {
-      const busId = (order as any).business?.id;
-      const busName = (order as any).business?.name ?? "";
+      const busId = order.business?.id;
+      const busName = order.business?.name ?? "";
       const busNameAr = busId ? (businessNamesMap[busId] ?? busName) : busName;
-      const busNameOrder = (order as any).business?.nameInAr ?? "";
+      const busNameOrder = order.business?.nameInAr ?? "";
       const haystack = [
         busName,
         busNameAr,

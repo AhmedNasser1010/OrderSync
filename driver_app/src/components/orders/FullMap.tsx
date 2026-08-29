@@ -17,7 +17,6 @@ import { MapSearch } from "./MapSearch";
 import { SmoothDriverMarker } from "./SmoothDriverMarker";
 import { X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useBusinessDisplayName } from "@/contexts/BusinessNamesContext";
 import type { MapFilters } from "@/app/[locale]/orders/map/page";
 import type { OrderType } from "@ordersync/types";
 import type { DriverPosition } from "@/hooks/useDriverLocation";
@@ -226,7 +225,6 @@ export function FullMap({
           <RouteControl
             driverPosition={driverPoint}
             destination={activeRoute.destination}
-            label={activeRoute.label}
             onError={handleClearRoute}
           />
         )}

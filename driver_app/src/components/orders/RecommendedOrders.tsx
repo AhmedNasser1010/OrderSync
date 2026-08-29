@@ -193,11 +193,15 @@ export function RecommendedOrders() {
     setClaimError(null);
   }, []);
 
+  const restaurantDisplayName = useBusinessDisplayName(
+    recommended?.restaurant.id,
+    recommended?.restaurant.name,
+  );
+
   if (isComputing) return null;
   if (!recommended) return null;
 
-  const { orders, restaurant, totalRouteDistance, savings } = recommended;
-  const restaurantDisplayName = useBusinessDisplayName(restaurant.id, restaurant.name);
+  const { orders, totalRouteDistance, savings } = recommended;
 
   const totalItems = orders.reduce((sum, o) => sum + (o.cart?.length ?? 0), 0);
   const totalPrice = orders.reduce(

@@ -4,7 +4,6 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
   onSnapshot,
   query,
   where,
@@ -12,12 +11,11 @@ import {
   arrayUnion,
   arrayRemove,
   orderBy,
-  limit,
   deleteField,
   updateDoc,
   increment,
 } from "firebase/firestore";
-import type { Driver, OrderType, OrderStatusType } from "@ordersync/types";
+import type { Driver, OrderType } from "@ordersync/types";
 import { canTransition } from "@ordersync/order-utils";
 
 export const firestoreApi = createApi({
