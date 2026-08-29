@@ -328,10 +328,6 @@ export function OrderDetailsDialog({
 
           <Section title="Notes & Metadata">
             <InfoRow label="Order Note" value={order.notes?.order || "—"} />
-            <InfoRow
-              label="Cancel Auto-Assign"
-              value={order.metadata?.cancelAutoAssign ? "Yes" : "No"}
-            />
             <InfoRow label="Created At" value={formatOrderDate(order.createdAt)} />
             <InfoRow label="Updated At" value={formatOrderDate(order.updatedAt)} />
           </Section>
