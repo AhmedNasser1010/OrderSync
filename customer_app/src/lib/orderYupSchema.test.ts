@@ -25,7 +25,7 @@ const validOrder = {
     driverEarnings: 5,
   },
   notes: { order: null },
-  metadata: { orderSource: "pc_chrome", cancelAutoAssign: false },
+  metadata: { orderSource: "pc_chrome" },
   customer: {
     uid: "cust-1",
     name: "Nasser",

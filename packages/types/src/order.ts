@@ -138,7 +138,5 @@ export type OrderType = {
 
   metadata: {
     orderSource: string;
-
-    cancelAutoAssign?: boolean;
   };
 };

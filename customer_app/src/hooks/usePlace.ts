@@ -311,7 +311,6 @@ const usePlace = () => {
       notes: { order: comment || undefined },
       metadata: {
         orderSource,
-        cancelAutoAssign: false,
       },
       customer: {
         uid: user.uid as string,

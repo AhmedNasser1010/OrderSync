@@ -44,6 +44,7 @@ import { toast } from "sonner";
 import DeliveryLocation from "@/components/DeliveryLocation";
 import ProfileAvatar from "@/components/Sidebar/ProfileAvatar";
 import { cn } from "@/lib/utils";
+import { IS_COMING_SOON } from "@/utils/comingSoon";
 
 const emptySubscribe = () => () => {};
 
@@ -372,7 +373,7 @@ function Header() {
           </div>
 
           <ul className="flex items-center gap-1 sm:gap-2.5">
-            {isHome && (
+            {!IS_COMING_SOON && isHome && (
               <li className="hidden lg:block">
                 <button
                   type="button"
@@ -384,7 +385,7 @@ function Header() {
               </li>
             )}
 
-            {user?.trackedOrder?.id && (
+            {!IS_COMING_SOON && user?.trackedOrder?.id && (
               <li>
                 <button
                   type="button"
@@ -475,7 +476,7 @@ function Header() {
               </li>
             )}
 
-            {mounted && cartItems.length > 0 && (
+            {!IS_COMING_SOON && mounted && cartItems.length > 0 && (
               <li>
                 <Link
                   href="/cart"
@@ -532,16 +533,18 @@ function Header() {
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
-          <button
-            type="button"
-            onClick={handleOrderNow}
-            className="w-full flex items-center justify-center gap-2 rounded-2xl bg-color-2 py-3.5 font-ProximaNovaSemiBold text-white transition-colors hover:bg-color-2/90 cursor-pointer"
-          >
-            <MapPinIcon className="size-4" />
-            {t("Order now")}
-          </button>
+          {!IS_COMING_SOON && (
+            <button
+              type="button"
+              onClick={handleOrderNow}
+              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-color-2 py-3.5 font-ProximaNovaSemiBold text-white transition-colors hover:bg-color-2/90 cursor-pointer"
+            >
+              <MapPinIcon className="size-4" />
+              {t("Order now")}
+            </button>
+          )}
 
-          {user?.trackedOrder?.id && (
+          {!IS_COMING_SOON && user?.trackedOrder?.id && (
             <button
               type="button"
               onClick={() => {
@@ -588,7 +591,7 @@ function Header() {
           </div>
 
           <div className="space-y-3">
-            {mounted && cartItems.length > 0 && (
+            {!IS_COMING_SOON && mounted && cartItems.length > 0 && (
               <Link
                 href="/cart"
                 onClick={() => setMenuOpen(false)}

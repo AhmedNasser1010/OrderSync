@@ -9,7 +9,6 @@ import ProfileAndLang from "@/app/settings/ProfileAndLang";
 import DisplaySettings from "@/app/settings/DisplaySettings";
 import OrderWorkflow from "@/app/settings/OrderWorkflow";
 import Themes from "@/app/settings/Themes";
-import CloseDay from "@/app/settings/CloseDay";
 
 export default function SettingsPage() {
   const t = useTranslations("Settings.logout");
@@ -17,7 +16,6 @@ export default function SettingsPage() {
 
   return (
     <div className="px-4 pb-40 pt-6 max-w-2xl mx-auto space-y-6">
-      <CloseDay />
       <ProfileAndLang />
       <DisplaySettings />
       <OrderWorkflow />

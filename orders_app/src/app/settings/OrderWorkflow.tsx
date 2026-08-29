@@ -13,6 +13,7 @@ import {
 import { useAppSelector } from "@/rtk/hooks";
 import { userUid } from "@/rtk/slices/constantsSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { PRINT_INVOICE_ENABLED } from "@/lib/feature-flags";
 
 export default function OrderWorkflow() {
   const t = useTranslations("Settings.workflow");
@@ -24,7 +25,7 @@ export default function OrderWorkflow() {
       skip: !userData?.accessToken,
     },
   );
-  const printInvoice = resData?.settings?.printInvoice ?? false;
+  const printInvoice = (resData?.settings?.printInvoice ?? false) && PRINT_INVOICE_ENABLED;
   const skipAccepted = resData?.settings?.skipAccepted ?? false;
   const [setOrderWorkflowSettings] = useSetOrderWorkflowSettingsMutation();
 
@@ -65,6 +66,7 @@ export default function OrderWorkflow() {
             id="print-invoice"
             defaultChecked={printInvoice}
             onCheckedChange={handlePrintInvoice}
+            disabled={!PRINT_INVOICE_ENABLED}
           />
         </div>
         <div className="flex items-center justify-between gap-3 py-3 border-t border-border">

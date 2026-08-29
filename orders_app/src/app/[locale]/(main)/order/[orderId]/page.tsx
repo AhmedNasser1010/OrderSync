@@ -38,6 +38,7 @@ import Invoice from "@/components/print-invoice-dialog/Invoice";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useReactToPrint } from "react-to-print";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { PRINT_INVOICE_ENABLED } from "@/lib/feature-flags";
 
 const STATUS_CONFIG: Record<OrderStatusType, { color: string; bg: string; dot: string }> = {
   RECEIVED: {
@@ -203,17 +204,19 @@ export default function OrderDetails({
                 <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", statusConfig.dot)} />
                 {st(order.status.current)}
               </Badge>
-              <ButtonGuard
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={printOrder}
-                disabled={!orderCart || !restaurant}
-                cooldown={1000}
-                showSpinner={false}
-              >
-                <Printer className="h-4 w-4" />
-              </ButtonGuard>
+              {PRINT_INVOICE_ENABLED && (
+                <ButtonGuard
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={printOrder}
+                  disabled={!orderCart || !restaurant}
+                  cooldown={1000}
+                  showSpinner={false}
+                >
+                  <Printer className="h-4 w-4" />
+                </ButtonGuard>
+              )}
             </div>
           </div>
         </div>

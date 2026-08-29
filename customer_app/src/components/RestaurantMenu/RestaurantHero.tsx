@@ -138,25 +138,23 @@ const RestaurantHero = ({
         </div>
       </div>
 
-      {res?.branding?.cover && (
-        <Image
-          src={res.branding.cover}
-          alt=""
-          loading="lazy"
-          fill
-          sizes="100vw"
-          className="object-cover opacity-30"
-          style={{
-            filter: isRestaurantAvailable({
-              status: res?.status,
-              openingHours: res?.operations?.openingHours,
-              openNowUntil: res?.operations?.openNowUntil,
-            })
-              ? "grayscale(0)"
-              : "grayscale(1)",
-          }}
-        />
-      )}
+      <Image
+        src={res?.branding?.cover || "/assets/restaurant-default-cover.jpg"}
+        alt=""
+        loading="lazy"
+        fill
+        sizes="100vw"
+        className="object-cover opacity-30"
+        style={{
+          filter: isRestaurantAvailable({
+            status: res?.status,
+            openingHours: res?.operations?.openingHours,
+            openNowUntil: res?.operations?.openNowUntil,
+          })
+            ? "grayscale(0)"
+            : "grayscale(1)",
+        }}
+      />
       <div className="absolute inset-0 bg-gradient-to-t from-[#282c3f] via-[#282c3f]/80 to-[#282c3f]/40" />
       <div className="absolute inset-0 bg-gradient-to-r from-[#282c3f]/40 to-[#fc8019]/10" />
     </div>

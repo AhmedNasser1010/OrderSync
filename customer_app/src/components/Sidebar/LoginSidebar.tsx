@@ -55,7 +55,7 @@ const LoginSidebar = () => {
   );
   const user = useAppSelector((state) => state.user);
   const lng = useAppSelector((state) => state.toggle.lng);
-  const { user: authUser, signInWithGoogle, logout } = useAuth();
+  const { user: authUser, signInWithGoogle, logout, signInError } = useAuth();
 
   const [expandUserInfo, setExpandUserInfo] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
@@ -82,6 +82,11 @@ const LoginSidebar = () => {
     const timer = setTimeout(() => setConfirmLogout(false), 5000);
     return () => clearTimeout(timer);
   }, [confirmLogout]);
+
+  useEffect(() => {
+    if (!signInError) return;
+    toast.error(t("Google sign in failed"), { position: "top-center" });
+  }, [signInError, t]);
 
   const changeLanguage = (lng: string) => {
     router.replace("/", { locale: lng });

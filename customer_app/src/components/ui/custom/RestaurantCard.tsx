@@ -97,17 +97,15 @@ function RestaurantCard({ info }: { info: RestaurantCardInfo }) {
   return (
     <div className={cn("flex flex-col gap-3 cursor-pointer", className)}>
       <div className="w-full h-56 relative rounded-xl overflow-hidden bg-color-7">
-        {cloudinaryImageId && (
-          <Image
-            src={cloudinaryImageId}
-            alt={resName || name}
-            loading="lazy"
-            fill
-            sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            style={{ filter: isAvailable ? "grayscale(0)" : "grayscale(1)" }}
-          />
-        )}
+        <Image
+          src={cloudinaryImageId || "/assets/restaurant-default-cover.jpg"}
+          alt={resName || name}
+          loading="lazy"
+          fill
+          sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          style={{ filter: isAvailable ? "grayscale(0)" : "grayscale(1)" }}
+        />
         {icon && (
           <Image
             src={icon}

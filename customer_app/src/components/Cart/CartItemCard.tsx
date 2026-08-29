@@ -111,7 +111,7 @@ const CartItemCard = ({
           className="group relative block h-24 w-28 cursor-zoom-in overflow-hidden rounded-2xl bg-color-7 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none sm:h-28 sm:w-32"
         >
           <Image
-            src={item?.backgrounds?.[0] || "/assets/FoodAndDrinkDesign.svg"}
+            src={item?.backgrounds?.[0] || "/assets/food-wrapper.jpeg"}
             alt={item?.title || "menu-img"}
             loading="lazy"
             fill
@@ -127,7 +127,7 @@ const CartItemCard = ({
       </div>
 
       <ImageViewer
-        src={item?.backgrounds?.[0] || "/assets/FoodAndDrinkDesign.svg"}
+        src={item?.backgrounds?.[0] || "/assets/food-wrapper.jpeg"}
         alt={item?.title}
         onClose={() => setViewerOpen(false)}
         open={viewerOpen}

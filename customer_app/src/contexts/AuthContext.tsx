@@ -27,6 +27,7 @@ import customerSchema from "@/lib/customerSchema";
 interface AuthContextValue {
   user: FirebaseUser | null;
   isAuthLoading: boolean;
+  signInError: Error | null;
   signInWithGoogle: () => Promise<void>;
   ensureCustomerDocument: (data?: {
     name?: string;
@@ -54,7 +55,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState<boolean>(true);
+  const [signInError, setSignInError] = useState<Error | null>(null);
   const redirectHandledRef = useRef(false);
+
+  const isDevLocalhost =
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1");
 
   const ensureCustomerDocument = useCallback(
     async (data?: { name?: string; phone?: string; provider?: string }) => {
@@ -84,6 +91,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const result = await getRedirectResult(auth);
       if (result) {
         await ensureCustomerDocument({ provider: "Google" });
+        dispatch(setUserUid(result.user.uid));
+        setSignInError(null);
         setUser(result.user);
       }
     } catch (err: unknown) {
@@ -94,13 +103,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ) {
         return;
       }
+      setSignInError(err instanceof Error ? err : new Error(String(err)));
       console.error("Error completing Google sign in:", getErrorMessage(err));
     }
-  }, [ensureCustomerDocument]);
+  }, [ensureCustomerDocument, dispatch]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
+        setSignInError(null);
         dispatch(setUserUid(currentUser.uid));
         setUser(currentUser);
       } else {
@@ -121,23 +132,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = useCallback(async (): Promise<void> => {
     const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider);
-      await ensureCustomerDocument({ provider: "Google" });
-      setUser(result.user);
+      if (isDevLocalhost) {
+        try {
+          const result = await signInWithPopup(auth, provider);
+          await ensureCustomerDocument({ provider: "Google" });
+          setSignInError(null);
+          setUser(result.user);
+          return;
+        } catch (err: unknown) {
+          const code = getAuthErrorCode(err);
+          if (code === "auth/popup-blocked") {
+            await signInWithRedirect(auth, provider);
+            return;
+          }
+          throw err;
+        }
+      }
+      await signInWithRedirect(auth, provider);
     } catch (err: unknown) {
       const code = getAuthErrorCode(err);
-      if (code === "auth/popup-blocked") {
-        try {
-          await signInWithRedirect(auth, provider);
-        } catch (redirectErr: unknown) {
-          console.error(
-            "Error starting Google sign in redirect:",
-            getErrorMessage(redirectErr)
-          );
-          throw redirectErr;
-        }
-        return;
-      }
       if (
         code === "auth/popup-closed-by-user" ||
         code === "auth/cancelled-popup-request"
@@ -146,7 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       throw err;
     }
-  }, [ensureCustomerDocument]);
+  }, [ensureCustomerDocument, isDevLocalhost]);
 
   const logout = useCallback(async (): Promise<void> => {
     try {
@@ -163,6 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         isAuthLoading,
+        signInError,
         signInWithGoogle,
         ensureCustomerDocument,
         logout,

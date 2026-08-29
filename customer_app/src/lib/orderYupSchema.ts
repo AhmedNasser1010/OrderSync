@@ -86,7 +86,6 @@ const orderYupSchema = yup.object().shape({
     .object()
     .shape({
       orderSource: yup.string().required(),
-      cancelAutoAssign: yup.boolean().required(),
     })
     .required(),
 

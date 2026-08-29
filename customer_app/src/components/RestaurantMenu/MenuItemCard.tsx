@@ -72,7 +72,7 @@ const MenuItemCard = ({
           className="group relative block h-28 w-32 cursor-zoom-in overflow-hidden rounded-2xl bg-color-7 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none sm:h-36 sm:w-44"
         >
           <Image
-            src={item?.backgrounds?.[0] || "/assets/FoodAndDrinkDesign.svg"}
+            src={item?.backgrounds?.[0] || "/assets/food-wrapper.jpeg"}
             alt={item?.title || "menu-img"}
             loading="lazy"
             fill
@@ -94,7 +94,7 @@ const MenuItemCard = ({
       </div>
 
       <ImageViewer
-        src={item?.backgrounds?.[0] || "/assets/FoodAndDrinkDesign.svg"}
+        src={item?.backgrounds?.[0] || "/assets/food-wrapper.jpeg"}
         alt={item?.title}
         onClose={() => setViewerOpen(false)}
         open={viewerOpen}

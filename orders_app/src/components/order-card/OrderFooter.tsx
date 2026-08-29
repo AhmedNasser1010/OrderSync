@@ -13,6 +13,7 @@ import ControlMenu from "./ControlMenu";
 import useOrderHandler from "@/hooks/order-handlers/useOrderHandlers";
 import { isFinalStatus } from "@ordersync/order-utils";
 import { cn } from "@/lib/utils";
+import { PRINT_INVOICE_ENABLED } from "@/lib/feature-flags";
 import {
   CheckCircle,
   CookingPot,
@@ -93,7 +94,7 @@ export default function OrderFooter({ id, activeTabValue, status, returnedByDriv
   const primaryLabelKey = primaryForward ? FORWARD_LABEL_KEYS[primaryForward] : null;
   const primaryLabel = primaryLabelKey ? ft(primaryLabelKey) : null;
 
-  const showPrintInvoice = printInvoice && activeTabValue !== "RECEIVED";
+  const showPrintInvoice = PRINT_INVOICE_ENABLED && printInvoice && activeTabValue !== "RECEIVED";
 
   const isReceived = status === "RECEIVED";
 

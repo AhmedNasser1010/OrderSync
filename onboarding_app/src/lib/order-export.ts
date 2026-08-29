@@ -214,11 +214,6 @@ export function buildOrderDetailRows(
   }
 
   push("Notes & Metadata", "Order Note", order.notes?.order);
-  push(
-    "Notes & Metadata",
-    "Cancel Auto-Assign",
-    order.metadata?.cancelAutoAssign ? "Yes" : "No",
-  );
   push("Notes & Metadata", "Created At", formatOrderDate(order.createdAt));
   push("Notes & Metadata", "Updated At", formatOrderDate(order.updatedAt));
 
