@@ -28,7 +28,7 @@ import getDeliveryFees from "@/utils/getDeliveryFees";
 import getDistanceFromLatlngInKm from "@/utils/getDistanceFromLatlngInKm";
 import orderYupSchema from "@/lib/orderYupSchema";
 import { placeOrderServer } from "@/app/actions/placeOrder";
-import { auth } from "@/lib/firebase";
+import { useAuthSession } from "@/hooks/useAuthSession";
 import type { PlaceOrderInput } from "@/lib/orderTypes";
 import type { InferType } from "yup";
 import type { CartItem } from "@/rtk/slices/cartSlice";
@@ -55,6 +55,7 @@ type Totals = {
 const usePlace = () => {
   const dispatch = useAppDispatch();
   const t = useTranslations();
+  const { isAuthenticated, getIdToken } = useAuthSession();
   // In-flight guard: prevents a second order from being submitted while a
   // previous submission is still running. Survives re-renders, so even a
   // rapidly re-rendered button cannot double-fire.
@@ -104,7 +105,7 @@ const usePlace = () => {
   };
 
   const checkIfUserIsLoggedIn = () => {
-    if (user?.uid) return true;
+    if (isAuthenticated) return true;
     showError("loginAndUpdateContactFirst");
     return false;
   };
@@ -334,11 +335,10 @@ const usePlace = () => {
   const placeOrderMutation = async (
     validatedData: InferType<typeof orderYupSchema>
   ) => {
-    const currentUser = auth.currentUser;
-    if (!currentUser) {
+    const idToken = await getIdToken();
+    if (!idToken) {
       throw { code: "UNAUTHORIZED" };
     }
-    const idToken = await currentUser.getIdToken();
     const result = await placeOrderServer({
       idToken,
       orderData: validatedData as unknown as PlaceOrderInput,

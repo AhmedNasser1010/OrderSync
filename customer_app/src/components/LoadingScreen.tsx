@@ -1,18 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import { useFetchBusinessesQuery } from "@/rtk/api/firestoreApi";
 import { cn } from "@/lib/utils";
 
 export default function LoadingScreen() {
-  const { isAuthLoading } = useAuth();
   const { isLoading: isRestaurantsLoading } = useFetchBusinessesQuery();
 
   const [fading, setFading] = useState(false);
   const [hidden, setHidden] = useState(false);
 
-  const ready = !isAuthLoading && !isRestaurantsLoading;
+  const ready = !isRestaurantsLoading;
 
   useEffect(() => {
     if (!ready) return;

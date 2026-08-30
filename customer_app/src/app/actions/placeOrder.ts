@@ -4,6 +4,10 @@ import { initAdmin } from "@/lib/firebase-admin";
 import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import {
+  getSessionCookieValue,
+  verifySessionCookie,
+} from "@/lib/auth/session";
+import {
   TERMINAL_STATUSES,
   calculateOrderFinance,
 } from "@ordersync/order-utils";
@@ -128,16 +132,31 @@ export async function placeOrderServer(args: {
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let decoded;
-    try {
-      decoded = await auth.verifyIdToken(idToken);
-    } catch {
-      return { success: false, code: "UNAUTHORIZED" };
+    let decodedUid: string | null = null;
+
+    // Preferred: verify the httpOnly session cookie established at sign-in.
+    const session = await getSessionCookieValue();
+    if (session) {
+      const sessionUser = await verifySessionCookie(session);
+      if (sessionUser) {
+        decodedUid = sessionUser.uid;
+      }
+    }
+
+    // Fallback: verify the client-supplied ID token.
+    if (!decodedUid && idToken) {
+      try {
+        const decoded = await auth.verifyIdToken(idToken);
+        decodedUid = decoded.uid;
+      } catch {
+        // fall through to the uid check below
+      }
     }
 
     if (
-      decoded.uid !== orderData.customerUid ||
-      decoded.uid !== orderData.customer?.uid
+      !decodedUid ||
+      decodedUid !== orderData.customerUid ||
+      decodedUid !== orderData.customer?.uid
     ) {
       return { success: false, code: "UNAUTHORIZED" };
     }

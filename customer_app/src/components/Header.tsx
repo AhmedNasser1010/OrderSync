@@ -32,14 +32,9 @@ import {
 import { LOGO_URL } from "@/utils/constants";
 import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
-import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { initUser } from "@/rtk/slices/userSlice";
 import { initServices } from "@/rtk/slices/servicesSlice";
 import { useFetchServicesQuery } from "@/rtk/api/firestoreApi";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuthSession } from "@/hooks/useAuthSession";
 import { toast } from "sonner";
 import DeliveryLocation from "@/components/DeliveryLocation";
 import ProfileAvatar from "@/components/Sidebar/ProfileAvatar";
@@ -201,7 +196,7 @@ function Header() {
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector((state) => state.cart.items);
   const user = useAppSelector((state) => state.user);
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuthSession();
   const router = useRouter();
   const pathname = usePathname();
   const isRTL = locale === "ar";
@@ -216,7 +211,7 @@ function Header() {
   );
 
   const isHome = pathname === `/${locale}` || pathname === "/";
-  const isLoggedIn = !!user?.userInfo?.uid;
+  const isLoggedIn = isAuthenticated;
 
   const { data: servicesConfig } = useFetchServicesQuery();
 
@@ -233,41 +228,16 @@ function Header() {
   }, [servicesConfig, dispatch]);
 
   useEffect(() => {
-    let unsub: (() => void) | null = null;
-
-    const unsubAuth = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser?.uid) {
-        const userRef = doc(db, "customers", currentUser.uid);
-        unsub = onSnapshot(
-          userRef,
-          (docSnapshot) => {
-            if (docSnapshot.exists()) {
-              dispatch(initUser(docSnapshot.data()));
-            }
-          },
-          (error) => {
-            console.error("Error in real-time listener [customers]:", error?.message);
-          }
-        );
-      }
-    });
-
-    return () => {
-      unsub?.();
-      unsubAuth();
-    };
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (user?.userInfo?.uid && user?.userInfo?.phone) {
+    if (isLoggedIn && user?.userInfo?.uid && !user?.userInfo?.phone) {
       toast(t("updateContactInfoAfterLogin"), {
         position: "top-center",
         duration: 4000,
       });
+      document.body.classList.add("overflow-hidden");
       dispatch(toggleLoginSidebar());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isLoggedIn, user?.userInfo?.uid, user?.userInfo?.phone]);
 
   useEffect(() => {
     dispatch(toggleLng(locale));
@@ -467,7 +437,7 @@ function Header() {
               <li>
                 <button
                   type="button"
-                  onClick={handleLoginSidebar}
+                  onClick={() => router.push("/signin")}
                   className="flex items-center gap-1.5 rounded-full border border-color-7 px-4 py-2 text-sm font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none cursor-pointer"
                 >
                   <UserIcon className="size-4 text-color-5" />
@@ -580,7 +550,7 @@ function Header() {
                 type="button"
                 onClick={() => {
                   setMenuOpen(false);
-                  handleLoginSidebar();
+                  router.push("/signin");
                 }}
                 className="w-full flex items-center justify-center gap-2 rounded-2xl border border-color-7 py-3 font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40 cursor-pointer"
               >

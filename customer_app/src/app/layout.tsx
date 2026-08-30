@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cairo, Alexandria } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthBootstrap } from "@/components/AuthBootstrap";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SerwistProvider } from "./serwist";
 
@@ -79,7 +79,7 @@ export default function RootLayout({
         >
           <StoreProvider>
             <ThemeProvider>
-              <AuthProvider>{children}</AuthProvider>
+              <AuthBootstrap>{children}</AuthBootstrap>
             </ThemeProvider>
           </StoreProvider>
         </SerwistProvider>

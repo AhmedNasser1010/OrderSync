@@ -10,6 +10,7 @@ import trackingSlice from "./slices/trackingSlice";
 import servicesSlice from "./slices/servicesSlice";
 import filterSlice from "./slices/filterSlice";
 import constantsSlice from "./slices/constantsSlice";
+import authSlice from "./slices/authSlice";
 
 import { firestoreApi } from "./api/firestoreApi";
 
@@ -27,6 +28,7 @@ export const makeStore = () => {
       services: servicesSlice,
       filter: filterSlice,
       constants: constantsSlice,
+      auth: authSlice,
       [firestoreApi.reducerPath]: firestoreApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>

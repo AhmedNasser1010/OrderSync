@@ -5,45 +5,19 @@ import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import {
   XIcon,
+  ArrowLeftIcon,
   CheckCircleIcon,
-  XCircleIcon,
-  AlertCircleIcon,
   LogOutIcon,
   ChevronDownIcon,
+  UserRoundIcon,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { toggleLoginSidebar, toggleLng } from "@/rtk/slices/toggleSlice";
-import { useAuth } from "@/contexts/AuthContext";
-import { useClickGuard } from "@/hooks/useClickGuard";
+import { useAuthSession } from "@/hooks/useAuthSession";
 import { useRouter } from "@/i18n/routing";
 import { LOGO_URL } from "@/utils/constants";
-import UserForm from "@/components/Sidebar/UserForm";
 import ProfileAvatar from "@/components/Sidebar/ProfileAvatar";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-
-function GoogleLogo({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 48 48" className={className} aria-hidden>
-      <path
-        fill="#EA4335"
-        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-      />
-      <path
-        fill="#4285F4"
-        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-      />
-      <path
-        fill="#34A853"
-        d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-      />
-    </svg>
-  );
-}
 
 const LoginSidebar = () => {
   const t = useTranslations();
@@ -55,38 +29,15 @@ const LoginSidebar = () => {
   );
   const user = useAppSelector((state) => state.user);
   const lng = useAppSelector((state) => state.toggle.lng);
-  const { user: authUser, signInWithGoogle, logout, signInError } = useAuth();
+  const { isAuthenticated, logout, isOnboardingComplete } = useAuthSession();
 
-  const [expandUserInfo, setExpandUserInfo] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
-  const [prevSidebarOpen, setPrevSidebarOpen] = useState(isLoginSidebarOpen);
-
-  if (isLoginSidebarOpen && prevSidebarOpen !== isLoginSidebarOpen) {
-    setPrevSidebarOpen(isLoginSidebarOpen);
-    if (
-      user?.userInfo &&
-      (!user.userInfo?.name ||
-        !user.userInfo?.phone ||
-        !user.locations?.home?.address ||
-        !user.locations?.home?.latlng?.[0])
-    ) {
-      setExpandUserInfo(true);
-    }
-  }
-
-  const isRTL = locale === "ar";
-  const isLoggedIn = !!authUser;
 
   useEffect(() => {
     if (!confirmLogout) return;
     const timer = setTimeout(() => setConfirmLogout(false), 5000);
     return () => clearTimeout(timer);
   }, [confirmLogout]);
-
-  useEffect(() => {
-    if (!signInError) return;
-    toast.error(t("Google sign in failed"), { position: "top-center" });
-  }, [signInError, t]);
 
   const changeLanguage = (lng: string) => {
     router.replace("/", { locale: lng });
@@ -96,7 +47,6 @@ const LoginSidebar = () => {
   const handleCloseSidebar = () => {
     dispatch(toggleLoginSidebar());
     document.body.classList.remove("overflow-hidden");
-    setExpandUserInfo(false);
     setConfirmLogout(false);
   };
 
@@ -115,37 +65,19 @@ const LoginSidebar = () => {
     handleCloseSidebar();
   };
 
-  const handleGoogleSignIn = async () => {
-    try {
-      await signInWithGoogle();
-    } catch {
-      toast.error(t("Google sign in failed"), { position: "top-center" });
-    }
+  const handleGoToSignin = () => {
+    handleCloseSidebar();
+    router.push("/signin");
   };
 
-  const { run: runGoogleSignIn, busy: isGoogleSigningIn } = useClickGuard(
-    handleGoogleSignIn,
-    { cooldown: 1500 }
-  );
+  const handleGoToOnboarding = () => {
+    handleCloseSidebar();
+    router.push("/onboarding");
+  };
 
-  const checks = [
-    { label: t("Name"), done: !!user?.userInfo?.name },
-    { label: t("Phone Number"), done: !!user?.userInfo?.phone },
-    { label: t("Address"), done: !!user?.locations?.home?.address },
-    {
-      label: t("Location"),
-      done:
-        !!user?.locations?.home?.latlng?.[0] &&
-        !!user?.locations?.home?.latlng?.[1],
-    },
-  ];
-  const completedCount = checks.filter((c) => c.done).length;
-  const percent = Math.round((completedCount / checks.length) * 100);
-  const isCompletedForm = completedCount === checks.length;
+  const isRTL = locale === "ar";
 
-  const avatarUrl =
-    authUser?.photoURL ||
-    (user?.userInfo as { avatar?: string } | undefined)?.avatar;
+  const avatarUrl = (user?.userInfo as { avatar?: string } | undefined)?.avatar;
 
   const pillPosition =
     (lng === "ar") === isRTL ? "left-1.5" : "right-1.5";
@@ -154,7 +86,7 @@ const LoginSidebar = () => {
     <>
       <div
         className={cn(
-          "login-sidebar fixed top-0 h-full overflow-y-scroll bg-card transition-all duration-500 z-40 px-5 py-5 w-full sm:px-8 sm:py-6 flex flex-col sm:w-[500px]",
+          "login-sidebar fixed top-0 h-full overflow-y-scroll bg-card transition-all duration-500 z-40 px-5 py-5 w-full sm:px-8 sm:py-6 flex flex-col sm:w-[420px]",
           isRTL ? "left-0" : "right-0",
           isLoginSidebarOpen
             ? "translate-x-0"
@@ -180,7 +112,7 @@ const LoginSidebar = () => {
           </button>
         </div>
 
-        {!isLoggedIn ? (
+        {!isAuthenticated ? (
           <div className="flex-1">
             {/* Hero */}
             <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-color-2 via-[#ff8c3b] to-[#ffab4a] p-6 text-white mb-6 shadow-lg shadow-color-2/25">
@@ -202,15 +134,14 @@ const LoginSidebar = () => {
               </div>
             </div>
 
-            {/* Google sign-in */}
+            {/* Google sign-in redirect */}
             <button
               type="button"
-              onClick={(e) => void runGoogleSignIn(e as never)}
-              disabled={isGoogleSigningIn}
-              className="group w-full flex items-center justify-center gap-3 rounded-2xl border border-color-7 bg-card py-4 px-4 text-base font-ProximaNovaSemiBold text-color-1 shadow-sm transition-all duration-200 hover:border-color-2/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer disabled:cursor-wait disabled:opacity-70"
+              onClick={handleGoToSignin}
+              className="group w-full flex items-center justify-center gap-3 rounded-2xl border border-color-7 bg-card py-4 px-4 text-base font-ProximaNovaSemiBold text-color-1 shadow-sm transition-all duration-200 hover:border-color-2/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer"
             >
-              <GoogleLogo className="size-5 shrink-0" />
-              {isGoogleSigningIn ? t("Signing in") : t("Login With Google")}
+              <span>{t("Login With Google")}</span>
+              <ArrowLeftIcon className="size-4 text-color-5 -scale-x-100 rtl:scale-x-100" />
             </button>
 
             <p className="mt-4 text-center text-xs font-ProximaNovaThin text-color-5">
@@ -232,84 +163,36 @@ const LoginSidebar = () => {
                 <h2 className="text-color-1 font-ProximaNovaBold text-xl leading-tight truncate">
                   {user?.userInfo?.name || t("Guest")}
                 </h2>
-                <p className="text-color-5 font-ProximaNovaThin text-sm truncate">
+                <p className="text-color-5 font-ProximaNovaThin text-sm truncate" dir="ltr">
                   {user?.userInfo?.phone || t("No phone number added")}
                 </p>
               </div>
             </div>
 
-            {/* Completion progress */}
-            <div className="rounded-2xl border border-color-7 bg-card p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-[11px] uppercase tracking-wider text-color-5 font-ProximaNovaSemiBold">
-                  {t("Profile completion")}
-                </span>
-                <span className="text-color-2 font-ProximaNovaBold text-sm">
-                  {percent}%
-                </span>
+            {isOnboardingComplete === false && (
+              <div className="rounded-2xl border border-color-2/30 bg-color-2/10 p-4">
+                <p className="text-sm font-ProximaNovaMed text-color-1">
+                  {t("ProfileIncomplete")}
+                </p>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-color-7 mb-4">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-color-2 to-[#ffab4a] transition-all duration-500"
-                  style={{ width: `${percent}%` }}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                {checks.map((c) => (
-                  <span
-                    key={c.label}
-                    className="flex items-center gap-2 text-sm font-ProximaNovaMed"
-                  >
-                    {c.done ? (
-                      <CheckCircleIcon className="size-4 shrink-0 text-color-11" />
-                    ) : (
-                      <XCircleIcon className="size-4 shrink-0 text-red-400" />
-                    )}
-                    <span
-                      className={cn(
-                        "truncate",
-                        c.done ? "text-color-1" : "text-color-5"
-                      )}
-                    >
-                      {c.label}
-                    </span>
-                  </span>
-                ))}
-              </div>
-            </div>
+            )}
 
-            {/* Update user info */}
-            <div>
-              <button
-                onClick={() => setExpandUserInfo((expand) => !expand)}
-                className={cn(
-                  "w-full flex items-center justify-between gap-3 rounded-2xl px-5 py-4 text-white font-ProximaNovaSemiBold text-base transition-all duration-200 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer",
-                  isCompletedForm
-                    ? "bg-color-11 hover:bg-color-11/90"
-                    : "bg-color-2 hover:bg-color-2/90"
+            {/* Edit profile */}
+            <button
+              type="button"
+              onClick={handleGoToOnboarding}
+              className="w-full flex items-center justify-between gap-3 rounded-2xl bg-color-2 px-5 py-4 text-white font-ProximaNovaSemiBold text-base transition-all duration-200 hover:bg-color-2/90 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer"
+            >
+              <span className="flex items-center gap-2.5">
+                {isOnboardingComplete ? (
+                  <CheckCircleIcon className="size-5 shrink-0" />
+                ) : (
+                  <UserRoundIcon className="size-5 shrink-0" />
                 )}
-              >
-                <span className="flex items-center gap-2.5">
-                  {isCompletedForm ? (
-                    <CheckCircleIcon className="size-5 shrink-0" />
-                  ) : (
-                    <AlertCircleIcon className="size-5 shrink-0" />
-                  )}
-                  {t("Update User Information")}
-                </span>
-                <ChevronDownIcon
-                  className={cn(
-                    "size-5 shrink-0 transition-transform duration-300",
-                    expandUserInfo && "rotate-180"
-                  )}
-                />
-              </button>
-              {expandUserInfo && (
-                <div className="mt-4">
-                  <UserForm />
-                </div>
-              )}
-            </div>
+                {t("Update User Information")}
+              </span>
+              <ChevronDownIcon className="size-5 shrink-0 -rotate-90" />
+            </button>
           </div>
         )}
 
@@ -346,7 +229,7 @@ const LoginSidebar = () => {
             </button>
           </div>
 
-          {isLoggedIn &&
+          {isAuthenticated &&
             (!confirmLogout ? (
               <button
                 onClick={() => setConfirmLogout(true)}
