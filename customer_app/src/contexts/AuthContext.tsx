@@ -126,25 +126,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = useCallback(async (): Promise<void> => {
     const provider = new GoogleAuthProvider();
-    try {
-      const result = await signInWithPopup(auth, provider);
-      await ensureCustomerDocument({ provider: "Google" });
-      setSignInError(null);
-      setUser(result.user);
-    } catch (err: unknown) {
-      const code = getAuthErrorCode(err);
-      if (code === "auth/popup-blocked") {
-        await signInWithRedirect(auth, provider);
+    const hostname =
+      typeof window !== "undefined"
+        ? window.location.hostname
+        : typeof process !== "undefined" && process.env
+          ? process.env.NEXT_PUBLIC_FIREBASE_AUTHDOMAIN || ""
+          : "";
+    const isLocalhost =
+      hostname === "localhost" || hostname === "127.0.0.1";
+
+    // Popup is only reliable when the auth iframe is same-origin (local dev).
+    // On cross-origin hosts (e.g. Vercel) desktop browsers block the popup and
+    // the third-party handshake, so use the full-page redirect instead.
+    if (isLocalhost) {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        await ensureCustomerDocument({ provider: "Google" });
+        setSignInError(null);
+        setUser(result.user);
         return;
+      } catch (err: unknown) {
+        const code = getAuthErrorCode(err);
+        if (
+          code === "auth/popup-blocked" ||
+          code === "auth/popup-closed-by-user" ||
+          code === "auth/cancelled-popup-request"
+        ) {
+          await signInWithRedirect(auth, provider);
+          return;
+        }
+        throw err;
       }
-      if (
-        code === "auth/popup-closed-by-user" ||
-        code === "auth/cancelled-popup-request"
-      ) {
-        return;
-      }
-      throw err;
     }
+
+    await signInWithRedirect(auth, provider);
   }, [ensureCustomerDocument]);
 
   const logout = useCallback(async (): Promise<void> => {
