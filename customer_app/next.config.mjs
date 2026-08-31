@@ -9,6 +9,19 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin-allow-popups",
+          },
+        ],
+      },
+    ];
+  },
   async rewrites() {
     // Serve Firebase Auth's same-origin relay from this app's domain so the
     // auth iframe stays first-party. The locale-prefixed variant is needed
