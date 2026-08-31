@@ -57,9 +57,17 @@ export function SignInView() {
           {error && (
             <p
               role="alert"
-              className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-center text-sm font-ProximaNovaMed text-red-600"
+              className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-left text-sm font-ProximaNovaMed text-red-700"
             >
-              {t("Google sign in failed")}
+              <span className="block text-center text-red-600">
+                {t("Google sign in failed")}
+              </span>
+              <span className="mt-2 block rounded-lg bg-white/80 px-3 py-2 font-mono text-xs text-red-800">
+                {error.code}
+              </span>
+              <span className="mt-2 block text-xs leading-5 text-red-700/90">
+                {error.message}
+              </span>
             </p>
           )}
         </div>
