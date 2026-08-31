@@ -6,6 +6,14 @@ import { verifySessionCookie, SESSION_COOKIE_NAME } from "@/lib/auth/session";
 
 const intlMiddleware = createMiddleware(routing);
 
+function applyCoopHeader(response: Response) {
+  response.headers.set(
+    "Cross-Origin-Opener-Policy",
+    "same-origin-allow-popups"
+  );
+  return response;
+}
+
 export async function proxy(request: NextRequest) {
   const intlResponse = intlMiddleware(request);
 
@@ -23,12 +31,12 @@ export async function proxy(request: NextRequest) {
   }
 
   if (isSignin && sessionUser) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return applyCoopHeader(NextResponse.redirect(new URL("/", request.url)));
   }
 
-  return intlResponse ?? NextResponse.next({ request });
+  return applyCoopHeader(intlResponse ?? NextResponse.next({ request }));
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!api|_next|_vercel|.*\\..*|.*__/auth).*)"],
 };
