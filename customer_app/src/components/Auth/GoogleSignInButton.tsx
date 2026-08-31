@@ -5,6 +5,19 @@ import { useAuthSession } from "@/hooks/useAuthSession";
 import { useClickGuard } from "@/hooks/useClickGuard";
 import { toast } from "sonner";
 
+function getAuthErrorDetails(error: unknown) {
+  if (typeof error === "object" && error !== null) {
+    const code = "code" in error ? String((error as { code?: unknown }).code ?? "") : "";
+    const message =
+      "message" in error
+        ? String((error as { message?: unknown }).message ?? "")
+        : "";
+    return { code, message };
+  }
+
+  return { code: "", message: String(error) };
+}
+
 function GoogleLogo({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 48 48" className={className} aria-hidden>
@@ -44,7 +57,9 @@ export function GoogleSignInButton({
       if (redirectTo && redirectTo !== "onboarding") {
         window.location.href = redirectTo;
       }
-    } catch {
+    } catch (error) {
+      const details = getAuthErrorDetails(error);
+      console.error("Google sign in failed", details, error);
       toast.error(t("Google sign in failed"), { position: "top-center" });
     }
   };
