@@ -10,12 +10,17 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async rewrites() {
-    // Serve Firebase Auth's same-origin relay (/__/auth/*) from this app's
-    // domain so the auth iframe stays first-party. Only takes effect when
-    // NEXT_PUBLIC_FIREBASE_AUTHDOMAIN points at this app's own origin.
+    // Serve Firebase Auth's same-origin relay from this app's domain so the
+    // auth iframe stays first-party. The locale-prefixed variant is needed
+    // because next-intl uses `localePrefix: "always"` and Firebase builds the
+    // handler URL from the current localized page path.
     return [
       {
         source: "/__/auth/:path*",
+        destination: `https://${process.env.NEXT_PUBLIC_PROJECT_ID}.firebaseapp.com/__/auth/:path*`,
+      },
+      {
+        source: "/:locale/__/auth/:path*",
         destination: `https://${process.env.NEXT_PUBLIC_PROJECT_ID}.firebaseapp.com/__/auth/:path*`,
       },
     ];
