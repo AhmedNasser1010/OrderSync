@@ -7,7 +7,6 @@ import {
   signOut as firebaseSignOut,
   GoogleAuthProvider,
   signInWithPopup,
-  signInWithRedirect,
   getRedirectResult,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -163,9 +162,14 @@ export function useAuthSession() {
         code === "auth/popup-closed-by-user" ||
         code === "auth/cancelled-popup-request"
       ) {
-        // Fall back to redirect only if the popup could not open/complete.
-        await signInWithRedirect(auth, provider);
-        return;
+        dispatch(
+          setAuthError({
+            code: code ?? "auth/popup-blocked",
+            message:
+              "Google sign-in needs popups enabled in this browser. The redirect fallback is disabled because it is unreliable in production on this deployment.",
+          })
+        );
+        throw err;
       }
       dispatch(setAuthError(toAuthError(err)));
       throw err;
