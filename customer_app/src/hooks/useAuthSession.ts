@@ -157,6 +157,7 @@ export function useAuthSession() {
       return;
     } catch (err) {
       const code = getAuthErrorCode(err);
+      dispatch(setUnauthenticated());
       if (
         code === "auth/popup-blocked" ||
         code === "auth/popup-closed-by-user" ||

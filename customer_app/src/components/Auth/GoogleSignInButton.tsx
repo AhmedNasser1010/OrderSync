@@ -2,7 +2,6 @@
 
 import { useTranslations } from "next-intl";
 import { useAuthSession } from "@/hooks/useAuthSession";
-import { useClickGuard } from "@/hooks/useClickGuard";
 import { toast } from "sonner";
 
 function getAuthErrorDetails(error: unknown) {
@@ -49,7 +48,7 @@ export function GoogleSignInButton({
   className?: string;
 }) {
   const t = useTranslations();
-  const { signInWithGoogle } = useAuthSession();
+  const { signInWithGoogle, isAuthLoading } = useAuthSession();
 
   const handleSignIn = async () => {
     try {
@@ -64,22 +63,18 @@ export function GoogleSignInButton({
     }
   };
 
-  const { run, busy } = useClickGuard(handleSignIn, { cooldown: 1500 });
-
   return (
     <button
       type="button"
-      // Redirect sign-in navigates the full page, so guard the click and
-      // surface failures via toast for user feedback in the meantime.
-      onClick={(e) => void run(e as never)}
-      disabled={busy}
+      onClick={() => void handleSignIn()}
+      disabled={isAuthLoading}
       className={
         className ||
         "group w-full flex items-center justify-center gap-3 rounded-2xl border border-color-7 bg-card py-4 px-4 text-base font-ProximaNovaSemiBold text-color-1 shadow-sm transition-all duration-200 hover:border-color-2/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer disabled:cursor-wait disabled:opacity-70"
       }
     >
       <GoogleLogo className="size-5 shrink-0" />
-      {busy ? t("Signing in") : t("Login With Google")}
+      {isAuthLoading ? t("Signing in") : t("Login With Google")}
     </button>
   );
 }
