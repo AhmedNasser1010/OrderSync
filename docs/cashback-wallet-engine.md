@@ -325,7 +325,7 @@ reason**, and a recent-activity list fed by `useFetchWalletTransactionsQuery`.
 ### Onboarding (admin)
 | File | Purpose |
 |------|---------|
-| `onboarding_app/src/rtk/api/firestoreApi.ts` | `fetchServices`/`updateServices` + cashback; `fetchWalletTransactions` query |
+| `onboarding_app/src/rtk/api/firestoreApi.ts` | `fetchServices`/`updateServices` + cashback; `fetchWalletTransactions` query; `adjustCustomerCredit` mutation (invalidates `Customers` → auto-refetch of history + balance) |
 | `onboarding_app/src/app/(dashboard)/settings/page.tsx` | cashback settings UI |
 | `onboarding_app/src/app/actions/adjustCredit.ts` | NEW — manual grant/revoke (Admin SDK) |
 | `onboarding_app/src/components/dashboard/AdjustCreditDialog.tsx` | NEW — adjust UI |

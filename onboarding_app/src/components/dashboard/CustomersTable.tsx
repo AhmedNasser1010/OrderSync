@@ -47,7 +47,6 @@ export function CustomersTable({
 
   const {
     data: creditTransactions = [],
-    refetch: refetchCreditTransactions,
   } = useFetchWalletTransactionsQuery(creditTarget?.uid ?? "", {
     skip: !creditTarget?.uid,
   });
@@ -58,7 +57,6 @@ export function CustomersTable({
   };
 
   const handleAdjusted = () => {
-    refetchCreditTransactions();
     setCreditRefreshKey((k) => k + 1);
   };
 

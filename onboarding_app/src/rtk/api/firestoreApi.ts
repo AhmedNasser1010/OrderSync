@@ -21,6 +21,7 @@ import { menuHasOffers } from "@/lib/menuHasOffers";
 import { deleteAuthUser } from "@/app/actions/deleteAuthUser";
 import { getUserProvider } from "@/app/actions/getUserProvider";
 import { setUserRoleClaim } from "@/app/actions/setUserRoleClaim";
+import { adjustCredit } from "@/app/actions/adjustCredit";
 import type {
   RestaurantStatusTypes,
   BusinessDocument,
@@ -1328,6 +1329,36 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ["Customers"],
     }),
+    adjustCustomerCredit: builder.mutation<
+      { success: boolean; newBalance?: number; code?: string },
+      {
+        targetUserId: string;
+        amount: number;
+        reason: string;
+        adminUid: string;
+        days?: number;
+      }
+    >({
+      async queryFn(args) {
+        try {
+          const result = await adjustCredit(args);
+          if (!result.success) {
+            return {
+              error: {
+                status: 400,
+                data: (result as { code?: string }).code,
+              },
+            };
+          }
+          return { data: result };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Write Operation [adjustCustomerCredit]:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Customers"],
+    }),
     createDriverDocument: builder.mutation<
       null,
       {
@@ -1548,5 +1579,6 @@ export const {
   useInitializeDailyAdvanceMutation,
   useSettleDriverAccountMutation,
   useUpdateCustomerDocumentMutation,
+  useAdjustCustomerCreditMutation,
   useSetReviewVisibilityMutation,
 } = firestoreApi;

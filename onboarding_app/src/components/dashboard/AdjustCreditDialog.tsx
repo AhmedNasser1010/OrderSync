@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Wallet } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { adjustCredit } from "@/app/actions/adjustCredit";
+import { useAdjustCustomerCreditMutation } from "@/rtk/api/firestoreApi";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import type { CustomerType, WalletTransaction } from "@ordersync/types";
@@ -55,10 +55,11 @@ export function AdjustCreditDialog({
   onAdjusted,
 }: AdjustCreditDialogProps) {
   const { user } = useAuth();
+  const [adjustCustomerCredit, { isLoading: isAdjusting }] =
+    useAdjustCustomerCreditMutation();
   const [amount, setAmount] = useState("");
   const [reason, setReason] = useState("");
   const [mode, setMode] = useState<"grant" | "revoke">("grant");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const name =
@@ -84,32 +85,29 @@ export function AdjustCreditDialog({
       setError("A reason is required for the audit trail.");
       return;
     }
-    setLoading(true);
     setError(null);
     try {
-      const result = await adjustCredit({
+      await adjustCustomerCredit({
         targetUserId: customer.uid,
         amount: mode === "grant" ? numeric : -numeric,
         reason: reason.trim(),
         adminUid: user.uid,
-      });
-      if (!result.success) {
-        setError(
-          result.code === "REASON_REQUIRED"
-            ? "A reason is required."
-            : result.code === "FORBIDDEN"
-              ? "You do not have permission."
-              : "Failed to adjust credits."
-        );
-        return;
-      }
+      }).unwrap();
       reset();
       onAdjusted();
       onOpenChange(false);
-    } catch {
-      setError("Failed to adjust credits.");
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      const code =
+        typeof err === "object" && err !== null && "data" in err
+          ? (err as { data?: string }).data
+          : undefined;
+      if (code === "REASON_REQUIRED") {
+        setError("A reason is required.");
+      } else if (code === "FORBIDDEN") {
+        setError("You do not have permission.");
+      } else {
+        setError("Failed to adjust credits.");
+      }
     }
   };
 
@@ -231,9 +229,9 @@ export function AdjustCreditDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={loading || !amount || !reason.trim()}
+            disabled={isAdjusting || !amount || !reason.trim()}
           >
-            {loading ? "Saving..." : "Apply credit"}
+            {isAdjusting ? "Saving..." : "Apply credit"}
           </Button>
         </DialogFooter>
       </DialogContent>
