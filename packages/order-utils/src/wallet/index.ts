@@ -19,6 +19,7 @@ export {
 export type {
   CreditInput,
   TransactionInput,
+  RedeemLedgerEntry,
   WalletDataShape,
   WalletCtx,
   FirestoreDocument,

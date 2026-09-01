@@ -6,7 +6,11 @@ import {
   createWalletCtx,
   clawbackOnCancellation,
 } from "@ordersync/order-utils";
-import type { OrderType, WalletCredit } from "@ordersync/types";
+import type {
+  OrderType,
+  WalletCredit,
+  WalletTransaction,
+} from "@ordersync/types";
 
 export type ClawbackResult =
   | { success: true; clawbackAmount: number; restoredAmount: number }
@@ -60,6 +64,19 @@ export async function handleOrderClawback(
       }
     }
 
+    // Exact amount each credit spent on this order, from the REDEEM ledger.
+    // Required to restore partially-consumed credits (which stay ACTIVE but
+    // with a reduced amount that no longer reflects what the order spent).
+    const ledgerSnap = await db
+      .collection("wallet_transactions")
+      .where("type", "==", "REDEEM")
+      .where("orderId", "==", orderId)
+      .get();
+    const redeemedLedger = ledgerSnap.docs.map((doc) => {
+      const data = doc.data() as Partial<WalletTransaction>;
+      return { creditId: String(data.creditId ?? ""), amount: data.amount ?? 0 };
+    });
+
     const earnedCredit = earned.docs[0]
       ? ({ id: earned.docs[0].id, ...earned.docs[0].data() } as WalletCredit)
       : null;
@@ -67,6 +84,16 @@ export async function handleOrderClawback(
     const customerDocRef = db.collection("customers").doc(uid);
 
     return await db.runTransaction(async (transaction) => {
+      // Idempotency: if this order was already refunded, do nothing. Reads in
+      // the transaction make concurrent/clawback retries conflict-safe.
+      const orderSnapInTx = await transaction.get(orderRef);
+      const orderInTx = orderSnapInTx.exists
+        ? (orderSnapInTx.data() as OrderType & { walletRefundedAt?: number })
+        : null;
+      if (orderInTx?.walletRefundedAt != null) {
+        return { success: true, clawbackAmount: 0, restoredAmount: 0 };
+      }
+
       const ctx = createWalletCtx(
         {
           transaction,
@@ -90,9 +117,12 @@ export async function handleOrderClawback(
           orderId,
           earnedCredit,
           redeemedCredits: redeemed,
+          redeemedLedger,
         },
         "system"
       );
+
+      transaction.update(orderRef, { walletRefundedAt: Date.now() });
 
       return {
         success: true,
