@@ -204,9 +204,12 @@ export function AdjustCreditDialog({
                     >
                       {TYPE_LABEL[tx.type] ?? tx.type}
                     </Badge>
-                    <span className="text-muted-foreground truncate">
-                      {tx.reason || format(new Date(tx.createdAt), "MMM dd, yyyy")}
-                    </span>
+                    <div className="min-w-0">
+                      {tx.reason && <p className="truncate">{tx.reason}</p>}
+                      <p className="text-[10px] text-muted-foreground truncate">
+                        {format(new Date(tx.createdAt), "dd/MM/yyyy hh:mm a")}
+                      </p>
+                    </div>
                   </div>
                   <span
                     className={cn(
