@@ -71,6 +71,9 @@ const usePlace = () => {
   const orderDiscounts = useAppSelector(
     (state) => state.menu.orderDiscounts || []
   );
+  const checkout = useAppSelector((state) => state.checkout);
+  const wallet = useAppSelector((state) => state.wallet);
+  const cartTotal = useAppSelector((state) => state.cart);
   const currentRes = restaurants?.find(
     (restaurant) => restaurant.accessToken === cart.restaurant
   );
@@ -260,6 +263,20 @@ const usePlace = () => {
 
     const subtotal = cartTotalPrice.total - deliveryFees;
     const discount = cartTotalPrice.total - cartTotalPrice.discount;
+    const baseTotal = cartTotalPrice.discount;
+
+    // Wallet redemption: how much the customer wants to apply, clamped to the
+    // available balance and to the current cart total. The server re-validates
+    // and re-computes this authoritatively.
+    const useWallet = checkout?.useWallet === true;
+    const requestedWallet = Number(checkout?.walletRedeemed ?? 0);
+    const walletRedeemed =
+      useWallet && wallet?.balance > 0
+        ? Math.max(
+            0,
+            Math.min(Math.floor(requestedWallet || wallet.balance), baseTotal)
+          )
+        : 0;
 
     return {
       customerUid: user.uid as string,
@@ -291,11 +308,12 @@ const usePlace = () => {
         subtotal,
         discount,
         deliveryFees,
-        total: cartTotalPrice.discount,
+        total: baseTotal,
         ...(autoDiscount && {
           promoCode: autoDiscount.code,
           promoDiscount: calculateDiscountAmount(subtotal, autoDiscount),
         }),
+        walletRedeemed: walletRedeemed > 0 ? walletRedeemed : undefined,
       },
       payment: {
         method: "CASH",
@@ -305,7 +323,7 @@ const usePlace = () => {
         subtotal,
         discount,
         deliveryFees,
-        total: cartTotalPrice.discount,
+        total: baseTotal,
         commissionPercent:
           currentRes?.commissionPercent ?? DEFAULT_COMMISSION_PERCENT,
       }),

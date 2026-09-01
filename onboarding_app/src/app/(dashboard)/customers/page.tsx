@@ -32,6 +32,7 @@ const customerColumns: ExportColumn[] = [
   { header: "Total Restaurants", accessor: "restaurants.length" },
   { header: "Created At", accessor: "createdAt" },
   { header: "Updated At", accessor: "updatedAt" },
+  { header: "Wallet Balance", accessor: "wallet.balance" },
 ];
 
 function getDateRangeMs(dateRange: string): number | null {

@@ -49,6 +49,30 @@ export {
 } from "./businessDay";
 
 export {
+  createWalletCtx,
+  grantCredit,
+  getCustomerBalance,
+  writeTx,
+  redeemCredits,
+  clawbackOnCancellation,
+  expireCredits,
+  getActiveCredits,
+  round2,
+  DAY_MS,
+  DEFAULT_WIPE_DAYS,
+} from "./wallet";
+export type {
+  WalletCtx,
+  WalletCtxDeps,
+  GrantResult,
+  RedeemResult,
+  ClawbackResult,
+  ExpireResult,
+  CreditInput,
+  TransactionInput,
+} from "./wallet";
+
+export {
   isDiscountActive,
   calculateDiscountAmount,
   evaluateConditions,

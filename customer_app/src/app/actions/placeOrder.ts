@@ -10,11 +10,16 @@ import {
 import {
   TERMINAL_STATUSES,
   calculateOrderFinance,
+  createWalletCtx,
+  redeemCredits,
+  getActiveCredits,
 } from "@ordersync/order-utils";
 import type {
   MainMenuType,
   OrderStatusType,
   DeliveryFeesConfig,
+  WalletCredit,
+  CashbackConfig,
 } from "@ordersync/types";
 import {
   computeServerPricing,
@@ -185,6 +190,19 @@ export async function placeOrderServer(args: {
 
     const orderRef = db.collection("orders").doc();
     const now = Date.now();
+
+    // Fetch the customer's active, unexpired cash-back credits outside the
+    // transaction (transaction.get() only supports document refs, not queries).
+    const activeCreditsSnap = await db
+      .collection("wallet_credits")
+      .where("userId", "==", orderData.customerUid)
+      .where("status", "==", "ACTIVE")
+      .get();
+    const activeCredits = getActiveCredits(
+      activeCreditsSnap.docs.map(
+        (doc) => ({ id: doc.id, ...doc.data() }) as WalletCredit
+      )
+    );
 
     const result: TransactionResult = await db.runTransaction(
       async (transaction) => {
@@ -372,20 +390,109 @@ export async function placeOrderServer(args: {
           return { error: { code: "PRICE_MISMATCH" } };
         }
 
+        // ------------------------------------------------------------------
+        // Cash Back redemption (server-authoritative).
+        // Cash back cannot be applied when the cart already carries a
+        // discount/promo, and redemption is capped by the platform config.
+        // ------------------------------------------------------------------
+        const cashbackConfig = (servicesConfig as unknown as {
+          cashback?: CashbackConfig;
+        }).cashback ?? {
+          enabled: false,
+          cashbackPercent: 0,
+          wipeDays: 90,
+          redemptionThreshold: 0,
+          maxCashbackPerTx: 0,
+        };
+        const hasDiscountOnOrder =
+          (serverPricing.promoCode != null && serverPricing.promoCode !== "") ||
+          (serverPricing.discount ?? 0) > 0;
+
+        let walletRedeemed = 0;
+        let walletCreditIds: string[] = [];
+
+        if (
+          cashbackConfig.enabled &&
+          !hasDiscountOnOrder &&
+          activeCredits.length > 0
+        ) {
+          const requested = Math.max(
+            0,
+            orderData.pricing.walletRedeemed ?? 0
+          );
+          const foodTotal = serverPricing.total;
+
+          if (
+            cashbackConfig.redemptionThreshold > 0 &&
+            foodTotal < cashbackConfig.redemptionThreshold
+          ) {
+            // below redemption threshold — do not apply
+          } else {
+            const cap = cashbackConfig.maxCashbackPerTx ?? 0;
+            const maxApply = cap > 0 ? Math.min(requested, cap) : requested;
+            const capped = Math.max(0, Math.min(maxApply, foodTotal));
+
+            const walletCtx = createWalletCtx(
+              {
+                transaction,
+                customerDocRef: () => customerRef,
+                creditsCol: (id?: string) =>
+                  id
+                    ? db.collection("wallet_credits").doc(id)
+                    : db.collection("wallet_credits").doc(),
+                transactionsCol: (id?: string) =>
+                  id
+                    ? db.collection("wallet_transactions").doc(id)
+                    : db.collection("wallet_transactions").doc(),
+              },
+              orderData.customerUid
+            );
+
+            const redeemed = await redeemCredits(
+              walletCtx,
+              {
+                userId: orderData.customerUid,
+                amount: capped,
+                orderId: orderRef.id,
+                activeCredits,
+              },
+              "customer"
+            );
+
+            walletRedeemed = redeemed.redeemedAmount;
+            walletCreditIds = redeemed.creditsUsed.map(
+              (c) => c.credit.id
+            );
+          }
+        }
+
         const orderNumber = randomOrderNumber();
 
-        const serverFinance = calculateOrderFinance({
+        const finalPricing = {
           ...serverPricing,
+          total: Math.max(0, serverPricing.total - walletRedeemed),
+          ...(walletRedeemed > 0 ? { walletRedeemed } : {}),
+        };
+
+        const serverFinance = calculateOrderFinance({
+          ...finalPricing,
           commissionPercent,
         });
 
         const businessSettings = restaurantData.settings ?? {};
         const marketplaceHidden = businessSettings.hideFromMarketplace === true;
 
+        const finalPayment = {
+          method: "CASH",
+          status: "COMPLETED" as const,
+          ...(walletCreditIds.length > 0 ? { walletCreditIds } : {}),
+        };
+
         const newOrder = {
           ...orderData,
           cart: serverLines,
-          pricing: serverPricing,
+          pricing: finalPricing,
+          payment: finalPayment,
           finance: serverFinance,
           id: orderRef.id,
           orderNumber,
@@ -416,7 +523,7 @@ export async function placeOrderServer(args: {
             pendingLoyalty: {
               orderId: orderRef.id,
               restaurant: orderData.business.id,
-              amount: serverPricing.total,
+              amount: finalPricing.total,
               items: serverLines.reduce(
                 (sum, item) => sum + (item.quantity || 0),
                 0

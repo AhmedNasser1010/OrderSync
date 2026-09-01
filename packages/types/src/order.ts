@@ -106,11 +106,14 @@ export type OrderType = {
     discount: number;
     deliveryFees: number;
     total: number;
+    walletRedeemed?: number;
+    cashbackEarned?: number;
   };
 
   payment: {
     method: string;
     status: string;
+    walletCreditIds?: string[];
   };
 
   finance: {

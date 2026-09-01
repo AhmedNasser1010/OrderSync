@@ -17,6 +17,7 @@ import {
   ChevronDownIcon,
   LogOutIcon,
   ShoppingCartIcon,
+  WalletIcon,
   GlobeIcon,
   UserIcon,
   SunIcon,
@@ -33,7 +34,11 @@ import { LOGO_URL } from "@/utils/constants";
 import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { initServices } from "@/rtk/slices/servicesSlice";
-import { useFetchServicesQuery } from "@/rtk/api/firestoreApi";
+import { initWallet } from "@/rtk/slices/walletSlice";
+import {
+  useFetchServicesQuery,
+  useFetchWalletBalanceQuery,
+} from "@/rtk/api/firestoreApi";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { toast } from "sonner";
 import DeliveryLocation from "@/components/DeliveryLocation";
@@ -196,7 +201,7 @@ function Header() {
   const dispatch = useAppDispatch();
   const cartItems = useAppSelector((state) => state.cart.items);
   const user = useAppSelector((state) => state.user);
-  const { logout, isAuthenticated } = useAuthSession();
+  const { logout, isAuthenticated, uid } = useAuthSession();
   const router = useRouter();
   const pathname = usePathname();
   const isRTL = locale === "ar";
@@ -214,6 +219,17 @@ function Header() {
   const isLoggedIn = isAuthenticated;
 
   const { data: servicesConfig } = useFetchServicesQuery();
+
+  const { data: walletBalance } = useFetchWalletBalanceQuery(uid ?? "", {
+    skip: !uid,
+  });
+  const walletState = useAppSelector((state) => state.wallet);
+
+  useEffect(() => {
+    if (isLoggedIn && uid) {
+      dispatch(initWallet({ balance: walletBalance ?? 0 }));
+    }
+  }, [isLoggedIn, uid, walletBalance, dispatch]);
 
   useEffect(() => {
     if (servicesConfig) {
@@ -460,6 +476,21 @@ function Header() {
                     </span>
                   </span>
                   <span className="hidden sm:inline">{t("Cart")}</span>
+                </Link>
+              </li>
+            )}
+
+            {!IS_COMING_SOON && mounted && isLoggedIn && (
+              <li>
+                <Link
+                  href="/wallet"
+                  aria-label={t("Wallet")}
+                  className="flex items-center gap-1.5 rounded-full border border-color-7 px-3 py-2 text-sm font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none"
+                >
+                  <WalletIcon className="size-4 text-color-5" />
+                  <span className="text-emerald-600">
+                    {walletState.balance.toFixed(2)} EGP
+                  </span>
                 </Link>
               </li>
             )}

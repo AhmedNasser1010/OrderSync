@@ -313,5 +313,19 @@
   "Thank you for your feedback": "شكراً على تقييمك! بنقدّر وقتك.",
   "Stay tuned for the opening": "تابعنا لموعد الافتتاح",
   "comingSoonDescription": "نحن نجهّز كل شيء للانطلاق الكبير. يمكنك في هذه الأثناء إنشاء حسابك وإعداد ملفك الشخصي.",
-  "Create Your Account": "أنشئ حسابك"
+  "Create Your Account": "أنشئ حسابك",
+  "title": "المحفظة",
+  "subtitle": "رصيد الكاش باك الخاص بك",
+  "availableBalance": "الرصيد المتاح",
+  "pendingBalance": "رصيد معلق: {amount}",
+  "activeCredits": "الرصيد النشط",
+  "history": "سجل المعاملات",
+  "noHistory": "لا توجد معاملات بعد. ستظهر أنشطة الكاش باك هنا.",
+  "type": {
+    "GRANT": "إضافة رصيد",
+    "REDEEM": "تم الاستخدام",
+    "EXPIRE": "منتهي",
+    "CLAWBACK": "تم الاسترداد",
+    "ADMIN_ADJUST": "تعديل إداري"
+  }
 }

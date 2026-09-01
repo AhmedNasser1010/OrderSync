@@ -32,6 +32,7 @@ import type {
   MainMenuType,
   HeroBanner,
   ServicesDocument,
+  WalletTransaction,
 } from "@ordersync/types";
 
 export interface UpdateBusinessInput {
@@ -157,7 +158,10 @@ export const firestoreApi = createApi({
     fetchServices: builder.query<
       Pick<
         ServicesDocument,
-        "deliveryFeesPerKm" | "minDeliveryFees" | "maxWorkDistanceKm"
+        | "deliveryFeesPerKm"
+        | "minDeliveryFees"
+        | "maxWorkDistanceKm"
+        | "cashback"
       >,
       void
     >({
@@ -174,6 +178,13 @@ export const firestoreApi = createApi({
               deliveryFeesPerKm: data.deliveryFeesPerKm ?? 3.5,
               minDeliveryFees: data.minDeliveryFees ?? 5,
               maxWorkDistanceKm: data.maxWorkDistanceKm ?? 15,
+              cashback: data.cashback ?? {
+                enabled: false,
+                cashbackPercent: 0,
+                wipeDays: 90,
+                redemptionThreshold: 0,
+                maxCashbackPerTx: 0,
+              },
             },
           };
         } catch (error: unknown) {
@@ -192,6 +203,13 @@ export const firestoreApi = createApi({
           minDeliveryFees?: number;
           maxWorkDistanceKm?: number;
           updatedBy?: string;
+          cashback?: {
+            enabled: boolean;
+            cashbackPercent: number;
+            wipeDays: number;
+            redemptionThreshold: number;
+            maxCashbackPerTx: number;
+          };
         };
       }
     >({
@@ -848,6 +866,34 @@ export const firestoreApi = createApi({
       },
       providesTags: ["Customers"],
     }),
+    fetchWalletTransactions: builder.query<WalletTransaction[], string>({
+      async queryFn(userId: string) {
+        try {
+          if (!userId) {
+            return { data: [] };
+          }
+          const ref = collection(db, "wallet_transactions");
+          const q = query(
+            ref,
+            where("userId", "==", userId),
+            orderBy("createdAt", "desc"),
+            limit(50),
+          );
+          const snapshot = await getDocs(q);
+          const transactions: WalletTransaction[] = snapshot.docs.map(
+            (docSnap) =>
+              ({ id: docSnap.id, ...docSnap.data() }) as WalletTransaction,
+          );
+          console.log("Read Operation [fetchWalletTransactions]");
+          return { data: transactions };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error(message);
+          return { error: message };
+        }
+      },
+      providesTags: ["Customers"],
+    }),
     fetchActiveOrders: builder.query<OrderType[], string[]>({
       async queryFn(accessTokens) {
         try {
@@ -1473,6 +1519,7 @@ export const {
   useLazyFetchDriverUsersQuery,
   useFetchCustomersQuery,
   useLazyFetchCustomersQuery,
+  useFetchWalletTransactionsQuery,
   useFetchActiveOrdersQuery,
   useFetchReceivedOrdersQuery,
   useSearchOrdersQuery,

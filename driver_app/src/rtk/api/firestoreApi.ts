@@ -17,6 +17,7 @@ import {
 } from "firebase/firestore";
 import type { Driver, OrderType } from "@ordersync/types";
 import { canTransition } from "@ordersync/order-utils";
+import { grantOrderCashback } from "@/app/actions/grantOrderCashback";
 
 export const firestoreApi = createApi({
   reducerPath: "firestoreApi",
@@ -538,6 +539,14 @@ export const firestoreApi = createApi({
             }
             transaction.update(driverRef, driverUpdate);
           });
+
+          // Grant cash back (server-side) once delivery is confirmed. The
+          // server action is idempotent, so retries are safe.
+          try {
+            await grantOrderCashback(orderId);
+          } catch (cashbackError) {
+            console.error("Error granting cashback after delivery:", cashbackError);
+          }
 
           return { data: null };
         } catch (error) {

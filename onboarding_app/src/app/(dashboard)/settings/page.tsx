@@ -12,11 +12,13 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import {
   AlertCircle,
+  BadgePercent,
   Loader2,
   MapPinned,
   Save,
   Truck,
 } from "lucide-react";
+import type { CashbackConfig } from "@ordersync/types";
 
 const DEFAULT_DELIVERY_FEES_PER_KM = 3.5;
 const DEFAULT_MIN_DELIVERY_FEES = 5;
@@ -34,6 +36,13 @@ export default function SettingsPage() {
   const [maxWorkDistanceKm, setMaxWorkDistanceKm] = useState<number | null>(
     null
   );
+  const [cashbackEnabled, setCashbackEnabled] = useState<boolean | null>(null);
+  const [cashbackPercent, setCashbackPercent] = useState<number | null>(null);
+  const [cashbackWipeDays, setCashbackWipeDays] = useState<number | null>(null);
+  const [cashbackThreshold, setCashbackThreshold] = useState<number | null>(
+    null
+  );
+  const [cashbackMaxPerTx, setCashbackMaxPerTx] = useState<number | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -48,6 +57,13 @@ export default function SettingsPage() {
     maxWorkDistanceKm ??
     data?.maxWorkDistanceKm ??
     DEFAULT_MAX_WORK_DISTANCE_KM;
+  const cbEnabled = cashbackEnabled ?? data?.cashback?.enabled ?? false;
+  const cbPercent = cashbackPercent ?? data?.cashback?.cashbackPercent ?? 0;
+  const cbWipeDays = cashbackWipeDays ?? data?.cashback?.wipeDays ?? 90;
+  const cbThreshold =
+    cashbackThreshold ?? data?.cashback?.redemptionThreshold ?? 0;
+  const cbMaxPerTx =
+    cashbackMaxPerTx ?? data?.cashback?.maxCashbackPerTx ?? 0;
 
   const handleSave = async () => {
     if (isSaving) return;
@@ -67,6 +83,21 @@ export default function SettingsPage() {
       setSaveError("Max work distance must be greater than zero.");
       return;
     }
+    const cb: CashbackConfig = {
+      enabled: cbEnabled,
+      cashbackPercent: Number(cbPercent),
+      wipeDays: Number(cbWipeDays),
+      redemptionThreshold: Number(cbThreshold),
+      maxCashbackPerTx: Number(cbMaxPerTx),
+    };
+    if (cb.cashbackPercent < 0 || cb.cashbackPercent > 100) {
+      setSaveError("Cash back percentage must be between 0 and 100.");
+      return;
+    }
+    if (Number.isNaN(cb.wipeDays) || cb.wipeDays <= 0) {
+      setSaveError("Wipe (expiry) days must be greater than zero.");
+      return;
+    }
 
     setIsSaving(true);
     setSaveError(null);
@@ -78,6 +109,7 @@ export default function SettingsPage() {
           deliveryFeesPerKm: perKm,
           minDeliveryFees: min,
           maxWorkDistanceKm: maxKm,
+          cashback: cb,
           updatedBy: user?.uid,
         },
       }).unwrap();
@@ -210,6 +242,117 @@ export default function SettingsPage() {
               {saveError}
             </p>
           )}
+
+          <div className="space-y-4 border-t pt-6">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <BadgePercent className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">
+                  Cash Back Engine
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Reward customers with global cash back on qualifying
+                  purchases, configure credit expiration, and set redemption
+                  limits.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                id="cashback-enabled"
+                type="checkbox"
+                checked={cbEnabled}
+                onChange={(e) => setCashbackEnabled(e.target.checked)}
+                className="h-4 w-4"
+              />
+              <Label htmlFor="cashback-enabled" className="!mt-0">
+                Enable cash back
+              </Label>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="cashback-percent">
+                  Cash back percentage (%)
+                </Label>
+                <Input
+                  id="cashback-percent"
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="100"
+                  value={cbPercent}
+                  onChange={(e) =>
+                    setCashbackPercent(
+                      e.target.value === "" ? 0 : Number(e.target.value)
+                    )
+                  }
+                  className="mt-1.5"
+                  disabled={!cbEnabled}
+                />
+              </div>
+              <div>
+                <Label htmlFor="cashback-wipe-days">
+                  Credit expiry (days)
+                </Label>
+                <Input
+                  id="cashback-wipe-days"
+                  type="number"
+                  step="1"
+                  min="1"
+                  value={cbWipeDays}
+                  onChange={(e) =>
+                    setCashbackWipeDays(
+                      e.target.value === "" ? 0 : Number(e.target.value)
+                    )
+                  }
+                  className="mt-1.5"
+                  disabled={!cbEnabled}
+                />
+              </div>
+              <div>
+                <Label htmlFor="cashback-threshold">
+                  Min cart to redeem (EGP)
+                </Label>
+                <Input
+                  id="cashback-threshold"
+                  type="number"
+                  step="1"
+                  min="0"
+                  value={cbThreshold}
+                  onChange={(e) =>
+                    setCashbackThreshold(
+                      e.target.value === "" ? 0 : Number(e.target.value)
+                    )
+                  }
+                  className="mt-1.5"
+                  disabled={!cbEnabled}
+                />
+              </div>
+              <div>
+                <Label htmlFor="cashback-max-per-tx">
+                  Max cash back per transaction (EGP)
+                </Label>
+                <Input
+                  id="cashback-max-per-tx"
+                  type="number"
+                  step="1"
+                  min="0"
+                  value={cbMaxPerTx}
+                  onChange={(e) =>
+                    setCashbackMaxPerTx(
+                      e.target.value === "" ? 0 : Number(e.target.value)
+                    )
+                  }
+                  className="mt-1.5"
+                  disabled={!cbEnabled}
+                />
+              </div>
+            </div>
+          </div>
 
           {saved && (
             <p className="text-sm text-emerald-600">

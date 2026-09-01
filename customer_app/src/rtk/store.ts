@@ -11,6 +11,7 @@ import servicesSlice from "./slices/servicesSlice";
 import filterSlice from "./slices/filterSlice";
 import constantsSlice from "./slices/constantsSlice";
 import authSlice from "./slices/authSlice";
+import walletSlice from "./slices/walletSlice";
 
 import { firestoreApi } from "./api/firestoreApi";
 
@@ -29,6 +30,7 @@ export const makeStore = () => {
       filter: filterSlice,
       constants: constantsSlice,
       auth: authSlice,
+      wallet: walletSlice,
       [firestoreApi.reducerPath]: firestoreApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>

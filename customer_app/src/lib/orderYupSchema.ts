@@ -52,6 +52,7 @@ const orderYupSchema = yup.object().shape({
       discount: yup.number().min(0).required(),
       deliveryFees: yup.number().min(0).required(),
       total: yup.number().min(0).required(),
+      walletRedeemed: yup.number().min(0).nullable().default(0),
     })
     .required(),
 
@@ -60,6 +61,7 @@ const orderYupSchema = yup.object().shape({
     .shape({
       method: yup.string().oneOf(["CASH"]).required(),
       status: yup.string().oneOf(["COMPLETED"]).required(),
+      walletCreditIds: yup.array().of(yup.string()).default([]),
     })
     .required(),
 

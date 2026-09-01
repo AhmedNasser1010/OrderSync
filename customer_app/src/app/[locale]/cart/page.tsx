@@ -33,6 +33,7 @@ import CartEmptyState from "@/components/Cart/CartEmptyState";
 import CartItemCard from "@/components/Cart/CartItemCard";
 import BillDetails from "@/components/Cart/BillDetails";
 import PaymentMethod from "@/components/Cart/PaymentMethod";
+import WalletRedemption from "@/components/Cart/WalletRedemption";
 import type { ItemType } from "@ordersync/types";
 import type { RestaurantDocument } from "@/types/restaurant";
 
@@ -404,6 +405,7 @@ export default function CartPage() {
 
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
           <PaymentMethod />
+          <WalletRedemption />
           <BillDetails
             itemTotal={itemTotal}
             deliveryFees={round2(deliveryFees)}

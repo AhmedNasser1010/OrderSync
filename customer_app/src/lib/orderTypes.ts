@@ -28,8 +28,13 @@ export interface PlaceOrderInput {
     total: number;
     promoCode?: string;
     promoDiscount?: number;
+    walletRedeemed?: number;
   };
-  payment: { method: string; status: string };
+  payment: {
+    method: string;
+    status: string;
+    walletCreditIds?: string[];
+  };
   finance?: Record<string, number>;
   notes?: Record<string, unknown>;
   metadata?: Record<string, unknown>;

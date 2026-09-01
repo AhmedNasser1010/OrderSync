@@ -199,6 +199,29 @@ service cloud.firestore {
     }
 
     // =====================================================================
+    // /wallet_credits/{creditId}
+    // Individual cash-back credits. Readable by the owning customer (to surface
+    // their wallet) and by partners (onboarding admin). All writes are performed
+    // exclusively by the server (Admin SDK) inside transactions, so clients can
+    // never create, mutate, or delete credits directly.
+    // =====================================================================
+    match /wallet_credits/{creditId} {
+      allow read: if isOwner(resourceData().userId) || isPartner();
+      allow create, update, delete: if false;
+    }
+
+    // =====================================================================
+    // /wallet_transactions/{txId}
+    // Immutable audit ledger for every wallet mutation. Readable by the owning
+    // customer and by partners. Writes are server-only; the ledger is append-only
+    // (no update or delete) so the audit trail cannot be tampered with.
+    // =====================================================================
+    match /wallet_transactions/{txId} {
+      allow read: if isOwner(resourceData().userId) || isPartner();
+      allow create, update, delete: if false;
+    }
+
+    // =====================================================================
     // /drivers/{driverId}
     // =====================================================================
     match /drivers/{driverId} {

@@ -17,9 +17,17 @@ import { db } from "@/lib/firebase";
 import {
   canTransition,
   getTimelineField,
+  getActiveCredits,
 } from "@ordersync/order-utils";
-import type { HeroBanner, OrderType, ServicesDocument } from "@ordersync/types";
+import type {
+  HeroBanner,
+  OrderType,
+  ServicesDocument,
+  WalletCredit,
+  WalletTransaction,
+} from "@ordersync/types";
 import { setHasOrder } from "@/rtk/slices/toggleSlice";
+import { handleOrderClawback } from "@/app/actions/handleOrderClawback";
 
 interface TrackedOrderArg {
   orderId?: string | null;
@@ -309,6 +317,16 @@ export const firestoreApi = createApi({
 
           await clearTrackedOrderIfMatching(uid, orderId);
 
+          // Claw back / restore cash back credits (server-side, idempotent).
+          try {
+            await handleOrderClawback(orderId);
+          } catch (clawbackError) {
+            console.error(
+              "Error clawing back cashback on cancel:",
+              clawbackError
+            );
+          }
+
           return { data: null };
         } catch (error) {
           const message =
@@ -548,6 +566,71 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ["User"],
     }),
+    fetchWalletBalance: builder.query<number, string>({
+      async queryFn(uid) {
+        try {
+          const ref = doc(db, "customers", uid);
+          const snapshot = await getDoc(ref);
+          const data = snapshot.exists()
+            ? (snapshot.data() as { wallet?: { balance?: number } })
+            : {};
+          return { data: data?.wallet?.balance ?? 0 };
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          return { error: message };
+        }
+      },
+      providesTags: ["User"],
+    }),
+    fetchWalletCredits: builder.query<WalletCredit[], string>({
+      async queryFn(uid) {
+        try {
+          const ref = query(
+            collection(db, "wallet_credits"),
+            where("userId", "==", uid),
+            where("status", "==", "ACTIVE"),
+            orderBy("expiresAt", "asc")
+          );
+          const snapshot = await getDocs(ref);
+          const credits = getActiveCredits(
+            snapshot.docs.map(
+              (d) => ({ ...(d.data() as WalletCredit), id: d.id })
+            )
+          );
+          return { data: credits };
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          return { error: message };
+        }
+      },
+      providesTags: ["User"],
+    }),
+    fetchWalletTransactions: builder.query<WalletTransaction[], string>({
+      async queryFn(uid) {
+        try {
+          if (!uid) return { data: [] };
+          const ref = query(
+            collection(db, "wallet_transactions"),
+            where("userId", "==", uid),
+            orderBy("createdAt", "desc"),
+            limit(100)
+          );
+          const snapshot = await getDocs(ref);
+          const transactions: WalletTransaction[] = snapshot.docs.map((d) => ({
+            ...(d.data() as WalletTransaction),
+            id: d.id,
+          }));
+          return { data: transactions };
+        } catch (error: unknown) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          return { error: message };
+        }
+      },
+      providesTags: ["User"],
+    }),
   }),
 });
 
@@ -562,6 +645,9 @@ export const {
   useSetOrderFeedbackMutation,
   useClearTrackedOrderMutation,
   useFinalizePendingLoyaltyMutation,
+  useFetchWalletBalanceQuery,
+  useFetchWalletCreditsQuery,
+  useFetchWalletTransactionsQuery,
 } = firestoreApi;
 
 trackedOrderCacheReader.read = (arg, state) => {

@@ -8,6 +8,14 @@ export type { OrderStatusType, OrderType } from "./order";
 export type { ManagerUser, PartnerUser } from "./user";
 export type { ServicesDocument, DeliveryFeesConfig } from "./services";
 export type {
+  WalletCredit,
+  WalletCreditSource,
+  WalletCreditStatus,
+  WalletTransaction,
+  WalletTransactionType,
+  CashbackConfig,
+} from "./wallet";
+export type {
   DiscountLevel,
   DiscountType,
   ConditionOperator,

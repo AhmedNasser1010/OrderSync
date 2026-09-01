@@ -14,6 +14,7 @@ import {
 import { db } from "@/lib/firebase";
 import type { OrderType, OrderStatusType, RestaurantStatusTypes, BusinessDocument } from "@ordersync/types";
 import { canTransition, canReverseTransition, getTimelineField, isDriverOwned } from "@ordersync/order-utils";
+import { handleOrderClawback } from "@/app/actions/handleOrderClawback";
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
@@ -300,6 +301,16 @@ export const firestoreApi = createApi({
 
             transaction.update(orderRef, updateData);
           });
+
+          // Claw back / restore cash back credits (server-side, idempotent).
+          try {
+            await handleOrderClawback(orderId);
+          } catch (clawbackError) {
+            console.error(
+              "Error clawing back cashback on cancel:",
+              clawbackError
+            );
+          }
 
           return { data: null };
         } catch (error) {

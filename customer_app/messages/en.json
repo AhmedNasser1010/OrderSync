@@ -313,5 +313,19 @@
   "Thank you for your feedback": "Thank you for your feedback! We appreciate your time.",
   "Stay tuned for the opening": "Stay tuned for the opening",
   "comingSoonDescription": "We're getting everything ready for the big launch. You can still create your account and set up your profile in the meantime.",
-  "Create Your Account": "Create Your Account"
+  "Create Your Account": "Create Your Account",
+  "title": "Wallet",
+  "subtitle": "Your cashback credits",
+  "availableBalance": "Available balance",
+  "pendingBalance": "Pending credits: {amount}",
+  "activeCredits": "Active credits",
+  "history": "Transaction history",
+  "noHistory": "No transactions yet. You'll see your cashback activity here.",
+  "type": {
+    "GRANT": "Credit added",
+    "REDEEM": "Redeemed",
+    "EXPIRE": "Expired",
+    "CLAWBACK": "Clawed back",
+    "ADMIN_ADJUST": "Admin adjustment"
+  }
 }

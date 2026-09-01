@@ -39,6 +39,10 @@ export type CustomerType = {
     pendingLoyalty: string | null;
     restaurant: string;
   };
+  wallet?: {
+    balance: number;
+    updatedAt: number;
+  };
   userInfo: {
     avatar: string;
     email: string;

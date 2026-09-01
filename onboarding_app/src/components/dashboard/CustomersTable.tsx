@@ -15,8 +15,10 @@ import { Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useUpdateCustomerDocumentMutation } from "@/rtk/api/firestoreApi";
+import { useFetchWalletTransactionsQuery } from "@/rtk/api/firestoreApi";
 import { SuspendDialog } from "@/components/dashboard/SuspendDialog";
-import type { CustomerType } from "@ordersync/types";
+import { AdjustCreditDialog } from "@/components/dashboard/AdjustCreditDialog";
+import type { CustomerType, WalletTransaction } from "@ordersync/types";
 
 interface CustomersTableProps {
   customers: CustomerType[];
@@ -40,6 +42,25 @@ export function CustomersTable({
   const [suspendTarget, setSuspendTarget] = useState<CustomerType | null>(
     null,
   );
+  const [creditTarget, setCreditTarget] = useState<CustomerType | null>(null);
+  const [creditRefreshKey, setCreditRefreshKey] = useState(0);
+
+  const {
+    data: creditTransactions = [],
+    refetch: refetchCreditTransactions,
+  } = useFetchWalletTransactionsQuery(creditTarget?.uid ?? "", {
+    skip: !creditTarget?.uid,
+  });
+
+  const openAdjustDialog = (customer: CustomerType) => {
+    setCreditTarget(customer);
+    setCreditRefreshKey((k) => k + 1);
+  };
+
+  const handleAdjusted = () => {
+    refetchCreditTransactions();
+    setCreditRefreshKey((k) => k + 1);
+  };
 
   const handleToggleActive = (customer: CustomerType) => {
     setSuspendTarget(customer);
@@ -151,6 +172,9 @@ export function CustomersTable({
             <TableHead className="text-foreground font-semibold">
               Status
             </TableHead>
+            <TableHead className="text-foreground font-semibold text-right">
+              Wallet
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -247,6 +271,19 @@ export function CustomersTable({
                     </button>
                   )}
                 </TableCell>
+                <TableCell className="py-4 text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <span className="text-sm font-semibold text-emerald-600">
+                      {customer.wallet?.balance ?? 0} EGP
+                    </span>
+                    <button
+                      className="cursor-pointer text-xs underline text-muted-foreground hover:text-foreground"
+                      onClick={() => openAdjustDialog(customer)}
+                    >
+                      Adjust
+                    </button>
+                  </div>
+                </TableCell>
               </TableRow>
             );
           })}
@@ -267,6 +304,17 @@ export function CustomersTable({
         onBan={handleBan}
         onUnban={handleUnban}
         onSaveNote={handleSaveNote}
+      />
+      <AdjustCreditDialog
+        key={creditRefreshKey}
+        open={creditTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setCreditTarget(null);
+        }}
+        customer={creditTarget}
+        balance={creditTarget?.wallet?.balance ?? 0}
+        transactions={creditTransactions as WalletTransaction[]}
+        onAdjusted={handleAdjusted}
       />
     </Card>
   );
