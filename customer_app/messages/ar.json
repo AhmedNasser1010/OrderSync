@@ -328,5 +328,9 @@
     "CLAWBACK": "تم الاسترداد",
     "ADMIN_ADJUST": "تعديل إداري"
   },
-  "Wallet": "المحفظة"
+  "Wallet": "المحفظة",
+  "Cash Back Wallet": "محفظة الكاش باك",
+  "EGP": "ج.م",
+  "available": "متاح",
+  "Apply to order": "تطبيق على الطلب"
 }

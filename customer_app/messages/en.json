@@ -328,5 +328,9 @@
     "CLAWBACK": "Clawed back",
     "ADMIN_ADJUST": "Admin adjustment"
   },
-  "Wallet": "Wallet"
+  "Wallet": "Wallet",
+  "Cash Back Wallet": "Cash Back Wallet",
+  "EGP": "EGP",
+  "available": "available",
+  "Apply to order": "Apply to order"
 }
