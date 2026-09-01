@@ -327,5 +327,6 @@
     "EXPIRE": "Expired",
     "CLAWBACK": "Clawed back",
     "ADMIN_ADJUST": "Admin adjustment"
-  }
+  },
+  "Wallet": "Wallet"
 }
