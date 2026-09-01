@@ -50,6 +50,10 @@ Two small conditions:
 The amount used is limited to the wallet balance and never makes an order
 totally free of charge (an order still has a minimum payable amount).
 
+Delivery fees are never covered by cash back — they always remain payable by the
+customer out of pocket. The wallet credit only ever applies to the food/items
+portion of the order.
+
 ---
 
 ## What Happens if an Order is Cancelled

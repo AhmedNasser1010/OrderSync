@@ -431,10 +431,16 @@ export async function placeOrderServer(args: {
 
           // Same computation the client cart uses, so the applied amount always
           // matches what the customer was shown.
+          // Cashback only covers the food/items portion of the total, never
+          // delivery fees. Delivery fees must always be paid out of pocket.
+          const redemptionBase = Math.max(
+            0,
+            serverPricing.total - (serverPricing.deliveryFees ?? 0)
+          );
           const capped = computeWalletRedemption({
             requested,
             balance,
-            orderTotal: serverPricing.total,
+            orderTotal: redemptionBase,
             enabled: cashbackConfig.enabled,
             hasDiscount: hasDiscountOnOrder,
             redemptionThreshold: cashbackConfig.redemptionThreshold,

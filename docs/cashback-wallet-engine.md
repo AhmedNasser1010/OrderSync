@@ -184,8 +184,10 @@ Location: `packages/order-utils/src/wallet/`, re-exported from
    lets the user toggle "use wallet" and shows how much will be applied.
 2. `usePlace.ts` reads `checkout.useWallet` / `checkout.walletRedeemed` and the
    wallet balance from the `wallet` slice, computes the clamped `walletRedeemed`
-   (≤ balance and ≤ base total, honoring exclusivity), and adds it to the pricing
-   payload. The **base `total` stays unchanged**.
+   (≤ balance and ≤ base total **minus delivery fees**, honoring exclusivity),
+   and adds it to the pricing payload. The **base `total` stays unchanged**.
+   Delivery fees are never covered by cashback — they always remain payable out
+   of pocket.
 3. Validation (`orderYupSchema.ts`, `orderTypes.ts`): `walletRedeemed` defaults
    to `0`, `walletCreditIds` defaults to `[]`.
 
@@ -193,7 +195,8 @@ Location: `packages/order-utils/src/wallet/`, re-exported from
 1. Sanity-checks and fetch active credits BEFORE the transaction.
 2. After `pricingMatches()` passes (comparing base totals), applies redemption
    using `redeemCredits` with the discount exclusivity, `redemptionThreshold`,
-   and `maxCashbackPerTx` rules.
+   and `maxCashbackPerTx` rules. Redemption is capped at the order total
+   **excluding delivery fees** so the fees are never deducted from cashback.
 3. Writes `finalPricing` with the **reduced** total + `walletCreditIds`.
 4. `pendingLoyalty.amount` uses the final (reduced) total.
 

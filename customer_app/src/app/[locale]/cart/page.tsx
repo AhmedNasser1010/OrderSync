@@ -231,9 +231,12 @@ export default function CartPage() {
   const hasDiscountOnCart =
     cartTotalPrice != null &&
     cartTotalPrice.total - cartTotalPrice.discount > 0;
+  // Cashback only covers the food/items portion of the total, never the
+  // delivery fees. Delivery fees always remain payable out of pocket.
+  const redemptionBase = Math.max(0, finalTotal - deliveryFees);
   const walletRedemptionArgs = {
     balance: walletBalance,
-    orderTotal: finalTotal,
+    orderTotal: redemptionBase,
     enabled: Boolean(cashback?.enabled),
     redemptionThreshold: cashback?.redemptionThreshold ?? 0,
     maxCashbackPerTx: cashback?.maxCashbackPerTx ?? 0,
