@@ -61,7 +61,7 @@ const WalletRedemption = () => {
         onClick={() => applyWallet(!useWallet)}
         className={`mt-4 flex w-full items-center justify-between rounded-xl border p-4 text-left transition-colors cursor-pointer ${
           useWallet
-            ? "border-emerald-500 bg-emerald-50"
+            ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950"
             : "border-color-7 bg-color-7/30"
         }`}
       >

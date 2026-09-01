@@ -233,13 +233,13 @@ const LoginSidebar = () => {
             (!confirmLogout ? (
               <button
                 onClick={() => setConfirmLogout(true)}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 py-3.5 text-red-500 font-ProximaNovaSemiBold text-base transition-colors hover:bg-red-100 focus-visible:ring-2 focus-visible:ring-red-300 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 py-3.5 text-red-500 font-ProximaNovaSemiBold text-base transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-950 dark:hover:bg-red-900/50 focus-visible:ring-2 focus-visible:ring-red-300 cursor-pointer"
               >
                 <LogOutIcon className="size-4 shrink-0" />
                 {t("Logout")}
               </button>
             ) : (
-              <div className="rounded-2xl border border-red-200 bg-red-50 p-4 space-y-3">
+              <div className="rounded-2xl border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950 p-4 space-y-3">
                 <p className="text-center text-sm font-ProximaNovaSemiBold text-red-600">
                   {t("Confirm logout?")}
                 </p>
@@ -252,7 +252,7 @@ const LoginSidebar = () => {
                   </button>
                   <button
                     onClick={() => setConfirmLogout(false)}
-                    className="flex-1 rounded-xl border border-red-200 bg-card py-3 text-color-6 font-ProximaNovaSemiBold text-sm transition-colors hover:bg-red-50 cursor-pointer"
+                    className="flex-1 rounded-xl border border-red-200 bg-card py-3 text-color-6 font-ProximaNovaSemiBold text-sm transition-colors hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-900/40 cursor-pointer"
                   >
                     {t("Cancel")}
                   </button>

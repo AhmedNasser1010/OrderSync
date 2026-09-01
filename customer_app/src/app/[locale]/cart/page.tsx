@@ -326,7 +326,7 @@ export default function CartPage() {
           <button
             type="button"
             onClick={handleClearAll}
-            className="flex shrink-0 items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-ProximaNovaSemiBold text-red-500 transition-colors hover:bg-red-100 cursor-pointer"
+            className="flex shrink-0 items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-ProximaNovaSemiBold text-red-500 transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-950 dark:hover:bg-red-900/50 cursor-pointer"
           >
             <Trash2 className="size-4" />
             {t("Clear All")}
