@@ -24,6 +24,8 @@ export const ORDER_EXPORT_COLUMNS: ExportColumn[] = [
   { header: "Restaurant Net", accessor: "finance.restaurantShare" },
   { header: "Driver Earnings", accessor: "finance.driverEarnings" },
   { header: "Cash Collected", accessor: "finance.cashCollected" },
+  { header: "Wallet Redeemed", accessor: "pricing.walletRedeemed" },
+  { header: "Cashback Earned", accessor: "pricing.cashbackEarned" },
   { header: "Created At", accessor: "createdAt" },
 ];
 
@@ -50,6 +52,8 @@ export function flattenOrderForExport(
     "finance.restaurantShare": order.finance?.restaurantShare ?? 0,
     "finance.driverEarnings": order.finance?.driverEarnings ?? 0,
     "finance.cashCollected": order.finance?.cashCollected ?? 0,
+    "pricing.walletRedeemed": order.pricing?.walletRedeemed ?? 0,
+    "pricing.cashbackEarned": order.pricing?.cashbackEarned ?? 0,
   };
 }
 
@@ -171,6 +175,16 @@ export function buildOrderDetailRows(
     "Finance",
     "Driver Earnings",
     formatCurrency(order.finance?.driverEarnings ?? 0),
+  );
+  push(
+    "Finance",
+    "Wallet Redeemed",
+    formatCurrency(order.pricing?.walletRedeemed ?? 0),
+  );
+  push(
+    "Finance",
+    "Cashback Earned",
+    formatCurrency(order.pricing?.cashbackEarned ?? 0),
   );
 
   if (order.cart?.length) {

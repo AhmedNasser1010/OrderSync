@@ -236,6 +236,14 @@ export function OrderDetailsDialog({
               label="Driver Earnings"
               value={formatCurrency(order.finance?.driverEarnings ?? 0)}
             />
+            <InfoRow
+              label="Wallet Redeemed"
+              value={formatCurrency(order.pricing?.walletRedeemed ?? 0)}
+            />
+            <InfoRow
+              label="Cashback Earned"
+              value={formatCurrency(order.pricing?.cashbackEarned ?? 0)}
+            />
           </Section>
 
           <Section title={`Cart Items (${order.cart?.length ?? 0})`}>
