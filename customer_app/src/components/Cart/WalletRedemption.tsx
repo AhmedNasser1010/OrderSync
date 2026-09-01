@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { useFetchWalletBalanceQuery } from "@/rtk/api/firestoreApi";
 import { addCheckout } from "@/rtk/slices/checkoutSlice";
 
-const WalletRedemption = () => {
+const WalletRedemption = ({ maxAmount = 0 }: { maxAmount?: number }) => {
   const t = useTranslations();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
@@ -19,18 +19,18 @@ const WalletRedemption = () => {
 
   const useWallet = checkout?.useWallet === true;
   const walletRedeemed = Number(checkout?.walletRedeemed ?? 0);
-  const hasBalance = balance > 0;
+  const hasApplicableCredit = balance > 0 && maxAmount > 0;
 
   const applyWallet = (apply: boolean, amount?: number) => {
     dispatch(
       addCheckout({
         useWallet: apply,
-        walletRedeemed: apply ? amount ?? balance : 0,
+        walletRedeemed: apply ? amount ?? maxAmount : 0,
       })
     );
   };
 
-  if (!hasBalance) return null;
+  if (!hasApplicableCredit) return null;
 
   return (
     <div className="rounded-2xl border border-color-7 bg-card p-5 sm:p-6">
@@ -69,7 +69,7 @@ const WalletRedemption = () => {
           {t("Apply to order")}
         </span>
         <span className="font-ProximaNovaBold text-sm text-emerald-600">
-          {useWallet ? `-${walletRedeemed} ${t("EGP")}` : `-${balance} ${t("EGP")}`}
+          {useWallet ? `-${walletRedeemed} ${t("EGP")}` : `-${maxAmount} ${t("EGP")}`}
         </span>
       </button>
     </div>

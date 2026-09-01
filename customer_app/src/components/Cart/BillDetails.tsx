@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgePercent, MessageSquareText, ReceiptText } from "lucide-react";
+import { BadgePercent, MessageSquareText, ReceiptText, Wallet } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const BillRow = ({
@@ -21,6 +21,7 @@ const BillDetails = ({
   deliveryFees,
   orderDiscount,
   orderDiscountAmount,
+  walletRedeemed = 0,
   total,
   savings,
   orderNumber,
@@ -36,6 +37,7 @@ const BillDetails = ({
     code?: string;
   } | null;
   orderDiscountAmount: number;
+  walletRedeemed?: number;
   total: number;
   savings: number;
   orderNumber?: string;
@@ -67,6 +69,15 @@ const BillDetails = ({
               {orderDiscount.message || orderDiscount.code}
             </span>
             <span className="egp">-{orderDiscountAmount}</span>
+          </div>
+        )}
+        {walletRedeemed > 0 && (
+          <div className="flex items-center justify-between text-color-11">
+            <span className="flex items-center gap-1.5 font-ProximaNovaSemiBold">
+              <Wallet className="size-4" />
+              {t("Cash Back")}
+            </span>
+            <span className="egp">-{walletRedeemed}</span>
           </div>
         )}
         {orderNumber && (

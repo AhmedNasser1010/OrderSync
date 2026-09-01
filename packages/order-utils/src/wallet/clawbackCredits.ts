@@ -34,6 +34,9 @@ export async function clawbackOnCancellation(
   let clawbackAmount = 0;
   let restoredAmount = 0;
 
+  // Firestore transactions require all reads to complete before any writes.
+  const prevBalance = await getBalance(ctx);
+
   // 1) Claw back earned cashback (reduces balance).
   if (input.earnedCredit && input.earnedCredit.status === "ACTIVE") {
     const amount = round2(input.earnedCredit.amount);
@@ -65,7 +68,6 @@ export async function clawbackOnCancellation(
 
   const netDelta = round2(restoredAmount - clawbackAmount);
 
-  const prevBalance = await getBalance(ctx);
   const newBalance = round2(Math.max(0, prevBalance + netDelta));
 
   ctx.transaction.update(ctx.customerRef, {

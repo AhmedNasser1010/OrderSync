@@ -22,6 +22,7 @@ import {
   applyOrderDiscounts,
   calculateDiscountAmount,
   calculateOrderFinance,
+  computeWalletRedemption,
   DEFAULT_COMMISSION_PERCENT,
 } from "@ordersync/order-utils";
 import getDeliveryFees from "@/utils/getDeliveryFees";
@@ -266,16 +267,31 @@ const usePlace = () => {
     const baseTotal = cartTotalPrice.discount;
 
     // Wallet redemption: how much the customer wants to apply, clamped to the
-    // available balance and to the current cart total. The server re-validates
-    // and re-computes this authoritatively.
+    // available balance and to the current cart total, honoring the platform
+    // cashback config (enabled, redemptionThreshold, maxCashbackPerTx) and the
+    // no-stacking-with-discount rule. Mirrors computeWalletRedemption on the
+    // server, and the server re-validates authoritatively.
     const useWallet = checkout?.useWallet === true;
     const requestedWallet = Number(checkout?.walletRedeemed ?? 0);
+    const cashback = (services as {
+      cashback?: {
+        enabled?: boolean;
+        redemptionThreshold?: number;
+        maxCashbackPerTx?: number;
+      };
+    }).cashback;
+    const hasDiscountOnCart = cartTotalPrice.total - cartTotalPrice.discount > 0;
     const walletRedeemed =
-      useWallet && wallet?.balance > 0
-        ? Math.max(
-            0,
-            Math.min(Math.floor(requestedWallet || wallet.balance), baseTotal)
-          )
+      useWallet && requestedWallet > 0
+        ? computeWalletRedemption({
+            requested: requestedWallet,
+            balance: Math.max(wallet?.balance ?? 0, requestedWallet),
+            orderTotal: baseTotal,
+            enabled: Boolean(cashback?.enabled),
+            redemptionThreshold: cashback?.redemptionThreshold ?? 0,
+            maxCashbackPerTx: cashback?.maxCashbackPerTx ?? 0,
+            hasDiscount: hasDiscountOnCart,
+          })
         : 0;
 
     return {

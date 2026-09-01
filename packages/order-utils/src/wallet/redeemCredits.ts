@@ -32,7 +32,14 @@ export async function redeemCredits(
     .sort((a, b) => a.expiresAt - b.expiresAt);
 
   let remaining = round2(input.amount);
-  const creditsUsed: RedeemResult["creditsUsed"] = [];
+  const creditsUsed: Array<{
+    credit: WalletCredit;
+    usedAmount: number;
+    fullyConsumed: boolean;
+  }> = [];
+
+  // Firestore transactions require all reads to complete before any writes.
+  const prevBalance = await getBalance(ctx);
 
   for (const credit of sorted) {
     if (remaining <= 0) break;
@@ -44,20 +51,11 @@ export async function redeemCredits(
     if (creditAmount <= 0) continue;
 
     const use = round2(Math.min(creditAmount, remaining));
-    const fullyConsumed = use >= creditAmount;
-
-    if (fullyConsumed) {
-      ctx.transaction.update(ctx.creditRef(credit.id), {
-        status: "REDEEMED",
-      });
-    } else {
-      // Partial consumption: reduce the credit's remaining amount, keep ACTIVE.
-      ctx.transaction.update(ctx.creditRef(credit.id), {
-        amount: round2(creditAmount - use),
-      });
-    }
-
-    creditsUsed.push({ credit: current, usedAmount: use });
+    creditsUsed.push({
+      credit: current,
+      usedAmount: use,
+      fullyConsumed: use >= creditAmount,
+    });
     remaining = round2(remaining - use);
   }
 
@@ -65,8 +63,20 @@ export async function redeemCredits(
     creditsUsed.reduce((sum, c) => sum + c.usedAmount, 0)
   );
 
-  const prevBalance = await getBalance(ctx);
   const newBalance = round2(Math.max(0, prevBalance - usedTotal));
+
+  for (const { credit, usedAmount, fullyConsumed } of creditsUsed) {
+    if (fullyConsumed) {
+      ctx.transaction.update(ctx.creditRef(credit.id), {
+        status: "REDEEMED",
+      });
+    } else {
+      // Partial consumption: reduce the credit's remaining amount, keep ACTIVE.
+      ctx.transaction.update(ctx.creditRef(credit.id), {
+        amount: round2(credit.amount - usedAmount),
+      });
+    }
+  }
 
   ctx.transaction.update(ctx.customerRef, {
     "wallet.balance": newBalance,

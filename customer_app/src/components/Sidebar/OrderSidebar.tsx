@@ -196,12 +196,12 @@ function ErrorBanner({
   };
 
   return (
-    <div className="border border-red-200 bg-red-50 rounded-2xl p-4 mb-4 flex items-start gap-3">
-      <span className="size-9 grid place-items-center rounded-full bg-red-100 shrink-0">
-        <XIcon className="size-4.5 text-red-500" />
+    <div className="border border-red-200 bg-red-50 rounded-2xl p-4 mb-4 flex items-start gap-3 dark:border-red-900 dark:bg-red-950/60">
+      <span className="size-9 grid place-items-center rounded-full bg-red-100 shrink-0 dark:bg-red-900/50">
+        <XIcon className="size-4.5 text-red-500 dark:text-red-400" />
       </span>
       <div className="min-w-0">
-        <p className="text-red-600 font-ProximaNovaSemiBold text-sm">
+        <p className="text-red-600 font-ProximaNovaSemiBold text-sm dark:text-red-400">
           {t(labels[status || ""] || "Your Order Has Been Canceled!")}
         </p>
         {reason && (

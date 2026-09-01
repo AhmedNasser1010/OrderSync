@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   ArrowLeft,
@@ -11,6 +11,7 @@ import {
   TrendingDown,
   RotateCcw,
   AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useAuthSession } from "@/hooks/useAuthSession";
@@ -23,6 +24,8 @@ import {
   type WalletCredit,
   type WalletTransaction,
 } from "@ordersync/types";
+
+const COOLDOWN_SECONDS = 30;
 
 const SOURCE_LABELS: Record<string, string> = {
   CAMPAIGN: "Campaign Bonus",
@@ -66,16 +69,38 @@ export default function WalletPage() {
   const locale = useLocale();
   const { uid } = useAuthSession();
 
-  const { data: balance = 0 } = useFetchWalletBalanceQuery(uid ?? "", {
-    skip: !uid,
-  });
-  const { data: credits = [] } = useFetchWalletCreditsQuery(uid ?? "", {
-    skip: !uid,
-  });
-  const { data: transactions = [] } = useFetchWalletTransactionsQuery(
-    uid ?? "",
-    { skip: !uid }
-  );
+  const {
+    data: balance = 0,
+    isFetching: isBalanceFetching,
+    refetch: refetchBalance,
+  } = useFetchWalletBalanceQuery(uid ?? "", { skip: !uid });
+  const {
+    data: credits = [],
+    isFetching: isCreditsFetching,
+    refetch: refetchCredits,
+  } = useFetchWalletCreditsQuery(uid ?? "", { skip: !uid });
+  const {
+    data: transactions = [],
+    isFetching: isTransactionsFetching,
+    refetch: refetchTransactions,
+  } = useFetchWalletTransactionsQuery(uid ?? "", { skip: !uid });
+
+  const isRefreshing = isBalanceFetching || isCreditsFetching || isTransactionsFetching;
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const id = setInterval(() => setCooldown((s) => s - 1), 1000);
+    return () => clearInterval(id);
+  }, [cooldown]);
+
+  const handleRefresh = useCallback(() => {
+    if (cooldown > 0 || isRefreshing) return;
+    refetchBalance();
+    refetchCredits();
+    refetchTransactions();
+    setCooldown(COOLDOWN_SECONDS);
+  }, [cooldown, isRefreshing, refetchBalance, refetchCredits, refetchTransactions]);
 
   const totalPending = useMemo(
     () => credits.reduce((sum, c) => sum + c.amount, 0),
@@ -92,7 +117,7 @@ export default function WalletPage() {
         >
           <ArrowLeft className="size-5 rtl:rotate-180" />
         </Link>
-        <div>
+        <div className="flex-1">
           <h1 className="font-Beiruti text-3xl leading-none text-color-1 sm:text-4xl">
             {t("title")}
           </h1>
@@ -101,6 +126,21 @@ export default function WalletPage() {
             {t("subtitle")}
           </p>
         </div>
+        <button
+          type="button"
+          onClick={handleRefresh}
+          disabled={isRefreshing || cooldown > 0}
+          aria-label={t("Refresh")}
+          className="grid size-10 shrink-0 place-items-center rounded-full border border-color-7 bg-card text-color-6 transition-colors hover:bg-color-7/40 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {cooldown > 0 ? (
+            <span className="text-xs font-ProximaNovaSemiBold">{cooldown}</span>
+          ) : (
+            <RefreshCw
+              className={`size-5 ${isRefreshing ? "animate-spin" : ""}`}
+            />
+          )}
+        </button>
       </div>
 
       <div className="rounded-3xl bg-gradient-to-br from-color-2 to-[#ffab4a] p-6 text-white shadow-lg shadow-color-2/20">
@@ -160,11 +200,17 @@ export default function WalletPage() {
         ) : (
           <div className="overflow-hidden rounded-2xl border border-color-7 bg-card">
             {transactions.map((tx: WalletTransaction, idx: number) => {
-              const Icon = TYPE_ICONS[tx.type] ?? AlertTriangle;
+              const Icon =
+                tx.type === "ADMIN_ADJUST" && tx.amount < 0
+                  ? TrendingDown
+                  : TYPE_ICONS[tx.type] ?? AlertTriangle;
               const isCredit =
                 tx.type === "GRANT" ||
-                tx.type === "ADMIN_ADJUST";
-              const isDebit = tx.type === "REDEEM" || tx.type === "CLAWBACK";
+                (tx.type === "ADMIN_ADJUST" && tx.amount >= 0);
+              const isDebit =
+                tx.type === "REDEEM" ||
+                tx.type === "CLAWBACK" ||
+                (tx.type === "ADMIN_ADJUST" && tx.amount < 0);
               return (
                 <div
                   key={tx.id}
@@ -205,7 +251,7 @@ export default function WalletPage() {
                     }`}
                   >
                     {isCredit ? "+" : isDebit ? "−" : ""}
-                    {formatAmount(tx.amount)}
+                    {formatAmount(Math.abs(tx.amount))}
                   </p>
                 </div>
               );

@@ -58,18 +58,18 @@ function OrderCancellationNotice() {
     <Popup open={isOpen} onOpenChange={(open) => !open && handleClick()}>
       <PopupContent className="pt-8">
         <PopupHeader closePopupCallback={handleClick} className="pt-2">
-          <div className="mx-auto grid size-14 place-items-center rounded-full bg-red-100 shrink-0 mb-1">
-            <XIcon className="size-7 text-red-500" />
+          <div className="mx-auto grid size-14 place-items-center rounded-full bg-red-100 shrink-0 mb-1 dark:bg-red-900/50">
+            <XIcon className="size-7 text-red-500 dark:text-red-400" />
           </div>
           <PopupTitle>
             {t(noticeTitles[status || ""] || "Your Order Has Been Canceled!")}
           </PopupTitle>
           {cancellationReason ? (
-            <div className="border border-red-200 bg-red-50 rounded-xl px-4 py-3 mt-1">
+            <div className="border border-red-200 bg-red-50 rounded-xl px-4 py-3 mt-1 dark:border-red-900 dark:bg-red-950/60">
               <p className="text-[11px] uppercase tracking-wide text-red-400 font-ProximaNovaSemiBold">
                 {t("Cancellation Reason")}
               </p>
-              <p className="text-red-600 font-ProximaNovaSemiBold text-sm leading-relaxed mt-1">
+              <p className="text-red-600 font-ProximaNovaSemiBold text-sm leading-relaxed mt-1 dark:text-red-400">
                 {cancellationReason}
               </p>
             </div>

@@ -179,6 +179,7 @@
   "Quantity is required": "Quantity is required",
   "Quantity must be at least 1": "Quantity must be at least 1",
   "Rate this Restaurant!": "Rate this Restaurant!",
+  "Refresh": "Refresh",
   "Remove": "Remove",
   "Remove Cart Items and Go Home": "Remove Cart Items and Go Home",
   "Reorder": "Reorder",
@@ -330,6 +331,7 @@
   },
   "Wallet": "Wallet",
   "Cash Back Wallet": "Cash Back Wallet",
+  "Cash Back": "Cash Back",
   "EGP": "EGP",
   "available": "available",
   "Apply to order": "Apply to order"

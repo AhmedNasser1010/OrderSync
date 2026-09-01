@@ -57,6 +57,7 @@ export {
   clawbackOnCancellation,
   expireCredits,
   getActiveCredits,
+  computeWalletRedemption,
   round2,
   DAY_MS,
   DEFAULT_WIPE_DAYS,

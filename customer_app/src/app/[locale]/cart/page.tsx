@@ -25,7 +25,13 @@ import {
 } from "@/rtk/slices/cartSlice";
 import { addCheckout } from "@/rtk/slices/checkoutSlice";
 import { toggleOrderSidebar } from "@/rtk/slices/toggleSlice";
-import { priceAfterDiscount, resolveItemDiscount, applyOrderDiscounts, calculateDiscountAmount } from "@ordersync/order-utils";
+import {
+  priceAfterDiscount,
+  resolveItemDiscount,
+  applyOrderDiscounts,
+  calculateDiscountAmount,
+  computeWalletRedemption,
+} from "@ordersync/order-utils";
 import getDistanceFromLatlngInKm from "@/utils/getDistanceFromLatlngInKm";
 import getDeliveryFees from "@/utils/getDeliveryFees";
 import isRestaurantAvailable from "@/utils/isRestaurantAvailable";
@@ -34,7 +40,8 @@ import CartItemCard from "@/components/Cart/CartItemCard";
 import BillDetails from "@/components/Cart/BillDetails";
 import PaymentMethod from "@/components/Cart/PaymentMethod";
 import WalletRedemption from "@/components/Cart/WalletRedemption";
-import type { ItemType } from "@ordersync/types";
+import { useFetchWalletBalanceQuery } from "@/rtk/api/firestoreApi";
+import type { ItemType, ServicesDocument } from "@ordersync/types";
 import type { RestaurantDocument } from "@/types/restaurant";
 
 type SelectedItem = ItemType & { quantity: number; selectedSize?: string | null };
@@ -56,6 +63,7 @@ export default function CartPage() {
   const restaurants = useAppSelector((state) => state.restaurants);
   const services = useAppSelector((state) => state.services);
   const user = useAppSelector((state) => state.user);
+  const checkout = useAppSelector((state) => state.checkout);
   const trackedOrder = user.trackedOrder || {
     id: null,
     restaurant: null,
@@ -209,6 +217,41 @@ export default function CartPage() {
   const finalTotal = cartTotalPrice ? round2(cartTotalPrice.discount) : 0;
   const savings = cartTotalPrice ? round2(cartTotalPrice.total - cartTotalPrice.discount) : 0;
   const autoOrderAmount = cartTotalPrice ? round2(cartTotalPrice.autoOrderAmount) : 0;
+
+  // Wallet redemption shown in the bill: mirrors usePlace so the displayed
+  // payable total matches what gets placed. Respects the platform cashback
+  // config (enabled, redemptionThreshold, maxCashbackPerTx) and the
+  // no-stacking-with-discount rule. Server re-validates authoritatively.
+  const cashback = (services as { cashback?: ServicesDocument["cashback"] })
+    .cashback;
+  const uid = user?.uid;
+  const { data: walletBalance = 0 } = useFetchWalletBalanceQuery(uid ?? "", {
+    skip: !uid,
+  });
+  const hasDiscountOnCart =
+    cartTotalPrice != null &&
+    cartTotalPrice.total - cartTotalPrice.discount > 0;
+  const walletRedemptionArgs = {
+    balance: walletBalance,
+    orderTotal: finalTotal,
+    enabled: Boolean(cashback?.enabled),
+    redemptionThreshold: cashback?.redemptionThreshold ?? 0,
+    maxCashbackPerTx: cashback?.maxCashbackPerTx ?? 0,
+    hasDiscount: hasDiscountOnCart,
+  };
+  const maxWalletAmount = computeWalletRedemption({
+    ...walletRedemptionArgs,
+    requested: Number.MAX_SAFE_INTEGER,
+  });
+  const requestedWallet = Number(checkout?.walletRedeemed ?? 0);
+  const walletRedeemed =
+    checkout?.useWallet === true && requestedWallet > 0
+      ? computeWalletRedemption({
+          ...walletRedemptionArgs,
+          requested: requestedWallet,
+        })
+      : 0;
+  const payableTotal = round2(finalTotal - walletRedeemed);
 
   const getItemPriceInfo = (item: SelectedItem) => {
     const sizePrice = item?.selectedSize
@@ -405,7 +448,7 @@ export default function CartPage() {
 
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
           <PaymentMethod />
-          <WalletRedemption />
+          {maxWalletAmount > 0 && <WalletRedemption maxAmount={maxWalletAmount} />}
           <BillDetails
             itemTotal={itemTotal}
             deliveryFees={round2(deliveryFees)}
@@ -418,7 +461,8 @@ export default function CartPage() {
                 : null
             }
             orderDiscountAmount={autoOrderAmount}
-            total={finalTotal}
+            walletRedeemed={walletRedeemed}
+            total={payableTotal}
             savings={savings}
             orderNumber={user?.trackedOrder?.orderNumber}
             comment={comment}
@@ -467,7 +511,7 @@ export default function CartPage() {
                 {t("Total Price")}
               </span>
               <span className="egp font-ProximaNovaBold text-lg">
-                {finalTotal}
+                {payableTotal}
               </span>
             </span>
             <button

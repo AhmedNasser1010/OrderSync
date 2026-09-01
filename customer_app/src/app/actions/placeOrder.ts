@@ -13,6 +13,7 @@ import {
   createWalletCtx,
   redeemCredits,
   getActiveCredits,
+  computeWalletRedemption,
 } from "@ordersync/order-utils";
 import type {
   MainMenuType,
@@ -394,10 +395,14 @@ export async function placeOrderServer(args: {
         // Cash Back redemption (server-authoritative).
         // Cash back cannot be applied when the cart already carries a
         // discount/promo, and redemption is capped by the platform config.
+        // Note: `servicesConfig` above is a rebuilt object without `cashback`;
+        // read the raw `services/platform` document for the cashback config.
         // ------------------------------------------------------------------
-        const cashbackConfig = (servicesConfig as unknown as {
-          cashback?: CashbackConfig;
-        }).cashback ?? {
+        const cashbackConfig = (
+          servicesSnap.exists
+            ? (servicesSnap.data() as { cashback?: CashbackConfig } | undefined)
+            : undefined
+        )?.cashback ?? {
           enabled: false,
           cashbackPercent: 0,
           wipeDays: 90,
@@ -420,18 +425,23 @@ export async function placeOrderServer(args: {
             0,
             orderData.pricing.walletRedeemed ?? 0
           );
-          const foodTotal = serverPricing.total;
+          const balance =
+            (customerData.wallet as { balance?: number } | undefined)
+              ?.balance ?? 0;
 
-          if (
-            cashbackConfig.redemptionThreshold > 0 &&
-            foodTotal < cashbackConfig.redemptionThreshold
-          ) {
-            // below redemption threshold — do not apply
-          } else {
-            const cap = cashbackConfig.maxCashbackPerTx ?? 0;
-            const maxApply = cap > 0 ? Math.min(requested, cap) : requested;
-            const capped = Math.max(0, Math.min(maxApply, foodTotal));
+          // Same computation the client cart uses, so the applied amount always
+          // matches what the customer was shown.
+          const capped = computeWalletRedemption({
+            requested,
+            balance,
+            orderTotal: serverPricing.total,
+            enabled: cashbackConfig.enabled,
+            hasDiscount: hasDiscountOnOrder,
+            redemptionThreshold: cashbackConfig.redemptionThreshold,
+            maxCashbackPerTx: cashbackConfig.maxCashbackPerTx,
+          });
 
+          if (capped > 0) {
             const walletCtx = createWalletCtx(
               {
                 transaction,

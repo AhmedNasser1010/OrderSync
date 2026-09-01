@@ -9,6 +9,8 @@ export type { ClawbackResult } from "./clawbackCredits";
 export { expireCredits } from "./expireCredits";
 export type { ExpireResult } from "./expireCredits";
 export { getActiveCredits } from "./getActiveCredits";
+export { computeWalletRedemption } from "./computeWalletRedemption";
+export type { WalletRedemptionComputeInput } from "./computeWalletRedemption";
 export {
   round2,
   DAY_MS,

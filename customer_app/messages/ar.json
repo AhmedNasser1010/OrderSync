@@ -179,6 +179,7 @@
   "Quantity is required": "الكمية مطلوبة",
   "Quantity must be at least 1": "الكمية لازم تكون على الأقل 1",
   "Rate this Restaurant!": "قيّم المطعم ده!",
+  "Refresh": "تحديث",
   "Remove": "ازالة",
   "Remove Cart Items and Go Home": "احذف منتجات السلة وارجع للرئيسية",
   "Reorder": "إعادة الطلب",
@@ -330,6 +331,7 @@
   },
   "Wallet": "المحفظة",
   "Cash Back Wallet": "محفظة الكاش باك",
+  "Cash Back": "كاش باك",
   "EGP": "ج.م",
   "available": "متاح",
   "Apply to order": "تطبيق على الطلب"

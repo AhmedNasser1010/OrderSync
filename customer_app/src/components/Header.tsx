@@ -238,6 +238,7 @@ function Header() {
           deliveryFees: servicesConfig.deliveryFees,
           minDeliveryFees: servicesConfig.minDeliveryFees,
           maxWorkDistanceKm: servicesConfig.maxWorkDistanceKm,
+          cashback: servicesConfig.cashback,
         })
       );
     }

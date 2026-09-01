@@ -149,6 +149,7 @@ export const firestoreApi = createApi({
         deliveryFees: ServicesDocument["deliveryFeesPerKm"];
         minDeliveryFees: ServicesDocument["minDeliveryFees"];
         maxWorkDistanceKm: ServicesDocument["maxWorkDistanceKm"];
+        cashback?: ServicesDocument["cashback"];
       },
       void
     >({
@@ -157,6 +158,7 @@ export const firestoreApi = createApi({
           deliveryFees: 3.5,
           minDeliveryFees: 5,
           maxWorkDistanceKm: 15,
+          cashback: undefined,
         },
       }),
       async onCacheEntryAdded(
@@ -176,10 +178,12 @@ export const firestoreApi = createApi({
                 draft.deliveryFees = data.deliveryFeesPerKm ?? 3.5;
                 draft.minDeliveryFees = data.minDeliveryFees ?? 5;
                 draft.maxWorkDistanceKm = data.maxWorkDistanceKm ?? 15;
+                draft.cashback = data.cashback;
               } else {
                 draft.deliveryFees = 3.5;
                 draft.minDeliveryFees = 5;
                 draft.maxWorkDistanceKm = 15;
+                draft.cashback = undefined;
               }
             });
           },
