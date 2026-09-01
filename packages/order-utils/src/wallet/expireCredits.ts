@@ -61,5 +61,6 @@ export async function expireCredits(
 async function getBalance(ctx: WalletCtx): Promise<number> {
   const snap = await ctx.transaction.get(ctx.customerRef);
   const data = (snap.data() ?? {}) as WalletDataShape;
-  return typeof data.balance === "number" ? data.balance : 0;
+  const nested = data.wallet?.balance;
+  return typeof nested === "number" ? nested : data.balance ?? 0;
 }

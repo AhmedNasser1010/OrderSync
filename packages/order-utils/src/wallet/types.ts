@@ -32,8 +32,9 @@ export interface TransactionInput {
 }
 
 export interface WalletDataShape {
+  /** Top-level balance (legacy). Prefer `wallet.balance`. */
   balance?: number;
-  updatedAt?: number;
+  wallet?: { balance?: number; updatedAt?: number };
 }
 
 /**
