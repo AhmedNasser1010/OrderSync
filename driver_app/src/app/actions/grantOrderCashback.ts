@@ -93,7 +93,7 @@ export async function grantOrderCashback(
         uid
       );
 
-      const { credit } = await grantCredit(ctx, {
+      await grantCredit(ctx, {
         userId: uid,
         amount: cashbackAmount,
         expiresAt,

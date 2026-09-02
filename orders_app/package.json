@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "PORT=3002 next dev",
     "build": "next build",
-    "start": "PORT=3002 next start"
+    "start": "PORT=3002 next start",
+    "lint": "eslint"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

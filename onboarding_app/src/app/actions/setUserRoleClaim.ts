@@ -11,7 +11,6 @@ const VALID_ROLES = [
 ] as const;
 
 const DRIVER_ROLE = "DRIVER" as const;
-const STAFF_ROLES = ["BUSINESSES_CREATOR", "BUSINESS_MANAGER"] as const;
 
 /**
  * Returns the existing conflicting role for the given email, if any, that

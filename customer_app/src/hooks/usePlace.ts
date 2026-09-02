@@ -74,7 +74,6 @@ const usePlace = () => {
   );
   const checkout = useAppSelector((state) => state.checkout);
   const wallet = useAppSelector((state) => state.wallet);
-  const cartTotal = useAppSelector((state) => state.cart);
   const currentRes = restaurants?.find(
     (restaurant) => restaurant.accessToken === cart.restaurant
   );
