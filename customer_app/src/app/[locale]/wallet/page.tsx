@@ -10,9 +10,11 @@ import {
   TrendingDown,
   RotateCcw,
   AlertTriangle,
+  Info,
 } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useAuthSession } from "@/hooks/useAuthSession";
+import { useAppSelector } from "@/rtk/hooks";
 import {
   useFetchWalletBalanceQuery,
   useFetchWalletCreditsQuery,
@@ -64,6 +66,8 @@ export default function WalletPage() {
   const t = useTranslations();
   const locale = useLocale();
   const { uid } = useAuthSession();
+  const services = useAppSelector((state) => state.services);
+  const cashbackEnabled = (services as { cashback?: { enabled?: boolean } }).cashback?.enabled !== false;
 
   const {
     data: balance = 0,
@@ -95,6 +99,15 @@ export default function WalletPage() {
           </p>
         </div>
       </div>
+
+      {!cashbackEnabled && (
+        <div className="mb-4 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
+          <Info className="mt-0.5 size-5 shrink-0 text-amber-500" />
+          <p className="text-sm font-ProximaNovaSemiBold">
+            {t("cashbackDisabledNotice")}
+          </p>
+        </div>
+      )}
 
       <div className="rounded-3xl bg-gradient-to-br from-color-2 to-[#ffab4a] p-6 text-white shadow-lg shadow-color-2/20">
         <p className="text-sm font-ProximaNovaSemiBold text-white/80">

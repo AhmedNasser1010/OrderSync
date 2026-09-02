@@ -321,6 +321,7 @@
   "activeCredits": "Active credits",
   "history": "Transaction history",
   "noHistory": "No transactions yet. You'll see your cashback activity here.",
+  "cashbackDisabledNotice": "Cashback is currently disabled. New orders will not earn wallet credits.",
   "type": {
     "GRANT": "Credit added",
     "REDEEM": "Redeemed",
