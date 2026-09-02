@@ -148,27 +148,29 @@ service cloud.firestore {
     // =====================================================================
     // /banners/{bannerId}
     //
-    // Global homepage hero cards. Publicly readable so the customer app can
-    // show them to everyone; only partners can manage them.
+    // Homepage hero cards. Publicly readable so the customer app can show
+    // them to everyone; each banner is owned by the partner who created it
+    // (partnerUid) and only that partner may create, update or delete them.
     // =====================================================================
     match /banners/{bannerId} {
       allow read: if true;
-      allow create, update, delete: if isPartner();
+      allow create: if isPartnerOwner(incomingData().partnerUid);
+      allow update, delete: if isPartnerOwner(resourceData().partnerUid);
     }
 
     // =====================================================================
     // /r2Images/{imageId}
     //
     // Gallery index of objects stored in the Cloudflare R2 bucket "zajil".
-    // Each doc mirrors an uploaded object (key + public URL). The onboarding
-    // app gallery lists these to let users pick an existing image instead of
-    // pasting a URL. URLs themselves are public via the R2 public bucket;
-    // only partners and business managers can mutate the index.
+    // Each doc mirrors an uploaded object (key + public URL). URLs themselves
+    // are public via the R2 public bucket, but the gallery index is scoped to
+    // the creator (createdBy = the partner's uid), so each on-boarding account
+    // only sees and manages its own images.
     // =====================================================================
     match /r2Images/{imageId} {
-      allow read: if isSignedIn();
+      allow read: if isSignedIn() && isOwner(resourceData().createdBy);
       allow create: if (isPartner() || isManager()) && isOwner(incomingData().createdBy);
-      allow delete: if isPartner() || isManager();
+      allow delete: if (isPartner() || isManager()) && isOwner(resourceData().createdBy);
       allow update: if false;
     }
 

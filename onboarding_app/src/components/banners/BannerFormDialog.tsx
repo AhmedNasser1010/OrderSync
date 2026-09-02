@@ -49,12 +49,14 @@ function fromBanner(banner: HeroBanner): BannerDraft {
 interface BannerFormContentProps {
   banner: HeroBanner | null;
   defaultSortOrder: number;
+  partnerUid: string;
   onClose: () => void;
 }
 
 function BannerFormContent({
   banner,
   defaultSortOrder,
+  partnerUid,
   onClose,
 }: BannerFormContentProps) {
   const [draft, setDraft] = useState<BannerDraft>(() =>
@@ -78,6 +80,7 @@ function BannerFormContent({
     setError(null);
 
     const payload = {
+      partnerUid,
       imageUrl: draft.imageUrl.trim(),
       href: draft.href.trim(),
       active: draft.active,
@@ -238,6 +241,7 @@ interface BannerFormDialogProps {
   onOpenChange: (open: boolean) => void;
   banner?: HeroBanner | null;
   defaultSortOrder: number;
+  partnerUid: string;
 }
 
 export function BannerFormDialog({
@@ -245,6 +249,7 @@ export function BannerFormDialog({
   onOpenChange,
   banner,
   defaultSortOrder,
+  partnerUid,
 }: BannerFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -253,6 +258,7 @@ export function BannerFormDialog({
           key={banner?.id ?? "new"}
           banner={banner ?? null}
           defaultSortOrder={defaultSortOrder}
+          partnerUid={partnerUid}
           onClose={() => onOpenChange(false)}
         />
       )}

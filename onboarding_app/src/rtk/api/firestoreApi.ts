@@ -72,11 +72,12 @@ export const firestoreApi = createApi({
   tagTypes: ["User", "Businesses", "Menu", "Drivers", "Customers", "Reviews", "Orders", "Banners", "Services"],
   endpoints: (builder) => ({
     // Query Endpoints
-    fetchBanners: builder.query<HeroBanner[], void>({
-      async queryFn() {
+    fetchBanners: builder.query<HeroBanner[], string>({
+      async queryFn(partnerUid) {
         try {
+          if (!partnerUid) return { data: [] };
           const ref = collection(db, "banners");
-          const q = query(ref, orderBy("sortOrder", "asc"));
+          const q = query(ref, where("partnerUid", "==", partnerUid), orderBy("sortOrder", "asc"));
           const snapshot = await getDocs(q);
           const banners: HeroBanner[] = snapshot.docs.map(
             (docSnap) =>

@@ -181,6 +181,14 @@
         { "fieldPath": "active", "order": "ASCENDING" },
         { "fieldPath": "sortOrder", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "banners",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "partnerUid", "order": "ASCENDING" },
+        { "fieldPath": "sortOrder", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

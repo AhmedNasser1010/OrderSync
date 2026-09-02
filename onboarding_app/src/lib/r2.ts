@@ -8,6 +8,7 @@ import {
   orderBy,
   query,
   setDoc,
+  where,
 } from "firebase/firestore";
 import { db, auth } from "@/lib/firebase";
 import {
@@ -88,7 +89,12 @@ export async function deleteImageRecord(imageId: string): Promise<void> {
 }
 
 export async function listImages(): Promise<R2Image[]> {
-  const q = query(collection(db, "r2Images"), orderBy("createdAt", "desc"));
+  const uid = userUid();
+  const q = query(
+    collection(db, "r2Images"),
+    where("createdBy", "==", uid),
+    orderBy("createdAt", "desc")
+  );
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => d.data() as R2Image);
 }

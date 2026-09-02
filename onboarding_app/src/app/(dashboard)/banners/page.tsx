@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
+import { useAppSelector } from "@/rtk/hooks";
+import { userUid } from "@/rtk/slices/constantsSlice";
 import { BannerFormDialog } from "@/components/banners/BannerFormDialog";
 import { BannerPreview } from "@/components/banners/BannerPreview";
 import { Button } from "@/components/ui/button";
@@ -47,13 +49,15 @@ export default function BannersPage() {
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [movingId, setMovingId] = useState<string | null>(null);
 
+  const partnerUid = useAppSelector(userUid) ?? "";
+
   const {
     data: banners = [],
     isLoading,
     isError,
     isFetching,
     refetch,
-  } = useFetchBannersQuery();
+  } = useFetchBannersQuery(partnerUid);
   const [updateBanner] = useUpdateBannerMutation();
   const [deleteBanner] = useDeleteBannerMutation();
 
@@ -332,6 +336,7 @@ export default function BannersPage() {
       onOpenChange={setFormOpen}
       banner={editing}
       defaultSortOrder={nextSortOrder}
+      partnerUid={partnerUid}
     />
 
     <Dialog
