@@ -101,8 +101,8 @@ export default function WalletPage() {
       </div>
 
       {!cashbackEnabled && (
-        <div className="mb-4 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
-          <Info className="mt-0.5 size-5 shrink-0 text-amber-500" />
+        <div className="mb-4 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
+          <Info className="mt-0.5 size-5 shrink-0 text-amber-500 dark:text-amber-400" />
           <p className="text-sm font-ProximaNovaSemiBold">
             {t("cashbackDisabledNotice")}
           </p>
