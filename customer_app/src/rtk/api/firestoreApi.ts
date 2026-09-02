@@ -79,6 +79,7 @@ export const firestoreApi = createApi({
     "Banners",
     "Services",
     "LastOrder",
+    "WalletLists",
   ],
   endpoints: (builder) => ({
     // =====================================================================
@@ -573,6 +574,7 @@ export const firestoreApi = createApi({
     fetchWalletBalance: builder.query<number, string>({
       async queryFn(uid) {
         try {
+          if (!uid) return { data: 0 };
           const ref = doc(db, "customers", uid);
           const snapshot = await getDoc(ref);
           const data = snapshot.exists()
@@ -584,6 +586,53 @@ export const firestoreApi = createApi({
             error instanceof Error ? error.message : "Unknown error";
           return { error: message };
         }
+      },
+      onCacheEntryAdded(
+        uid,
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch }
+      ) {
+        return (async () => {
+          await cacheDataLoaded;
+
+          if (!uid) return;
+
+          // Realtime subscription on the customer doc so the balance reflects
+          // wallet mutations immediately (order placed -> redemption lowers it,
+          // cancel/clawback -> it rises, plus cashback earned on delivery, admin
+          // adjustments and credit expiry). A single-doc listener costs one read
+          // per change, identical to the one-shot getDoc it replaces.
+          const ref = doc(db, "customers", uid);
+          let lastBalance: number | undefined;
+
+          const unsubscribe = onSnapshot(
+            ref,
+            (docSnapshot) => {
+              const data = docSnapshot.exists()
+                ? (docSnapshot.data() as { wallet?: { balance?: number } })
+                : {};
+              const balance = data?.wallet?.balance ?? 0;
+              updateCachedData(() => balance);
+
+              if (lastBalance !== undefined && balance !== lastBalance) {
+                // Refresh the credits/transactions lists only when the balance
+                // actually moved, to keep reads cheap. Only the list tags are
+                // invalidated (not "User"), so the balance itself is not
+                // redundantly refetched and there is no invalidation loop.
+                dispatch(firestoreApi.util.invalidateTags(["WalletLists"]));
+              }
+              lastBalance = balance;
+            },
+            (error) => {
+              console.error(
+                "Error in real-time listener [walletBalance]:",
+                error?.message
+              );
+            }
+          );
+
+          await cacheEntryRemoved;
+          unsubscribe();
+        })();
       },
       providesTags: ["User"],
     }),
@@ -609,7 +658,7 @@ export const firestoreApi = createApi({
           return { error: message };
         }
       },
-      providesTags: ["User"],
+      providesTags: ["WalletLists"],
     }),
     fetchWalletTransactions: builder.query<WalletTransaction[], string>({
       async queryFn(uid) {
@@ -633,7 +682,7 @@ export const firestoreApi = createApi({
           return { error: message };
         }
       },
-      providesTags: ["User"],
+      providesTags: ["WalletLists"],
     }),
   }),
 });
