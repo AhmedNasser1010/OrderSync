@@ -3,7 +3,7 @@
 // Runtime types generated with workerd@1.20260828.1 2026-08-01 nodejs_compat
 interface __BaseEnv_Env {
 	ORDERSYNC_BUCKET: R2Bucket;
-	R2_PUBLIC_DOMAIN: "https://pub-fd5c9e71bf0d4aa6bf3ebbfefbed5c55.r2.dev";
+	R2_PUBLIC_DOMAIN: "https://bucket.zajil.food";
 	ALLOWED_BUCKET: "zajil";
 }
 declare namespace Cloudflare {

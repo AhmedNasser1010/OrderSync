@@ -14,7 +14,7 @@
     }
   ],
   "vars": {
-    "R2_PUBLIC_DOMAIN": "https://pub-fd5c9e71bf0d4aa6bf3ebbfefbed5c55.r2.dev",
+    "R2_PUBLIC_DOMAIN": "https://bucket.zajil.food",
     "ALLOWED_BUCKET": "zajil"
   }
 }

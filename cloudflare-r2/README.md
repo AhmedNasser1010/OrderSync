@@ -4,7 +4,7 @@ Uploads, deletes and serves images for the Order Sync platform (restaurant
 icons/covers, homepage hero banners, menu item backgrounds).
 
 Images are stored in the **`zajil`** R2 bucket and served via the bucket's
-public URL (`https://pub-fd5c9e71bf0d4aa6bf3ebbfefbed5c55.r2.dev`). The
+public URL (`https://bucket.zajil.food`). The
 public URL is stored in Firestore (`branding.icon`, `branding.cover`,
 `HeroBanner.imageUrl`, `ItemType.backgrounds`, ...) so the customer and
 onboarding apps can render them with `next/image`.

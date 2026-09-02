@@ -13,7 +13,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "pub-fd5c9e71bf0d4aa6bf3ebbfefbed5c55.r2.dev",
+        hostname: "bucket.zajil.food",
         port: "",
         pathname: "/**",
       },
