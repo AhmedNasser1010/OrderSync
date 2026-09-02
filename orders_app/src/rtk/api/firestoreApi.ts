@@ -15,6 +15,7 @@ import { db } from "@/lib/firebase";
 import type { OrderType, OrderStatusType, RestaurantStatusTypes, BusinessDocument } from "@ordersync/types";
 import { canTransition, canReverseTransition, getTimelineField, isDriverOwned } from "@ordersync/order-utils";
 import { handleOrderClawback } from "@/app/actions/handleOrderClawback";
+import { grantOrderCashback } from "@/app/actions/grantOrderCashback";
 
 export const firestoreApi = createApi({
   baseQuery: fakeBaseQuery(),
@@ -146,6 +147,7 @@ export const firestoreApi = createApi({
           if (!updatedStatus) throw new Error("Target status is required.");
 
           const orderRef = doc(db, "orders", orderId);
+          let isMarkCompleteDelivery = false;
 
           await runTransaction(db, async (transaction) => {
             const orderSnap = await transaction.get(orderRef);
@@ -193,6 +195,9 @@ export const firestoreApi = createApi({
 
             const now = Date.now();
             const isReverse = canReverseTransition(currentStatus, updatedStatus) || isSkipAcceptedReverse;
+            if (updatedStatus === "DELIVERED" && currentStatus === "READY" && allowMarkComplete) {
+              isMarkCompleteDelivery = true;
+            }
 
             const updateData: Record<string, unknown> = {
               "status.current": updatedStatus,
@@ -215,6 +220,20 @@ export const firestoreApi = createApi({
 
             transaction.update(orderRef, updateData);
           });
+
+          // Grant cash back (server-side) when the kitchen marks the order
+          // complete directly (READY -> DELIVERED, no driver assigned). The
+          // server action is idempotent, so retries are safe.
+          if (isMarkCompleteDelivery) {
+            try {
+              await grantOrderCashback(orderId);
+            } catch (orderCashbackError) {
+              console.error(
+                "Error granting cashback after marking order complete:",
+                orderCashbackError
+              );
+            }
+          }
 
           return { data: null };
         } catch (error) {

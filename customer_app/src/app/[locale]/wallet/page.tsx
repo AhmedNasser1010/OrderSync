@@ -23,7 +23,7 @@ import {
   type WalletTransaction,
 } from "@ordersync/types";
 
-const SOURCE_LABELS: Record<string, string> = {
+const SOURCE_LABEL_KEYS: Record<string, string> = {
   CAMPAIGN: "Campaign Bonus",
   ADMIN_ADJUST: "Admin Adjustment",
   ORDER_EARN: "Cashback",
@@ -39,8 +39,8 @@ const TYPE_ICONS: Record<string, typeof Coins> = {
   ADMIN_ADJUST: TrendingUp,
 };
 
-function formatAmount(amount: number): string {
-  return `${amount.toFixed(2)} EGP`;
+function formatAmount(amount: number, t: (key: string) => string): string {
+  return `${amount.toFixed(2)} ${t("EGP")}`;
 }
 
 function formatDate(ts: number, locale: string): string {
@@ -55,9 +55,9 @@ function formatDate(ts: number, locale: string): string {
   }
 }
 
-function daysLeft(expiresAt: number): string {
+function daysLeft(expiresAt: number, t: ReturnType<typeof useTranslations>): string {
   const days = Math.max(0, Math.ceil((expiresAt - Date.now()) / 86400000));
-  return days === 0 ? "Today" : `${days} day${days === 1 ? "" : "s"} left`;
+  return days === 0 ? t("Today") : t("daysLeft", { count: days });
 }
 
 export default function WalletPage() {
@@ -101,7 +101,7 @@ export default function WalletPage() {
           {t("availableBalance")}
         </p>
         <p className="mt-1 font-Beiruti text-5xl font-bold">
-          {formatAmount(balance)}
+          {formatAmount(balance, t)}
         </p>
       </div>
 
@@ -122,16 +122,16 @@ export default function WalletPage() {
                   </div>
                   <div>
                     <p className="font-ProximaNovaSemiBold text-color-1">
-                      {SOURCE_LABELS[credit.source] ?? credit.source}
+                      {t(SOURCE_LABEL_KEYS[credit.source] ?? credit.source)}
                     </p>
                     <p className="flex items-center gap-1 text-xs text-color-8">
                       <Clock className="size-3" />
-                      {daysLeft(credit.expiresAt)}
+                      {daysLeft(credit.expiresAt, t)}
                     </p>
                   </div>
                 </div>
                 <p className="font-ProximaNovaBold text-emerald-600">
-                  {formatAmount(credit.amount)}
+                  {formatAmount(credit.amount, t)}
                 </p>
               </div>
             ))}
@@ -201,7 +201,7 @@ export default function WalletPage() {
                     }`}
                   >
                     {isCredit ? "+" : isDebit ? "−" : ""}
-                    {formatAmount(Math.abs(tx.amount))}
+                    {formatAmount(Math.abs(tx.amount), t)}
                   </p>
                 </div>
               );

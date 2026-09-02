@@ -490,7 +490,7 @@ function Header() {
                 >
                   <WalletIcon className="size-4 text-color-5" />
                   <span className="text-emerald-600">
-                    {walletState.balance.toFixed(2)} EGP
+                    {walletState.balance.toFixed(2)} {t("EGP")}
                   </span>
                 </Link>
               </li>

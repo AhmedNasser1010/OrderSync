@@ -331,8 +331,15 @@
   "Wallet": "المحفظة",
   "Cash Back Wallet": "محفظة الكاش باك",
   "Cash Back": "كاش باك",
-  "EGP": "ج.م",
+  "Campaign Bonus": "مكافأة الحملة",
+  "Admin Adjustment": "تعديل إداري",
+  "Cashback": "كاش باك",
+  "Welcome Bonus": "مكافأة الترحيب",
+  "Win-Back Bonus": "مكافأة الاسترجاع",
+  "EGP": "جنيه",
   "available": "متاح",
   "Apply to order": "تطبيق على الطلب",
-  "Amount to spend": "مبلغ الكاش باك المراد استخدامه"
+  "Amount to spend": "مبلغ الكاش باك المراد استخدامه",
+  "Today": "اليوم",
+  "daysLeft": "{count, plural, one {يوم واحد متبقي} two {يومان متبقيان} few {# أيام متبقية} many {# يومًا متبقيًا} other {# يوم متبقي}}"
 }

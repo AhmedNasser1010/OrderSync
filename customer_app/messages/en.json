@@ -331,8 +331,15 @@
   "Wallet": "Wallet",
   "Cash Back Wallet": "Cash Back Wallet",
   "Cash Back": "Cash Back",
+  "Campaign Bonus": "Campaign Bonus",
+  "Admin Adjustment": "Admin Adjustment",
+  "Cashback": "Cashback",
+  "Welcome Bonus": "Welcome Bonus",
+  "Win-Back Bonus": "Win-Back Bonus",
   "EGP": "EGP",
   "available": "available",
   "Apply to order": "Apply to order",
-  "Amount to spend": "Cashback amount to spend"
+  "Amount to spend": "Cashback amount to spend",
+  "Today": "Today",
+  "daysLeft": "{count, plural, one {# day left} other {# days left}}"
 }
