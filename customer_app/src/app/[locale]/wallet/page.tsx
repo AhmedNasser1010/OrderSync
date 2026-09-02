@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   ArrowLeft,
@@ -76,11 +75,6 @@ export default function WalletPage() {
     data: transactions = [],
   } = useFetchWalletTransactionsQuery(uid ?? "", { skip: !uid });
 
-  const totalPending = useMemo(
-    () => credits.reduce((sum, c) => sum + c.amount, 0),
-    [credits]
-  );
-
   return (
     <div className="mx-auto min-h-screen max-w-3xl px-4 pb-40 pt-6 sm:px-6 lg:pt-8">
       <div className="mb-6 flex items-center gap-3">
@@ -108,9 +102,6 @@ export default function WalletPage() {
         </p>
         <p className="mt-1 font-Beiruti text-5xl font-bold">
           {formatAmount(balance)}
-        </p>
-        <p className="mt-2 text-sm text-white/80">
-          {t("pendingBalance", { amount: formatAmount(totalPending) })}
         </p>
       </div>
 

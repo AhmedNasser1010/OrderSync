@@ -318,7 +318,6 @@
   "title": "Wallet",
   "subtitle": "Your cashback credits",
   "availableBalance": "Available balance",
-  "pendingBalance": "Pending credits: {amount}",
   "activeCredits": "Active credits",
   "history": "Transaction history",
   "noHistory": "No transactions yet. You'll see your cashback activity here.",

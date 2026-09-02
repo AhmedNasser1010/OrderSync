@@ -318,7 +318,6 @@
   "title": "المحفظة",
   "subtitle": "رصيد الكاش باك الخاص بك",
   "availableBalance": "الرصيد المتاح",
-  "pendingBalance": "رصيد معلق: {amount}",
   "activeCredits": "الرصيد النشط",
   "history": "سجل المعاملات",
   "noHistory": "لا توجد معاملات بعد. ستظهر أنشطة الكاش باك هنا.",
