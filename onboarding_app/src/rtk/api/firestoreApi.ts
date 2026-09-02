@@ -40,11 +40,13 @@ export interface UpdateBusinessInput {
   accessToken: string;
   partnerUid: string;
   updates: Partial<BusinessDocument>;
+  idToken: string;
 }
 
 export interface DeleteBusinessInput {
   accessToken: string;
   userUid: string;
+  idToken: string;
 }
 
 export type OrderLookupField =
@@ -325,8 +327,11 @@ export const firestoreApi = createApi({
     }),
 
     // Mutation Endpoints
-    createUserDocument: builder.mutation<null, { uid: string; email: string }>({
-      async queryFn({ uid, email }) {
+    createUserDocument: builder.mutation<
+      null,
+      { uid: string; email: string; idToken: string }
+    >({
+      async queryFn({ uid, email, idToken }) {
         try {
           const userData = {
             createdAt: Date.now(),
@@ -345,8 +350,14 @@ export const firestoreApi = createApi({
           };
 
           const docRef = doc(db, "users", uid);
+          // Validate / assign the role claim BEFORE writing the user document,
+          // so an account that already holds another role (e.g. a customer)
+          // can't be silently promoted, and no stray user doc is left behind.
+          const claimResult = await setUserRoleClaim(uid, "BUSINESSES_CREATOR", idToken);
+          if (!claimResult.success) {
+            throw new Error(claimResult.error || "Failed to set role claim");
+          }
           await setDoc(docRef, userData);
-          await setUserRoleClaim(uid, "BUSINESSES_CREATOR");
 
           console.log("Write Operation [createUserDocument]");
           return { data: null };
@@ -371,9 +382,10 @@ export const firestoreApi = createApi({
           displayName?: string | null;
           phoneNumber?: string | null;
         };
+        idToken: string;
       }
     >({
-      async queryFn({ business, user }) {
+      async queryFn({ business, user, idToken }) {
         try {
           if (!business?.accessToken) {
             throw new Error("Business access token is required.");
@@ -398,6 +410,20 @@ export const firestoreApi = createApi({
           // Fetch manager's provider from Firebase Auth (not Partner data)
           const providerResult = await getUserProvider(managerUid);
           const managerProvider = providerResult.provider || "Email/Password";
+
+          // Validate / assign the manager role claim BEFORE writing any docs,
+          // so a partner can't create a business then fail with a confusing
+          // partial write when they try to make themselves (or a customer, or
+          // an account that already holds another role) the manager. Only
+          // proceed if the claim was set successfully.
+          const claimResult = await setUserRoleClaim(
+            managerUid,
+            "BUSINESS_MANAGER",
+            idToken,
+          );
+          if (!claimResult.success) {
+            throw new Error(claimResult.error || "Failed to set manager role.");
+          }
 
           await runTransaction(db, async (transaction) => {
             const businessRef = doc(db, "businesses", business.accessToken);
@@ -468,8 +494,6 @@ export const firestoreApi = createApi({
             transaction.set(managerRef, managerData, { merge: true });
           });
 
-          await setUserRoleClaim(managerUid, "BUSINESS_MANAGER");
-
           console.log("Write Operation [createBusiness]");
           return { data: null };
         } catch (error: unknown) {
@@ -481,7 +505,7 @@ export const firestoreApi = createApi({
       invalidatesTags: ["User", "Businesses"],
     }),
     updateBusiness: builder.mutation<null, UpdateBusinessInput>({
-      async queryFn({ accessToken, partnerUid, updates }) {
+      async queryFn({ accessToken, partnerUid, updates, idToken }) {
         try {
           if (!accessToken) {
             throw new Error("Business access token is required.");
@@ -537,7 +561,7 @@ export const firestoreApi = createApi({
           });
 
           if (managerChanged && newManagerUid) {
-            await setUserRoleClaim(newManagerUid, "BUSINESS_MANAGER");
+            await setUserRoleClaim(newManagerUid, "BUSINESS_MANAGER", idToken);
           }
 
           console.log("Write Operation [updateBusiness]");
@@ -551,7 +575,7 @@ export const firestoreApi = createApi({
       invalidatesTags: ["Businesses", "User"],
     }),
     deleteBusiness: builder.mutation<null, DeleteBusinessInput>({
-      async queryFn({ accessToken, userUid }) {
+      async queryFn({ accessToken, userUid, idToken }) {
         try {
           if (!accessToken) {
             throw new Error("Business access token is required.");
@@ -633,7 +657,7 @@ export const firestoreApi = createApi({
           //    This removes the business manager's authentication so they can no longer log in.
           //    Only delete if the owner is different from the current authenticated user.
           if (ownerUid && ownerUid !== userUid) {
-            const result = await deleteAuthUser(ownerUid);
+            const result = await deleteAuthUser(ownerUid, idToken);
             if (result.success) {
               console.log(
                 `Cleanup [deleteBusiness]: Owner auth user deleted (ownerUid: ${ownerUid})`,
@@ -778,8 +802,11 @@ export const firestoreApi = createApi({
       },
       providesTags: ["User"],
     }),
-    deleteManager: builder.mutation<null, string>({
-      async queryFn(managerUid: string) {
+    deleteManager: builder.mutation<
+      null,
+      { managerUid: string; idToken: string }
+    >({
+      async queryFn({ managerUid, idToken }) {
         try {
           if (!managerUid) {
             throw new Error("Manager UID is required.");
@@ -787,7 +814,7 @@ export const firestoreApi = createApi({
           const managerRef = doc(db, "users", managerUid);
           await writeBatch(db).delete(managerRef).commit();
           console.log("Write Operation [deleteManager]");
-          const result = await deleteAuthUser(managerUid);
+          const result = await deleteAuthUser(managerUid, idToken);
           if (!result.success) {
             console.error(
               "deleteManager: Failed to delete auth user:",
@@ -1336,7 +1363,7 @@ export const firestoreApi = createApi({
         targetUserId: string;
         amount: number;
         reason: string;
-        adminUid: string;
+        idToken: string;
         days?: number;
       }
     >({
@@ -1371,9 +1398,10 @@ export const firestoreApi = createApi({
         secondPhone?: string;
         provider: string;
         licensePlate?: { letters: string; numbers: number };
+        idToken: string;
       }
     >({
-      async queryFn({ uid, partnerUid, email, name, phone, secondPhone, provider, licensePlate }) {
+      async queryFn({ uid, partnerUid, email, name, phone, secondPhone, provider, licensePlate, idToken }) {
         try {
           if (!uid) throw new Error("Driver UID is required.");
           if (!partnerUid) throw new Error("Partner UID is required.");
@@ -1411,8 +1439,14 @@ export const firestoreApi = createApi({
           if (licensePlate) driverData.licensePlate = licensePlate;
 
           const docRef = doc(db, "drivers", uid);
+          // Validate the role assignment (one role per account, caller is a
+          // partner) BEFORE writing the driver document, so a customer account
+          // can never be promoted to driver and no stray doc is left behind.
+          const claimResult = await setUserRoleClaim(uid, "DRIVER", idToken);
+          if (!claimResult.success) {
+            throw new Error(claimResult.error || "Failed to set role claim");
+          }
           await setDoc(docRef, driverData);
-          await setUserRoleClaim(uid, "DRIVER");
 
           console.log("Write Operation [createDriverDocument]");
           return { data: null };
@@ -1448,15 +1482,18 @@ export const firestoreApi = createApi({
       },
       invalidatesTags: ["Drivers"],
     }),
-    deleteDriverDocument: builder.mutation<null, string>({
-      async queryFn(uid: string) {
+    deleteDriverDocument: builder.mutation<
+      null,
+      { uid: string; idToken: string }
+    >({
+      async queryFn({ uid, idToken }) {
         try {
           if (!uid) throw new Error("Driver UID is required.");
 
           const driverRef = doc(db, "drivers", uid);
           await deleteDoc(driverRef);
 
-          const result = await deleteAuthUser(uid);
+          const result = await deleteAuthUser(uid, idToken);
           if (!result.success) {
             console.error(
               "deleteDriverDocument: Failed to delete auth user:",

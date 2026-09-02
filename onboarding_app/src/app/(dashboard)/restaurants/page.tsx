@@ -138,7 +138,8 @@ export default function RestaurantsPage() {
 
   const handleDelete = async (accessToken: string) => {
     if (!authUser) return;
-    await deleteBusiness({ accessToken, userUid: authUser.uid }).unwrap();
+    const idToken = await authUser.getIdToken();
+    await deleteBusiness({ accessToken, userUid: authUser.uid, idToken }).unwrap();
   };
 
   return (

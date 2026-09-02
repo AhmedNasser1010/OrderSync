@@ -120,7 +120,9 @@ export default function ManagersPage() {
   );
 
   const handleDelete = async (uid: string) => {
-    await deleteManager(uid).unwrap();
+    if (!authUser) return;
+    const idToken = await authUser.getIdToken();
+    await deleteManager({ managerUid: uid, idToken }).unwrap();
   };
 
   return (

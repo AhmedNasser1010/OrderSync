@@ -87,11 +87,12 @@ export function AdjustCreditDialog({
     }
     setError(null);
     try {
+      const idToken = await user.getIdToken();
       await adjustCustomerCredit({
         targetUserId: customer.uid,
         amount: mode === "grant" ? numeric : -numeric,
         reason: reason.trim(),
-        adminUid: user.uid,
+        idToken,
       }).unwrap();
       reset();
       onAdjusted();

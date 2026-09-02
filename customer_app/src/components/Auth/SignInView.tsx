@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { GoogleSignInButton } from "@/components/Auth/GoogleSignInButton";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { LOGO_URL } from "@/utils/constants";
@@ -11,22 +11,19 @@ import { LOGO_URL } from "@/utils/constants";
 export function SignInView() {
   const t = useTranslations();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { isAuthenticated, isAuthLoading, isOnboardingComplete, error } =
     useAuthSession();
-
-  const from = searchParams.get("from");
 
   useEffect(() => {
     if (isAuthLoading) return;
     if (!isAuthenticated) return;
 
-    if (isOnboardingComplete === false && from === "onboarding") {
+    if (isOnboardingComplete === false) {
       router.replace("/onboarding");
     } else {
       router.replace("/");
     }
-  }, [isAuthenticated, isAuthLoading, isOnboardingComplete, from, router]);
+  }, [isAuthenticated, isAuthLoading, isOnboardingComplete, router]);
 
   return (
     <section className="min-h-[70vh] flex items-center justify-center px-4 py-10">

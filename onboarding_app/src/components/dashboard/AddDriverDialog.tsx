@@ -22,7 +22,8 @@ function isValidEmail(email: string): boolean {
 }
 
 export function AddDriverDialog() {
-  const partnerUid = useAuth().user?.uid;
+  const authUser = useAuth().user;
+  const partnerUid = authUser?.uid;
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -65,7 +66,7 @@ export function AddDriverDialog() {
   };
 
   const handleSubmit = async () => {
-    if (!uid || !partnerUid) return;
+    if (!uid || !partnerUid || !authUser) return;
 
     setIsSubmitting(true);
     setSubmitError(null);
@@ -73,6 +74,7 @@ export function AddDriverDialog() {
     try {
       const providerResult = await getUserProvider(uid);
       const provider = providerResult.provider || "unknown";
+      const idToken = await authUser.getIdToken();
 
       const licensePlate =
         licensePlateLetters && licensePlateNumbers
@@ -88,6 +90,7 @@ export function AddDriverDialog() {
         secondPhone: secondPhone || undefined,
         provider,
         licensePlate,
+        idToken,
       }).unwrap();
 
       setOpen(false);

@@ -52,6 +52,21 @@ export function useAuthSession() {
       const docSnapshot = await getDoc(userDocRef);
 
       if (!docSnapshot.exists()) {
+        // Do not auto-create a customer profile for an account that already
+        // holds a business (creator/manager) or driver role. One Auth account
+        // must map to exactly one role, so staff/driver accounts are not also
+        // silently registered as customers.
+        let role: string | undefined;
+        try {
+          const tokenResult = await user.getIdTokenResult();
+          role = tokenResult.claims.role as string | undefined;
+        } catch {
+          role = undefined;
+        }
+        if (role && role !== "CUSTOMER") {
+          return;
+        }
+
         const createUserData = customerSchema({
           uid: user.uid,
           name: data?.name || user.displayName || "",

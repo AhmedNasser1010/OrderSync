@@ -26,6 +26,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import {
   toggleLoginSidebar,
+  setLoginSidebarIsOpen,
   toggleOrderSidebar,
   toggleLng,
   setTheme,
@@ -251,7 +252,7 @@ function Header() {
         duration: 4000,
       });
       document.body.classList.add("overflow-hidden");
-      dispatch(toggleLoginSidebar());
+      dispatch(setLoginSidebarIsOpen(true));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn, user?.userInfo?.uid, user?.userInfo?.phone]);

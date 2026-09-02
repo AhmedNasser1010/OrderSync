@@ -19,11 +19,11 @@ export interface AuthState {
 }
 
 const initialState: AuthState = {
-  status: "loading",
+  status: "unauthenticated",
   uid: null,
   idToken: null,
   error: null,
-  isOnboardingComplete: false,
+  isOnboardingComplete: true,
 };
 
 const authSlice = createSlice({

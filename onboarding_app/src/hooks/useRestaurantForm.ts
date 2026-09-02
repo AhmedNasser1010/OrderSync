@@ -134,6 +134,11 @@ export function useRestaurantForm(initialData?: BusinessDocument) {
       return false;
     }
 
+    setErrors({});
+    if (!currentUser?.uid || !currentUser.email) {
+      throw new Error("You must be signed in to manage a business.");
+    }
+
     setIsSubmitting(true);
     try {
       if (!formData.accessToken) {
@@ -144,15 +149,15 @@ export function useRestaurantForm(initialData?: BusinessDocument) {
       const ownerName = formData.owner.name ?? "";
 
       if (initialData?.accessToken) {
+        const idToken = await currentUser.getIdToken();
         await updateBusiness({
           accessToken: formData.accessToken,
           partnerUid: initialData.partnerUid,
           updates: { ...formData, updatedAt: now },
+          idToken,
         }).unwrap();
       } else {
-        if (!currentUser?.uid || !currentUser.email) {
-          throw new Error("You must be signed in to create a business.");
-        }
+        const idToken = await currentUser.getIdToken();
 
         await createBusiness({
           business: formData,
@@ -165,6 +170,7 @@ export function useRestaurantForm(initialData?: BusinessDocument) {
             displayName: currentUser.displayName,
             phoneNumber: currentUser.phoneNumber,
           },
+          idToken,
         }).unwrap();
       }
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { verifySessionCookie, SESSION_COOKIE_NAME } from "@/lib/auth/session";
 
 /**
  * Public routes that unauthenticated users can access.
@@ -15,25 +16,18 @@ const isPublicRoute = (pathname: string): boolean => {
 }
 
 /**
- * Proxy that guards protected routes by checking for an auth-token cookie.
+ * Proxy that guards protected routes by verifying the httpOnly session cookie.
  *
- * If the user is not authenticated and tries to access a protected route,
- * they are redirected to the signup (register) page.
- *
- * If the user IS authenticated and tries to access auth pages,
- * they are redirected to the restaurants dashboard.
- *
- * This follows Next.js best practices for route protection:
- * - Runs at the edge before the request reaches the page
- * - No client-side flash of protected content
- * - Works even if JavaScript is disabled
- * - Server-side enforcement that can't be bypassed by client code
+ * The session cookie is set server-side (httpOnly, not readable by JS) and is
+ * cryptographically verified against Firebase here at the edge, so route
+ * protection cannot be bypassed by a forged client cookie.
  */
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const authToken = request.cookies.get('auth-token')?.value
+  const session = request.cookies.get(SESSION_COOKIE_NAME)?.value
+  const sessionUser = session ? await verifySessionCookie(session) : null
 
-  const isAuthenticated = !!authToken
+  const isAuthenticated = !!sessionUser
 
   // Allow public routes when not authenticated
   if (!isAuthenticated && isPublicRoute(pathname)) {
@@ -57,18 +51,9 @@ export function proxy(request: NextRequest) {
 
 /**
  * Configure which routes the proxy should run on.
- * This is important for performance — we only run the proxy on
- * routes that need protection or special handling.
  */
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public assets (images, fonts, etc.)
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],
 }

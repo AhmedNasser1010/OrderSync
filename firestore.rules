@@ -57,16 +57,19 @@ service cloud.firestore {
       return hasCustomerDoc();
     }
 
+    // Role is determined from the authoritative Firebase Auth custom claim,
+    // which is only assigned by the server (verified against the caller's
+    // ID token). It can never be forged by creating a Firestore document.
     function isManager() {
-      return hasUsersDoc() && getUsersDoc().userInfo.role == 'BUSINESS_MANAGER';
+      return isSignedIn() && request.auth.token.role == 'BUSINESS_MANAGER' && hasUsersDoc();
     }
 
     function isPartner() {
-      return hasUsersDoc() && getUsersDoc().userInfo.role == 'BUSINESSES_CREATOR';
+      return isSignedIn() && request.auth.token.role == 'BUSINESSES_CREATOR' && hasUsersDoc();
     }
 
     function isRider() {
-      return isSignedIn() && exists(/databases/$(database)/documents/drivers/$(request.auth.uid));
+      return isSignedIn() && request.auth.token.role == 'DRIVER';
     }
 
     function managerAccessToken() {

@@ -23,7 +23,10 @@ import {
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { setUserUid } from "@/rtk/slices/constantsSlice";
-import { setAuthCookie, clearAuthCookie } from "@/lib/auth-cookie";
+import {
+  establishSession,
+  revokeSession,
+} from "@/app/actions/establishSession";
 import { setUserRoleClaim } from "@/app/actions/setUserRoleClaim";
 
 interface AuthContextValue {
@@ -107,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (!isSigningUp.current) {
               await firebaseSignOut(auth);
               dispatch(setUserUid(null));
-              clearAuthCookie();
+              await revokeSession();
               setUser(null);
               setIsAuthLoading(false);
               if (!initialCheckDone.current) {
@@ -119,7 +122,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
 
           dispatch(setUserUid(currentUser.uid));
-          setAuthCookie(currentUser.uid);
+          try {
+            const idToken = await currentUser.getIdToken();
+            await establishSession(idToken);
+          } catch {
+            // Session refresh best-effort; claims/rules remain the authority.
+          }
           setUser(currentUser);
           setIsAuthLoading(false);
 
@@ -129,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } else {
           dispatch(setUserUid(null));
-          clearAuthCookie();
+          await revokeSession();
           setUser(null);
           setIsAuthLoading(false);
 
@@ -171,7 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await firebaseSignOut(auth);
         setUser(null);
         dispatch(setUserUid(null));
-        clearAuthCookie();
+        await revokeSession();
         throw new Error(
           "Access denied. Only businesses creators can access this app.",
         );
@@ -217,7 +225,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           businesses: [],
         },
       });
-      await setUserRoleClaim(uid, "BUSINESSES_CREATOR");
+      const idToken = await firebaseUser.getIdToken();
+      await setUserRoleClaim(uid, "BUSINESSES_CREATOR", idToken);
       await firebaseUser.getIdToken(true);
 
       const tokenResult = await firebaseUser.getIdTokenResult();
@@ -227,14 +236,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await firebaseSignOut(auth);
         setUser(null);
         dispatch(setUserUid(null));
-        clearAuthCookie();
+        await revokeSession();
         throw new Error(
           "Access denied. Only businesses creators can access this app.",
         );
       }
 
       dispatch(setUserUid(firebaseUser.uid));
-      setAuthCookie(firebaseUser.uid);
       setUser(firebaseUser);
       setIsAuthLoading(false);
       initialCheckDone.current = true;
@@ -266,6 +274,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const docSnapshot = await getDoc(userDocRef);
 
       if (!docSnapshot.exists()) {
+        // Assign the role claim first (validates the one-role-per-account
+        // invariant server-side) before creating the user document.
+        const idToken = await googleUser.getIdToken();
+        const claimResult = await setUserRoleClaim(
+          googleUser.uid,
+          "BUSINESSES_CREATOR",
+          idToken,
+        );
+        if (!claimResult.success) {
+          throw new Error(claimResult.error || "Failed to set role claim");
+        }
+        await googleUser.getIdToken(true);
+
         await setDoc(userDocRef, {
           createdAt: Date.now(),
           updatedAt: Date.now(),
@@ -281,8 +302,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             businesses: [],
           },
         });
-        await setUserRoleClaim(googleUser.uid, "BUSINESSES_CREATOR");
-        await googleUser.getIdToken(true);
       }
 
       const tokenResult = await googleUser.getIdTokenResult();
@@ -292,14 +311,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await firebaseSignOut(auth);
         setUser(null);
         dispatch(setUserUid(null));
-        clearAuthCookie();
+        await revokeSession();
         throw new Error(
           "Access denied. Only businesses creators can access this app.",
         );
       }
 
       dispatch(setUserUid(googleUser.uid));
-      setAuthCookie(googleUser.uid);
       setUser(googleUser);
       setIsAuthLoading(false);
       initialCheckDone.current = true;
@@ -327,7 +345,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async (): Promise<void> => {
     try {
-      clearAuthCookie();
+      await revokeSession();
       await firebaseSignOut(auth);
     } catch (err) {
       throw err;

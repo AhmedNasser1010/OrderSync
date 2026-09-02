@@ -239,7 +239,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const firebaseUser = userCredential.user;
       const uid = firebaseUser.uid;
 
-      const result = await setUserRoleClaim(uid, "DRIVER");
+      const idToken = await firebaseUser.getIdToken();
+      const result = await setUserRoleClaim(uid, "DRIVER", idToken);
       if (!result.success) {
         throw new Error(result.error || "Failed to set role claim");
       }
@@ -296,9 +297,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const docSnapshot = await getDoc(userDocRef);
 
       if (!docSnapshot.exists()) {
+        const idToken = await googleUser.getIdToken();
         const claimResult = await setUserRoleClaim(
           googleUser.uid,
           "DRIVER",
+          idToken,
         );
         if (!claimResult.success) {
           throw new Error(claimResult.error || "Failed to set role claim");

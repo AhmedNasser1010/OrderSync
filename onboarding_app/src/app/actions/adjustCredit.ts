@@ -27,11 +27,11 @@ export async function adjustCredit(args: {
   targetUserId: string;
   amount: number;
   reason: string;
-  adminUid: string;
+  idToken: string;
   days?: number;
 }): Promise<AdjustCreditResult> {
   try {
-    const { targetUserId, amount, reason, adminUid, days } = args;
+    const { targetUserId, amount, reason, idToken, days } = args;
 
     if (!targetUserId) return { success: false, code: "NO_TARGET" };
     if (!reason || reason.trim().length === 0) {
@@ -45,18 +45,17 @@ export async function adjustCredit(args: {
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Verify the caller is a partner/manager (admin) via custom claims.
-    if (adminUid) {
-      try {
-        const adminUser = await auth.getUser(adminUid);
-        const claims = adminUser.customClaims ?? {};
-        const isAdmin =
-          claims.role === "BUSINESSES_CREATOR" ||
-          claims.role === "BUSINESS_MANAGER";
-        if (!isAdmin) return { success: false, code: "FORBIDDEN" };
-      } catch {
-        return { success: false, code: "FORBIDDEN" };
-      }
+    // Verify the caller from their ID token (never trust client-supplied uids).
+    let adminUid: string;
+    try {
+      const decoded = await auth.verifyIdToken(idToken);
+      const isAdmin =
+        decoded.role === "BUSINESSES_CREATOR" ||
+        decoded.role === "BUSINESS_MANAGER";
+      if (!isAdmin) return { success: false, code: "FORBIDDEN" };
+      adminUid = decoded.uid;
+    } catch {
+      return { success: false, code: "FORBIDDEN" };
     }
 
     const customerRef = db.collection("customers").doc(targetUserId);

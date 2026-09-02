@@ -56,6 +56,10 @@ const toggleSlice = createSlice({
     toggleLoginSidebar: (state) => {
       state.isLoginSidebarOpen = !state.isLoginSidebarOpen;
     },
+    setLoginSidebarIsOpen: (state, { payload }) => {
+      state.isLoginSidebarOpen =
+        payload === undefined ? !state.isLoginSidebarOpen : payload;
+    },
     toggleOrderSidebar: (state) => {
       state.isOrderSidebarOpen = !state.isOrderSidebarOpen;
     },
@@ -166,6 +170,7 @@ const toggleSlice = createSlice({
 export const {
   toggleLoginSidebar,
   toggleOrderSidebar,
+  setLoginSidebarIsOpen,
   setOrderSidebarIsOpen,
   toggleLng,
   setShowItemsAlreadyInCartPopup,

@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { useTranslations } from "next-intl";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { toast } from "sonner";
@@ -49,6 +50,11 @@ export function GoogleSignInButton({
 }) {
   const t = useTranslations();
   const { signInWithGoogle, isAuthLoading } = useAuthSession();
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   const handleSignIn = async () => {
     try {
@@ -67,14 +73,14 @@ export function GoogleSignInButton({
     <button
       type="button"
       onClick={() => void handleSignIn()}
-      disabled={isAuthLoading}
+      disabled={mounted && isAuthLoading}
       className={
         className ||
         "group w-full flex items-center justify-center gap-3 rounded-2xl border border-color-7 bg-card py-4 px-4 text-base font-ProximaNovaSemiBold text-color-1 shadow-sm transition-all duration-200 hover:border-color-2/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer disabled:cursor-wait disabled:opacity-70"
       }
     >
       <GoogleLogo className="size-5 shrink-0" />
-      {isAuthLoading ? t("Signing in") : t("Login With Google")}
+      {!mounted || isAuthLoading ? t("Signing in") : t("Login With Google")}
     </button>
   );
 }

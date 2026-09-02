@@ -38,7 +38,8 @@ const driverColumns: ExportColumn[] = [
 ];
 
 export default function DriversPage() {
-  const partnerUid = useAuth().user?.uid ?? "";
+  const authUser = useAuth().user;
+  const partnerUid = authUser?.uid ?? "";
   const [cooldown, setCooldown] = useState(0);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -190,7 +191,9 @@ export default function DriversPage() {
         <DriversTable
           drivers={paginatedDrivers}
           onDelete={async (uid) => {
-            await deleteDriver(uid);
+            if (!authUser) return;
+            const idToken = await authUser.getIdToken();
+            await deleteDriver({ uid, idToken });
           }}
         />
       )}
