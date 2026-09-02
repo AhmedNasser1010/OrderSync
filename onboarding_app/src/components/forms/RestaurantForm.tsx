@@ -185,6 +185,7 @@ export function RestaurantForm({
               settings={{
                 printInvoice: formData.settings.printInvoice,
                 allowMarkComplete: formData.settings.allowMarkComplete,
+                enableLiveTrackingMap: formData.settings.enableLiveTrackingMap,
               }}
               topChains={formData.topChains}
               commissionPercent={formData.commissionPercent ?? ""}

@@ -342,5 +342,7 @@
   "Apply to order": "تطبيق على الطلب",
   "Amount to spend": "مبلغ الكاش باك المراد استخدامه",
   "Today": "اليوم",
-  "daysLeft": "{count, plural, one {يوم واحد متبقي} two {يومان متبقيان} few {# أيام متبقية} many {# يومًا متبقيًا} other {# يوم متبقي}}"
+  "daysLeft": "{count, plural, one {يوم واحد متبقي} two {يومان متبقيان} few {# أيام متبقية} many {# يومًا متبقيًا} other {# يوم متبقي}}",
+  "liveTrackingDisabledTitle": "تتبع مباشر غير متاح",
+  "liveTrackingDisabledMessage": "نعتذر، التتبع المباشر للطلب غير متاح لهذا المطعم في الوقت الحالي."
 }

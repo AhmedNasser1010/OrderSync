@@ -48,6 +48,7 @@ export type BusinessDocument = {
     skipAccepted?: boolean;
     allowMarkComplete?: boolean;
     hideFromMarketplace?: boolean;
+    enableLiveTrackingMap?: boolean;
   };
   status: RestaurantStatusTypes;
   hasOffers?: boolean;

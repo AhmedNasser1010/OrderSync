@@ -265,6 +265,7 @@ function createEmptyBusinessDocument(): BusinessDocument {
       printInvoice: true,
       allowMarkComplete: false,
       hideFromMarketplace: false,
+      enableLiveTrackingMap: true,
     },
     status: "active",
     updatedAt: Date.now(),

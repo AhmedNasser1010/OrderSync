@@ -342,5 +342,7 @@
   "Apply to order": "Apply to order",
   "Amount to spend": "Cashback amount to spend",
   "Today": "Today",
-  "daysLeft": "{count, plural, one {# day left} other {# days left}}"
+  "daysLeft": "{count, plural, one {# day left} other {# days left}}",
+  "liveTrackingDisabledTitle": "Live tracking unavailable",
+  "liveTrackingDisabledMessage": "We're sorry, live order tracking is not available for this restaurant at the moment."
 }

@@ -9,6 +9,7 @@ interface SettingsPanelProps {
   settings: {
     printInvoice: boolean;
     allowMarkComplete?: boolean;
+    enableLiveTrackingMap?: boolean;
   };
   topChains: boolean;
   commissionPercent: number | "";
@@ -17,6 +18,7 @@ interface SettingsPanelProps {
   onChange: (settings: {
     printInvoice: boolean;
     allowMarkComplete?: boolean;
+    enableLiveTrackingMap?: boolean;
   }) => void;
   onTopChainsChange: (value: boolean) => void;
 }
@@ -46,6 +48,11 @@ export function SettingsPanel({
       description: "Complete orders without delivery drivers (starter plan)",
     },
     {
+      id: "enableLiveTrackingMap",
+      label: "Live Tracking Map",
+      description: "Show live driver tracking map to customers during delivery",
+    },
+    {
       id: "topChains",
       label: "Top Chains",
       description: "Feature this restaurant in top chains",
@@ -58,6 +65,8 @@ export function SettingsPanel({
         return settings.printInvoice;
       case "allowMarkComplete":
         return settings.allowMarkComplete ?? false;
+      case "enableLiveTrackingMap":
+        return settings.enableLiveTrackingMap ?? true;
       case "topChains":
         return topChains;
       default:

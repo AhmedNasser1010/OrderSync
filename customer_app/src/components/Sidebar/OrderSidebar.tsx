@@ -310,6 +310,7 @@ const OrderSidebar = () => {
   const isMapLive = ["READY", "RESERVED", "PICKED_UP", "ON_ROUTE"].includes(
     currentStatus ?? ""
   );
+  const isLiveTrackingEnabled = currentRes?.settings?.enableLiveTrackingMap !== false;
   const isRTL = locale === "ar";
 
   const activeStep = STEPS[Math.max(0, currentStepIndex)];
@@ -518,7 +519,7 @@ const OrderSidebar = () => {
                 | undefined) ?? null
             }
             driverLocation={driverLocation}
-            className="h-56 sm:h-64"
+            className={cn("h-56 sm:h-64", !isLiveTrackingEnabled && "blur-[3px] pointer-events-none")}
           />
           {isMapLive && (
             <div className="absolute top-3 inset-s-3 pointer-events-none z-900">
@@ -544,7 +545,7 @@ const OrderSidebar = () => {
               )}
             </div>
           )}
-          {!isMapLive && (
+          {!isMapLive && isLiveTrackingEnabled && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20 backdrop-blur-[1.5px]">
               <div className="bg-white/95 dark:bg-card/95 backdrop-blur-sm rounded-2xl px-5 py-3.5 shadow-lg text-center">
                 <p className="text-color-1 font-ProximaNovaSemiBold text-sm text-center">
@@ -552,6 +553,18 @@ const OrderSidebar = () => {
                 </p>
                 <p className="text-color-5 dark:text-color-8 font-ProximaNovaThin text-xs text-center mt-0.5">
                   {t("You'll see the driver in real time")}
+                </p>
+              </div>
+            </div>
+          )}
+          {!isLiveTrackingEnabled && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-black/20 backdrop-blur-[1.5px]">
+              <div className="bg-white/95 dark:bg-card/95 backdrop-blur-sm rounded-2xl px-5 py-3.5 shadow-lg text-center max-w-[260px]">
+                <p className="text-color-1 font-ProximaNovaSemiBold text-sm text-center">
+                  {t("liveTrackingDisabledTitle")}
+                </p>
+                <p className="text-color-5 dark:text-color-8 font-ProximaNovaThin text-xs text-center mt-0.5">
+                  {t("liveTrackingDisabledMessage")}
                 </p>
               </div>
             </div>
