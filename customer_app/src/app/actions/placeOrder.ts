@@ -228,6 +228,15 @@ export async function placeOrderServer(args: {
         const restaurantData = businessSnap.data() ?? {};
         const menuData = menuSnap.data();
 
+        const platformData = servicesSnap.exists
+          ? (servicesSnap.data() as {
+              maintenance?: { enabled?: boolean };
+            })
+          : {};
+        if (platformData.maintenance?.enabled) {
+          return { error: { code: "MAINTENANCE" } };
+        }
+
         const restaurantStatus = restaurantData.status || "pause";
         if (
           restaurantStatus === "inactive" ||

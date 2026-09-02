@@ -434,6 +434,17 @@ const usePlace = () => {
     }
 
     if (
+      error?.code === "MAINTENANCE" ||
+      error?.data?.code === "MAINTENANCE"
+    ) {
+      toast.error(t("maintenanceDescription"), {
+        position: "top-center",
+        duration: 4000,
+      });
+      return;
+    }
+
+    if (
       error?.code === "PRICE_MISMATCH" ||
       error?.data?.code === "PRICE_MISMATCH"
     ) {

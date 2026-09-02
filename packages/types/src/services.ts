@@ -9,6 +9,11 @@ export interface ServicesDocument {
     redemptionThreshold: number;
     maxCashbackPerTx: number;
   };
+  maintenance?: {
+    enabled: boolean;
+    message?: string | null;
+    eta?: string | null;
+  };
   updatedAt: number;
   updatedBy: string;
 }

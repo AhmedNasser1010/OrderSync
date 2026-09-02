@@ -10,6 +10,7 @@ import PopupProvider from "@/components/PopupProvider";
 import { PwaInstallButton } from "@/components/pwa-install-button";
 import LoadingScreen from "@/components/LoadingScreen";
 import ComingSoonGate from "@/components/ComingSoon/ComingSoonGate";
+import MaintenanceGate from "@/components/Maintenance/MaintenanceGate";
 import { IS_COMING_SOON } from "@/utils/comingSoon";
 
 type Props = {
@@ -41,6 +42,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           {children}
         </main>
         <ComingSoonGate />
+        <MaintenanceGate />
         <LoginSidebar />
         <OrderSidebar />
         <PwaInstallButton />

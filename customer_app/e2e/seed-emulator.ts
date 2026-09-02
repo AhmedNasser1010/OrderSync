@@ -129,6 +129,7 @@ export async function seedEmulator() {
   await db.collection("services").doc("platform").set({
     deliveryFeesPerKm: 3.5,
     minDeliveryFees: 5,
+    maintenance: { enabled: false },
     updatedAt: now,
     updatedBy: "e2e-seed",
   });

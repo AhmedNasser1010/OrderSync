@@ -166,6 +166,7 @@ export const firestoreApi = createApi({
         | "minDeliveryFees"
         | "maxWorkDistanceKm"
         | "cashback"
+        | "maintenance"
       >,
       void
     >({
@@ -189,6 +190,7 @@ export const firestoreApi = createApi({
                 redemptionThreshold: 0,
                 maxCashbackPerTx: 0,
               },
+              maintenance: data.maintenance ?? { enabled: false },
             },
           };
         } catch (error: unknown) {
@@ -213,6 +215,11 @@ export const firestoreApi = createApi({
             wipeDays: number;
             redemptionThreshold: number;
             maxCashbackPerTx: number;
+          };
+          maintenance?: {
+            enabled: boolean;
+            message?: string | null;
+            eta?: string | null;
           };
         };
       }

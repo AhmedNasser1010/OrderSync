@@ -4,6 +4,11 @@ export interface ServicesState {
   deliveryFees?: number;
   minDeliveryFees?: number;
   maxWorkDistanceKm?: number;
+  maintenance?: {
+    enabled: boolean;
+    message?: string | null;
+    eta?: string | null;
+  };
   [key: string]: unknown;
 }
 

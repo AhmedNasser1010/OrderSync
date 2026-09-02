@@ -5,6 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   useFetchServicesQuery,
   useUpdateServicesMutation,
@@ -17,6 +27,7 @@ import {
   MapPinned,
   Save,
   Truck,
+  Wrench,
 } from "lucide-react";
 import type { CashbackConfig } from "@ordersync/types";
 
@@ -43,6 +54,15 @@ export default function SettingsPage() {
     null
   );
   const [cashbackMaxPerTx, setCashbackMaxPerTx] = useState<number | null>(null);
+  const [maintenanceEnabled, setMaintenanceEnabled] = useState<boolean | null>(
+    null
+  );
+  const [maintenanceMessage, setMaintenanceMessage] = useState<string | null>(
+    null
+  );
+  const [maintenanceEta, setMaintenanceEta] = useState<string | null>(null);
+  const [confirmMaintenanceDialog, setConfirmMaintenanceDialog] =
+    useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -64,6 +84,10 @@ export default function SettingsPage() {
     cashbackThreshold ?? data?.cashback?.redemptionThreshold ?? 0;
   const cbMaxPerTx =
     cashbackMaxPerTx ?? data?.cashback?.maxCashbackPerTx ?? 0;
+  const maintenanceOn = maintenanceEnabled ?? data?.maintenance?.enabled ?? false;
+  const maintenanceMessageValue =
+    maintenanceMessage ?? data?.maintenance?.message ?? "";
+  const maintenanceEtaValue = maintenanceEta ?? data?.maintenance?.eta ?? "";
 
   const handleSave = async () => {
     if (isSaving) return;
@@ -103,6 +127,16 @@ export default function SettingsPage() {
     setSaveError(null);
     setSaved(false);
 
+    const maintenance: {
+      enabled: boolean;
+      message?: string | null;
+      eta?: string | null;
+    } = { enabled: maintenanceOn };
+    const trimmedMessage = maintenanceMessageValue.trim();
+    const trimmedEta = maintenanceEtaValue.trim();
+    maintenance.message = trimmedMessage || null;
+    maintenance.eta = trimmedEta || null;
+
     try {
       await updateServices({
         updates: {
@@ -110,6 +144,7 @@ export default function SettingsPage() {
           minDeliveryFees: min,
           maxWorkDistanceKm: maxKm,
           cashback: cb,
+          maintenance,
           updatedBy: user?.uid,
         },
       }).unwrap();
@@ -121,6 +156,19 @@ export default function SettingsPage() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleToggleMaintenance = (value: boolean) => {
+    if (value && !maintenanceOn) {
+      setConfirmMaintenanceDialog(true);
+      return;
+    }
+    setMaintenanceEnabled(value);
+  };
+
+  const confirmEnableMaintenance = () => {
+    setMaintenanceEnabled(true);
+    setConfirmMaintenanceDialog(false);
   };
 
   return (
@@ -242,6 +290,78 @@ export default function SettingsPage() {
               {saveError}
             </p>
           )}
+
+          <div className="space-y-4 border-t pt-6">
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                  maintenanceOn
+                    ? "bg-destructive/10 text-destructive"
+                    : "bg-primary/10 text-primary"
+                }`}
+              >
+                <Wrench className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">
+                  Maintenance Mode
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Put the entire customer app into maintenance. It becomes
+                  non-interactive and shows an apology message, useful during
+                  planned maintenance or upgrades.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-border p-4">
+              <div>
+                <Label
+                  htmlFor="maintenance-enabled"
+                  className="text-sm font-medium"
+                >
+                  Enable maintenance mode
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {maintenanceOn
+                    ? "Customers will see the maintenance page and cannot place orders."
+                    : "Customers can browse and order normally."}
+                </p>
+              </div>
+              <Switch
+                id="maintenance-enabled"
+                checked={maintenanceOn}
+                onCheckedChange={handleToggleMaintenance}
+              />
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="maintenance-message">
+                  Message to customers (optional)
+                </Label>
+                <Textarea
+                  id="maintenance-message"
+                  value={maintenanceMessageValue}
+                  onChange={(e) => setMaintenanceMessage(e.target.value)}
+                  placeholder="e.g. We are upgrading our systems and will be back very soon."
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label htmlFor="maintenance-eta">
+                  Expected back (date, optional)
+                </Label>
+                <Input
+                  id="maintenance-eta"
+                  type="date"
+                  value={maintenanceEtaValue}
+                  onChange={(e) => setMaintenanceEta(e.target.value)}
+                  className="mt-1.5 max-w-xs"
+                />
+              </div>
+            </div>
+          </div>
 
           <div className="space-y-4 border-t pt-6">
             <div className="flex items-center gap-2">
@@ -372,6 +492,37 @@ export default function SettingsPage() {
           </div>
         </Card>
       )}
+
+      <Dialog
+        open={confirmMaintenanceDialog}
+        onOpenChange={setConfirmMaintenanceDialog}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center">
+                <AlertCircle className="h-5 w-5 text-destructive" />
+              </div>
+              <div>
+                <DialogTitle>Enable Maintenance Mode?</DialogTitle>
+                <DialogDescription className="mt-1">
+                  This will immediately disable the entire customer app. All
+                  visitors will see a maintenance page and will not be able to
+                  browse the menu or place orders.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setConfirmMaintenanceDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmEnableMaintenance}>
+              Enable Maintenance
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

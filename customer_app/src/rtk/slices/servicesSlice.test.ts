@@ -15,6 +15,25 @@ describe("servicesSlice", () => {
     expect(reducer(undefined, initServices(services))).toEqual(services);
   });
 
+  it("stores the maintenance flag", () => {
+    const services = {
+      deliveryFees: 10,
+      maintenance: { enabled: true, message: "We'll be back", eta: "Sep 5" },
+    };
+    expect(reducer(undefined, initServices(services)).maintenance).toEqual(
+      services.maintenance
+    );
+  });
+
+  it("stores a cleared maintenance message as null", () => {
+    const services = {
+      maintenance: { enabled: true, message: null, eta: null },
+    };
+    expect(reducer(undefined, initServices(services)).maintenance).toEqual(
+      services.maintenance
+    );
+  });
+
   it("clears services", () => {
     const state = reducer(undefined, initServices({ deliveryFees: 10 }));
     expect(reducer(state, clearServices())).toEqual({});
