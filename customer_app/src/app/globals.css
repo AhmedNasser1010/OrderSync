@@ -141,6 +141,13 @@
 /* ============================================================
    Brand font utilities (Cairo body/UI, Alexandria display)
    ============================================================ */
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 @utility font-GrotThin {
   font-family: var(--font-cairo);
   font-weight: 300;
@@ -276,6 +283,25 @@
   }
 }
 
+@keyframes bottom-nav-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.home-bottom-nav {
+  animation: bottom-nav-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-bottom-nav {
+    animation: none;
+  }
+}
+
 @keyframes order-pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(252, 128, 25, 0.5);
@@ -395,7 +421,6 @@
 .hero-banner-slider .slick-track {
   display: flex;
   flex-wrap: nowrap;
-  margin-left: 4.762%;
 }
 
 .hero-banner-slider .slick-slide {
@@ -403,7 +428,7 @@
 }
 
 [dir="rtl"] .hero-banner-slider .slick-track {
-  margin-left: 9.524%;
+  margin-left: 0;
 }
 
 .slick-dots {

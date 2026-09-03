@@ -3,15 +3,16 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 import { HtmlAttributes } from "@/components/HtmlAttributes";
 import { ThemedToaster } from "@/components/ThemedToaster";
-import Header from "@/components/Header";
-import LoginSidebar from "@/components/Sidebar/LoginSidebar";
+import HomeHeader from "@/components/Home/HomeHeader";
+import MobileDrawer from "@/components/MobileDrawer";
+import MainContent from "@/components/MainContent";
 import OrderSidebar from "@/components/Sidebar/OrderSidebar";
 import PopupProvider from "@/components/PopupProvider";
 import { PwaInstallButton } from "@/components/pwa-install-button";
 import LoadingScreen from "@/components/LoadingScreen";
 import ComingSoonGate from "@/components/ComingSoon/ComingSoonGate";
 import MaintenanceGate from "@/components/Maintenance/MaintenanceGate";
-import { IS_COMING_SOON } from "@/utils/comingSoon";
+import HomeBottomNav from "@/components/Home/HomeBottomNav";
 
 type Props = {
   children: React.ReactNode;
@@ -28,24 +29,18 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      <LoadingScreen />
-      <HtmlAttributes locale={locale} />
-      <PopupProvider>
-        <Header />
-        <main
-          id="main-content"
-          className={`pt-20 min-h-screen bg-background ${
-            IS_COMING_SOON ? "blur-md pointer-events-none select-none" : ""
-          }`}
-        >
-          {children}
-        </main>
-        <ComingSoonGate />
-        <MaintenanceGate />
-        <LoginSidebar />
-        <OrderSidebar />
-        <PwaInstallButton />
+<NextIntlClientProvider locale={locale} messages={messages}>
+        <LoadingScreen />
+        <HtmlAttributes locale={locale} />
+        <PopupProvider>
+          <HomeHeader />
+          <MainContent>{children}</MainContent>
+          <ComingSoonGate />
+          <MaintenanceGate />
+          <MobileDrawer />
+          <OrderSidebar />
+          <PwaInstallButton />
+          <HomeBottomNav />
       </PopupProvider>
       <ThemedToaster />
     </NextIntlClientProvider>

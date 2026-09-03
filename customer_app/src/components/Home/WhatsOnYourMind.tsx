@@ -5,8 +5,8 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { addFilter, clearAll } from "@/rtk/slices/filterSlice";
-import SectionHeader from "@/components/Home/SectionHeader";
 import type { RestaurantDocument } from "@/types/restaurant";
+import { cn } from "@/lib/utils";
 
 const CATEGORY_IMAGES: Record<string, string> = {
   crepes: "/images/dishes/crepes.webp",
@@ -20,6 +20,7 @@ function WhatsOnYourMind() {
   const dispatch = useAppDispatch();
   const t = useTranslations();
   const restaurants = useAppSelector((state) => state.restaurants);
+  const activeFilter = useAppSelector((state) => state.filter);
 
   const categories = useMemo(() => {
     const map = new Map<string, string>();
@@ -35,59 +36,70 @@ function WhatsOnYourMind() {
 
   if (categories.length === 0) return null;
 
-  const scrollBy = (dir: number) => {
-    const el = document.querySelector<HTMLElement>(".food-category");
-    el?.scrollBy({ left: dir * 250, behavior: "smooth" });
-  };
-
   const handleTriggerFilter = (tag: string) => {
-    dispatch(clearAll());
-    dispatch(addFilter(tag));
+    if (activeFilter.includes(tag)) {
+      dispatch(clearAll());
+    } else {
+      dispatch(clearAll());
+      dispatch(addFilter(tag));
+    }
     document
       .getElementById("restaurants")
       ?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <>
-      <div className="divider"></div>
-      <section id="img-carousel" className="relative">
-        <SectionHeader
-          title={t("What's on your mind?")}
-          arrows
-          onLeft={() => scrollBy(-250)}
-          onRight={() => scrollBy(250)}
-        />
-        <div className="food-category overflow-x-auto scroll-smooth scrollbar-hide max-w-[1500px] pb-2">
-          <div className="flex gap-6">
-            {categories.map((category) => (
-              <button
-                type="button"
-                key={category?.id}
-                onClick={() => handleTriggerFilter(category.id)}
-                className="group flex shrink-0 cursor-pointer flex-col items-center gap-2 focus-visible:ring-2 focus-visible:ring-color-2/50 rounded-xl outline-none"
+    <section id="img-carousel" className="pt-6">
+      <div className="flex gap-3 overflow-x-auto scroll-smooth scrollbar-hide pb-2">
+        {categories.map((category, i) => {
+          const isActive = activeFilter.includes(category.id);
+          const isFirst = i === 0;
+          const isLast = i === categories.length - 1;
+          return (
+            <button
+              type="button"
+              key={category?.id}
+              onClick={() => handleTriggerFilter(category.id)}
+              aria-pressed={isActive}
+              className={cn(
+                "group flex shrink-0 cursor-pointer flex-col items-center gap-2 rounded-2xl border bg-card p-3 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none",
+                isActive
+                  ? "border-color-2/50 shadow-md shadow-color-2/10"
+                  : "border-color-7 shadow-sm hover:-translate-y-0.5 hover:shadow-md",
+                isFirst && "ms-4 sm:ms-10",
+                isLast && "me-4 sm:me-10"
+              )}
+            >
+              <span className="relative grid size-16 place-items-center overflow-hidden rounded-xl bg-color-7">
+                {category?.img ? (
+                  <Image
+                    src={category.img}
+                    alt={t(category.id)}
+                    loading="lazy"
+                    width={64}
+                    height={64}
+                    className="size-16 object-cover transition-transform duration-300 group-hover:scale-110"
+                  />
+                ) : (
+                  <span className="text-2xl" aria-hidden="true">🍽️</span>
+                )}
+                {isActive && (
+                  <span className="absolute inset-0 bg-color-2/15" />
+                )}
+              </span>
+              <span
+                className={cn(
+                  "font-GrotBold text-sm tracking-tight transition-colors",
+                  isActive ? "text-color-2" : "text-color-3"
+                )}
               >
-                <span className="block w-36">
-                  {category?.img && (
-                    <Image
-                      src={category.img}
-                      alt={t(category.id)}
-                      loading="lazy"
-                      width={144}
-                      height={144}
-                      className="h-36 w-36 rounded-full object-cover ring-4 ring-transparent transition-all duration-300 group-hover:scale-105 group-hover:ring-color-7"
-                    />
-                  )}
-                </span>
-                <span className="font-GrotMed text-color-3 text-sm tracking-tight">
-                  {t(category.id)}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
+                {t(category.id)}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
   );
 }
 

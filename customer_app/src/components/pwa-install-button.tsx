@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import {
   DownloadIcon,
   SmartphoneIcon,
@@ -9,6 +10,7 @@ import {
   ZapIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import {
   Popup,
@@ -19,6 +21,7 @@ import {
   PopupDescription,
 } from "@/components/ui/custom/Popup";
 import { LOGO_URL } from "@/utils/constants";
+import type { RootState } from "@/rtk/store";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -49,8 +52,24 @@ const features = [
   },
 ];
 
+const KNOWN_ROUTES = ["cart", "wallet", "checkout", "signin", "onboarding"];
+const HIDDEN_ROUTES = ["signin", "onboarding"];
+
 export function PwaInstallButton() {
   const t = useTranslations();
+  const pathname = usePathname();
+  const isOrderSidebarOpen = useSelector(
+    (state: RootState) => state.toggle.isOrderSidebarOpen
+  );
+
+  const segments = pathname.split("/").filter(Boolean);
+  const currentPage = segments[1] ?? "";
+  const isRestaurantMenu =
+    segments.length === 2 && !KNOWN_ROUTES.includes(currentPage);
+
+  const isHidden =
+    isRestaurantMenu || isOrderSidebarOpen || HIDDEN_ROUTES.includes(currentPage);
+
   const checkIfInstalled = useCallback(() => {
     if (typeof window === "undefined") return false;
     return (
@@ -115,20 +134,21 @@ export function PwaInstallButton() {
     setDeferredPrompt(null);
   };
 
-  if (isInstalled || !deferredPrompt || isDismissed()) {
+  if (isHidden || isInstalled || !deferredPrompt || isDismissed()) {
     return null;
   }
 
   return (
     <>
-      <Button
+      <button
+        type="button"
         onClick={() => setShowSheet(true)}
-        className="fixed bottom-6 left-6 z-50 size-14 rounded-full bg-color-2 text-white shadow-[0_8px_24px_rgba(252,128,25,0.35)] hover:bg-color-2/90"
-        size="icon"
+        className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 rounded-full bg-color-2 px-4 py-2 text-sm font-ProximaNovaSemiBold text-white shadow-[0_8px_24px_rgba(252,128,25,0.35)] transition-all hover:bg-color-2/90 hover:shadow-[0_8px_32px_rgba(252,128,25,0.45)] active:scale-95 lg:hidden"
         aria-label={t("Install the app")}
       >
-        <DownloadIcon className="size-6" />
-      </Button>
+        <DownloadIcon className="size-4" />
+        {t("Install the app")}
+      </button>
 
       <Popup open={showSheet} onOpenChange={(open) => !open && setShowSheet(false)}>
         <PopupContent className="w-full max-w-sm rounded-2xl p-6 text-center">

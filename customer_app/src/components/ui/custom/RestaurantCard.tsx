@@ -30,8 +30,8 @@ interface RestaurantCardInfo {
 function StarIcon({ className }: { className?: string }) {
   return (
     <svg
-      width="16"
-      height="16"
+      width="14"
+      height="14"
       viewBox="0 0 20 20"
       fill="none"
       role="img"
@@ -47,13 +47,12 @@ function StarIcon({ className }: { className?: string }) {
   );
 }
 
-function RestaurantCard({ info }: { info: RestaurantCardInfo }) {
+function RestaurantCard({ info, compact }: { info: RestaurantCardInfo; compact?: boolean }) {
   const {
     areaName,
     name,
     nameInAr,
     avgRating,
-    totalRatings,
     cloudinaryImageId,
     icon,
     sla,
@@ -71,55 +70,39 @@ function RestaurantCard({ info }: { info: RestaurantCardInfo }) {
 
   const isAvailable = isRestaurantAvailable({ status, openingHours, openNowUntil });
 
-  const renderRatings = () => {
-    if (avgRating === undefined) return null;
-    const rating = Number(avgRating);
-    const ratingLabel = Number.isFinite(rating)
-      ? rating.toFixed(1)
-      : String(avgRating);
-
-    return (
-      <div className="flex items-center gap-1.5">
-        <span className="flex items-center gap-1 rounded bg-color-11 px-1.5 py-0.5 text-white font-ProximaNovaSemiBold">
-          <StarIcon className="size-3" />
-          <span className="text-xs">{ratingLabel}</span>
-        </span>
-        {totalRatings !== undefined && totalRatings > 0 && (
-          <span className="text-xs text-color-4 font-GrotThin">
-            ({totalRatings > 999 ? `${(totalRatings / 1000).toFixed(1)}k` : totalRatings}{" "}
-            {t("ratings")})
-          </span>
-        )}
-      </div>
-    );
-  };
+  const ratingLabel = avgRating !== undefined ? Number(avgRating).toFixed(1) : null;
 
   return (
-    <div className={cn("flex flex-col gap-3 cursor-pointer", className)}>
-      <div className="w-full h-56 relative rounded-xl overflow-hidden bg-color-7">
+    <div
+      className={cn(
+        "group flex flex-col gap-2.5 cursor-pointer overflow-hidden rounded-2xl border border-color-7 bg-card p-2.5 shadow-sm transition-all hover:shadow-md",
+        className
+      )}
+    >
+      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-color-7">
         <Image
           src={cloudinaryImageId || "/assets/restaurant-default-cover.jpg"}
           alt={resName || name}
           loading="lazy"
           fill
-          sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+          sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 50vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105"
           style={{ filter: isAvailable ? "grayscale(0)" : "grayscale(1)" }}
         />
-        {icon && (
+        {icon && !compact && (
           <Image
             src={icon}
             alt=""
             loading="lazy"
-            width={40}
-            height={40}
-            className="absolute bottom-2 end-2 size-10 rounded-lg object-cover shadow-md ring-2 ring-white bg-white"
+            width={34}
+            height={34}
+            className="absolute bottom-2 end-2 size-8 rounded-lg object-cover shadow-md ring-2 ring-white bg-white"
           />
         )}
         {promotionalSubtitle && (
           <p
             style={{ textShadow: "2px 2px 5px black" }}
-            className="absolute font-black bottom-3 start-3 text-white uppercase tracking-tighter text-[22px] leading-none"
+            className="absolute font-black bottom-2 start-2 text-white uppercase tracking-tighter text-[15px] leading-none"
           >
             {promotionalSubtitle}
           </p>
@@ -129,34 +112,40 @@ function RestaurantCard({ info }: { info: RestaurantCardInfo }) {
             status={status}
             openingHours={openingHours}
             openNowUntil={openNowUntil}
+            className={cn("px-2 text-[10px]", compact && "px-1.5 text-[8px]")}
           />
         </span>
         {hasOffers && (
-          <span className="absolute top-2 end-2 z-10 rounded-full bg-gradient-to-r from-color-2 to-[#ffab4a] px-3 py-1 font-ProximaNovaBold text-xs uppercase tracking-wide text-white shadow-lg shadow-color-2/30">
+          <span className={cn("absolute top-2 end-2 z-10 rounded-full bg-gradient-to-r from-color-2 to-[#ffab4a] font-ProximaNovaBold uppercase tracking-wide text-white shadow-lg shadow-color-2/30", compact ? "px-1.5 py-px text-[8px]" : "px-2.5 py-0.5 text-[10px]")}>
             {t("Offers")}
           </span>
         )}
       </div>
-      <div className="mx-3">
+      <div className="flex flex-col gap-1.5 px-1 pb-0.5">
         <div className="flex items-center justify-between gap-2">
-          <h2 className="font-GrotBold text-lg tracking-tighter text-color-3 truncate">
+          <h2 className="font-GrotBold text-[15px] leading-tight tracking-tighter text-color-1 truncate">
             {resName}
           </h2>
-          <div className="shrink-0">{renderRatings()}</div>
-        </div>
-        <div className="flex items-center gap-1.5 mt-1.5 text-sm font-ProximaNovaSemiBold text-color-3">
-          {sla && <span>{sla}</span>}
-          {cuisines && cuisines.length > 0 && (
-            <>
-              <span className="size-1 shrink-0 rounded-full bg-color-8" />
-              <span className="min-w-0 truncate">
-                {cuisines.map((cuisine) => t(cuisine)).join(", ")}
-              </span>
-            </>
+          {ratingLabel && (
+            <span className="flex shrink-0 items-center gap-1 rounded-md bg-color-11 px-1.5 py-0.5 text-white font-ProximaNovaSemiBold">
+              <StarIcon className="size-2.5" />
+              <span className="text-[11px]">{ratingLabel}</span>
+            </span>
           )}
         </div>
-        <div className="font-GrotThin text-color-4 tracking-tight text-base truncate mt-0.5">
-          {areaName}
+        {cuisines && cuisines.length > 0 && (
+          <p className="truncate text-xs font-ProximaNovaSemiBold text-color-3">
+            {compact ? t(cuisines[0]) : cuisines.map((cuisine) => t(cuisine)).join(", ")}
+          </p>
+        )}
+        <div className="flex items-center gap-1.5 text-[11px] font-ProximaNovaThin text-color-5">
+          {sla && <span>{sla}</span>}
+          {areaName && (
+            <>
+              <span className="size-0.5 rounded-full bg-color-8" />
+              <span className="truncate">{areaName}</span>
+            </>
+          )}
         </div>
       </div>
     </div>

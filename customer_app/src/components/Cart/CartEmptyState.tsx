@@ -8,7 +8,7 @@ const CartEmptyState = () => {
   const t = useTranslations();
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-5 pb-20 pt-28 text-center">
+    <div className="mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-5 py-10 text-center">
       <div className="grid size-28 place-items-center rounded-full bg-color-7/60">
         <ShoppingCart className="size-12 text-color-5" strokeWidth={1.5} />
       </div>

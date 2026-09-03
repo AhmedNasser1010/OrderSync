@@ -21,6 +21,7 @@ import {
 } from "@ordersync/order-utils";
 import type {
   HeroBanner,
+  MainMenuType,
   OrderType,
   ServicesDocument,
   WalletCredit,
@@ -142,6 +143,32 @@ export const firestoreApi = createApi({
           return { error: message };
         }
       },
+      providesTags: ["Menu"],
+    }),
+
+    fetchAllMenus: builder.query<Record<string, MainMenuType>, string[]>({
+      async queryFn(resIds) {
+        try {
+          const menus = await Promise.all(
+            resIds.map(async (resId) => {
+              const menuRef = doc(db, "menus", resId);
+              const menuSnapshot = await getDoc(menuRef);
+              return [resId, menuSnapshot.exists() ? (menuSnapshot.data() as MainMenuType) : null] as const;
+            })
+          );
+          const result: Record<string, MainMenuType> = {};
+          for (const [id, menu] of menus) {
+            if (menu) result[id] = menu;
+          }
+          return { data: result };
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error(message);
+          return { error: message };
+        }
+      },
+      keepUnusedDataFor: 60,
       providesTags: ["Menu"],
     }),
 
@@ -695,6 +722,7 @@ export const {
   useFetchBannersQuery,
   useFetchBusinessesQuery,
   useFetchMenuDataQuery,
+  useFetchAllMenusQuery,
   useFetchServicesQuery,
   useFetchOrderTrackingDataQuery,
   useFetchLastOrderQuery,

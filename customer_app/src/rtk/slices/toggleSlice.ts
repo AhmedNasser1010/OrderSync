@@ -2,8 +2,8 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "@/rtk/store";
 
 export interface ToggleState {
-  isLoginSidebarOpen: boolean;
   isOrderSidebarOpen: boolean;
+  isMenuOpen: boolean;
   lng: string;
   showItemsAlreadyInCartPopup: boolean;
   showTrackedOrderLockPopup: boolean;
@@ -28,8 +28,8 @@ export interface ToggleState {
 }
 
 const initialState: ToggleState = {
-  isLoginSidebarOpen: false,
   isOrderSidebarOpen: false,
+  isMenuOpen: false,
   lng: "ar",
   showItemsAlreadyInCartPopup: false,
   showTrackedOrderLockPopup: false,
@@ -53,15 +53,14 @@ const toggleSlice = createSlice({
   name: "toggle",
   initialState,
   reducers: {
-    toggleLoginSidebar: (state) => {
-      state.isLoginSidebarOpen = !state.isLoginSidebarOpen;
-    },
-    setLoginSidebarIsOpen: (state, { payload }) => {
-      state.isLoginSidebarOpen =
-        payload === undefined ? !state.isLoginSidebarOpen : payload;
-    },
     toggleOrderSidebar: (state) => {
       state.isOrderSidebarOpen = !state.isOrderSidebarOpen;
+    },
+    toggleMenu: (state) => {
+      state.isMenuOpen = !state.isMenuOpen;
+    },
+    setMenuIsOpen: (state, { payload }) => {
+      state.isMenuOpen = payload === undefined ? !state.isMenuOpen : payload;
     },
     setOrderSidebarIsOpen: (state, { payload }) => {
       state.isOrderSidebarOpen =
@@ -168,9 +167,9 @@ const toggleSlice = createSlice({
 });
 
 export const {
-  toggleLoginSidebar,
   toggleOrderSidebar,
-  setLoginSidebarIsOpen,
+  toggleMenu,
+  setMenuIsOpen,
   setOrderSidebarIsOpen,
   toggleLng,
   setShowItemsAlreadyInCartPopup,

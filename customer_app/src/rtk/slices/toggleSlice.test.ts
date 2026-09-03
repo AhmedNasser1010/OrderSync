@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import reducer, {
-  toggleLoginSidebar,
   toggleOrderSidebar,
+  setMenuIsOpen,
   setOrderSidebarIsOpen,
   toggleLng,
   setShowItemsAlreadyInCartPopup,
@@ -33,14 +33,14 @@ describe("toggleSlice", () => {
     expect(state.lng).toBe("ar");
     expect(state.theme).toBe("light");
     expect(state.hasOrder).toBe(true);
-    expect(state.isLoginSidebarOpen).toBe(false);
+    expect(state.isMenuOpen).toBe(false);
   });
 
-  it("toggles the login sidebar", () => {
-    let state = reducer(undefined, toggleLoginSidebar());
-    expect(state.isLoginSidebarOpen).toBe(true);
-    state = reducer(state, toggleLoginSidebar());
-    expect(state.isLoginSidebarOpen).toBe(false);
+  it("toggles the menu", () => {
+    let state = reducer(undefined, setMenuIsOpen(true));
+    expect(state.isMenuOpen).toBe(true);
+    state = reducer(state, setMenuIsOpen(false));
+    expect(state.isMenuOpen).toBe(false);
   });
 
   it("toggles and forces the order sidebar", () => {

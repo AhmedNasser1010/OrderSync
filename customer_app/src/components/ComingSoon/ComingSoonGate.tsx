@@ -6,7 +6,7 @@ import { StoreIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/routing";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
-import { toggleLoginSidebar } from "@/rtk/slices/toggleSlice";
+import { setMenuIsOpen } from "@/rtk/slices/toggleSlice";
 import {
   Popup,
   PopupContent,
@@ -21,9 +21,7 @@ function ComingSoonGate() {
   const router = useRouter();
   const pathname = usePathname();
   const dispatch = useAppDispatch();
-  const isLoginSidebarOpen = useAppSelector(
-    (state) => state.toggle.isLoginSidebarOpen
-  );
+  const isMenuOpen = useAppSelector((state) => state.toggle.isMenuOpen);
 
   useEffect(() => {
     if (IS_COMING_SOON && pathname !== "/") {
@@ -32,7 +30,7 @@ function ComingSoonGate() {
   }, [pathname, router]);
 
   useEffect(() => {
-    if (isLoginSidebarOpen) return;
+    if (isMenuOpen) return;
     if (!IS_COMING_SOON) return;
     const className = "overflow-hidden";
     const hadClass = document.body.classList.contains(className);
@@ -40,10 +38,10 @@ function ComingSoonGate() {
     return () => {
       if (!hadClass) document.body.classList.remove(className);
     };
-  }, [isLoginSidebarOpen]);
+  }, [isMenuOpen]);
 
   if (!IS_COMING_SOON) return null;
-  if (isLoginSidebarOpen) return null;
+  if (isMenuOpen) return null;
 
   return (
     <Popup open onOpenChange={() => {}}>
@@ -64,7 +62,7 @@ function ComingSoonGate() {
         </div>
         <button
           type="button"
-          onClick={() => dispatch(toggleLoginSidebar())}
+          onClick={() => dispatch(setMenuIsOpen(true))}
           className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-color-2 py-3.5 font-ProximaNovaSemiBold text-white shadow-lg shadow-color-2/30 transition-all hover:bg-color-2/90 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none"
         >
           <StoreIcon className="size-4" />

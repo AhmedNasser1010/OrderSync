@@ -21,9 +21,10 @@ function DefaultHero() {
   };
 
   return (
-    <section className="relative mt-6 overflow-hidden rounded-3xl bg-gradient-to-br from-color-2 via-[#ff8c3b] to-[#ffab4a]">
-      <div className="absolute inset-0 bg-gradient-to-l from-transparent to-black/30" />
-      <div className="relative flex flex-col items-start gap-4 px-6 py-10 sm:px-12 sm:py-14">
+    <section className="relative mt-6 overflow-hidden rounded-3xl bg-gradient-to-br from-color-2 via-[#ff8c3b] to-[#ffab4a] shadow-lg shadow-color-2/20">
+      <div className="absolute inset-0 bg-gradient-to-l from-transparent to-black/25" />
+      <div className="absolute -end-8 -top-8 size-40 rounded-full bg-white/10 blur-2xl" />
+      <div className="relative flex flex-col items-start gap-4 px-6 py-9 sm:px-12 sm:py-12">
         <p className="rounded-full bg-white/20 px-3 py-1 text-[11px] font-ProximaNovaSemiBold uppercase tracking-widest text-white backdrop-blur-sm">
           {t("Zajil")}
         </p>
@@ -65,7 +66,7 @@ function BannerCard({ banner }: { banner: HeroBannerType }) {
   );
 
   const baseClass =
-    "relative h-48 w-full overflow-hidden rounded-3xl bg-secondary sm:h-52 outline-none";
+    "relative h-48 w-full overflow-hidden rounded-3xl bg-secondary ring-1 ring-color-7 shadow-sm sm:h-56 outline-none";
 
   if (!href) {
     return <div className={baseClass}>{content}</div>;
@@ -133,7 +134,7 @@ function HeroBanner() {
     dots: true,
     infinite: true,
     speed: 600,
-    slidesToShow: 1.05,
+    slidesToShow: 1,
     slidesToScroll: 1,
     autoplay: banners.length > 1,
     autoplaySpeed: AUTO_SCROLL_INTERVAL,
@@ -141,8 +142,7 @@ function HeroBanner() {
     pauseOnFocus: true,
     arrows: false,
     rtl: isRTL,
-    centerMode: true,
-    centerPadding: "0px",
+    centerMode: false,
     customPaging: (i: number) => (
       <button type="button" aria-label={`Go to slide ${i + 1}`} />
     ),
@@ -153,14 +153,7 @@ function HeroBanner() {
         </ul>
       </div>
     ),
-    responsive: [
-      {
-        breakpoint: 640,
-        settings: {
-          slidesToShow: 1.05,
-        },
-      },
-    ],
+    responsive: [],
   };
 
   return (

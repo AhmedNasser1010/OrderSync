@@ -5,7 +5,7 @@ import { useRef } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
-  toggleLoginSidebar,
+  setMenuIsOpen,
   toggleOrderSidebar,
   setShowRestaurantUnavailablePopup,
   setShowOutOfRangePopup,
@@ -101,7 +101,7 @@ const usePlace = () => {
       duration: 4000,
     });
     if (sidebar === "login") {
-      dispatch(toggleLoginSidebar());
+      dispatch(setMenuIsOpen(true));
     } else {
       dispatch(toggleOrderSidebar());
     }

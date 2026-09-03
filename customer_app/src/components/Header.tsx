@@ -8,11 +8,8 @@ import {
   type CSSProperties,
 } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
 import {
   MenuIcon,
-  XIcon,
-  MapPinIcon,
   BikeIcon,
   ChevronDownIcon,
   LogOutIcon,
@@ -25,13 +22,11 @@ import {
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import {
-  toggleLoginSidebar,
-  setLoginSidebarIsOpen,
   toggleOrderSidebar,
   toggleLng,
+  setMenuIsOpen,
   setTheme,
 } from "@/rtk/slices/toggleSlice";
-import { LOGO_URL } from "@/utils/constants";
 import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/routing";
 import { initServices } from "@/rtk/slices/servicesSlice";
@@ -205,9 +200,7 @@ function Header() {
   const { logout, isAuthenticated, uid } = useAuthSession();
   const router = useRouter();
   const pathname = usePathname();
-  const isRTL = locale === "ar";
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const mounted = useSyncExternalStore(
@@ -253,7 +246,7 @@ function Header() {
         duration: 4000,
       });
       document.body.classList.add("overflow-hidden");
-      dispatch(setLoginSidebarIsOpen(true));
+      dispatch(setMenuIsOpen(true));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn, user?.userInfo?.uid, user?.userInfo?.phone]);
@@ -279,32 +272,18 @@ function Header() {
     return () => document.removeEventListener("mousedown", onClick);
   }, [profileOpen]);
 
-  useEffect(() => {
-    document.body.classList.toggle("overflow-hidden", menuOpen);
-    return () => document.body.classList.remove("overflow-hidden");
-  }, [menuOpen]);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
-
   const handleOrderSidebar = () => {
     dispatch(toggleOrderSidebar());
     document.body.classList.add("overflow-hidden");
   };
 
-  const handleLoginSidebar = () => {
-    dispatch(toggleLoginSidebar());
+  const handleMenu = () => {
+    dispatch(setMenuIsOpen(true));
     document.body.classList.add("overflow-hidden");
   };
 
   const handleOrderNow = () => {
-    setMenuOpen(false);
+    dispatch(setMenuIsOpen(false));
     if (isHome) {
       document.getElementById("restaurants")?.scrollIntoView({ behavior: "smooth" });
     } else {
@@ -314,12 +293,23 @@ function Header() {
 
   const handleLogout = async () => {
     setProfileOpen(false);
-    setMenuOpen(false);
+    dispatch(setMenuIsOpen(false));
     await logout();
   };
 
   const avatarUrl =
     (user?.userInfo as { avatar?: string } | undefined)?.avatar;
+
+  if (isHome) {
+    return (
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:bg-color-2 focus:px-4 focus:py-2 focus:text-white focus:font-ProximaNovaSemiBold"
+      >
+        {t("Skip to content")}
+      </a>
+    );
+  }
 
   return (
     <>
@@ -339,7 +329,7 @@ function Header() {
           <div className="flex items-center md:gap-5 gap-2">
             <button
               type="button"
-              onClick={() => setMenuOpen(true)}
+              onClick={() => dispatch(setMenuIsOpen(true))}
               aria-label={t("Menu")}
               className="lg:hidden grid size-9 place-items-center rounded-full text-color-1 hover:bg-color-7/40 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none"
             >
@@ -432,7 +422,7 @@ function Header() {
                         role="menuitem"
                         onClick={() => {
                           setProfileOpen(false);
-                          handleLoginSidebar();
+                          handleMenu();
                         }}
                         className="flex w-full cursor-pointer items-center gap-2.5 px-4 py-2.5 text-sm font-ProximaNovaMed text-color-6 transition-colors hover:bg-color-7/40"
                       >
@@ -500,129 +490,6 @@ function Header() {
           </ul>
         </div>
       </header>
-
-      {/* Mobile drawer */}
-      <div
-        className={cn(
-          "fixed inset-0 z-[55] bg-black/60 transition-opacity duration-300 lg:hidden",
-          menuOpen ? "opacity-100" : "pointer-events-none opacity-0"
-        )}
-        onClick={() => setMenuOpen(false)}
-      />
-      <div
-        className={cn(
-          "fixed top-0 bottom-0 z-[56] flex w-[82%] max-w-sm flex-col bg-card shadow-2xl transition-transform duration-300 lg:hidden",
-          isRTL ? "right-0" : "left-0",
-          menuOpen ? "translate-x-0" : isRTL ? "translate-x-full" : "-translate-x-full"
-        )}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t("Menu")}
-      >
-        <div className="flex items-center justify-between border-b border-color-7 px-5 py-4">
-          <div className="flex items-center gap-2">
-            <Image src={LOGO_URL} alt="logo" width={36} height={36} className="h-9 w-9 object-contain" />
-            <span className="font-Beiruti text-2xl text-color-1">
-              {t("Zajil")}
-            </span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setMenuOpen(false)}
-            aria-label={t("Close")}
-            className="grid size-9 place-items-center rounded-full bg-color-7/60 hover:bg-color-7 transition-colors cursor-pointer"
-          >
-            <XIcon className="size-5 text-color-1" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
-          {!IS_COMING_SOON && (
-            <button
-              type="button"
-              onClick={handleOrderNow}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-color-2 py-3.5 font-ProximaNovaSemiBold text-white transition-colors hover:bg-color-2/90 cursor-pointer"
-            >
-              <MapPinIcon className="size-4" />
-              {t("Order now")}
-            </button>
-          )}
-
-          {!IS_COMING_SOON && user?.trackedOrder?.id && (
-            <button
-              type="button"
-              onClick={() => {
-                setMenuOpen(false);
-                handleOrderSidebar();
-              }}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-color-11/10 py-3.5 font-ProximaNovaSemiBold text-color-11 transition-colors hover:bg-color-11/20 cursor-pointer"
-            >
-              <BikeIcon className="size-4" />
-              {t("Order Track")}
-            </button>
-          )}
-
-          <div className="border-t border-color-7 pt-4 space-y-3">
-            {isLoggedIn ? (
-              <div className="flex items-center gap-3 rounded-2xl border border-color-7 p-3">
-                <ProfileAvatar
-                  name={user?.userInfo?.name}
-                  photoUrl={avatarUrl}
-                  size="sm"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-ProximaNovaSemiBold text-color-1">
-                    {user?.userInfo?.name || t("Guest")}
-                  </p>
-                  <p className="truncate text-xs font-ProximaNovaThin text-color-5" dir="ltr">
-                    {user?.userInfo?.phone || t("No phone number added")}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  router.push("/signin");
-                }}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl border border-color-7 py-3 font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40 cursor-pointer"
-              >
-                <UserIcon className="size-4 text-color-5" />
-                {t("Sign In")}
-              </button>
-            )}
-          </div>
-
-          <div className="space-y-3">
-            {!IS_COMING_SOON && mounted && cartItems.length > 0 && (
-              <Link
-                href="/cart"
-                onClick={() => setMenuOpen(false)}
-                className="flex w-full items-center justify-center gap-2 rounded-full border border-color-7 py-2 font-ProximaNovaSemiBold text-color-1 transition-colors hover:bg-color-7/40"
-              >
-                <ShoppingCartIcon className="size-4" />
-                {t("Cart")}
-              </Link>
-            )}
-            <div className="flex items-center gap-3">
-              <ThemeToggle onNavigate={() => setMenuOpen(false)} fullWidth />
-              <LanguageSwitcher onNavigate={() => setMenuOpen(false)} fullWidth />
-            </div>
-          </div>
-
-          {isLoggedIn && (
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50 py-3 font-ProximaNovaSemiBold text-red-500 transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-950 dark:hover:bg-red-900/50 cursor-pointer"
-            >
-              <LogOutIcon className="size-4" />
-              {t("Logout")}
-            </button>
-          )}
-        </div>
-      </div>
     </>
   );
 }

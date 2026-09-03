@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Bike, MapPin, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { useRouter } from "@/i18n/routing";
 import OpenBadge from "@/components/Home/OpenBadge";
 import isRestaurantAvailable from "@/utils/isRestaurantAvailable";
 import type { RestaurantDocument } from "@/types/restaurant";
@@ -40,6 +40,7 @@ const RestaurantHero = ({
   };
 }) => {
   const t = useTranslations();
+  const router = useRouter();
   const { city, name, cuisines, areaName, sla } = resMainInfo;
   const rating = Number(res?.reviewSummary?.averageRating);
   const totalReviews = Number(res?.reviewSummary?.totalReviews) || 0;
@@ -55,15 +56,15 @@ const RestaurantHero = ({
         <nav aria-label="Breadcrumb" className="relative z-10">
           <ol className="inline-flex items-center gap-1.5">
             <li>
-              <Link href="/" className="text-xs font-ProximaNovaMed text-white/80 hover:text-white">
+              <button type="button" onClick={() => router.push("/")} className="text-xs font-ProximaNovaMed text-white/80 hover:text-white cursor-pointer">
                 {t("Home")}
-              </Link>
+              </button>
             </li>
             <li className="flex items-center gap-1.5">
               <BreadcrumbArrow />
-              <Link href="/" className="text-xs font-ProximaNovaMed text-white/80 hover:text-white">
+              <button type="button" onClick={() => router.push("/")} className="text-xs font-ProximaNovaMed text-white/80 hover:text-white cursor-pointer">
                 {city}
-              </Link>
+              </button>
             </li>
             <li aria-current="page" className="flex items-center gap-1.5">
               <BreadcrumbArrow />

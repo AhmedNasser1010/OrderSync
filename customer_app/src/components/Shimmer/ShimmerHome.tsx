@@ -64,7 +64,7 @@ function RestaurantCardSkeleton({ cardWidth }: { cardWidth?: string }) {
 
 function ShimmerHome() {
   return (
-    <div className="container mx-auto mb-10 overflow-x-hidden px-2 sm:px-10">
+    <div className="container mx-auto mb-10 overflow-x-clip px-2 sm:px-10">
       <div className="flex items-center gap-3 pt-4 w-full">
         <SkeletonBlock className="h-11 w-48 shrink-0 rounded-full" />
         <SkeletonBlock className="h-11 flex-1 rounded-full" />

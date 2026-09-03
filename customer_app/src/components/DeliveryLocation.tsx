@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { MapPinIcon, ChevronDownIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
-import { toggleLoginSidebar } from "@/rtk/slices/toggleSlice";
+import { setMenuIsOpen } from "@/rtk/slices/toggleSlice";
 import {
   Popup,
   PopupContent,
@@ -52,7 +52,7 @@ function DeliveryLocation({ variant = "bar", className }: DeliveryLocationProps)
 
   const handleClick = () => {
     if (!isLoggedIn) {
-      dispatch(toggleLoginSidebar());
+      dispatch(setMenuIsOpen(true));
       return;
     }
     setPicked(
@@ -88,7 +88,7 @@ function DeliveryLocation({ variant = "bar", className }: DeliveryLocationProps)
         type="button"
         onClick={handleClick}
         className={cn(
-          "group flex items-center gap-2.5 rounded-full border border-color-7 bg-card shadow-sm transition-all hover:border-color-2/40 hover:shadow-md focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none cursor-pointer",
+          "group flex items-center gap-2.5 rounded-full transition-all focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none cursor-pointer",
           variant === "compact"
             ? "py-1.5 ps-3 pe-2"
             : "py-2.5 ps-4 pe-3",
@@ -96,14 +96,18 @@ function DeliveryLocation({ variant = "bar", className }: DeliveryLocationProps)
         )}
         aria-label={t("Deliver to")}
       >
-        <MapPinIcon className="size-4 shrink-0 text-color-2" />
+        <MapPinIcon
+          className="size-4 shrink-0 text-color-1"
+          fill="currentColor"
+          strokeWidth={0}
+        />
         <span className="flex flex-col items-start leading-none">
           {variant === "bar" && (
             <span className="text-[10px] uppercase tracking-wider font-ProximaNovaSemiBold text-color-5">
               {t("Deliver to")}
             </span>
           )}
-          <span className="max-w-28 truncate text-sm font-ProximaNovaSemiBold text-color-1">
+          <span className="max-w-28 truncate text-sm font-bold text-color-1">
             {address}
           </span>
         </span>

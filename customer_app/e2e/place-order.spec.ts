@@ -27,10 +27,6 @@ test("customer can place an order end-to-end via the emulator", async ({
 }) => {
   await page.goto("/en/Test-Restaurant");
 
-  await expect(
-    page.getByRole("button", { name: "Your account" })
-  ).toBeVisible();
-
   await page.getByRole("button", { name: "Add" }).click();
   await expect(page.getByText("View Cart")).toBeVisible();
   await page.getByText("View Cart").click();

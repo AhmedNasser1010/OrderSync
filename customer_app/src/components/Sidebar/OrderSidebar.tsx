@@ -653,7 +653,7 @@ const OrderSidebar = () => {
         )}
 
         {/* Footer actions */}
-        <div className="mt-auto pt-3">
+        <div className="mt-auto pt-3 pb-20">
           {currentStatus === "RECEIVED" ? (
             <button
               onClick={cancelOrder}
