@@ -14,6 +14,7 @@ export interface ServicesDocument {
     message?: string | null;
     eta?: string | null;
   };
+  enableLiveTrackingMap?: boolean;
   updatedAt: number;
   updatedBy: string;
 }

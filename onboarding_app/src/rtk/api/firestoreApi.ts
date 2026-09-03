@@ -167,6 +167,7 @@ export const firestoreApi = createApi({
         | "maxWorkDistanceKm"
         | "cashback"
         | "maintenance"
+        | "enableLiveTrackingMap"
       >,
       void
     >({
@@ -191,6 +192,7 @@ export const firestoreApi = createApi({
                 maxCashbackPerTx: 0,
               },
               maintenance: data.maintenance ?? { enabled: false },
+              enableLiveTrackingMap: data.enableLiveTrackingMap ?? true,
             },
           };
         } catch (error: unknown) {
@@ -221,6 +223,7 @@ export const firestoreApi = createApi({
             message?: string | null;
             eta?: string | null;
           };
+          enableLiveTrackingMap?: boolean;
         };
       }
     >({
@@ -781,6 +784,36 @@ export const firestoreApi = createApi({
         }
       },
       invalidatesTags: ["Businesses"],
+    }),
+    setAllLiveTrackingMap: builder.mutation<
+      null,
+      { enableLiveTrackingMap: boolean }
+    >({
+      async queryFn({ enableLiveTrackingMap }) {
+        try {
+          const snapshot = await getDocs(collection(db, "businesses"));
+          if (snapshot.empty) {
+            return { data: null };
+          }
+
+          const batch = writeBatch(db);
+          for (const businessDoc of snapshot.docs) {
+            batch.update(businessDoc.ref, {
+              "settings.enableLiveTrackingMap": enableLiveTrackingMap,
+              updatedAt: Date.now(),
+            });
+          }
+          await batch.commit();
+
+          console.log("Write Operation [setAllLiveTrackingMap]");
+          return { data: null };
+        } catch (error: unknown) {
+          const message = getErrorMessage(error);
+          console.error("Error setting all live tracking maps:", message);
+          return { error: message };
+        }
+      },
+      invalidatesTags: ["Businesses", "Services"],
     }),
     fetchManagers: builder.query<ManagerUser[], string>({
       async queryFn(partnerUid: string) {
@@ -1618,6 +1651,7 @@ export const {
   useDeleteManagerMutation,
   useSetRestaurantStatusMutation,
   useSetMarketplaceVisibilityMutation,
+  useSetAllLiveTrackingMapMutation,
   useCreateDriverDocumentMutation,
   useUpdateDriverDocumentMutation,
   useDeleteDriverDocumentMutation,

@@ -18,6 +18,7 @@ import {
 import {
   useFetchServicesQuery,
   useUpdateServicesMutation,
+  useSetAllLiveTrackingMapMutation,
 } from "@/rtk/api/firestoreApi";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -25,6 +26,7 @@ import {
   BadgePercent,
   Loader2,
   MapPinned,
+  Radar,
   Save,
   Truck,
   Wrench,
@@ -39,6 +41,7 @@ export default function SettingsPage() {
   const { user } = useAuth();
   const { data, isLoading, isError } = useFetchServicesQuery();
   const [updateServices] = useUpdateServicesMutation();
+  const [setAllLiveTrackingMap] = useSetAllLiveTrackingMapMutation();
 
   const [deliveryFeesPerKm, setDeliveryFeesPerKm] = useState<number | null>(
     null
@@ -61,6 +64,10 @@ export default function SettingsPage() {
     null
   );
   const [maintenanceEta, setMaintenanceEta] = useState<string | null>(null);
+  const [liveTrackingEnabled, setLiveTrackingEnabled] = useState<
+    boolean | null
+  >(null);
+  const [isSavingLiveTracking, setIsSavingLiveTracking] = useState(false);
   const [confirmMaintenanceDialog, setConfirmMaintenanceDialog] =
     useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -88,6 +95,8 @@ export default function SettingsPage() {
   const maintenanceMessageValue =
     maintenanceMessage ?? data?.maintenance?.message ?? "";
   const maintenanceEtaValue = maintenanceEta ?? data?.maintenance?.eta ?? "";
+  const liveTrackingOn =
+    liveTrackingEnabled ?? data?.enableLiveTrackingMap ?? true;
 
   const handleSave = async () => {
     if (isSaving) return;
@@ -169,6 +178,24 @@ export default function SettingsPage() {
   const confirmEnableMaintenance = () => {
     setMaintenanceEnabled(true);
     setConfirmMaintenanceDialog(false);
+  };
+
+  const handleToggleLiveTracking = async (value: boolean) => {
+    if (isSavingLiveTracking) return;
+    setIsSavingLiveTracking(true);
+    setSaveError(null);
+    try {
+      await setAllLiveTrackingMap({
+        enableLiveTrackingMap: value,
+      }).unwrap();
+      setLiveTrackingEnabled(value);
+    } catch (e: unknown) {
+      const message =
+        e instanceof Error ? e.message : "Failed to update live tracking.";
+      setSaveError(message);
+    } finally {
+      setIsSavingLiveTracking(false);
+    }
   };
 
   return (
@@ -360,6 +387,49 @@ export default function SettingsPage() {
                   className="mt-1.5 max-w-xs"
                 />
               </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 border-t pt-6">
+            <div className="flex items-center gap-2">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Radar className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">
+                  Live Tracking Map
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Globally enable or disable the live driver tracking map for
+                  all restaurants at once, instead of changing it on each
+                  restaurant one by one.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between rounded-lg border border-border p-4">
+              <div>
+                <Label
+                  htmlFor="live-tracking-enabled"
+                  className="text-sm font-medium"
+                >
+                  Enable live tracking map for all restaurants
+                </Label>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {liveTrackingOn
+                    ? "Customers will see live driver tracking maps during delivery for every restaurant."
+                    : "Live driver tracking maps are disabled for all restaurants."}
+                </p>
+              </div>
+              {isSavingLiveTracking ? (
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              ) : (
+                <Switch
+                  id="live-tracking-enabled"
+                  checked={liveTrackingOn}
+                  onCheckedChange={handleToggleLiveTracking}
+                />
+              )}
             </div>
           </div>
 
