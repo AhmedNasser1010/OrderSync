@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, SearchX } from "lucide-react";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { useAppSelector } from "@/rtk/hooks";
 import { useFetchAllMenusQuery } from "@/rtk/api/firestoreApi";
 import type { RestaurantDocument } from "@/types/restaurant";

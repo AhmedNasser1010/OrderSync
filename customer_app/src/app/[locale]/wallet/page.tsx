@@ -12,7 +12,7 @@ import {
   AlertTriangle,
   Info,
 } from "lucide-react";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { useAppSelector } from "@/rtk/hooks";
 import {

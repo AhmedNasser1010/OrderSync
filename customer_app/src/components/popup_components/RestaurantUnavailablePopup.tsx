@@ -15,7 +15,7 @@ import { setShowRestaurantUnavailablePopup } from "@/rtk/slices/toggleSlice";
 import { initRestaurants } from "@/rtk/slices/restaurantsSlice";
 import DB_GET_COLLECTION from "@/utils/DB_GET_COLLECTION";
 import type { BusinessDocument } from "@ordersync/types";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 
 function RestaurantUnavailablePopup() {

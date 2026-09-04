@@ -11,6 +11,7 @@ export interface ToggleState {
   showResPausedPopup: boolean;
   showRestaurantUnavailablePopup: boolean;
   showOutOfRangePopup: boolean;
+  showProfileIncompletePopup: boolean;
   showOrderPlacementErrorDialog: boolean;
   showOrderPlacementLoading: boolean;
   showOrderPlacementSuccess: boolean;
@@ -37,6 +38,7 @@ const initialState: ToggleState = {
   showResPausedPopup: false,
   showRestaurantUnavailablePopup: false,
   showOutOfRangePopup: false,
+  showProfileIncompletePopup: false,
   showOrderPlacementErrorDialog: false,
   showOrderPlacementLoading: false,
   showOrderPlacementSuccess: false,
@@ -93,6 +95,10 @@ const toggleSlice = createSlice({
       state.showOutOfRangePopup =
         payload === undefined ? !state.showOutOfRangePopup : payload;
     },
+    setShowProfileIncompletePopup: (state, { payload }) => {
+      state.showProfileIncompletePopup =
+        payload === undefined ? !state.showProfileIncompletePopup : payload;
+    },
     setShowOrderPlacementErrorDialog: (state, { payload }) => {
       state.showOrderPlacementErrorDialog =
         payload === undefined
@@ -114,6 +120,7 @@ const toggleSlice = createSlice({
       state.showResPausedPopup = false;
       state.showRestaurantUnavailablePopup = false;
       state.showOutOfRangePopup = false;
+      state.showProfileIncompletePopup = false;
       state.showOrderPlacementErrorDialog = false;
       state.showOrderPlacementLoading = false;
       state.showOrderPlacementSuccess = false;
@@ -178,6 +185,7 @@ export const {
   setShowResPausedPopup,
   setShowRestaurantUnavailablePopup,
   setShowOutOfRangePopup,
+  setShowProfileIncompletePopup,
   setShowOrderPlacementErrorDialog,
   setShowOrderPlacementLoading,
   setShowOrderPlacementSuccess,

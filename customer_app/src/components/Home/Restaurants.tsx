@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { clearAll } from "@/rtk/slices/filterSlice";
 import { useTranslations } from "next-intl";

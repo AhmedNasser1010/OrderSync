@@ -28,7 +28,7 @@ import {
   setTheme,
 } from "@/rtk/slices/toggleSlice";
 import { useTranslations, useLocale } from "next-intl";
-import { Link, usePathname, useRouter } from "@/i18n/routing";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { initServices } from "@/rtk/slices/servicesSlice";
 import { initWallet } from "@/rtk/slices/walletSlice";
 import {

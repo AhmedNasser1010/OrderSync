@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "@/i18n/routing";
+import { usePathname } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { IS_COMING_SOON } from "@/utils/comingSoon";
 import { cn } from "@/lib/utils";

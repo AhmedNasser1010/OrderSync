@@ -3,7 +3,7 @@
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { UserIcon, PhoneIcon, MapPinIcon, CheckIcon } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import useUserForm from "@/hooks/useUserForm";

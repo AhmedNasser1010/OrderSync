@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { useAppSelector } from "@/rtk/hooks";
 import { applyOrderDiscounts, calculateDiscountAmount, priceAfterDiscount, resolveItemDiscount } from "@ordersync/order-utils";
 

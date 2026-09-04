@@ -27,7 +27,7 @@ import {
 } from "@/rtk/slices/toggleSlice";
 import { LOGO_URL } from "@/utils/constants";
 import { useTranslations, useLocale } from "next-intl";
-import { Link, usePathname, useRouter } from "@/i18n/routing";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import ProfileAvatar from "@/components/Sidebar/ProfileAvatar";
 import { cn } from "@/lib/utils";
@@ -126,11 +126,6 @@ function MobileDrawer() {
     await logout();
   };
 
-  const handleGoToSignin = () => {
-    close();
-    router.push("/signin");
-  };
-
   const handleGoToOnboarding = () => {
     close();
     router.push("/onboarding");
@@ -213,14 +208,14 @@ function MobileDrawer() {
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={handleGoToSignin}
+              <Link
+                href="/signin"
+                onClick={close}
                 className="group w-full flex items-center justify-center gap-3 rounded-2xl border border-color-7 bg-card py-4 text-base font-ProximaNovaSemiBold text-color-1 shadow-sm transition-all duration-200 hover:border-color-2/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer"
               >
                 <span>{t("Login")}</span>
                 <ArrowLeftIcon className="size-4 text-color-5 -scale-x-100 rtl:scale-x-100" />
-              </button>
+              </Link>
 
               <p className="mt-1 text-center text-xs font-ProximaNovaThin text-color-5">
                 {t("Continue with Google to start ordering")}

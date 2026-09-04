@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Slider from "react-slick";
 import { ArrowDownIcon } from "lucide-react";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useFetchBannersQuery } from "@/rtk/api/firestoreApi";
 import type { HeroBanner as HeroBannerType } from "@ordersync/types";

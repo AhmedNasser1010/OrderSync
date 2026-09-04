@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Bike, MapPin, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import OpenBadge from "@/components/Home/OpenBadge";
 import isRestaurantAvailable from "@/utils/isRestaurantAvailable";
 import type { RestaurantDocument } from "@/types/restaurant";

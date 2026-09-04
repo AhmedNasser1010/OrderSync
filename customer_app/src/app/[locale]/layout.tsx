@@ -8,6 +8,7 @@ import MobileDrawer from "@/components/MobileDrawer";
 import MainContent from "@/components/MainContent";
 import OrderSidebar from "@/components/Sidebar/OrderSidebar";
 import PopupProvider from "@/components/PopupProvider";
+import ProfileIncompleteController from "@/components/ProfileIncompleteController";
 import { PwaInstallButton } from "@/components/pwa-install-button";
 import LoadingScreen from "@/components/LoadingScreen";
 import ComingSoonGate from "@/components/ComingSoon/ComingSoonGate";
@@ -33,6 +34,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <LoadingScreen />
         <HtmlAttributes locale={locale} />
         <PopupProvider>
+          <ProfileIncompleteController />
           <HomeHeader />
           <MainContent>{children}</MainContent>
           <ComingSoonGate />

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { AlertCircle, SearchX } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import useRestaurants from "@/hooks/useRestaurants";
 import useRestaurantMenu from "@/hooks/useRestaurantMenu";

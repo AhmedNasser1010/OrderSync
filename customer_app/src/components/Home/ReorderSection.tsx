@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { RotateCcw } from "lucide-react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { skipToken } from "@reduxjs/toolkit/query";
 import {

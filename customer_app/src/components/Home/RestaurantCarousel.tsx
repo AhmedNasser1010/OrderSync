@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import SectionHeader from "@/components/Home/SectionHeader";
 import RestaurantCard from "@/components/ui/custom/RestaurantCard";

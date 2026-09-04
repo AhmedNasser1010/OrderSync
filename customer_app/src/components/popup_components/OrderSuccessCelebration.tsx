@@ -2,7 +2,7 @@
 
 import { useMemo, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { BikeIcon, Loader2Icon } from "lucide-react";
 import {
   Popup,

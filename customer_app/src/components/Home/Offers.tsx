@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import Slider, { Settings } from "react-slick";
 import SectionHeader from "@/components/Home/SectionHeader";

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { StoreIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useRouter, usePathname } from "@/i18n/routing";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { setMenuIsOpen } from "@/rtk/slices/toggleSlice";
 import {

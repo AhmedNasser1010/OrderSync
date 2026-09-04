@@ -16,7 +16,7 @@ import {
   setOrderSidebarIsOpen,
 } from "@/rtk/slices/toggleSlice";
 import useOrder from "@/hooks/useOrder";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { XIcon } from "lucide-react";
 

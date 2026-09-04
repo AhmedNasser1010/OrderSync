@@ -7,7 +7,7 @@ import {
   WalletIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Link, usePathname } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/navigation";
 import { useAppSelector } from "@/rtk/hooks";
 import { cn } from "@/lib/utils";
 

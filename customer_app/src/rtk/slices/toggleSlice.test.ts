@@ -9,6 +9,8 @@ import reducer, {
   setShowResClosedPopup,
   setShowResPausedPopup,
   setShowRestaurantUnavailablePopup,
+  setShowOutOfRangePopup,
+  setShowProfileIncompletePopup,
   setShowOrderPlacementErrorDialog,
   setShowOrderPlacementLoading,
   setShowOrderPlacementSuccess,
@@ -64,6 +66,15 @@ describe("toggleSlice", () => {
     expect(state.showItemsAlreadyInCartPopup).toBe(false);
   });
 
+  it("toggles the profile incomplete popup with or without an explicit payload", () => {
+    let state = reducer(undefined, setShowProfileIncompletePopup());
+    expect(state.showProfileIncompletePopup).toBe(true);
+    state = reducer(state, setShowProfileIncompletePopup(true));
+    expect(state.showProfileIncompletePopup).toBe(true);
+    state = reducer(state, setShowProfileIncompletePopup(false));
+    expect(state.showProfileIncompletePopup).toBe(false);
+  });
+
   it("resets all popup states", () => {
     let state = reducer(undefined, setShowOrderPlacementErrorDialog());
     state = reducer(state, setShowResClosedPopup());
@@ -73,12 +84,15 @@ describe("toggleSlice", () => {
     state = reducer(state, setShowTrackedOrderLockPopup());
     state = reducer(state, setShowResPausedPopup());
     state = reducer(state, setShowItemsAlreadyInCartPopup());
+    state = reducer(state, setShowProfileIncompletePopup());
     const reset = reducer(state, resetPopupStates());
     expect(reset.showItemsAlreadyInCartPopup).toBe(false);
     expect(reset.showTrackedOrderLockPopup).toBe(false);
     expect(reset.showResClosedPopup).toBe(false);
     expect(reset.showResPausedPopup).toBe(false);
     expect(reset.showRestaurantUnavailablePopup).toBe(false);
+    expect(reset.showOutOfRangePopup).toBe(false);
+    expect(reset.showProfileIncompletePopup).toBe(false);
     expect(reset.showOrderPlacementErrorDialog).toBe(false);
     expect(reset.showOrderPlacementLoading).toBe(false);
     expect(reset.showOrderPlacementSuccess).toBe(false);

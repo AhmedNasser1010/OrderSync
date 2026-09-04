@@ -22,17 +22,21 @@ export async function proxy(request: NextRequest) {
   const sessionUser = session ? await verifySessionCookie(session) : null;
 
   const isOnboarding = pathname.endsWith("/onboarding");
-  const isSignin = pathname.endsWith("/signin");
 
   if (isOnboarding && !sessionUser) {
-    const url = new URL("/signin", request.url);
+    // Preserve the locale prefix (e.g. /en/onboarding -> /en/signin) so the
+    // redirect does not fall back to the default locale.
+    const signinPath = pathname.replace(/\/onboarding\/?$/, "/signin");
+    const url = new URL(signinPath, request.url);
     url.searchParams.set("from", "onboarding");
     return NextResponse.redirect(url);
   }
 
-  if (isSignin && sessionUser) {
-    return applyCoopHeader(NextResponse.redirect(new URL("/", request.url)));
-  }
+  // Note: /signin is intentionally NOT guarded here. Authenticated users are
+  // redirected client-side by SignInView (router.replace("/")). A middleware
+  // bounce based on the session cookie silently cancels client-initiated
+  // navigation (e.g. the drawer login button) whenever the cookie and the
+  // client-side Firebase auth state disagree.
 
   return applyCoopHeader(intlResponse ?? NextResponse.next({ request }));
 }

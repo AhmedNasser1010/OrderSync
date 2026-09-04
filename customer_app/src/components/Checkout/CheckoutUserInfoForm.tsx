@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { object, string, type ValidationError } from "yup";
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import { addCheckout } from "@/rtk/slices/checkoutSlice";
 import Divider from "@/components/Checkout/Divider";

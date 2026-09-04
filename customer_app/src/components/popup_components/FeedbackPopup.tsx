@@ -24,7 +24,7 @@ import {
 } from "@/rtk/slices/toggleSlice";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { CheckCircleIcon } from "lucide-react";
 
 function FeedbackPopup() {

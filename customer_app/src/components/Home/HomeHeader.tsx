@@ -9,7 +9,7 @@ import { setMenuIsOpen } from "@/rtk/slices/toggleSlice";
 import { initWallet } from "@/rtk/slices/walletSlice";
 import { useFetchWalletBalanceQuery } from "@/rtk/api/firestoreApi";
 import { useAuthSession } from "@/hooks/useAuthSession";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import DeliveryLocation from "@/components/DeliveryLocation";
 
 const emptySubscribe = () => () => {};

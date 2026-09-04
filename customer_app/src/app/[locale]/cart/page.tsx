@@ -13,7 +13,7 @@ import {
   Store,
   Trash2,
 } from "lucide-react";
-import { Link } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import useRestaurants from "@/hooks/useRestaurants";
 import useRestaurantMenu from "@/hooks/useRestaurantMenu";

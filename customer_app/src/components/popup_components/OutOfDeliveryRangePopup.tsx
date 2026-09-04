@@ -11,7 +11,7 @@ import {
   PopupDescription,
 } from "@/components/ui/custom/Popup";
 import { setShowOutOfRangePopup } from "@/rtk/slices/toggleSlice";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 
 function OutOfDeliveryRangePopup() {

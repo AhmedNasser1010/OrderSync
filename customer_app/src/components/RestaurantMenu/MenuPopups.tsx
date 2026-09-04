@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/navigation";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "@/rtk/hooks";
 import MenuPopup from "@/components/RestaurantMenu/MenuPopup";
