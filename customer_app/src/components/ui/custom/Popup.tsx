@@ -43,12 +43,15 @@ function PopupOverlay({
 
 function PopupContent({
   className,
+  overlayClassName,
   children,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content>) {
+}: React.ComponentProps<typeof DialogPrimitive.Content> & {
+  overlayClassName?: string;
+}) {
   return (
     <PopupPortal>
-      <PopupOverlay />
+      <PopupOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         data-slot="popup-content"
         className={cn(

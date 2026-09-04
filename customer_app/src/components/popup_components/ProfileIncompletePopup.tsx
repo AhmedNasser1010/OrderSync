@@ -34,7 +34,10 @@ function ProfileIncompletePopup() {
 
   return (
     <Popup open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <PopupContent className="sm:max-w-md">
+      <PopupContent
+        className="sm:max-w-md z-[62]"
+        overlayClassName="z-[62]"
+      >
         <PopupHeader closePopupCallback={handleClose}>
           <div className="mx-auto grid size-14 place-items-center rounded-2xl bg-color-2/10">
             <UserRoundIcon className="size-7 text-color-2" />
