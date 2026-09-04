@@ -11,19 +11,15 @@ import { LOGO_URL } from "@/utils/constants";
 export function SignInView() {
   const t = useTranslations();
   const router = useRouter();
-  const { isAuthenticated, isAuthLoading, isOnboardingComplete, error } =
+  const { isAuthenticated, isAuthLoading, error } =
     useAuthSession();
 
   useEffect(() => {
     if (isAuthLoading) return;
     if (!isAuthenticated) return;
 
-    if (isOnboardingComplete === false) {
-      router.replace("/onboarding");
-    } else {
-      router.replace("/");
-    }
-  }, [isAuthenticated, isAuthLoading, isOnboardingComplete, router]);
+    router.replace("/");
+  }, [isAuthenticated, isAuthLoading, router]);
 
   return (
     <section className="min-h-[70vh] flex items-center justify-center px-4 py-10">

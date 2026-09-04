@@ -42,10 +42,8 @@ function GoogleLogo({ className }: { className?: string }) {
 }
 
 export function GoogleSignInButton({
-  redirectTo,
   className,
 }: {
-  redirectTo?: string;
   className?: string;
 }) {
   const t = useTranslations();
@@ -59,9 +57,6 @@ export function GoogleSignInButton({
   const handleSignIn = async () => {
     try {
       await signInWithGoogle();
-      if (redirectTo && redirectTo !== "onboarding") {
-        window.location.href = redirectTo;
-      }
     } catch (error) {
       const details = getAuthErrorDetails(error);
       console.error("Google sign in failed", details, error);
@@ -80,7 +75,7 @@ export function GoogleSignInButton({
       }
     >
       <GoogleLogo className="size-5 shrink-0" />
-      {!mounted || isAuthLoading ? t("Signing in") : t("Login With Google")}
+      {!mounted || isAuthLoading ? t("Signing in") : t("Login")}
     </button>
   );
 }

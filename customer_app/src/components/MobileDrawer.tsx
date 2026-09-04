@@ -218,7 +218,7 @@ function MobileDrawer() {
                 onClick={handleGoToSignin}
                 className="group w-full flex items-center justify-center gap-3 rounded-2xl border border-color-7 bg-card py-4 text-base font-ProximaNovaSemiBold text-color-1 shadow-sm transition-all duration-200 hover:border-color-2/40 hover:shadow-md hover:-translate-y-0.5 active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-color-2/50 cursor-pointer"
               >
-                <span>{t("Login With Google")}</span>
+                <span>{t("Login")}</span>
                 <ArrowLeftIcon className="size-4 text-color-5 -scale-x-100 rtl:scale-x-100" />
               </button>
 
