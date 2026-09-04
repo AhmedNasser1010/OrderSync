@@ -23,21 +23,7 @@ function ProfileIncompletePopup() {
     (state) => state.toggle.showProfileIncompletePopup
   );
 
-  const rememberDismissed = () => {
-    try {
-      if (typeof window !== "undefined") {
-        window.sessionStorage.setItem(
-          "zajil-profile-popup-dismissed",
-          "1"
-        );
-      }
-    } catch {
-      // Storage unavailable; non-blocking.
-    }
-  };
-
   const handleClose = () => {
-    rememberDismissed();
     dispatch(setShowProfileIncompletePopup(false));
   };
 
