@@ -75,7 +75,7 @@ export function GoogleSignInButton({
       }
     >
       <GoogleLogo className="size-5 shrink-0" />
-      {!mounted || isAuthLoading ? t("Signing in") : t("Login")}
+      {!mounted || isAuthLoading ? t("Signing in") : t("Login With Google")}
     </button>
   );
 }
