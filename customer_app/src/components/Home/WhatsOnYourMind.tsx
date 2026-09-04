@@ -9,11 +9,11 @@ import type { RestaurantDocument } from "@/types/restaurant";
 import { cn } from "@/lib/utils";
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  crepes: "/images/dishes/crepes.webp",
-  "eastern-pie": "/images/dishes/eastern-pie.webp",
-  negresco: "/images/dishes/negresco.webp",
-  pizza: "/images/dishes/pizza.webp",
-  sandwich: "/images/dishes/sandwich.webp"
+  crepes: "/images/dishes/crepes-icon.webp",
+  "eastern-pie": "/images/dishes/eastern-pie-icon.webp",
+  negresco: "/images/dishes/negresco-icon.webp",
+  pizza: "/images/dishes/pizza-icon.webp",
+  sandwich: "/images/dishes/sandwich-icon.webp",
 };
 
 function WhatsOnYourMind() {
@@ -67,10 +67,10 @@ function WhatsOnYourMind() {
                   ? "border-color-2/50 shadow-md shadow-color-2/10"
                   : "border-color-7 shadow-sm hover:-translate-y-0.5 hover:shadow-md",
                 isFirst && "ms-4 sm:ms-10",
-                isLast && "me-4 sm:me-10"
+                isLast && "me-4 sm:me-10",
               )}
             >
-              <span className="relative grid size-16 place-items-center overflow-hidden rounded-xl bg-color-7">
+              <span className="relative grid size-17 place-items-center overflow-hidden rounded-xl">
                 {category?.img ? (
                   <Image
                     src={category.img}
@@ -78,10 +78,12 @@ function WhatsOnYourMind() {
                     loading="lazy"
                     width={64}
                     height={64}
-                    className="size-16 object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="size-21 object-cover transition-transform duration-300 group-hover:scale-110"
                   />
                 ) : (
-                  <span className="text-2xl" aria-hidden="true">🍽️</span>
+                  <span className="text-2xl" aria-hidden="true">
+                    🍽️
+                  </span>
                 )}
                 {isActive && (
                   <span className="absolute inset-0 bg-color-2/15" />
@@ -90,7 +92,7 @@ function WhatsOnYourMind() {
               <span
                 className={cn(
                   "font-GrotBold text-sm tracking-tight transition-colors",
-                  isActive ? "text-color-2" : "text-color-3"
+                  isActive ? "text-color-2" : "text-color-3",
                 )}
               >
                 {t(category.id)}
