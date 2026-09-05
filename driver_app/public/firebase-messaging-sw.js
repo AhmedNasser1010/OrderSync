@@ -16,7 +16,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification?.title ?? "New Order Available";
   const notificationOptions = {
     body: payload.notification?.body ?? "A new order is ready for pickup.",
-    icon: "/icon.png",
+    icon: "/icons/icon-192.png",
     badge: "/badge.png",
     data: payload.data ?? {},
     vibrate: [200, 100, 200],

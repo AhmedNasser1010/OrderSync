@@ -38,7 +38,7 @@ export function NewOrderToast() {
       <div className="flex items-center gap-3 rounded-2xl border bg-background/95 p-3 shadow-lg shadow-black/5 backdrop-blur">
         <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-muted">
           <Image
-            src="/icon.png"
+            src="/icons/icon-192.png"
             alt=""
             width={40}
             height={40}
