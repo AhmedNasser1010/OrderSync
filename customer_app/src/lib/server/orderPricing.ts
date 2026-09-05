@@ -199,7 +199,6 @@ export function computeServerPricing(
     promoCode = autoDiscount.code;
     promoDiscount = calculateDiscountAmount(unitSubtotal, autoDiscount);
   }
-
   const afterOrderDiscount = Math.max(
     0,
     finalSubtotal - orderDiscountAmount
@@ -216,7 +215,7 @@ export function computeServerPricing(
       discount: itemDiscount + orderDiscountAmount,
       deliveryFees,
       total: afterOrderDiscount + deliveryFees,
-      ...(promoCode ? { promoCode, promoDiscount } : {}),
+      ...(promoDiscount !== undefined ? { promoCode, promoDiscount } : {}),
     },
     lines,
   };

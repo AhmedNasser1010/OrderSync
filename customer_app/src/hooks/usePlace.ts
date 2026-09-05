@@ -150,6 +150,20 @@ const usePlace = () => {
     return true;
   };
 
+  const checkIfServicesConfigLoaded = () => {
+    // The services slice starts as {} and is hydrated app-wide by
+    // ServicesHydrator. If pricing config is still missing, the delivery-fee
+    // fallback would disagree with the server and the order would be rejected.
+    if (
+      services.deliveryFees !== undefined &&
+      services.minDeliveryFees !== undefined
+    ) {
+      return true;
+    }
+    showError("pricingConfigLoading", "order");
+    return false;
+  };
+
   const checkIfRestaurantIsOpen = () => {
     if (
       workingDaysChecker(
@@ -475,6 +489,7 @@ const usePlace = () => {
       if (
         checkIfUserIsLoggedIn() &&
         checkIfUserIsActive() &&
+        checkIfServicesConfigLoaded() &&
         checkIfRestaurantIsOpen() &&
         checkIfRestaurantHasCommission() &&
         checkUserInformation() &&

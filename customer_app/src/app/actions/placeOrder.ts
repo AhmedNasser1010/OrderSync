@@ -397,6 +397,31 @@ export async function placeOrderServer(args: {
         }
 
         if (!pricingMatches(orderData.pricing, serverPricing)) {
+          // Logged so pricing drift is diagnosable — this failure otherwise
+          // surfaces to the customer as a generic "something went wrong".
+          const c = orderData.pricing;
+          const diff = (
+            ["subtotal", "discount", "deliveryFees", "total"] as const
+          )
+            .map(
+              (k) =>
+                `${k}: client=${c[k]} server=${serverPricing[k]}${
+                  Math.abs((c[k] ?? 0) - (serverPricing[k] ?? 0)) > PRICING_EPSILON
+                    ? "  <-- DIFFERS"
+                    : ""
+                }`
+            )
+            .join(" | ");
+          console.error(
+            `[placeOrderServer] PRICE_MISMATCH business=${orderData.business.id} customer=${orderData.customerUid}\n` +
+              `  ${diff}\n` +
+              `  promoCode: client=${orderData.pricing.promoCode ?? "none"} server=${serverPricing.promoCode ?? "none"}\n` +
+              `  promoDiscount: client=${orderData.pricing.promoDiscount ?? "none"} server=${serverPricing.promoDiscount ?? "none"}\n` +
+              `  walletRedeemed: client=${orderData.pricing.walletRedeemed ?? 0}\n` +
+              `  serverInputs: distanceKm=${distanceKm.toFixed(3)} servicesConfig=${JSON.stringify(servicesConfig)}\n` +
+              `  serverRestaurantLatLng=${JSON.stringify(restaurantLatLng)}\n` +
+              `  cart: ${JSON.stringify(orderData.cart)}`
+          );
           return { error: { code: "PRICE_MISMATCH" } };
         }
 

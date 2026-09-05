@@ -36,6 +36,34 @@ interface TrackedOrderArg {
   uid?: string | null;
 }
 
+function mapServicesDoc(
+  docSnapshot: Awaited<ReturnType<typeof getDoc>>
+): {
+  deliveryFees: ServicesDocument["deliveryFeesPerKm"];
+  minDeliveryFees: ServicesDocument["minDeliveryFees"];
+  maxWorkDistanceKm: ServicesDocument["maxWorkDistanceKm"];
+  cashback?: ServicesDocument["cashback"];
+  maintenance?: ServicesDocument["maintenance"];
+} {
+  if (docSnapshot.exists()) {
+    const data = docSnapshot.data() as Partial<ServicesDocument>;
+    return {
+      deliveryFees: data.deliveryFeesPerKm ?? 3.5,
+      minDeliveryFees: data.minDeliveryFees ?? 5,
+      maxWorkDistanceKm: data.maxWorkDistanceKm ?? 15,
+      cashback: data.cashback,
+      maintenance: data.maintenance ?? { enabled: false },
+    };
+  }
+  return {
+    deliveryFees: 3.5,
+    minDeliveryFees: 5,
+    maxWorkDistanceKm: 15,
+    cashback: undefined,
+    maintenance: { enabled: false },
+  };
+}
+
 const trackedOrderCacheReader: {
   read?: (arg: TrackedOrderArg, state: unknown) => Partial<OrderType> | undefined;
 } = {};
@@ -182,15 +210,21 @@ export const firestoreApi = createApi({
       },
       void
     >({
-      queryFn: () => ({
-        data: {
-          deliveryFees: 3.5,
-          minDeliveryFees: 5,
-          maxWorkDistanceKm: 15,
-          cashback: undefined,
-          maintenance: { enabled: false },
-        },
-      }),
+      // Read the real platform config up front. Never seed the cache with
+      // hardcoded defaults — clients must not price orders with invented
+      // values while the snapshot is pending (the server rejects mismatches
+      // with PRICE_MISMATCH, which customers see as a generic failure).
+      async queryFn() {
+        try {
+          const docSnapshot = await getDoc(doc(db, "services", "platform"));
+          return { data: mapServicesDoc(docSnapshot) };
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
+          console.error("Error fetching [services]:", message);
+          return { error: message };
+        }
+      },
       async onCacheEntryAdded(
         _arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
@@ -202,22 +236,7 @@ export const firestoreApi = createApi({
         const unsubscribe = onSnapshot(
           servicesRef,
           (docSnapshot) => {
-            updateCachedData((draft) => {
-              if (docSnapshot.exists()) {
-                const data = docSnapshot.data() as Partial<ServicesDocument>;
-                draft.deliveryFees = data.deliveryFeesPerKm ?? 3.5;
-                draft.minDeliveryFees = data.minDeliveryFees ?? 5;
-                draft.maxWorkDistanceKm = data.maxWorkDistanceKm ?? 15;
-                draft.cashback = data.cashback;
-                draft.maintenance = data.maintenance ?? { enabled: false };
-              } else {
-                draft.deliveryFees = 3.5;
-                draft.minDeliveryFees = 5;
-                draft.maxWorkDistanceKm = 15;
-                draft.cashback = undefined;
-                draft.maintenance = { enabled: false };
-              }
-            });
+            updateCachedData(() => mapServicesDoc(docSnapshot));
           },
           (error) => {
             console.error(

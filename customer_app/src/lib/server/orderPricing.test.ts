@@ -5,6 +5,7 @@ import {
   type ServerPricingInput,
 } from "./orderPricing";
 import type { MainMenuType } from "@ordersync/types";
+import type { DiscountObject } from "@ordersync/types";
 
 const RES_ID = "res-123";
 const RESTAURANT_LATLNG: [number, number] = [30, 31];
@@ -257,6 +258,35 @@ describe("computeServerPricing", () => {
       promoCode: "FIXED30",
       promoDiscount: 30,
     });
+  });
+
+  it("includes promoDiscount for an order-level discount without a code", () => {
+    // The client (usePlace) sends promoDiscount whenever an order discount is
+    // eligible, even if the discount has no `code`. The server must mirror
+    // that, otherwise pricingMatches() rejects the order with PRICE_MISMATCH.
+    const menu = buildMenu({
+      orderDiscounts: [
+        {
+          id: "d-order",
+          code: "",
+          message: "auto 10% off",
+          level: "order",
+          type: "P",
+          value: 10,
+          conditions: { operator: "AND", rules: [] },
+          active: true,
+        } as DiscountObject,
+      ],
+    });
+    const result = computeServerPricing(input({ menu }));
+    expect(result.pricing).toMatchObject({
+      subtotal: 200,
+      discount: 20,
+      deliveryFees: 5,
+      total: 185,
+      promoDiscount: 20,
+    });
+    expect(result.pricing.promoCode).toBe("");
   });
 
   it("caps the order discount at the subtotal", () => {
