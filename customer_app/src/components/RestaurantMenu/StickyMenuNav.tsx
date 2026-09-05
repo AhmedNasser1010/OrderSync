@@ -34,7 +34,7 @@ const StickyMenuNav = ({
           }
         });
       },
-      { rootMargin: "-100px 0px -60% 0px", threshold: 0 }
+      { rootMargin: "-100px 0px -60% 0px", threshold: 0 },
     );
 
     sections.forEach((section) => observer.observe(section));
@@ -51,7 +51,7 @@ const StickyMenuNav = ({
   const currentActive = query ? null : activeId;
 
   return (
-    <div className="sticky top-14 z-30 border-b border-color-7 bg-background/95 shadow-sm backdrop-blur-md">
+    <div className="sticky top-0 z-30 border-b border-color-7 bg-background/95 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex w-full items-center gap-3 px-4 py-2.5 2xl:max-w-5xl">
         <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {categories.map((category) => (
@@ -63,7 +63,7 @@ const StickyMenuNav = ({
                 "shrink-0 rounded-full px-4 py-1.5 font-ProximaNovaSemiBold text-sm transition-all cursor-pointer",
                 currentActive === category.id
                   ? "bg-foreground text-background shadow-sm"
-                  : "bg-color-7 text-color-6 hover:bg-color-7/60"
+                  : "bg-color-7 text-color-6 hover:bg-color-7/60",
               )}
             >
               {category.title}
