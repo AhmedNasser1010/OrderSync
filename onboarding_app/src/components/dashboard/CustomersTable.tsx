@@ -162,6 +162,12 @@ export function CustomersTable({
               City
             </TableHead>
             <TableHead className="text-foreground font-semibold">
+              Referred By
+            </TableHead>
+            <TableHead className="text-foreground font-semibold">
+              Referrals
+            </TableHead>
+            <TableHead className="text-foreground font-semibold">
               Joined
             </TableHead>
             <TableHead className="text-foreground font-semibold">
@@ -221,6 +227,30 @@ export function CustomersTable({
                   <Badge variant="outline" className="capitalize">
                     {city}
                   </Badge>
+                </TableCell>
+                <TableCell className="py-4 text-sm text-muted-foreground">
+                  {customer.referral?.referredBy ? (
+                    <span
+                      className="font-mono text-xs"
+                      title={customer.referral.referredBy}
+                    >
+                      {customer.referral.referredBy.slice(0, 10)}...
+                    </span>
+                  ) : (
+                    "—"
+                  )}
+                </TableCell>
+                <TableCell className="py-4">
+                  {(customer.referral?.successReferred?.length ?? 0) > 0 ? (
+                    <Badge
+                      variant="outline"
+                      className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-400"
+                    >
+                      {customer.referral?.successReferred?.length}
+                    </Badge>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">0</span>
+                  )}
                 </TableCell>
                 <TableCell className="py-4 text-sm text-muted-foreground">
                   {customer.createdAt

@@ -365,6 +365,13 @@
   "Amount to spend": "Cashback amount to spend",
   "Today": "Today",
   "daysLeft": "{count, plural, one {# day left} other {# days left}}",
+  "referralTitle": "Refer a friend",
+  "referralSubtitle": "Share your link and earn cashback credits when your friends order",
+  "referralCopyLink": "Copy referral link",
+  "referralShare": "Share",
+  "referralCodeLabel": "Your referral code",
+  "referralShareTitle": "Join Zajil",
+  "referralShareMessage": "Order from Zajil and enjoy cashback credits! Use my link:",
   "liveTrackingDisabledTitle": "Live tracking unavailable",
   "liveTrackingDisabledMessage": "We're sorry, live order tracking is not available for this restaurant at the moment."
 }

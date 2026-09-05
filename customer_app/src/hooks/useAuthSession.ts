@@ -23,6 +23,11 @@ import {
   type AuthErrorInfo,
 } from "@/rtk/slices/authSlice";
 import customerSchema from "@/lib/customerSchema";
+import {
+  captureReferralParam,
+  getStoredReferral,
+  clearStoredReferral,
+} from "@/lib/referral";
 import { establishSession } from "@/app/actions/establishSession";
 import { clearSession } from "@/app/actions/clearSession";
 
@@ -74,14 +79,20 @@ export function useAuthSession() {
           phone: data?.phone || user.phoneNumber || "",
           avatar: user.photoURL || "",
           provider: "Google",
+          referredBy: getStoredReferral() || undefined,
         });
         await setDoc(userDocRef, createUserData);
+        clearStoredReferral();
         dispatch(setOnboardingComplete(false));
         return;
       }
 
       // A doc already exists: onboarding is considered complete once the
       // essential contact + location fields are populated.
+      // Any pending ?ref= can no longer be attributed (referrals apply only to
+      // newly created customer docs), so drop it to prevent it leaking to a
+      // future account on the same browser.
+      clearStoredReferral();
       const data2 = docSnapshot.data();
       const name = data2?.userInfo?.name;
       const phone = data2?.userInfo?.phone;
@@ -113,6 +124,10 @@ export function useAuthSession() {
   useEffect(() => {
     if (bootstrappedRef.current) return;
     bootstrappedRef.current = true;
+
+    // Persist a pending ?ref= referral code (if any) before auth fires, so an
+    // already-signed-in user or the popup callback can attribute it.
+    captureReferralParam();
 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {

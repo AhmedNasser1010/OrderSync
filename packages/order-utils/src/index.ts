@@ -39,6 +39,13 @@ export {
 } from "./orderFinance";
 
 export {
+  isReferralFirstOrder,
+  getReferredBy,
+  shouldCreditReferral,
+  type CustomerReferralShape,
+} from "./referral";
+
+export {
   parseTimeToMinutes,
   localDateKey,
   getSessionRangeForDate,

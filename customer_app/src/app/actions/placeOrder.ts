@@ -2,7 +2,10 @@
 
 import { initAdmin } from "@/lib/firebase-admin";
 import { getAuth } from "firebase-admin/auth";
-import { getFirestore } from "firebase-admin/firestore";
+import {
+  FieldValue,
+  getFirestore,
+} from "firebase-admin/firestore";
 import {
   getSessionCookieValue,
   verifySessionCookie,
@@ -14,6 +17,9 @@ import {
   redeemCredits,
   getActiveCredits,
   computeWalletRedemption,
+  getReferredBy,
+  isReferralFirstOrder,
+  shouldCreditReferral,
 } from "@ordersync/order-utils";
 import type {
   MainMenuType,
@@ -227,6 +233,30 @@ export async function placeOrderServer(args: {
         const customerData = customerSnap.data() ?? {};
         const restaurantData = businessSnap.data() ?? {};
         const menuData = menuSnap.data();
+
+        // Referral attribution: this is a "successful referral" when a customer
+        // who signed up through someone's invite link places their FIRST order.
+        // `isFirstOrder` starts true at signup and is flipped to false exactly
+        // once, so only the very first order can produce a referral credit on
+        // the referrer's `successReferred`. Self-referrals are ignored, and the
+        // referrer document must exist (partners store no customers doc, so
+        // partner-originated referrals are simply not counted here).
+        const referralFirstOrder = isReferralFirstOrder(customerData.referral);
+        const referredBy = getReferredBy(customerData.referral);
+        const referrerRef =
+          referralFirstOrder && referredBy
+            ? db.collection("customers").doc(referredBy)
+            : null;
+        let referrerExists = false;
+        if (referrerRef) {
+          const referrerSnap = await transaction.get(referrerRef);
+          referrerExists = referrerSnap.exists;
+        }
+        const creditReferrer = shouldCreditReferral({
+          customerUid: orderData.customer.uid,
+          referral: customerData.referral,
+          referrerExists,
+        });
 
         const platformData = servicesSnap.exists
           ? (servicesSnap.data() as {
@@ -583,7 +613,16 @@ export async function placeOrderServer(args: {
               counted: false,
             },
           },
+          ...(referralFirstOrder ? { "referral.isFirstOrder": false } : {}),
         });
+
+        if (creditReferrer && referrerRef) {
+          transaction.update(referrerRef, {
+            "referral.successReferred": FieldValue.arrayUnion(
+              orderData.customer.uid
+            ),
+          });
+        }
 
         return { data: { orderId: orderRef.id, orderNumber } };
       }

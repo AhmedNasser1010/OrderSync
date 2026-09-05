@@ -15,6 +15,7 @@ import {
 import { Link } from "@/i18n/navigation";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { useAppSelector } from "@/rtk/hooks";
+import ReferralLinkCard from "@/components/Referral/ReferralLinkCard";
 import {
   useFetchWalletBalanceQuery,
   useFetchWalletCreditsQuery,
@@ -117,6 +118,8 @@ export default function WalletPage() {
           {formatAmount(balance, t)}
         </p>
       </div>
+
+      <ReferralLinkCard />
 
       {credits.length > 0 && (
         <section className="mt-6">

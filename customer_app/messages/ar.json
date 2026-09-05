@@ -365,6 +365,13 @@
   "Amount to spend": "مبلغ الكاش باك المراد استخدامه",
   "Today": "اليوم",
   "daysLeft": "{count, plural, one {يوم واحد متبقي} two {يومان متبقيان} few {# أيام متبقية} many {# يومًا متبقيًا} other {# يوم متبقي}}",
+  "referralTitle": "ادعُ صديقاً",
+  "referralSubtitle": "شارك رابطك واكسب كاش باك عندما يطلب أصدقاؤك",
+  "referralCopyLink": "نسخ رابط الدعوة",
+  "referralShare": "مشاركة",
+  "referralCodeLabel": "كود الدعوة الخاص بك",
+  "referralShareTitle": "انضم لزاجل",
+  "referralShareMessage": "اطلب من زاجل واكسب رصيد كاش باك! استخدم رابطي:",
   "liveTrackingDisabledTitle": "تتبع مباشر غير متاح",
   "liveTrackingDisabledMessage": "نعتذر، التتبع المباشر للطلب غير متاح لهذا المطعم في الوقت الحالي."
 }

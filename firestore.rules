@@ -57,6 +57,16 @@ service cloud.firestore {
       return hasCustomerDoc();
     }
 
+    // Referral attribution must be immutable for clients. It is written only
+    // at customer-doc creation; enforcement here prevents a user from later
+    // editing their own `referredBy` / `successReferred` / `isFirstOrder` to
+    // fabricate or change attribution in anticipation of payout.
+    // (Authoritative writes flow through the Admin SDK / server actions, which
+    // bypass these rules.)
+    function referralImmutable() {
+      return incomingData().referral == resourceData().referral;
+    }
+
     // Role is determined from the authoritative Firebase Auth custom claim,
     // which is only assigned by the server (verified against the caller's
     // ID token). It can never be forged by creating a Firestore document.
@@ -198,8 +208,8 @@ service cloud.firestore {
       allow list: if isPartner();
       allow create: if isOwner(userId)
         && incomingData().userInfo.role == 'CUSTOMER';
-      allow update: if isCustomer() && isOwner(userId);
-      allow update: if isPartner() && resourceData().partnerUid == request.auth.uid;
+      allow update: if isCustomer() && isOwner(userId) && referralImmutable();
+      allow update: if isPartner() && resourceData().partnerUid == request.auth.uid && referralImmutable();
       allow delete: if false;
     }
 
