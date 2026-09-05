@@ -6,7 +6,6 @@ import Slider from "react-slick";
 import { ArrowDownIcon } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useFetchBannersQuery } from "@/rtk/api/firestoreApi";
 import type { HeroBanner as HeroBannerType } from "@ordersync/types";
 
 const AUTO_SCROLL_INTERVAL = 4000;
@@ -121,12 +120,9 @@ function HeroBannerSkeleton() {
   );
 }
 
-function HeroBanner() {
+function HeroBanner({ banners }: { banners: HeroBannerType[] }) {
   const locale = useLocale();
   const isRTL = locale === "ar";
-  const { data: banners, isLoading } = useFetchBannersQuery();
-
-  if (isLoading) return <HeroBannerSkeleton />;
 
   if (!banners || banners.length === 0) return <DefaultHero />;
 
@@ -167,4 +163,5 @@ function HeroBanner() {
   );
 }
 
+export { HeroBannerSkeleton };
 export default HeroBanner;

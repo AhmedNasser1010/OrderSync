@@ -16,10 +16,9 @@ const CATEGORY_IMAGES: Record<string, string> = {
   sandwich: "/images/dishes/sandwich-icon.webp",
 };
 
-function WhatsOnYourMind() {
+function WhatsOnYourMind({ restaurants }: { restaurants: RestaurantDocument[] }) {
   const dispatch = useAppDispatch();
   const t = useTranslations();
-  const restaurants = useAppSelector((state) => state.restaurants);
   const activeFilter = useAppSelector((state) => state.filter);
 
   const categories = useMemo(() => {

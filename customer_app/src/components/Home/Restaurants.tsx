@@ -12,11 +12,10 @@ import SectionHeader from "@/components/Home/SectionHeader";
 import { toCardInfo } from "@/components/Home/cardInfo";
 import type { RestaurantDocument } from "@/types/restaurant";
 
-function Restaurants() {
+function Restaurants({ restaurants }: { restaurants: RestaurantDocument[] }) {
   const t = useTranslations();
   const dispatch = useAppDispatch();
   const filter = useAppSelector((state) => state.filter);
-  const restaurants = useAppSelector((state) => state.restaurants);
 
   const filteredRestaurants = useMemo(() => {
     if (filter.length && restaurants.length) {

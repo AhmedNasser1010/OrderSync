@@ -1,8 +1,5 @@
-"use client";
-
-import { useAppSelector } from "@/rtk/hooks";
-import useRestaurants from "@/hooks/useRestaurants";
-import HeroBanner from "@/components/Home/HeroBanner";
+import { Suspense } from "react";
+import HeroBanner, { HeroBannerSkeleton } from "@/components/Home/HeroBanner";
 import ReorderSection from "@/components/Home/ReorderSection";
 import WhatsOnYourMind from "@/components/Home/WhatsOnYourMind";
 import PopularDishes from "@/components/Home/PopularDishes";
@@ -12,124 +9,104 @@ import {
 } from "@/utils/featureFlags";
 import Restaurants from "@/components/Home/Restaurants";
 import CtaStrip from "@/components/Home/CtaStrip";
+import HomeGreeting from "@/components/Home/HomeGreeting";
+import RestaurantsHydrator from "@/components/Home/RestaurantsHydrator";
 import {
   WhatsOnYourMindSkeleton,
   PopularDishesSkeleton,
   RestaurantsSkeleton,
 } from "@/components/Shimmer/HomeSkeletons";
-import { useTranslations } from "next-intl";
-import { useAppDispatch } from "@/rtk/hooks";
-import { toggleOrderSidebar } from "@/rtk/slices/toggleSlice";
-import { useAuthSession } from "@/hooks/useAuthSession";
-import { useSyncExternalStore } from "react";
-import { BikeIcon } from "lucide-react";
-import { IS_COMING_SOON } from "@/utils/comingSoon";
-import RestaurantSearch from "@/components/RestaurantSearch";
+import { getBanners } from "@/lib/server/banners";
+import { getBusinesses } from "@/lib/server/restaurants";
 
-const emptySubscribe = () => () => {};
+/**
+ * Rebuild the prerendered homepage (and re-fetch businesses) at most once
+ * every 60 seconds.
+ */
+export const revalidate = 60;
 
-function greetingKey(date: Date) {
-  const h = date.getHours();
-  if (h < 12) return "Good morning";
-  return "Good evening";
+
+/**
+ * The homepage is now a Server Component with one Suspense boundary per
+ * data-driven section. The shell (greeting, hero, CTA) renders immediately,
+ * and each section streams in as its own data resolves — instead of every
+ * section waiting for the slowest fetch before swapping skeletons at once.
+ *
+ * All sections share the same request-cached `getBusinesses()` read, so the
+ * three boundaries below resolve together (one Firestore read per request)
+ * while ReorderSection / menus keep loading on the client independently.
+ */
+
+async function WhatsOnYourMindSection() {
+  const restaurants = await getBusinesses();
+  if (restaurants.length === 0) return null;
+  return <WhatsOnYourMind restaurants={restaurants} />;
 }
 
-function HomeGreeting() {
-  const t = useTranslations();
-  const dispatch = useAppDispatch();
-  const greeting = greetingKey(new Date());
-  const { uid, isAuthenticated } = useAuthSession();
-  const mounted = useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false,
-  );
+async function PopularDishesSection() {
+  const restaurants = await getBusinesses();
+  if (restaurants.length === 0) return null;
+  return <PopularDishes restaurants={restaurants} />;
+}
 
-  const user = useAppSelector((state) => state.user);
+async function RestaurantsSection() {
+  const restaurants = await getBusinesses();
+  if (restaurants.length === 0) return null;
+  return <Restaurants restaurants={restaurants} />;
+}
 
-  const handleOrderTracking = () => {
-    dispatch(toggleOrderSidebar());
-    document.body.classList.add("overflow-hidden");
-  };
+/**
+ * Streams the banners server-side so the hero section no longer waits for a
+ * client-side RTK Query fetch after hydration. Banners resolve from a single
+ * collection query, so they appear as one unit — but immediately with the
+ * page stream rather than after a client fetch.
+ */
+async function HeroBannerSection() {
+  const banners = await getBanners();
+  return <HeroBanner banners={banners} />;
+}
 
-  return (
-    <>
-      {!IS_COMING_SOON && user?.trackedOrder?.id && (
-        <div className="px-4 pt-4 sm:px-10">
-          <button
-            type="button"
-            onClick={handleOrderTracking}
-            aria-label={t("Order Tracking")}
-            className="order-pulse mx-auto flex items-center gap-2 rounded-full bg-color-11/10 px-4 py-2.5 text-sm font-ProximaNovaSemiBold text-color-11 transition-colors hover:bg-color-11/20 focus-visible:ring-2 focus-visible:ring-color-11/50 outline-none cursor-pointer"
-          >
-            <span className="relative flex size-2">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-color-11 opacity-75" />
-              <span className="relative inline-flex size-2 rounded-full bg-color-11" />
-            </span>
-            <BikeIcon className="size-4" />
-            <span>{t("Order Track")}</span>
-          </button>
-        </div>
-      )}
-
-      <div className="px-4 pt-6 text-center sm:px-10">
-        <p className="text-sm font-ProximaNovaSemiBold text-color-2">
-          {t(greeting)}
-        </p>
-        <h1 className="mt-1 font-GrotBlack text-2xl tracking-tight text-color-1 sm:text-3xl">
-          {t("Home greeting title")
-            .split(/(Zajil|زاجل)/)
-            .map((part, i) =>
-              part === "Zajil" || part === "زاجل" ? (
-                <span key={i} className="text-color-2">
-                  {part}
-                </span>
-              ) : (
-                part
-              ),
-            )}
-        </h1>
-        <p className="mt-2 font-ProximaNovaBold text-lg text-color-5">
-          {t("Home greeting subtitle")}
-        </p>
-      </div>
-
-      <div className="px-4 pt-5 sm:px-10">
-        <RestaurantSearch />
-      </div>
-    </>
-  );
+/**
+ * Hydrates the Redux `restaurants` slice from the same server data so
+ * client-only consumers (RestaurantSearch, OrderSidebar, ReorderSection)
+ * keep working without a duplicate client-side Firestore fetch.
+ */
+async function RestaurantsHydrationSection() {
+  const restaurants = await getBusinesses();
+  return <RestaurantsHydrator restaurants={restaurants} />;
 }
 
 export default function HomePage() {
-  const { isLoading } = useRestaurants();
-
-  const restaurants = useAppSelector((state) => state.restaurants);
-
   return (
-    <>
-      <div className="container mx-auto overflow-x-clip px-0 pb-24 sm:px-10">
-        <HomeGreeting />
+    <div className="container mx-auto overflow-x-clip px-0 pb-24 sm:px-10">
+      <HomeGreeting />
 
-        {isLoading ? <WhatsOnYourMindSkeleton /> : <WhatsOnYourMind />}
+      <Suspense fallback={<WhatsOnYourMindSkeleton />}>
+        <WhatsOnYourMindSection />
+      </Suspense>
 
-        <div className="px-4 sm:px-0">
-          <HeroBanner />
-          {IS_REORDER_ENABLED && <ReorderSection />}
+      <div className="px-4 sm:px-0">
+        <Suspense fallback={<HeroBannerSkeleton />}>
+          <HeroBannerSection />
+        </Suspense>
+        {IS_REORDER_ENABLED && <ReorderSection />}
 
-          {IS_POPULAR_DISHES_ENABLED &&
-            (isLoading ? (
-              <PopularDishesSkeleton />
-            ) : (
-              <PopularDishes restaurants={restaurants} />
-            ))}
+        {IS_POPULAR_DISHES_ENABLED && (
+          <Suspense fallback={<PopularDishesSkeleton />}>
+            <PopularDishesSection />
+          </Suspense>
+        )}
 
-          {isLoading ? <RestaurantsSkeleton /> : <Restaurants />}
+        <Suspense fallback={<RestaurantsSkeleton />}>
+          <RestaurantsSection />
+        </Suspense>
 
-          <CtaStrip />
-        </div>
+        <CtaStrip />
       </div>
 
-    </>
+      <Suspense fallback={null}>
+        <RestaurantsHydrationSection />
+      </Suspense>
+    </div>
   );
 }
