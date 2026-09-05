@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "زاجل | Zajel",
+    name: "زاجل | Zajil",
     short_name: "زاجل",
     description:
       "اطلب أكل لذيذ أونلاين من مطاعمك المحلية المفضلة مع زاجل. توصيل أكل سريع وموثوق لحد بابك.",
