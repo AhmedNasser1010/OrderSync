@@ -16,6 +16,7 @@ import {
   Utensils,
   Inbox,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -101,9 +102,13 @@ export function AppSidebar() {
             className="flex min-w-0 items-center gap-2"
             aria-label="OrderSync home"
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/60 text-sm font-bold text-primary-foreground group-data-[collapsible=icon]:size-6 group-data-[collapsible=icon]:rounded-md">
-              O
-            </div>
+            <Image
+              src="/icons/icon-192.png"
+              alt="OrderSync"
+              width={32}
+              height={32}
+              className="h-8 w-8 shrink-0 rounded-lg group-data-[collapsible=icon]:size-6 group-data-[collapsible=icon]:rounded-md"
+            />
             <span className="truncate font-semibold text-sidebar-foreground group-data-[collapsible=icon]:hidden">
               OrderSync
             </span>

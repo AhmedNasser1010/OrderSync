@@ -13,23 +13,23 @@ export default function manifest(): MetadataRoute.Manifest {
     categories: ["business", "productivity"],
     icons: [
       {
-        src: "/icons/icon-192.png",
+src: "/icons/icon-192-v2.png",
         sizes: "192x192",
         type: "image/png",
       },
       {
-        src: "/icons/icon-512.png",
+        src: "/icons/icon-512-v2.png",
         sizes: "512x512",
         type: "image/png",
       },
       {
-        src: "/icons/icon-maskable-192.png",
+        src: "/icons/icon-maskable-192-v2.png",
         sizes: "192x192",
         type: "image/png",
         purpose: "maskable",
       },
       {
-        src: "/icons/icon-maskable-512.png",
+        src: "/icons/icon-maskable-512-v2.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",
@@ -41,13 +41,13 @@ export default function manifest(): MetadataRoute.Manifest {
         name: "Today's Orders",
         short_name: "Today",
         url: "/en/main/today",
-        icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }],
+        icons: [{ src: "/icons/icon-192-v2.png", sizes: "192x192" }],
       },
       {
         name: "Settings",
         short_name: "Settings",
         url: "/en/main/settings",
-        icons: [{ src: "/icons/icon-192.png", sizes: "192x192" }],
+        icons: [{ src: "/icons/icon-192-v2.png", sizes: "192x192" }],
       },
     ],
   };
