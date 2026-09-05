@@ -26,8 +26,12 @@ test.describe("Guest guards", () => {
     await expect(placeOrder).toBeVisible({ timeout: 60_000 });
     await placeOrder.click();
 
-    await expect(
-      page.getByRole("button", { name: "Login With Google" })
-    ).toBeVisible();
+    const loginCta = page.getByRole("button", {
+      name: "Login to Continue",
+    });
+    await expect(loginCta).toBeVisible();
+
+    await loginCta.click();
+    await page.waitForURL(/\/en\/signin$/);
   });
 });

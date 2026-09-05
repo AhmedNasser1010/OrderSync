@@ -10,6 +10,7 @@ import {
   setShowRestaurantUnavailablePopup,
   setShowOutOfRangePopup,
   setShowOrderPlacementErrorDialog,
+  setShowLoginPromptPopup,
   setShowOrderPlacementLoading,
   setShowOrderPlacementSuccess,
 } from "@/rtk/slices/toggleSlice";
@@ -109,7 +110,7 @@ const usePlace = () => {
 
   const checkIfUserIsLoggedIn = () => {
     if (isAuthenticated) return true;
-    showError("loginAndUpdateContactFirst");
+    dispatch(setShowLoginPromptPopup(true));
     return false;
   };
 

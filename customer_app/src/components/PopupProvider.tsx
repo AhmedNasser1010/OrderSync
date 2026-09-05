@@ -7,6 +7,7 @@ import OutOfDeliveryRangePopup from "@/components/popup_components/OutOfDelivery
 import OrderPlacementErrorDialog from "@/components/popup_components/OrderPlacementErrorDialog";
 import OrderSuccessCelebration from "@/components/popup_components/OrderSuccessCelebration";
 import ProfileIncompletePopup from "@/components/popup_components/ProfileIncompletePopup";
+import LoginPromptDialog from "@/components/popup_components/LoginPromptDialog";
 
 function PopupProvider({ children }: { children: React.ReactNode }) {
   return (
@@ -18,6 +19,7 @@ function PopupProvider({ children }: { children: React.ReactNode }) {
       <OrderPlacementErrorDialog />
       <OrderSuccessCelebration />
       <ProfileIncompletePopup />
+      <LoginPromptDialog />
       {children}
     </>
   );

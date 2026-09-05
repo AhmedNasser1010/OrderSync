@@ -13,6 +13,7 @@ export interface ToggleState {
   showOutOfRangePopup: boolean;
   showProfileIncompletePopup: boolean;
   showOrderPlacementErrorDialog: boolean;
+  showLoginPromptPopup: boolean;
   showOrderPlacementLoading: boolean;
   showOrderPlacementSuccess: boolean;
   rateIsOpen: boolean;
@@ -40,6 +41,7 @@ const initialState: ToggleState = {
   showOutOfRangePopup: false,
   showProfileIncompletePopup: false,
   showOrderPlacementErrorDialog: false,
+  showLoginPromptPopup: false,
   showOrderPlacementLoading: false,
   showOrderPlacementSuccess: false,
   rateIsOpen: false,
@@ -105,6 +107,10 @@ const toggleSlice = createSlice({
           ? !state.showOrderPlacementErrorDialog
           : payload;
     },
+    setShowLoginPromptPopup: (state, { payload }) => {
+      state.showLoginPromptPopup =
+        payload === undefined ? !state.showLoginPromptPopup : payload;
+    },
     setShowOrderPlacementLoading: (state, { payload }) => {
       state.showOrderPlacementLoading =
         payload === undefined ? !state.showOrderPlacementLoading : payload;
@@ -122,6 +128,7 @@ const toggleSlice = createSlice({
       state.showOutOfRangePopup = false;
       state.showProfileIncompletePopup = false;
       state.showOrderPlacementErrorDialog = false;
+      state.showLoginPromptPopup = false;
       state.showOrderPlacementLoading = false;
       state.showOrderPlacementSuccess = false;
     },
@@ -187,6 +194,7 @@ export const {
   setShowOutOfRangePopup,
   setShowProfileIncompletePopup,
   setShowOrderPlacementErrorDialog,
+  setShowLoginPromptPopup,
   setShowOrderPlacementLoading,
   setShowOrderPlacementSuccess,
   resetPopupStates,
