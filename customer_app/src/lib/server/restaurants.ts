@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { getFirestore } from "firebase-admin/firestore";
 import { initAdmin } from "@/lib/firebase-admin";
+import { isMarketplaceRestaurant } from "@/lib/marketplaceRestaurant";
 import type { BusinessDocument } from "@ordersync/types";
 
 /**
@@ -19,9 +20,10 @@ export const getBusinesses = cache(
       const app = await initAdmin();
       const db = getFirestore(app);
       const snapshot = await db.collection("businesses").get();
-      return snapshot.docs.map((doc) =>
+      const businesses = snapshot.docs.map((doc) =>
         JSON.parse(JSON.stringify({ id: doc.id, ...doc.data() }))
       ) as BusinessDocument[];
+      return businesses.filter(isMarketplaceRestaurant);
     } catch (error) {
       console.error("[getBusinesses] Failed to fetch businesses:", error);
       return [];
