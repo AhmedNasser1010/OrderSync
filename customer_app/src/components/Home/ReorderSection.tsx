@@ -14,6 +14,7 @@ import {
 } from "@/rtk/slices/cartSlice";
 import { useFetchLastOrderQuery, useFetchMenuDataQuery } from "@/rtk/api/firestoreApi";
 import { validateReorder } from "@/lib/reorder";
+import { ReorderSkeleton } from "@/components/Shimmer/HomeSkeletons";
 import type { MainMenuType, OrderType, ItemType } from "@ordersync/types";
 import type { RestaurantDocument } from "@/types/restaurant";
 
@@ -90,7 +91,8 @@ function ReorderSection() {
     router.push("/cart");
   };
 
-  if (!user?.uid || isLoading) return null;
+  if (!user?.uid) return null;
+  if (isLoading) return <ReorderSkeleton />;
   if (!lastOrder || !(lastOrder as Partial<OrderType>).id) return null;
 
   const hintKey = hasTrackedOrder

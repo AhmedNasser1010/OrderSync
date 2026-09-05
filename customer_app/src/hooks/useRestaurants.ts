@@ -8,13 +8,15 @@ import type { BusinessDocument } from "@ordersync/types";
 
 const useRestaurants = () => {
   const dispatch = useAppDispatch();
-  const { data } = useFetchBusinessesQuery();
+  const { data, isLoading, isFetching } = useFetchBusinessesQuery();
 
   useEffect(() => {
     if (Array.isArray(data) && data.length) {
       dispatch(initRestaurants(data as BusinessDocument[]));
     }
   }, [data, dispatch]);
+
+  return { isLoading, isFetching };
 };
 
 export default useRestaurants;

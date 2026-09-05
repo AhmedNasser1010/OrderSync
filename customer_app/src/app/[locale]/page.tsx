@@ -2,7 +2,6 @@
 
 import { useAppSelector } from "@/rtk/hooks";
 import useRestaurants from "@/hooks/useRestaurants";
-import ShimmerHome from "@/components/Shimmer/ShimmerHome";
 import HeroBanner from "@/components/Home/HeroBanner";
 import ReorderSection from "@/components/Home/ReorderSection";
 import WhatsOnYourMind from "@/components/Home/WhatsOnYourMind";
@@ -13,6 +12,11 @@ import {
 } from "@/utils/featureFlags";
 import Restaurants from "@/components/Home/Restaurants";
 import CtaStrip from "@/components/Home/CtaStrip";
+import {
+  WhatsOnYourMindSkeleton,
+  PopularDishesSkeleton,
+  RestaurantsSkeleton,
+} from "@/components/Shimmer/HomeSkeletons";
 import { useTranslations } from "next-intl";
 import { useAppDispatch } from "@/rtk/hooks";
 import { toggleOrderSidebar } from "@/rtk/slices/toggleSlice";
@@ -98,28 +102,29 @@ function HomeGreeting() {
 }
 
 export default function HomePage() {
-  useRestaurants();
+  const { isLoading } = useRestaurants();
 
   const restaurants = useAppSelector((state) => state.restaurants);
-
-  if (restaurants.length <= 0) return <ShimmerHome />;
 
   return (
     <>
       <div className="container mx-auto overflow-x-clip px-0 pb-24 sm:px-10">
         <HomeGreeting />
 
-        <WhatsOnYourMind />
+        {isLoading ? <WhatsOnYourMindSkeleton /> : <WhatsOnYourMind />}
 
         <div className="px-4 sm:px-0">
           <HeroBanner />
           {IS_REORDER_ENABLED && <ReorderSection />}
 
-          {IS_POPULAR_DISHES_ENABLED && (
-            <PopularDishes restaurants={restaurants} />
-          )}
+          {IS_POPULAR_DISHES_ENABLED &&
+            (isLoading ? (
+              <PopularDishesSkeleton />
+            ) : (
+              <PopularDishes restaurants={restaurants} />
+            ))}
 
-          <Restaurants />
+          {isLoading ? <RestaurantsSkeleton /> : <Restaurants />}
 
           <CtaStrip />
         </div>
