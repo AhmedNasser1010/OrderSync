@@ -132,7 +132,8 @@
   "ProfileIncompleteBody": "Add a few details so we can deliver your orders to the right place without any hiccups.",
   "ProfileIncompleteHint": "You are just one step away.",
   "ProfileIncompleteDismiss": "Maybe later",
-  "SignInDisclaimers": "By continuing you agree to our Terms of Service and Privacy Policy.",
+  "SignInDisclaimersBefore": "By continuing you agree to our",
+  "SignInDisclaimersAfter": "and",
   "Merro": "Merro",
   "min": "min",
   "Name": "Name",
@@ -373,5 +374,9 @@
   "referralShareTitle": "Join Zajil",
   "referralShareMessage": "Order from Zajil and enjoy cashback credits! Use my link:",
   "liveTrackingDisabledTitle": "Live tracking unavailable",
-  "liveTrackingDisabledMessage": "We're sorry, live order tracking is not available for this restaurant at the moment."
+  "liveTrackingDisabledMessage": "We're sorry, live order tracking is not available for this restaurant at the moment.",
+  "TermsAndPrivacy": "Terms & Privacy",
+  "TermsAndPrivacySubtitle": "Read about the terms governing your use and how we handle your data",
+  "TermsConditions": "Terms & Conditions",
+  "PrivacyPolicy": "Privacy Policy"
 }

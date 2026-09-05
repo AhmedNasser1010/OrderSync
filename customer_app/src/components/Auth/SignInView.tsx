@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
+import { Link } from "@/i18n/navigation";
 import { GoogleSignInButton } from "@/components/Auth/GoogleSignInButton";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { LOGO_URL } from "@/utils/constants";
@@ -66,7 +67,21 @@ export function SignInView() {
         </div>
 
         <p className="mt-6 text-center text-[11px] font-ProximaNovaThin text-color-5">
-          {t("SignInDisclaimers")}
+          {t("SignInDisclaimersBefore")}{" "}
+          <Link
+            href="/terms-and-privacy"
+            className="underline underline-offset-2 text-color-2 hover:text-color-2/80 transition-colors"
+          >
+            {t("TermsConditions")}
+          </Link>{" "}
+          {t("SignInDisclaimersAfter")}{" "}
+          <Link
+            href="/terms-and-privacy#privacy"
+            className="underline underline-offset-2 text-color-2 hover:text-color-2/80 transition-colors"
+          >
+            {t("PrivacyPolicy")}
+          </Link>
+          .
         </p>
       </div>
     </section>

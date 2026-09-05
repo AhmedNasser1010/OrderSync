@@ -14,7 +14,7 @@ import DeliveryLocation from "@/components/DeliveryLocation";
 
 const emptySubscribe = () => () => {};
 
-const KNOWN_ROUTES = ["cart", "wallet", "checkout", "signin", "onboarding"];
+const KNOWN_ROUTES = ["cart", "wallet", "checkout", "signin", "onboarding", "terms-and-privacy"];
 
 function HomeHeader() {
   const t = useTranslations();

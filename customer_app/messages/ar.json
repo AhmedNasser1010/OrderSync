@@ -132,7 +132,8 @@
   "ProfileIncompleteBody": "أضف بضعة بيانات حتى نتمكن من توصيل طلباتك إلى المكان الصحيح دون أي مشاكل.",
   "ProfileIncompleteHint": "أنت على بُعد خطوة واحدة فقط.",
   "ProfileIncompleteDismiss": "لاحقاً",
-  "SignInDisclaimers": "بالمتابعة فإنك توافق على شروط الخدمة وسياسة الخصوصية.",
+  "SignInDisclaimersBefore": "بالمتابعة فإنك توافق على",
+  "SignInDisclaimersAfter": "و",
   "Merro": "ميرو",
   "min": "دقيقة",
   "Name": "الاسم",
@@ -373,5 +374,9 @@
   "referralShareTitle": "انضم لزاجل",
   "referralShareMessage": "اطلب من زاجل واكسب رصيد كاش باك! استخدم رابطي:",
   "liveTrackingDisabledTitle": "تتبع مباشر غير متاح",
-  "liveTrackingDisabledMessage": "نعتذر، التتبع المباشر للطلب غير متاح لهذا المطعم في الوقت الحالي."
+  "liveTrackingDisabledMessage": "نعتذر، التتبع المباشر للطلب غير متاح لهذا المطعم في الوقت الحالي.",
+  "TermsAndPrivacy": "الشروط والخصوصية",
+  "TermsAndPrivacySubtitle": "اقرأ عن الشروط التي تحكم استخدامك وكيفية تعاملنا مع بياناتك",
+  "TermsConditions": "الشروط والأحكام",
+  "PrivacyPolicy": "سياسة الخصوصية"
 }

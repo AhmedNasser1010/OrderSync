@@ -291,6 +291,25 @@ function MobileDrawer() {
         </div>
 
         <div className="border-t border-color-7 px-5 py-4">
+          <p className="mb-4 text-center text-[11px] font-ProximaNovaThin text-color-5">
+            {t("SignInDisclaimersBefore")}{" "}
+            <Link
+              href="/terms-and-privacy"
+              onClick={close}
+              className="underline underline-offset-2 text-color-2 hover:text-color-2/80 transition-colors"
+            >
+              {t("TermsConditions")}
+            </Link>{" "}
+            {t("SignInDisclaimersAfter")}{" "}
+            <Link
+              href="/terms-and-privacy#privacy"
+              onClick={close}
+              className="underline underline-offset-2 text-color-2 hover:text-color-2/80 transition-colors"
+            >
+              {t("PrivacyPolicy")}
+            </Link>
+            .
+          </p>
           {isAuthenticated &&
             (!confirmLogout ? (
               <button
