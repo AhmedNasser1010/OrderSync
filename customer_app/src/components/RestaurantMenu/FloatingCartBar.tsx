@@ -5,7 +5,12 @@ import { ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useAppSelector } from "@/rtk/hooks";
-import { applyOrderDiscounts, calculateDiscountAmount, priceAfterDiscount, resolveItemDiscount } from "@ordersync/order-utils";
+import {
+  applyOrderDiscounts,
+  calculateDiscountAmount,
+  priceAfterDiscount,
+  resolveItemDiscount,
+} from "@ordersync/order-utils";
 
 const FloatingCartBar = ({ resID }: { resID: string }) => {
   const t = useTranslations();
@@ -13,7 +18,9 @@ const FloatingCartBar = ({ resID }: { resID: string }) => {
   const cartRestaurantID = useAppSelector((state) => state.cart.restaurant);
   const menuItems = useAppSelector((state) => state.menu.items);
   const categories = useAppSelector((state) => state.menu.categories);
-  const orderDiscounts = useAppSelector((state) => state.menu.orderDiscounts || []);
+  const orderDiscounts = useAppSelector(
+    (state) => state.menu.orderDiscounts || [],
+  );
   const user = useAppSelector((state) => state.user);
 
   const isVisible = cartItems.length > 0 && cartRestaurantID === resID;
@@ -47,10 +54,12 @@ const FloatingCartBar = ({ resID }: { resID: string }) => {
         const discountIncluded = isAvailableForUser && price !== finalPrice;
         return {
           total: acc.total + price * item.quantity,
-          discount: acc.discount + (discountIncluded ? finalPrice : price) * item.quantity,
+          discount:
+            acc.discount +
+            (discountIncluded ? finalPrice : price) * item.quantity,
         };
       },
-      { total: 0, discount: 0 }
+      { total: 0, discount: 0 },
     );
 
     if (orderDiscounts?.length) {
@@ -58,27 +67,35 @@ const FloatingCartBar = ({ resID }: { resID: string }) => {
         selectedItems,
         orderDiscounts,
         user,
-        resID
+        resID,
       );
       const autoOrderDiscount = eligible[0] || null;
       if (autoOrderDiscount && result.total > 0) {
         const orderDiscountAmount = calculateDiscountAmount(
           result.discount,
-          autoOrderDiscount
+          autoOrderDiscount,
         );
         result.discount = Math.max(0, result.discount - orderDiscountAmount);
       }
     }
 
     return Math.round(result.discount * 100) / 100;
-  }, [cartItems, isVisible, menuItems, categories, orderDiscounts, user, resID]);
+  }, [
+    cartItems,
+    isVisible,
+    menuItems,
+    categories,
+    orderDiscounts,
+    user,
+    resID,
+  ]);
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-22 inset-x-0 z-40 px-4">
+    <div className="fixed bottom-22 lg:bottom-4 inset-x-0 z-40 px-4">
       <Link
         href="/cart"
         className="mx-auto flex w-full max-w-xl items-center justify-between gap-4 rounded-full bg-[#282c3f] py-3 pe-3 ps-5 text-white shadow-2xl shadow-black/40 transition-transform hover:scale-[1.02]"
@@ -91,8 +108,12 @@ const FloatingCartBar = ({ resID }: { resID: string }) => {
             </span>
           </span>
           <span className="flex flex-col">
-            <span className="font-ProximaNovaSemiBold text-sm">{totalItems} {t("Items")}</span>
-            <span className="egp font-ProximaNovaMed text-sm text-white/70">{subtotal}</span>
+            <span className="font-ProximaNovaSemiBold text-sm">
+              {totalItems} {t("Items")}
+            </span>
+            <span className="egp font-ProximaNovaMed text-sm text-white/70">
+              {subtotal}
+            </span>
           </span>
         </span>
         <span className="flex items-center gap-1 rounded-full bg-color-2 px-5 py-2 font-ProximaNovaSemiBold text-sm text-white">
