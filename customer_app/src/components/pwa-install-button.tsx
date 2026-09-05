@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
@@ -21,12 +21,9 @@ import {
   PopupDescription,
 } from "@/components/ui/custom/Popup";
 import { LOGO_URL } from "@/utils/constants";
+import { IS_COMING_SOON } from "@/utils/comingSoon";
+import { usePwaInstall } from "@/hooks/usePwaInstall";
 import type { RootState } from "@/rtk/store";
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-}
 
 const DISMISS_KEY = "pwa-install-dismissed";
 const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -68,21 +65,13 @@ export function PwaInstallButton() {
     segments.length === 2 && !KNOWN_ROUTES.includes(currentPage);
 
   const isHidden =
-    isRestaurantMenu || isOrderSidebarOpen || HIDDEN_ROUTES.includes(currentPage);
+    isRestaurantMenu ||
+    isOrderSidebarOpen ||
+    HIDDEN_ROUTES.includes(currentPage) ||
+    IS_COMING_SOON;
 
-  const checkIfInstalled = useCallback(() => {
-    if (typeof window === "undefined") return false;
-    return (
-      window.matchMedia("(display-mode: standalone)").matches ||
-      ("standalone" in window.navigator &&
-        (window.navigator as { standalone?: boolean }).standalone === true)
-    );
-  }, []);
-
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
+  const { canInstall, promptInstall } = usePwaInstall();
   const [showSheet, setShowSheet] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(() => checkIfInstalled());
 
   const isDismissed = useCallback(() => {
     if (typeof window === "undefined") return false;
@@ -92,49 +81,17 @@ export function PwaInstallButton() {
     return Date.now() - dismissedTime < DISMISS_DURATION;
   }, []);
 
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-    };
-
-    const handleAppInstalled = () => {
-      setIsInstalled(true);
-      setDeferredPrompt(null);
-    };
-
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    window.addEventListener("appinstalled", handleAppInstalled);
-
-    return () => {
-      window.removeEventListener(
-        "beforeinstallprompt",
-        handleBeforeInstallPrompt
-      );
-      window.removeEventListener("appinstalled", handleAppInstalled);
-    };
-  }, []);
-
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
-
-    await deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-
-    if (outcome === "accepted") {
-      setIsInstalled(true);
-    }
-    setDeferredPrompt(null);
     setShowSheet(false);
+    await promptInstall();
   };
 
   const handleDismiss = () => {
     localStorage.setItem(DISMISS_KEY, Date.now().toString());
     setShowSheet(false);
-    setDeferredPrompt(null);
   };
 
-  if (isHidden || isInstalled || !deferredPrompt || isDismissed()) {
+  if (isHidden || !canInstall || isDismissed()) {
     return null;
   }
 

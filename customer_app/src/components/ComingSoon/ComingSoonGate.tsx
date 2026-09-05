@@ -21,6 +21,8 @@ import {
   PopupDescription,
 } from "@/components/ui/custom/Popup";
 import { IS_COMING_SOON, isComingSoonExemptPath } from "@/utils/comingSoon";
+import { usePwaInstall } from "@/hooks/usePwaInstall";
+import { DownloadIcon } from "lucide-react";
 import { LOGO_URL } from "@/utils/constants";
 
 function ComingSoonGate() {
@@ -29,6 +31,7 @@ function ComingSoonGate() {
   const pathname = usePathname();
   const isMenuOpen = useAppSelector((state) => state.toggle.isMenuOpen);
   const { isAuthenticated } = useAuthSession();
+  const { canInstall, promptInstall } = usePwaInstall();
 
   useEffect(() => {
     if (IS_COMING_SOON && pathname !== "/" && !isComingSoonExemptPath(pathname)) {
@@ -126,6 +129,18 @@ function ComingSoonGate() {
               <CircleCheckBigIcon className="size-4" />
               {t("thanksForSigningIn")}
             </div>
+          )}
+
+          {canInstall && (
+            <button
+              type="button"
+              onClick={() => promptInstall()}
+              className="flex w-full cursor-pointer animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards items-center justify-center gap-2 rounded-2xl border border-color-2/40 bg-color-2/10 py-3 font-ProximaNovaSemiBold text-color-2 transition-all hover:bg-color-2/20 focus-visible:ring-2 focus-visible:ring-color-2/50 outline-none"
+              style={{ animationDelay: "400ms" }}
+            >
+              <DownloadIcon className="size-4" />
+              {t("Install the app")}
+            </button>
           )}
         </div>
       </PopupContent>
