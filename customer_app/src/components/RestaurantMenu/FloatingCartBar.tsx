@@ -78,7 +78,7 @@ const FloatingCartBar = ({ resID }: { resID: string }) => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-5 inset-x-0 z-40 px-4">
+    <div className="fixed bottom-22 inset-x-0 z-40 px-4">
       <Link
         href="/cart"
         className="mx-auto flex w-full max-w-xl items-center justify-between gap-4 rounded-full bg-[#282c3f] py-3 pe-3 ps-5 text-white shadow-2xl shadow-black/40 transition-transform hover:scale-[1.02]"
