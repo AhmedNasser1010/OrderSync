@@ -5,6 +5,7 @@ import StoreProvider from "./StoreProvider";
 import { AuthBootstrap } from "@/components/AuthBootstrap";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SerwistProvider } from "./serwist";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 
 const CairoFont = Cairo({
   subsets: ["arabic", "latin"],
@@ -66,6 +67,7 @@ export default function RootLayout({
       <body
         className={`${CairoFont.variable} ${AlexandriaFont.variable} min-h-full flex flex-col`}
       >
+        <GoogleAnalytics />
         {process.env.NODE_ENV !== "production" && (
           <script
             dangerouslySetInnerHTML={{
